@@ -8,19 +8,39 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--no-audit --no-fund"
+  NEXT_PUBLIC_USE_TEXT_LOGO = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_DEMO_ACCOUNTS = "true"
+
+# Production deploys (Netlify testing)
+[context.production.environment]
+  NEXT_PUBLIC_USE_TEXT_LOGO = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_DEMO_ACCOUNTS = "true"
 
 # QA on deploy previews and branch deploys
 [context.deploy-preview.environment]
   ENABLE_DEMO_ACCOUNTS = "true"
   NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
-  ENABLE_POINTS_OVERRIDE = "true"
+  NEXT_PUBLIC_USE_TEXT_LOGO = "true"
 
 [context.branch-deploy.environment]
   ENABLE_DEMO_ACCOUNTS = "true"
   NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
-  ENABLE_POINTS_OVERRIDE = "true"
+  NEXT_PUBLIC_USE_TEXT_LOGO = "true"
 
 [dev]
   command = "npm run dev"
   targetPort = 3000
   autoLaunch = false
+
+# Cache immutable Next.js build assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

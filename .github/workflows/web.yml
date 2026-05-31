@@ -35,4 +35,4 @@ jobs:
         env:
           ENABLE_DEMO_ACCOUNTS: "true"
           NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS: "true"
-          ENABLE_POINTS_OVERRIDE: "true"
+          NEXT_PUBLIC_USE_TEXT_LOGO: "true"
