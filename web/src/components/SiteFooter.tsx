@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { getSessionAccount } from "@/lib/auth";
 import { appContentClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 const COPYRIGHT_YEAR = new Date().getFullYear();
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const account = await getSessionAccount();
+
   return (
     <footer className="safe-bottom mt-auto shrink-0 border-t border-zinc-200 bg-white">
       <div className={`${appContentClass} px-4 py-6 sm:px-6 sm:py-8`}>
@@ -25,9 +28,11 @@ export function SiteFooter() {
             <Link href="/data-use-policy" className="transition hover:text-teal-950 hover:underline">
               {formatHeadingCase("Data use policy")}
             </Link>
-            <Link href="/account/delete" className="transition hover:text-teal-950 hover:underline">
-              {formatHeadingCase("Delete account")}
-            </Link>
+            {account ? (
+              <Link href="/account/delete" className="transition hover:text-teal-950 hover:underline">
+                {formatHeadingCase("Delete account")}
+              </Link>
+            ) : null}
           </nav>
         </div>
         <p className="mt-4 max-w-3xl text-xs leading-relaxed text-zinc-500">
