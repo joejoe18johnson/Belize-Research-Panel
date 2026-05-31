@@ -1,8 +1,10 @@
-# Monorepo pointer — app config is in web/netlify.toml
-# Netlify UI: Base directory = web  OR  Package directory = web (with base at repo root)
+# Next.js on Netlify — config lives beside package.json (Package directory: web)
+# https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
+#
+# Netlify UI: leave Publish directory BLANK (plugin manages output).
+# Set Package directory to "web" if Base directory is repo root.
 
 [build]
-  base = "web"
   command = "npm run build:netlify"
 
 [[plugins]]
