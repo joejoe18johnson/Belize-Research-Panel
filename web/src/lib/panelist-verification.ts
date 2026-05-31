@@ -12,6 +12,7 @@ export interface VerificationItem {
   label: string;
   description: string;
   valueOnFile: string;
+  valueLabel?: string;
   status: VerificationItemStatus;
   statusLabel: string;
   essential: boolean;
@@ -90,14 +91,15 @@ export async function buildVerificationCenterSummary(
       id: "photo_id",
       label: formatHeadingCase("Photo identification"),
       description: formatHeadingCase(
-        "Government-issued photo ID submitted during registration to confirm your identity and eligibility."
+        "We use government-issued photo ID submitted during registration solely to confirm your identity and eligibility. We do not keep or store ID documents in our files."
       ),
+      valueLabel: formatHeadingCase("Submitted"),
       valueOnFile: photoOnFile
         ? authorisedRegistration
-          ? formatHeadingCase("Authorised registration — photo ID review in progress")
+          ? formatHeadingCase("Authorised registration — ID review in progress; documents are not stored in our files")
           : hasPhotoUpload
-            ? `${photoIdType} — ${formatHeadingCase("document uploaded")}`
-            : photoIdType
+            ? `${photoIdType} — ${formatHeadingCase("used for verification only; not stored in our files")}`
+            : `${photoIdType} — ${formatHeadingCase("type declared; document not stored in our files")}`
         : formatHeadingCase("Not provided"),
       status: isVerified ? "verified" : itemStatusWhenAccountPending(photoOnFile),
       statusLabel: "",

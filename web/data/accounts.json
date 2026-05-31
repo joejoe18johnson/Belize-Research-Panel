@@ -93,5 +93,23 @@
     "password_hash": "7627d44973506948359b8bbbba0be4ce7d0696398f90058dc190eb8219ecdbf1",
     "verification_sent_at": "2026-01-01T00:00:00.000Z",
     "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "44444444-4444-4444-4444-444444444444",
+    "first_name": "Glen",
+    "last_name": "Avilez",
+    "email": "glen.avilez@belizepanel.test",
+    "password_salt": "demo-salt-glen01",
+    "password_hash": "69ad7ef6365972e1e0faea06dfd68af986aec29b44aa9c95502ccd2ea25c840d",
+    "email_verified": "true",
+    "verification_token": "",
+    "verification_sent_at": "2026-05-31T12:00:00.000Z",
+    "created_at": "2026-05-31T12:00:00.000Z",
+    "panelist_registered": "true",
+    "citizenship_status": "Citizen of Belize",
+    "commonwealth_country": "",
+    "dob": "1982-04-10",
+    "account_status": "active",
+    "hold_reason": ""
   }
 ]

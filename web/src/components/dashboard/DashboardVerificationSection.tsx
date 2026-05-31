@@ -113,7 +113,9 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
                   </div>
                   <p className="mt-1 text-sm leading-relaxed text-zinc-600">{item.description}</p>
                   <p className="mt-3 text-sm">
-                    <span className="font-medium text-zinc-800">{formatHeadingCase("On file")}: </span>
+                    <span className="font-medium text-zinc-800">
+                      {item.valueLabel ?? formatHeadingCase("On file")}:{" "}
+                    </span>
                     <span className="text-zinc-700">{item.valueOnFile}</span>
                   </p>
                   {item.status === "pending_approval" ? (

@@ -725,7 +725,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 <FileInput accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("photoIdFile", file); touch("photoIdFile"); validateField("photoIdFile"); }} error={fieldError("photoIdFile")} optional={form.registrationMode === "Registration by authorised person"} />
               </Field>
             </FieldGroup>
-            <Alert variant="info">Photo identification is used only for identity and eligibility verification. ID numbers may be blurred or covered before upload, as long as the registrant&apos;s name, photograph, and eligibility details remain visible.</Alert>
+            <Alert variant="info">Photo identification is used only to verify your identity and eligibility. We do not keep or store ID images or copies in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.</Alert>
             {form.registrationMode === "Registration by authorised person" ? (
               <>
                 <p className="text-sm text-zinc-600">Authorised registration mode allows photo upload to be bypassed when an authorised verification or QR process has been used.</p>
