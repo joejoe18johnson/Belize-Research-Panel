@@ -7,6 +7,8 @@ import {
 } from "./panelist-dashboard";
 import { getPanelistSurveys } from "./panelist-surveys";
 import { loadRedemptionRequests } from "./redemption-requests";
+import { loadRewardBalanceSeed } from "./panelist-reward-balances";
+import { getReservedPoints } from "./reward-redemption";
 import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "panelist-points-overrides.json");
@@ -68,6 +70,20 @@ export async function setPointsOverride(email: string, points: number | null): P
   return normalized;
 }
 
+function sumFulfilledRedemptionPoints(
+  requests: Awaited<ReturnType<typeof loadRedemptionRequests>>
+): number {
+  return requests
+    .filter((request) => request.status === "fulfilled")
+    .reduce((sum, request) => sum + request.points, 0);
+}
+
+function sumActiveRedemptionPoints(
+  requests: Awaited<ReturnType<typeof loadRedemptionRequests>>
+): number {
+  return getReservedPoints(requests);
+}
+
 function sumRedeemedPoints(
   requests: Awaited<ReturnType<typeof loadRedemptionRequests>>
 ): number {
@@ -83,27 +99,41 @@ export async function resolveRewardSummary(
   const base = calculateMvpRewardPoints(profile);
   const { completed } = await getPanelistSurveys(email);
   const surveyPoints = completed.reduce((sum, survey) => sum + survey.points, 0);
-  const totalPointsToDate = base.registrationPoints + base.verificationPoints + surveyPoints;
+  const calculatedEarned = base.registrationPoints + base.verificationPoints + surveyPoints;
+
+  const seed = await loadRewardBalanceSeed(email);
+  const totalPointsToDate =
+    typeof seed?.totalPointsToDate === "number" && Number.isFinite(seed.totalPointsToDate)
+      ? Math.max(0, Math.round(seed.totalPointsToDate))
+      : calculatedEarned;
 
   const redemptionRequests = await loadRedemptionRequests(email);
+  const fulfilledPoints = sumFulfilledRedemptionPoints(redemptionRequests);
+  const activeHoldPoints = sumActiveRedemptionPoints(redemptionRequests);
   const redeemedPoints = sumRedeemedPoints(redemptionRequests);
-  const calculatedBalance = Math.max(0, totalPointsToDate - redeemedPoints);
 
-  let totalPoints = calculatedBalance;
+  let totalPoints: number;
+
+  if (typeof seed?.totalPoints === "number" && Number.isFinite(seed.totalPoints)) {
+    totalPoints = Math.max(0, Math.round(seed.totalPoints));
+  } else {
+    const balanceBeforeHolds = Math.max(0, totalPointsToDate - fulfilledPoints);
+    totalPoints = Math.max(0, balanceBeforeHolds - activeHoldPoints);
+  }
+
+  totalPoints = Math.min(totalPoints, totalPointsToDate);
+
   let calculatedPoints: number | undefined;
   let usingOverride = false;
 
   if (isPointsOverrideEnabled()) {
     const override = await loadPointsOverride(email);
     if (override !== null) {
-      totalPoints = override;
-      calculatedPoints = calculatedBalance;
+      totalPoints = Math.min(override, totalPointsToDate);
+      calculatedPoints = Math.max(0, balanceBeforeHolds - activeHoldPoints);
       usingOverride = true;
     }
   }
-
-  // Available balance must never exceed cumulative lifetime earnings.
-  totalPoints = Math.min(totalPoints, totalPointsToDate);
 
   return {
     ...base,

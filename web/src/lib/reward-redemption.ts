@@ -234,7 +234,9 @@ export function getReservedPoints(requests: RedemptionRequest[]): number {
     .reduce((sum, request) => sum + request.points, 0);
 }
 
+/** Spendable balance after fulfilled redemptions and active holds (pending/approved). */
 export function getAvailablePoints(totalPoints: number, requests: RedemptionRequest[]): number {
+  // totalPoints is the balance after fulfilled redemptions; subtract active holds only once.
   return Math.max(0, totalPoints - getReservedPoints(requests));
 }
 
@@ -289,16 +291,16 @@ export function getExampleTiers(option: RedemptionOption, count = 4): Redemption
 }
 
 export function buildRedemptionOptionProgress(
-  totalPoints: number,
+  availablePoints: number,
   option: RedemptionOption
 ): RedemptionOptionProgress {
   const minPoints = getMinPointsForOption(option);
-  const pointsNeeded = Math.max(0, minPoints - totalPoints);
-  const progressPercent = Math.min(100, Math.round((totalPoints / minPoints) * 100));
+  const pointsNeeded = Math.max(0, minPoints - availablePoints);
+  const progressPercent = Math.min(100, Math.round((availablePoints / minPoints) * 100));
 
   return {
     option,
-    eligible: totalPoints >= minPoints,
+    eligible: availablePoints >= minPoints,
     pointsNeeded,
     progressPercent,
     minPoints,
@@ -372,7 +374,7 @@ export function validateRedemptionRequest(input: {
   | { ok: false; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
 
-  if (!canAccessRedemption(input.totalPoints)) {
+  if (!canAccessRedemption(getAvailablePoints(input.totalPoints, input.requests))) {
     errors.form = `You need at least ${REDEMPTION_MINIMUM_POINTS} points (${formatBz(20)}) before redeeming.`;
     return { ok: false, errors };
   }

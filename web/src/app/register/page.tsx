@@ -59,7 +59,7 @@ export default async function RegisterPage() {
     <div className="min-h-screen bg-zinc-100">
       <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white">
         <div className={`relative ${appContentClass} flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4`}>
-          <BrpLogoLink href="/" variant="light" priority />
+          <BrpLogoLink href="/" variant="light" />
           <div className="absolute right-3 flex items-center gap-2 text-sm sm:right-4 sm:gap-4">
             <Link
               href="/account/delete"

@@ -18,7 +18,7 @@ export function AuthPageShell({
     <div className="flex min-h-screen flex-col bg-zinc-100">
       <header className="safe-top shrink-0 border-b border-zinc-200 bg-white">
         <div className={`mx-auto flex ${AUTH_CONTENT_MAX} items-center justify-center px-3 py-3 sm:px-4 sm:py-4`}>
-          <BrpLogoLink href="/" variant="light" priority />
+          <BrpLogoLink href="/" variant="light" />
         </div>
       </header>
       <main className="flex flex-1 items-start justify-center px-3 py-8 sm:items-center sm:px-4 sm:py-16">

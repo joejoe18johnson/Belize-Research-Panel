@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { BrpLogoLink, LOGO_DARK_BG_SRC } from "@/components/BrpLogo";
+import { BrpLogoLink } from "@/components/BrpLogo";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white">
       <header className="safe-top mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6">
-        <BrpLogoLink href="/" src={LOGO_DARK_BG_SRC} priority />
+        <BrpLogoLink href="/" variant="dark" />
         <div className="hidden w-full gap-2 sm:flex sm:w-auto sm:gap-3">
           <Link
             href="/login"
@@ -58,7 +58,7 @@ export default function HomePage() {
             ["Secure accounts", "Create an account with email verification before completing panelist registration."],
             ["Matched research", "Political, market, and civic interest profiling for relevant survey invitations."],
           ].map(([title, body]) => (
-            <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur sm:p-6">
+            <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
               <h2 className="text-lg font-semibold">{formatHeadingCase(title)}</h2>
               <p className="mt-2 text-sm leading-relaxed text-teal-100">{formatHeadingCase(body)}</p>
             </div>

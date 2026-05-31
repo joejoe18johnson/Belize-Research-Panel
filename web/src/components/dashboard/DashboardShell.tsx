@@ -28,13 +28,13 @@ export function DashboardShell({
 }) {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <header className="safe-top sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur-sm">
+      <header className="safe-top sticky top-0 z-20 border-b border-zinc-200 bg-white">
         <div className={`${CONTENT_CLASS} flex min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-4 sm:py-4`}>
           <BrpLogoLink
             href="/dashboard"
             variant="light"
             className="min-w-0"
-            logoClassName="h-7 max-w-[9rem] sm:h-10 sm:max-w-none"
+            logoClassName="sm:text-base"
           />
           <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-3">
             <NotificationBellLink unreadCount={badges.unreadNotifications} />
