@@ -167,7 +167,7 @@ export function DashboardOverviewSection({
         <StatCard
           label="Reward points"
           value={String(rewards.totalPoints)}
-          hint={`${rewards.totalPointsToDate} earned to date`}
+          hint={`${rewards.totalPointsToDate} earned to date · ${rewards.totalPoints} available`}
           tone={rewards.verified ? "success" : "default"}
           icon={<StarIcon className="h-5 w-5" />}
         />
