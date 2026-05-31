@@ -89,25 +89,28 @@ export async function resolveRewardSummary(
   const redeemedPoints = sumRedeemedPoints(redemptionRequests);
   const calculatedBalance = Math.max(0, totalPointsToDate - redeemedPoints);
 
-  const override = await loadPointsOverride(email);
+  let totalPoints = calculatedBalance;
+  let calculatedPoints: number | undefined;
+  let usingOverride = false;
 
-  if (override === null) {
-    return {
-      ...base,
-      surveyPoints,
-      totalPointsToDate,
-      redeemedPoints,
-      totalPoints: calculatedBalance,
-    };
+  if (isPointsOverrideEnabled()) {
+    const override = await loadPointsOverride(email);
+    if (override !== null) {
+      totalPoints = override;
+      calculatedPoints = calculatedBalance;
+      usingOverride = true;
+    }
   }
+
+  // Available balance must never exceed cumulative lifetime earnings.
+  totalPoints = Math.min(totalPoints, totalPointsToDate);
 
   return {
     ...base,
     surveyPoints,
     totalPointsToDate,
     redeemedPoints,
-    totalPoints: override,
-    calculatedPoints: calculatedBalance,
-    usingOverride: true,
+    totalPoints,
+    ...(calculatedPoints !== undefined ? { calculatedPoints, usingOverride } : {}),
   };
 }

@@ -37,7 +37,7 @@ export function DashboardRewardsSection({
           <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 bg-teal-700 px-6 py-5 text-white">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-teal-100">{formatHeadingCase("Your balance")}</p>
+                <p className="text-sm font-medium text-teal-100">{formatHeadingCase("Available balance")}</p>
                 <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{rewards.totalPoints}</p>
                 <p className="mt-1 text-sm text-teal-100">{formatHeadingCase("Reward points")}</p>
                 <p className="mt-1 text-xs text-teal-100/90">{REDEMPTION_RATE_LABEL}</p>
@@ -79,14 +79,30 @@ export function DashboardRewardsSection({
             <ul className="space-y-3 border-t border-zinc-100 pt-5 text-sm">
               <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
-                  <span className="font-medium text-zinc-800">{formatHeadingCase("Total points to date")}</span>
+                  <span className="font-medium text-zinc-800">{formatHeadingCase("Points earned to date")}</span>
                   <span className="text-lg font-bold text-zinc-900">{rewards.totalPointsToDate}</span>
                 </div>
                 <p className="mt-1 text-xs text-zinc-500">
-                  {formatBz(pointsToBz(rewards.totalPointsToDate))} lifetime ·{" "}
-                  {rewards.totalPointsToDate - rewards.totalPoints > 0
-                    ? `${rewards.totalPoints} current balance`
-                    : `${rewards.totalPoints} available`}
+                  {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative · registration, verification, and
+                  completed surveys
+                </p>
+              </li>
+              {rewards.redeemedPoints > 0 ? (
+                <li className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-700">
+                  <span>{formatHeadingCase("Redeemed or reserved")}</span>
+                  <span className="font-semibold text-zinc-600">−{rewards.redeemedPoints}</span>
+                </li>
+              ) : null}
+              <li className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-medium text-teal-900">{formatHeadingCase("Available balance")}</span>
+                  <span className="text-lg font-bold text-teal-900">{rewards.totalPoints}</span>
+                </div>
+                <p className="mt-1 text-xs text-teal-800/80">
+                  {formatBz(pointsToBz(rewards.totalPoints))} ·{" "}
+                  {rewards.redeemedPoints > 0
+                    ? formatHeadingCase("earned to date minus redemptions")
+                    : formatHeadingCase("same as earned to date when nothing has been redeemed")}
                 </p>
               </li>
               <li className="flex items-center justify-between gap-4 text-zinc-700">
@@ -105,12 +121,6 @@ export function DashboardRewardsSection({
                   {rewards.surveyPoints > 0 ? `+${rewards.surveyPoints}` : formatHeadingCase("None yet")}
                 </span>
               </li>
-              {rewards.redeemedPoints > 0 ? (
-                <li className="flex items-center justify-between gap-4 text-zinc-700">
-                  <span>{formatHeadingCase("Redeemed or reserved")}</span>
-                  <span className="font-semibold text-zinc-600">−{rewards.redeemedPoints}</span>
-                </li>
-              ) : null}
             </ul>
           </div>
         </DashboardCard>
