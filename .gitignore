@@ -1,5 +1,8 @@
 .DS_Store
 *.DS_Store
 
+# Local Streamlit prototype — not deployed from this repo
+appfiles/
+
 # Accidental nested clone — use repo root instead
 web/Belize-Research-Panel/
