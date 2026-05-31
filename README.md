@@ -22,15 +22,23 @@ Demo accounts: `npm run seed:demo` (also runs automatically on Netlify build).
 ## Netlify deploy checklist
 
 1. Connect [GitHub repo](https://github.com/joejoe18johnson/Belize-Research-Panel) in Netlify.
-2. Netlify reads **`netlify.toml` at the repo root** — no manual base directory needed.
-3. **Required env var** (Site settings → Environment variables):
-   - `AUTH_SESSION_SECRET` — long random string (required for login sessions on production)
-4. **Already set in `netlify.toml`** for testing:
-   - `NEXT_PUBLIC_USE_TEXT_LOGO=true` — fast text logo (no PNG download)
-   - `NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS=true` — demo login shortcuts on deploy previews/production
+2. **Build settings** (Site configuration → Build & deploy):
+   - **Runtime:** Next.js (auto-detected after plugin runs)
+   - **Base directory:** `web`
+   - **Build command:** `npm run build:netlify` (or leave blank — `netlify.toml` sets this)
+   - **Publish directory:** leave **empty** — do not set `.next` or `public` manually
+   - **Package directory:** `web` if Base directory is repo root
+3. **`netlify.toml`** at repo root includes `@netlify/plugin-nextjs` (required for App Router SSR).
+4. **Required env var:** `AUTH_SESSION_SECRET` — long random string for login sessions.
 
-**Build:** `npm run build:netlify` (seeds demo accounts, then `next build`)  
-**Node:** 20 (`web/.nvmrc`)
+### Fix “Page not found” (Netlify generic 404)
+
+This usually means Netlify deployed a **static folder** instead of the Next.js runtime:
+
+1. Clear **Publish directory** in the Netlify UI (must be empty).
+2. Confirm **Base directory** is `web`.
+3. Redeploy after pushing — root `netlify.toml` must include `[[plugins]] package = "@netlify/plugin-nextjs"`.
+4. Check deploy log for “@netlify/plugin-nextjs” running after `next build`.
 
 ### Demo credentials (bundled in `web/data/`)
 
