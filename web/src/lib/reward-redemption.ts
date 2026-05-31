@@ -1,0 +1,435 @@
+import { cleanText } from "./validation";
+
+/** 500 points = BZ$20 */
+export const POINTS_PER_BZ_DOLLAR = 25;
+
+/** Minimum balance before any redemption option unlocks (BZ$20). */
+export const REDEMPTION_MINIMUM_POINTS = 500;
+
+export const REDEMPTION_RATE_LABEL = "500 points = BZ$20";
+
+export type RedemptionOptionId =
+  | "mobile_top_up"
+  | "gift_card"
+  | "bank_transfer"
+  | "utility_credit";
+
+export type RedemptionFieldType = "text" | "tel" | "email" | "select" | "textarea";
+
+export type RedemptionAmountMode = "increments_20" | "increments_50" | "custom_min_20";
+
+export interface RedemptionField {
+  name: string;
+  label: string;
+  type: RedemptionFieldType;
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+  options?: { value: string; label: string }[];
+}
+
+export interface RedemptionOption {
+  id: RedemptionOptionId;
+  label: string;
+  description: string;
+  amountMode: RedemptionAmountMode;
+  minAmountBz: number;
+  incrementLabel: string;
+  fields: RedemptionField[];
+}
+
+export const REDEMPTION_OPTIONS: RedemptionOption[] = [
+  {
+    id: "mobile_top_up",
+    label: "Mobile top-up",
+    description: "Airtime credit for DigiCell or Smart!, applied in BZ$20 increments.",
+    amountMode: "increments_20",
+    minAmountBz: 20,
+    incrementLabel: "BZ$20 increments",
+    fields: [
+      {
+        name: "phone",
+        label: "Mobile number",
+        type: "tel",
+        required: true,
+        placeholder: "e.g. 501-600-1234",
+        hint: "WhatsApp number on your profile is preferred.",
+      },
+      {
+        name: "carrier",
+        label: "Mobile carrier",
+        type: "select",
+        required: true,
+        options: [
+          { value: "", label: "Select carrier" },
+          { value: "digicell", label: "DigiCell" },
+          { value: "smart", label: "Smart!" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "gift_card",
+    label: "Gift card",
+    description: "Digital gift card delivered by email in BZ$50 increments.",
+    amountMode: "increments_50",
+    minAmountBz: 50,
+    incrementLabel: "BZ$50 increments",
+    fields: [
+      {
+        name: "retailer",
+        label: "Gift card type",
+        type: "text",
+        required: true,
+        placeholder: "e.g. Amazon, Brodi's, Save-U",
+        hint: "Tell us which gift card you would like.",
+      },
+      {
+        name: "deliveryEmail",
+        label: "Delivery email",
+        type: "email",
+        required: true,
+        placeholder: "you@example.com",
+      },
+    ],
+  },
+  {
+    id: "bank_transfer",
+    label: "Bank/ Cash payout",
+    description: "Direct deposit to your Belize bank account in BZ$20 increments.",
+    amountMode: "increments_20",
+    minAmountBz: 20,
+    incrementLabel: "BZ$20 increments",
+    fields: [
+      {
+        name: "bankName",
+        label: "Bank name",
+        type: "select",
+        required: true,
+        options: [
+          { value: "", label: "Select bank" },
+          { value: "belize_bank", label: "Belize Bank" },
+          { value: "atlantic_bank", label: "Atlantic Bank" },
+          { value: "heritage_bank", label: "Heritage Bank" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        name: "accountNumber",
+        label: "Account number",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "accountHolderName",
+        label: "Account holder name",
+        type: "text",
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "utility_credit",
+    label: "Utility credit",
+    description: "Pay toward your utility bill from BZ$20 upward.",
+    amountMode: "custom_min_20",
+    minAmountBz: 20,
+    incrementLabel: "BZ$20 minimum",
+    fields: [
+      {
+        name: "utilityProvider",
+        label: "Utility provider",
+        type: "select",
+        required: true,
+        options: [
+          { value: "", label: "Select provider" },
+          { value: "bel", label: "Belize Electricity Limited (BEL)" },
+          { value: "bws", label: "Belize Water Services (BWS)" },
+        ],
+      },
+      {
+        name: "accountNumber",
+        label: "Utility account number",
+        type: "text",
+        required: true,
+        placeholder: "Account number on your bill",
+      },
+      {
+        name: "accountName",
+        label: "Account holder name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "serviceAddress",
+        label: "Service address",
+        type: "textarea",
+        required: true,
+        placeholder: "Street address where the utility service is provided",
+        hint: "Use the address shown on your utility bill.",
+      },
+    ],
+  },
+];
+
+export type RedemptionRequestStatus = "pending" | "approved" | "rejected" | "fulfilled";
+
+export interface RedemptionRequest {
+  id: string;
+  email: string;
+  optionId: RedemptionOptionId;
+  optionLabel: string;
+  points: number;
+  amountBz?: number;
+  valueLabel: string;
+  status: RedemptionRequestStatus;
+  details: Record<string, string>;
+  notes: string;
+  submittedAt: string;
+  updatedAt: string;
+}
+
+export interface RedemptionAmountChoice {
+  amountBz: number;
+  points: number;
+  label: string;
+}
+
+export interface RedemptionOptionProgress {
+  option: RedemptionOption;
+  eligible: boolean;
+  pointsNeeded: number;
+  progressPercent: number;
+  minPoints: number;
+  exampleTiers: RedemptionAmountChoice[];
+}
+
+export function bzToPoints(amountBz: number): number {
+  return Math.round(amountBz * POINTS_PER_BZ_DOLLAR);
+}
+
+export function pointsToBz(points: number): number {
+  return points / POINTS_PER_BZ_DOLLAR;
+}
+
+export function formatBz(amountBz: number): string {
+  return `BZ$${amountBz % 1 === 0 ? amountBz : amountBz.toFixed(2)}`;
+}
+
+export function getMinPointsForOption(option: RedemptionOption): number {
+  return bzToPoints(option.minAmountBz);
+}
+
+export function getRedemptionOption(id: string): RedemptionOption | undefined {
+  return REDEMPTION_OPTIONS.find((option) => option.id === id);
+}
+
+export function canAccessRedemption(totalPoints: number): boolean {
+  return totalPoints >= REDEMPTION_MINIMUM_POINTS;
+}
+
+export function getReservedPoints(requests: RedemptionRequest[]): number {
+  return requests
+    .filter((request) => request.status === "pending" || request.status === "approved")
+    .reduce((sum, request) => sum + request.points, 0);
+}
+
+export function getAvailablePoints(totalPoints: number, requests: RedemptionRequest[]): number {
+  return Math.max(0, totalPoints - getReservedPoints(requests));
+}
+
+function getIncrementBz(mode: RedemptionAmountMode): number | null {
+  if (mode === "increments_20") return 20;
+  if (mode === "increments_50") return 50;
+  return null;
+}
+
+export function getRedemptionAmountChoices(
+  option: RedemptionOption,
+  availablePoints: number
+): RedemptionAmountChoice[] {
+  const minPoints = getMinPointsForOption(option);
+  if (availablePoints < minPoints) return [];
+
+  const maxAmountBz = pointsToBz(availablePoints);
+  const increment = getIncrementBz(option.amountMode);
+
+  if (increment) {
+    const choices: RedemptionAmountChoice[] = [];
+    for (let amountBz = option.minAmountBz; amountBz <= maxAmountBz + 0.001; amountBz += increment) {
+      const points = bzToPoints(amountBz);
+      if (points > availablePoints) break;
+      choices.push({
+        amountBz,
+        points,
+        label: `${formatBz(amountBz)} (${points} pts)`,
+      });
+    }
+    return choices;
+  }
+
+  return [];
+}
+
+export function getExampleTiers(option: RedemptionOption, count = 4): RedemptionAmountChoice[] {
+  const increment = getIncrementBz(option.amountMode) ?? 20;
+  const tiers: RedemptionAmountChoice[] = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const amountBz = option.minAmountBz + index * increment;
+    const points = bzToPoints(amountBz);
+    tiers.push({
+      amountBz,
+      points,
+      label: `${formatBz(amountBz)} · ${points} pts`,
+    });
+  }
+
+  return tiers;
+}
+
+export function buildRedemptionOptionProgress(
+  totalPoints: number,
+  option: RedemptionOption
+): RedemptionOptionProgress {
+  const minPoints = getMinPointsForOption(option);
+  const pointsNeeded = Math.max(0, minPoints - totalPoints);
+  const progressPercent = Math.min(100, Math.round((totalPoints / minPoints) * 100));
+
+  return {
+    option,
+    eligible: totalPoints >= minPoints,
+    pointsNeeded,
+    progressPercent,
+    minPoints,
+    exampleTiers: getExampleTiers(option),
+  };
+}
+
+export function getEligibleRedemptionOptions(
+  totalPoints: number,
+  requests: RedemptionRequest[]
+): RedemptionOption[] {
+  const available = getAvailablePoints(totalPoints, requests);
+  return REDEMPTION_OPTIONS.filter((option) => available >= getMinPointsForOption(option));
+}
+
+function parseAmountBz(raw: string): number | null {
+  const cleaned = cleanText(raw).replace(/^\$|^BZ\$|^bz\$/i, "");
+  const value = Number.parseFloat(cleaned);
+  if (!Number.isFinite(value)) return null;
+  return value;
+}
+
+function validateAmountForOption(
+  option: RedemptionOption,
+  amountBz: number,
+  availablePoints: number,
+  errors: Record<string, string>
+): number | null {
+  if (amountBz < option.minAmountBz) {
+    errors.amountBz = `Minimum redemption is ${formatBz(option.minAmountBz)}.`;
+    return null;
+  }
+
+  const points = bzToPoints(amountBz);
+  if (points > availablePoints) {
+    errors.amountBz = `You only have ${availablePoints} available points (${formatBz(pointsToBz(availablePoints))}).`;
+    return null;
+  }
+
+  const increment = getIncrementBz(option.amountMode);
+  if (increment && amountBz % increment !== 0) {
+    errors.amountBz = `Amount must be in ${option.incrementLabel.toLowerCase()}.`;
+    return null;
+  }
+
+  if (option.amountMode === "custom_min_20" && amountBz < 20) {
+    errors.amountBz = "Utility credit requests must be at least BZ$20.";
+    return null;
+  }
+
+  return points;
+}
+
+export function validateRedemptionRequest(input: {
+  optionId: string;
+  amountBz?: number | string;
+  details: Record<string, string>;
+  notes?: string;
+  totalPoints: number;
+  requests: RedemptionRequest[];
+}):
+  | {
+      ok: true;
+      option: RedemptionOption;
+      amountBz: number;
+      points: number;
+      valueLabel: string;
+      details: Record<string, string>;
+      notes: string;
+    }
+  | { ok: false; errors: Record<string, string> } {
+  const errors: Record<string, string> = {};
+
+  if (!canAccessRedemption(input.totalPoints)) {
+    errors.form = `You need at least ${REDEMPTION_MINIMUM_POINTS} points (${formatBz(20)}) before redeeming.`;
+    return { ok: false, errors };
+  }
+
+  const option = getRedemptionOption(input.optionId);
+  if (!option) {
+    errors.optionId = "Please select a redemption option.";
+    return { ok: false, errors };
+  }
+
+  const available = getAvailablePoints(input.totalPoints, input.requests);
+
+  let amountBz: number | null = null;
+  if (typeof input.amountBz === "number") {
+    amountBz = input.amountBz;
+  } else if (typeof input.amountBz === "string") {
+    amountBz = parseAmountBz(input.amountBz);
+    if (amountBz === null) {
+      errors.amountBz = "Please enter a valid amount.";
+      return { ok: false, errors };
+    }
+  } else {
+    errors.amountBz = "Please select or enter a redemption amount.";
+    return { ok: false, errors };
+  }
+
+  const points = validateAmountForOption(option, amountBz, available, errors);
+  if (points === null) {
+    return { ok: false, errors };
+  }
+
+  const details: Record<string, string> = {};
+  for (const field of option.fields) {
+    const raw = cleanText(input.details[field.name] ?? "");
+    if (field.required && !raw) {
+      errors[field.name] = `${field.label} is required.`;
+      continue;
+    }
+    if (field.type === "email" && raw && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) {
+      errors[field.name] = "Please enter a valid email address.";
+      continue;
+    }
+    if (raw) details[field.name] = raw;
+  }
+
+  const notes = cleanText(input.notes ?? "");
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    option,
+    amountBz,
+    points,
+    valueLabel: `${formatBz(amountBz)} ${option.label.toLowerCase()}`,
+    details,
+    notes,
+  };
+}

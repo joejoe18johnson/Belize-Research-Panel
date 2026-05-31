@@ -1,0 +1,5 @@
+.DS_Store
+*.DS_Store
+
+# Accidental nested clone — use repo root instead
+web/Belize-Research-Panel/
