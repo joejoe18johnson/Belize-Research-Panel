@@ -1,9 +1,10 @@
-# Monorepo pointer — app config is in web/netlify.toml
-# Netlify UI: Base directory = web  OR  Package directory = web (with base at repo root)
+# Next.js app in web/ — @netlify/plugin-nextjs manages SSR output.
+# publish must differ from base (do NOT set Publish directory to "web" in Netlify UI).
 
 [build]
   base = "web"
   command = "npm run build:netlify"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
