@@ -49,6 +49,19 @@ const DEMO_ACCOUNTS = [
     commonwealth_country: "",
     dob: "1995-08-22",
   },
+  {
+    id: "44444444-4444-4444-4444-444444444444",
+    first_name: "Glen",
+    last_name: "Avilez",
+    email: "glen.avilez@belizepanel.test",
+    password_salt: "demo-salt-glen01",
+    email_verified: "true",
+    verification_token: "",
+    panelist_registered: "true",
+    citizenship_status: "Citizen of Belize",
+    commonwealth_country: "",
+    dob: "1982-04-10",
+  },
 ];
 
 const LEGACY_DEMO_EMAILS = new Set([
@@ -57,6 +70,7 @@ const LEGACY_DEMO_EMAILS = new Set([
   "johannesjohnsonj@gmail.com",
   "demo.verified@belizepanel.test",
   "demo.unverified@belizepanel.test",
+  "glen.avilez@belizepanel.test",
 ]);
 
 function hashPassword(password, salt) {

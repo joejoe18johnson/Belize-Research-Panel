@@ -32,7 +32,11 @@ function normalizeEmail(email: string): string {
   return cleanText(email).toLowerCase();
 }
 
+/** Set to true to show the dev points override UI on the rewards page. */
+const POINTS_DEV_TOOL_ENABLED = false;
+
 export function isPointsOverrideEnabled(): boolean {
+  if (!POINTS_DEV_TOOL_ENABLED) return false;
   return process.env.NODE_ENV !== "production" || process.env.ENABLE_POINTS_OVERRIDE === "true";
 }
 
