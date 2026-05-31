@@ -45,7 +45,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
     <nav className="border-t border-zinc-100 bg-white" aria-label="Dashboard sections">
       <div className="nav-scroll overflow-x-auto overscroll-x-contain">
         <div
-          className={`mx-auto flex w-max min-w-full max-w-none snap-x snap-mandatory gap-1.5 px-3 py-2.5 sm:w-full sm:gap-2 sm:px-4 sm:py-3 ${APP_CONTENT_MAX}`}
+          className={`mx-auto flex w-max min-w-full max-w-none snap-x snap-mandatory justify-start gap-1.5 px-3 py-2.5 sm:w-full sm:justify-center sm:gap-2 sm:px-4 sm:py-3 ${APP_CONTENT_MAX}`}
         >
           {NAV_ITEMS.map((item) => {
             const active = isActive(pathname, item.href, item.exact);
