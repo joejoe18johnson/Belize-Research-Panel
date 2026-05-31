@@ -1,21 +1,72 @@
 {
   "glen.avilez@belizepanel.test": [
     {
-      "id": "1a8ae26e-7740-43a2-81a4-79bb31aabf6b",
+      "id": "glen-redeem-fulfilled-1",
+      "email": "glen.avilez@belizepanel.test",
+      "optionId": "gift_card",
+      "optionLabel": "Gift card",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 gift card",
+      "status": "fulfilled",
+      "details": {
+        "retailer": "Brodi's",
+        "deliveryEmail": "glen.avilez@belizepanel.test"
+      },
+      "notes": "",
+      "submittedAt": "2026-04-12T10:00:00.000Z",
+      "updatedAt": "2026-04-15T14:00:00.000Z"
+    },
+    {
+      "id": "glen-redeem-fulfilled-2",
       "email": "glen.avilez@belizepanel.test",
       "optionId": "mobile_top_up",
       "optionLabel": "Mobile top-up",
       "points": 500,
       "amountBz": 20,
       "valueLabel": "BZ$20 mobile top-up",
-      "status": "pending",
+      "status": "fulfilled",
       "details": {
         "phone": "501-610-0000",
-        "carrier": "smart"
+        "carrier": "digicell"
       },
       "notes": "",
-      "submittedAt": "2026-05-31T20:38:59.505Z",
-      "updatedAt": "2026-05-31T20:38:59.505Z"
+      "submittedAt": "2026-03-08T09:00:00.000Z",
+      "updatedAt": "2026-03-10T11:00:00.000Z"
+    },
+    {
+      "id": "glen-redeem-fulfilled-3",
+      "email": "glen.avilez@belizepanel.test",
+      "optionId": "bank_transfer",
+      "optionLabel": "Bank/ Cash payout",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 bank/ cash payout",
+      "status": "fulfilled",
+      "details": {
+        "bankName": "belize_bank",
+        "accountNumber": "****4521"
+      },
+      "notes": "",
+      "submittedAt": "2026-02-01T16:00:00.000Z",
+      "updatedAt": "2026-02-04T10:00:00.000Z"
+    },
+    {
+      "id": "glen-redeem-fulfilled-4",
+      "email": "glen.avilez@belizepanel.test",
+      "optionId": "utility_credit",
+      "optionLabel": "Utility bill credit",
+      "points": 550,
+      "amountBz": 22,
+      "valueLabel": "BZ$22 utility bill credit",
+      "status": "fulfilled",
+      "details": {
+        "provider": "belize_electricity",
+        "accountNumber": "****8890"
+      },
+      "notes": "",
+      "submittedAt": "2026-01-15T12:00:00.000Z",
+      "updatedAt": "2026-01-18T09:00:00.000Z"
     }
   ]
 }
