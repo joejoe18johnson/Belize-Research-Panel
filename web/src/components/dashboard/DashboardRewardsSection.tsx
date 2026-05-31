@@ -1,6 +1,6 @@
 import type { DashboardRewardSummary } from "@/lib/panelist-dashboard";
 import type { RedemptionRequest } from "@/lib/reward-redemption";
-import { REDEMPTION_MINIMUM_POINTS, REDEMPTION_RATE_LABEL, getAvailablePoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
+import { REDEMPTION_MINIMUM_POINTS, REDEMPTION_RATE_LABEL, getAvailablePoints, getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { GiftIcon, StarIcon } from "./DashboardIcons";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
@@ -25,8 +25,8 @@ export function DashboardRewardsSection({
   showDevPointsEditor?: boolean;
 }) {
   const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
-  const progressPercent = Math.min(100, Math.round((rewards.totalPoints / REDEMPTION_MINIMUM_POINTS) * 100));
-  const pointsToMilestone = Math.max(0, REDEMPTION_MINIMUM_POINTS - rewards.totalPoints);
+  const progressPercent = Math.min(100, Math.round((availablePoints / REDEMPTION_MINIMUM_POINTS) * 100));
+  const pointsToMilestone = Math.max(0, REDEMPTION_MINIMUM_POINTS - availablePoints);
 
   return (
     <div className="space-y-6">
@@ -38,11 +38,13 @@ export function DashboardRewardsSection({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-teal-100">{formatHeadingCase("Available balance")}</p>
-                <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{rewards.totalPoints}</p>
+                <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{availablePoints}</p>
                 <p className="mt-1 text-sm text-teal-100">{formatHeadingCase("Reward points")}</p>
                 <p className="mt-1 text-xs text-teal-100/90">{REDEMPTION_RATE_LABEL}</p>
-                {redemptionRequests.length > 0 ? (
-                  <p className="mt-2 text-xs text-teal-100/90">{availablePoints} available to redeem</p>
+                {getReservedPoints(redemptionRequests) > 0 ? (
+                  <p className="mt-2 text-xs text-teal-100/90">
+                    {getReservedPoints(redemptionRequests)} pts reserved on pending requests
+                  </p>
                 ) : null}
               </div>
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
@@ -96,10 +98,10 @@ export function DashboardRewardsSection({
               <li className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-medium text-teal-900">{formatHeadingCase("Available balance")}</span>
-                  <span className="text-lg font-bold text-teal-900">{rewards.totalPoints}</span>
+                  <span className="text-lg font-bold text-teal-900">{availablePoints}</span>
                 </div>
                 <p className="mt-1 text-xs text-teal-800/80">
-                  {formatBz(pointsToBz(rewards.totalPoints))} ·{" "}
+                  {formatBz(pointsToBz(availablePoints))} ·{" "}
                   {rewards.redeemedPoints > 0
                     ? formatHeadingCase("earned to date minus redemptions")
                     : formatHeadingCase("same as earned to date when nothing has been redeemed")}

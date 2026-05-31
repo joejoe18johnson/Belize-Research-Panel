@@ -5,6 +5,11 @@ import { fileURLToPath } from "url";
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  compress: true,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   turbopack: {
     root: projectRoot,
   },

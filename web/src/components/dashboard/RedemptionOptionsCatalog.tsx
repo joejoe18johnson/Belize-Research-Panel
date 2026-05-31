@@ -92,9 +92,9 @@ export function RedemptionOptionsCatalog({
   totalPoints: number;
   requests: RedemptionRequest[];
 }) {
-  const unlocked = canAccessRedemption(totalPoints);
   const availablePoints = getAvailablePoints(totalPoints, requests);
-  const progressItems = REDEMPTION_OPTIONS.map((option) => buildRedemptionOptionProgress(totalPoints, option));
+  const unlocked = canAccessRedemption(availablePoints);
+  const progressItems = REDEMPTION_OPTIONS.map((option) => buildRedemptionOptionProgress(availablePoints, option));
 
   return (
     <DashboardCard>
@@ -180,7 +180,7 @@ export function RedemptionOptionsCatalog({
                   <span
                     key={tier.amountBz}
                     className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${
-                      totalPoints >= tier.points
+                      availablePoints >= tier.points
                         ? "border-teal-200 bg-teal-50 text-teal-800"
                         : "border-zinc-200 bg-zinc-50 text-zinc-600"
                     }`}
