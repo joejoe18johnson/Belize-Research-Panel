@@ -31,19 +31,12 @@ export function BrpLogoText({
 
   return (
     <span
-      className={`inline-block leading-none ${className}`.trim()}
+      className={`inline-block whitespace-nowrap text-sm font-bold tracking-tight sm:text-base ${
+        isDark ? "text-white" : "text-teal-950"
+      } ${className}`.trim()}
       aria-label="Belize Research Panel"
     >
-      <span
-        className={`block text-[0.625rem] font-semibold uppercase tracking-[0.18em] sm:text-xs ${
-          isDark ? "text-teal-200" : "text-teal-700"
-        }`}
-      >
-        Belize
-      </span>
-      <span className={`block text-sm font-bold tracking-tight sm:text-base ${isDark ? "text-white" : "text-teal-950"}`}>
-        Research Panel
-      </span>
+      Belize Research Panel
     </span>
   );
 }
