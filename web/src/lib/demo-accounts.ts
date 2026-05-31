@@ -66,7 +66,11 @@ export const DEMO_ACCOUNTS = [
 ] as const;
 
 export function isDemoAccountsEnabled(): boolean {
-  return process.env.NODE_ENV !== "production" || process.env.ENABLE_DEMO_ACCOUNTS === "true";
+  return (
+    process.env.NODE_ENV !== "production" ||
+    process.env.ENABLE_DEMO_ACCOUNTS === "true" ||
+    process.env.NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS === "true"
+  );
 }
 
 export function getDemoAccountEmails(): Set<string> {
