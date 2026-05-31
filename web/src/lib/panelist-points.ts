@@ -113,12 +113,13 @@ export async function resolveRewardSummary(
   const redeemedPoints = sumRedeemedPoints(redemptionRequests);
 
   let totalPoints: number;
+  const balanceBeforeHolds = Math.max(0, totalPointsToDate - fulfilledPoints);
+  const computedAvailable = Math.max(0, balanceBeforeHolds - activeHoldPoints);
 
   if (typeof seed?.totalPoints === "number" && Number.isFinite(seed.totalPoints)) {
     totalPoints = Math.max(0, Math.round(seed.totalPoints));
   } else {
-    const balanceBeforeHolds = Math.max(0, totalPointsToDate - fulfilledPoints);
-    totalPoints = Math.max(0, balanceBeforeHolds - activeHoldPoints);
+    totalPoints = computedAvailable;
   }
 
   totalPoints = Math.min(totalPoints, totalPointsToDate);
@@ -130,16 +131,19 @@ export async function resolveRewardSummary(
     const override = await loadPointsOverride(email);
     if (override !== null) {
       totalPoints = Math.min(override, totalPointsToDate);
-      calculatedPoints = Math.max(0, balanceBeforeHolds - activeHoldPoints);
+      calculatedPoints = computedAvailable;
       usingOverride = true;
     }
   }
+
+  const redeemedPointsDisplay =
+    totalPointsToDate > totalPoints ? totalPointsToDate - totalPoints : redeemedPoints;
 
   return {
     ...base,
     surveyPoints,
     totalPointsToDate,
-    redeemedPoints,
+    redeemedPoints: redeemedPointsDisplay,
     totalPoints,
     ...(calculatedPoints !== undefined ? { calculatedPoints, usingOverride } : {}),
   };
