@@ -1,0 +1,26 @@
+# Belize Research Panel — Next.js app lives in web/
+# https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
+
+[build]
+  base = "web"
+  command = "npm run build:netlify"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+# QA on deploy previews and branch deploys
+[context.deploy-preview.environment]
+  ENABLE_DEMO_ACCOUNTS = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_POINTS_OVERRIDE = "true"
+
+[context.branch-deploy.environment]
+  ENABLE_DEMO_ACCOUNTS = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_POINTS_OVERRIDE = "true"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  autoLaunch = false

@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { DEMO_ACCOUNT_PASSWORD, DEMO_REGISTERED_ACCOUNT, DEMO_REGISTRATION_READY_ACCOUNT, DEMO_UNVERIFIED_REGISTERED_ACCOUNT } from "@/lib/demo-accounts";
-import { Field, TextInput } from "@/components/registration/form-ui";
 import { PasswordInput } from "@/components/auth/PasswordInput";
+import { Field, TextInput } from "@/components/registration/form-ui";
+import {
+  DEMO_ACCOUNT_PASSWORD,
+  DEMO_REGISTERED_ACCOUNT,
+  DEMO_REGISTRATION_READY_ACCOUNT,
+  DEMO_UNVERIFIED_REGISTERED_ACCOUNT,
+  isDemoAccountsEnabled,
+} from "@/lib/demo-accounts";
 import type { FieldErrors } from "@/lib/validation";
 
 export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
@@ -159,7 +165,7 @@ export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
         </Link>
       </p>
 
-      {process.env.NODE_ENV !== "production" ? (
+      {isDemoAccountsEnabled() ? (
         <div className="space-y-2 text-center text-xs text-zinc-500">
           <p>
             Dev:{" "}

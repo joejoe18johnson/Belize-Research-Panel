@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { formatHeadingCase } from "@/lib/sentence-case";
 import type { SessionAccount } from "@/lib/auth-types";
+import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
+import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AccountOnHoldView({ account }: { account: SessionAccount }) {
   const pendingEmail = account.pendingEmail;
@@ -30,7 +31,7 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
               An administrator must approve this change before your account is reactivated. Your login email stays{" "}
               <span className="font-medium">{account.email}</span> until then.
             </p>
-            {process.env.NODE_ENV !== "production" ? (
+            {isDemoAccountsEnabled() ? (
               <p className="mt-2 text-xs text-zinc-500">
                 Dev: approve with{" "}
                 <code className="rounded bg-zinc-200 px-1 py-0.5">
@@ -53,7 +54,7 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
               An administrator must approve this change before your account is reactivated. Current number on file
               remains active until then.
             </p>
-            {process.env.NODE_ENV !== "production" ? (
+            {isDemoAccountsEnabled() ? (
               <p className="mt-2 text-xs text-zinc-500">
                 Dev: approve with{" "}
                 <code className="rounded bg-zinc-200 px-1 py-0.5">

@@ -6,10 +6,12 @@ on:
     branches: [main]
     paths:
       - "web/**"
+      - "netlify.toml"
       - ".github/workflows/web.yml"
   pull_request:
     paths:
       - "web/**"
+      - "netlify.toml"
       - ".github/workflows/web.yml"
 
 defaults:
@@ -29,4 +31,8 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:netlify
+        env:
+          ENABLE_DEMO_ACCOUNTS: "true"
+          NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS: "true"
+          ENABLE_POINTS_OVERRIDE: "true"

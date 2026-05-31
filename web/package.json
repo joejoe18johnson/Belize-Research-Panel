@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --webpack",
     "build": "next build",
+    "build:netlify": "npm run seed:demo && npm run build",
     "start": "next start",
     "lint": "eslint",
     "seed:demo": "node scripts/seed-demo-accounts.mjs"
