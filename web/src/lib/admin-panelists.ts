@@ -70,10 +70,7 @@ export function countDuplicateNameDob(rows: PanelistRow[]): number {
 }
 
 export function getAdminPanelOverview(rows: PanelistRow[]): AdminPanelOverview {
-  const duplicateByNameDob = countDuplicateNameDob(rows);
-  const markedPossibleDuplicate = rows.filter(
-    (row) => cleanText(row.verification_status) === "Possible Duplicate"
-  ).length;
+  const markedPossibleDuplicate = rows.filter(isFlaggedPanelist).length;
 
   return {
     total: rows.length,

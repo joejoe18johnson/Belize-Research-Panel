@@ -30,9 +30,11 @@ export const metadata = {
 export default async function AdminPanelistsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ email?: string; verification?: string }>;
+  searchParams: Promise<{ email?: string; verification?: string; tab?: string }>;
 }) {
   const params = await searchParams;
+  const initialTab =
+    params.tab === "flagged" ? "flagged" : params.tab === "duplicates" ? "duplicates" : undefined;
   const [rows, accounts, photoUploadUsernames, residenceUploadUsernames] = await Promise.all([
     loadPanelists(),
     loadAccounts(),
@@ -74,6 +76,7 @@ export default async function AdminPanelistsPage({
       rows={rows}
       requirementByEmail={requirementByEmail}
       initialEmail={params.email}
+      initialTab={initialTab}
       initialVerification={params.verification}
       photoUploadUsernames={photoUploadUsernames}
       residenceUploadUsernames={residenceUploadUsernames}

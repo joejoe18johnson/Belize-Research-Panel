@@ -8,7 +8,9 @@ import {
   applyAdminPanelistFilters,
   countPanelistsByField,
   getDuplicateReviewRows,
+  getFlaggedPanelists,
   groupDuplicateReviewClusters,
+  isFlaggedPanelist,
   panelistDisplayLabel,
   type AdminPanelistPublicRow,
 } from "@/lib/admin-panelists";
@@ -73,6 +75,7 @@ export function AdminPanelistsClient({
   filterOptions,
   initialVerification,
   initialEmail,
+  initialTab,
   photoUploadUsernames,
   residenceUploadUsernames,
 }: {
@@ -89,11 +92,12 @@ export function AdminPanelistsClient({
   };
   initialVerification?: string;
   initialEmail?: string;
+  initialTab?: "all" | "duplicates" | "flagged";
   photoUploadUsernames: Set<string>;
   residenceUploadUsernames: Set<string>;
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"all" | "duplicates">("all");
+  const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
   const [verificationFilter, setVerificationFilter] = useState<string[]>([]);
   const [districtFilter, setDistrictFilter] = useState<string[]>([]);
   const [constituencyFilter, setConstituencyFilter] = useState<string[]>([]);
@@ -123,6 +127,16 @@ export function AdminPanelistsClient({
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
   const duplicateClusters = useMemo(() => groupDuplicateReviewClusters(rows), [rows]);
+  const flaggedRows = useMemo(
+    () =>
+      applyAdminPanelistFilters(getFlaggedPanelists(rows), {
+        verification: verificationFilter,
+        district: districtFilter,
+        constituency: constituencyFilter,
+        voterStatus: voterFilter,
+      }),
+    [rows, verificationFilter, districtFilter, constituencyFilter, voterFilter]
+  );
 
   const verificationCounts = useMemo(
     () => countPanelistsByField(rows, "verification_status", filterOptions.verification),
@@ -143,6 +157,7 @@ export function AdminPanelistsClient({
 
   const allPagination = useTablePagination(filteredRows);
   const duplicatePagination = useTablePagination(duplicateClusters, 10);
+  const flaggedPagination = useTablePagination(flaggedRows);
 
   const cityOptions =
     editState?.district && editState.district in CITY_TOWN_VILLAGE
@@ -184,6 +199,10 @@ export function AdminPanelistsClient({
       admin_photo_id_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.photoId, derived?.photoId === "approved"),
     });
   };
+
+  useEffect(() => {
+    if (initialTab) setTab(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     if (initialVerification) {
@@ -367,7 +386,8 @@ export function AdminPanelistsClient({
 
   const TABS = [
     { id: "all" as const, label: "All panelists", count: filteredRows.length },
-    { id: "duplicates" as const, label: "Duplicate Review", count: duplicateClusters.length },
+    { id: "flagged" as const, label: "Flagged", count: getFlaggedPanelists(rows).length },
+    { id: "duplicates" as const, label: "Duplicate review", count: duplicateClusters.length },
   ];
 
   const rowActionTone =
@@ -452,7 +472,8 @@ export function AdminPanelistsClient({
             <div>
               <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Duplicate Review")}</h2>
               <p className="mt-1 max-w-3xl text-sm text-zinc-600">
-                Records that share the same name and exact date of birth are flagged for review.
+                Records that share the same name and exact date of birth are grouped here for comparison. Flag a record
+                to set its verification status to Possible Duplicate.
               </p>
             </div>
             {duplicateClusters.length > 0 ? (
@@ -514,6 +535,51 @@ export function AdminPanelistsClient({
             </div>
           )}
         </section>
+      ) : tab === "flagged" ? (
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Flagged panelists")}</h2>
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+                Panelists with verification status Possible Duplicate. Their accounts are placed on hold until an
+                administrator clears the review.
+              </p>
+            </div>
+          </div>
+          {rowActionMessage ? (
+            <div className="mt-3">
+              <BrandedAlert tone={rowActionTone} compact showIcon>
+                {rowActionMessage}
+              </BrandedAlert>
+            </div>
+          ) : null}
+          {flaggedRows.length > 0 ? (
+            <>
+              <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+                <DataTable
+                  rows={flaggedPagination.paginatedRows}
+                  columns={TABLE_COLUMNS}
+                  actions={rowActions}
+                  requirementByEmail={requirementByEmail}
+                />
+              </div>
+              <TablePagination
+                page={flaggedPagination.page}
+                pageSize={flaggedPagination.pageSize}
+                totalPages={flaggedPagination.totalPages}
+                totalRows={flaggedPagination.totalRows}
+                onPageChange={flaggedPagination.setPage}
+                onPageSizeChange={flaggedPagination.setPageSize}
+              />
+            </>
+          ) : (
+            <div className="mt-3">
+              <BrandedAlert tone="success" compact showIcon>
+                No panelists are currently flagged as Possible Duplicate.
+              </BrandedAlert>
+            </div>
+          )}
+        </section>
       ) : (
         <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -540,7 +606,6 @@ export function AdminPanelistsClient({
             <DataTable
               rows={allPagination.paginatedRows}
               columns={TABLE_COLUMNS}
-              highlightDuplicates
               actions={rowActions}
               requirementByEmail={requirementByEmail}
             />
@@ -850,13 +915,11 @@ function IconButton({
 function DataTable({
   rows,
   columns,
-  highlightDuplicates = false,
   actions,
   requirementByEmail,
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
-  highlightDuplicates?: boolean;
   actions?: RowActions;
   requirementByEmail: Record<
     string,
@@ -887,31 +950,21 @@ function DataTable({
           </tr>
         ) : (
           rows.map((row, index) => {
-            const flagged = highlightDuplicates && "duplicate_name_dob_flag" in row && row.duplicate_name_dob_flag;
-            const alreadyFlagged = cleanText(row.verification_status) === "Possible Duplicate";
+            const isFlagged = isFlaggedPanelist(row);
             const requirements = requirementByEmail[cleanText(row.email).toLowerCase()];
             return (
               <tr
                 key={`${row.email}-${index}`}
-                className={`border-b border-zinc-100 ${flagged || alreadyFlagged ? "bg-amber-50/80" : ""}`}
+                className={`border-b border-zinc-100 ${isFlagged ? "bg-amber-50/80" : ""}`}
               >
                 {actions ? (
                   <td className="sticky left-0 z-10 bg-inherit px-2 py-2">
-                    <RowActionButtons email={row.email} actions={actions} flagged={alreadyFlagged} />
+                    <RowActionButtons email={row.email} actions={actions} flagged={isFlagged} />
                   </td>
                 ) : null}
                 {columns.map((column) => (
                   <td key={column} className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-zinc-700">
-                    {column === "verification_status" && flagged ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span>{row[column] ?? ""}</span>
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
-                          Name + DOB
-                        </span>
-                      </span>
-                    ) : (
-                      row[column] ?? ""
-                    )}
+                    {row[column] ?? ""}
                   </td>
                 ))}
                 <td className="whitespace-nowrap px-3 py-2">

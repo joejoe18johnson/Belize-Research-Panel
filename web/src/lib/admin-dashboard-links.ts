@@ -1,10 +1,13 @@
 /** Deep links from admin dashboard metric cards to the right queue or filter. */
+import { cleanText } from "./validation";
+
 export const ADMIN_DASHBOARD_LINKS = {
   panelists: "/admin/panelists",
+  panelistsFlagged: "/admin/panelists?tab=flagged",
   verified: "/admin/panelists?verification=Verified",
   underReview: "/admin/under-review",
   underReviewIncomplete: "/admin/under-review?queue=incomplete",
-  underReviewFlagged: "/admin/under-review?queue=flagged",
+  underReviewFlagged: "/admin/panelists?tab=flagged",
   underReviewOnHold: "/admin/under-review?queue=on_hold",
   payouts: "/admin/payouts",
   phoneReview: "/admin/under-review?requirement=phone",
@@ -44,7 +47,7 @@ export function filterUnderReviewRowsByQueue<
   }
 
   if (queue === "flagged") {
-    return rows.filter((row) => row.verificationStatus === "Possible Duplicate");
+    return rows.filter((row) => cleanText(row.verificationStatus) === "Possible Duplicate");
   }
 
   return rows.filter((row) => row.accountStatus === "on_hold");
@@ -52,7 +55,7 @@ export function filterUnderReviewRowsByQueue<
 
 export const UNDER_REVIEW_QUEUE_LABELS: Record<UnderReviewQueueFilter, string> = {
   incomplete: "Requirements incomplete",
-  flagged: "Flagged panelists",
+  flagged: "Flagged (possible duplicate)",
   on_hold: "Accounts on hold",
 };
 

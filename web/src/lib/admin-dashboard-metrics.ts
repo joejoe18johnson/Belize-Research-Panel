@@ -122,7 +122,6 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
   const { panelists, accounts, redemptionRequests } = hub;
 
   const flagged = panelists.filter(isFlaggedPanelist).length;
-  const duplicateByNameDob = countDuplicateNameDob(panelists);
 
   const onHoldAccounts = accounts.filter((account) => cleanText(account.account_status) === "on_hold");
   const fraudReviewHold = onHoldAccounts.filter((account) => account.hold_reason === "fraud_review").length;
