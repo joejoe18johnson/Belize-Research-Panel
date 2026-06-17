@@ -65,6 +65,7 @@ export interface UnderReviewRow {
   emailRequirement: RequirementApprovalStatus;
   phoneRequirement: RequirementApprovalStatus;
   photoIdRequirement: RequirementApprovalStatus;
+  hasAddressDocument: boolean;
 }
 
 export interface NotificationQueueRow {
@@ -260,6 +261,7 @@ export function buildUnderReviewRows(
       emailRequirement: requirements.email,
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
+      hasAddressDocument: Boolean(cleanText(row.place_of_residence)),
     });
   }
 
@@ -282,6 +284,7 @@ export function buildUnderReviewRows(
         emailRequirement: "missing",
         phoneRequirement: "missing",
         photoIdRequirement: "missing",
+        hasAddressDocument: false,
       });
       continue;
     }
@@ -302,6 +305,7 @@ export function buildUnderReviewRows(
       emailRequirement: requirements.email,
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
+      hasAddressDocument: Boolean(cleanText(panelist.place_of_residence)),
     });
   }
 

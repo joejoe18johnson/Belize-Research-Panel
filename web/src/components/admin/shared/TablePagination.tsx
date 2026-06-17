@@ -2,15 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-export const PAGE_SIZE_OPTIONS = [25, 30, 50] as const;
+export const PAGE_SIZE_OPTIONS = [2, 20, 30, 40, "all"] as const;
 export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
 
-export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption = 30) {
+function effectivePageSize(pageSize: PageSizeOption, totalRows: number): number {
+  if (pageSize === "all") return Math.max(totalRows, 1);
+  return pageSize;
+}
+
+export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption = 2) {
   const [pageSize, setPageSize] = useState<PageSizeOption>(defaultPageSize);
   const [page, setPage] = useState(1);
 
   const totalRows = rows.length;
-  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+  const resolvedPageSize = effectivePageSize(pageSize, totalRows);
+  const totalPages = Math.max(1, Math.ceil(totalRows / resolvedPageSize));
 
   useEffect(() => {
     setPage(1);
@@ -22,8 +28,8 @@ export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption
 
   const safePage = Math.min(page, totalPages);
   const paginatedRows = useMemo(
-    () => rows.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [rows, safePage, pageSize]
+    () => rows.slice((safePage - 1) * resolvedPageSize, safePage * resolvedPageSize),
+    [rows, safePage, resolvedPageSize]
   );
 
   return {
@@ -34,6 +40,7 @@ export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption
     setPageSize,
     totalPages,
     totalRows,
+    resolvedPageSize,
   };
 }
 
@@ -52,8 +59,9 @@ export function TablePagination({
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: PageSizeOption) => void;
 }) {
-  const start = totalRows === 0 ? 0 : (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, totalRows);
+  const resolvedPageSize = effectivePageSize(pageSize, totalRows);
+  const start = totalRows === 0 ? 0 : (page - 1) * resolvedPageSize + 1;
+  const end = Math.min(page * resolvedPageSize, totalRows);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
@@ -62,19 +70,17 @@ export function TablePagination({
           <span className="text-xs font-medium uppercase tracking-wide text-zinc-500">Rows per page</span>
           <select
             value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value) as PageSizeOption)}
+            onChange={(e) => onPageSizeChange(e.target.value as PageSizeOption)}
             className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm"
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
-                {size}
+                {size === "all" ? "All" : size}
               </option>
             ))}
           </select>
         </label>
-        <span>
-          {totalRows === 0 ? "No rows" : `${start}–${end} of ${totalRows}`}
-        </span>
+        <span>{totalRows === 0 ? "No rows" : `${start}–${end} of ${totalRows}`}</span>
       </div>
       <div className="flex items-center gap-2">
         <button
