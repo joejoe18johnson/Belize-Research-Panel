@@ -42,7 +42,7 @@ export async function PATCH(request: Request) {
     }
 
     const settings = await saveRewardSettings(validation.settings, session.displayName);
-    revalidatePath("/admin/campaigns/reward-settings");
+    revalidatePath("/admin/reward-settings");
     revalidatePath("/dashboard/rewards");
     revalidatePath("/dashboard/rewards/redeem");
 

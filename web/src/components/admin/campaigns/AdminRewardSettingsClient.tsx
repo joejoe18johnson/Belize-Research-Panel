@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
@@ -127,16 +126,10 @@ export function AdminRewardSettingsClient({ initialSettings }: { initialSettings
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageIntro
-          eyebrow="Campaigns"
+          eyebrow="Rewards"
           title={formatHeadingCase("Reward settings")}
           description="Configure panelist earning rules, redemption thresholds, and the points-to-cash rate shown on the dashboard."
         />
-        <Link
-          href="/admin/campaigns"
-          className="inline-flex min-h-10 items-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-        >
-          Back to campaigns
-        </Link>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
