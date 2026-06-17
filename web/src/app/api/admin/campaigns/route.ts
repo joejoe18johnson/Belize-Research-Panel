@@ -41,6 +41,8 @@ export async function POST(request: Request) {
       title: cleanText(String(body.title ?? "")),
       description: cleanText(String(body.description ?? "")),
       category: (cleanText(String(body.category ?? "civic")) || "civic") as SurveyCategory,
+      deliveryType: cleanText(String(body.deliveryType ?? "external")) === "internal" ? "internal" : "external",
+      surveyDefinitionId: cleanText(String(body.surveyDefinitionId ?? "")),
       surveyUrl: cleanText(String(body.surveyUrl ?? "")),
       points: Number(body.points ?? 100),
       assignedDate: cleanText(String(body.assignedDate ?? "")),

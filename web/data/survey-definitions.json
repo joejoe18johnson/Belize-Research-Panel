@@ -1,0 +1,91 @@
+[
+  {
+    "id": "survey-belize-coastal-tourism-2026",
+    "title": "Belize coastal tourism attitudes 2026",
+    "description": "Share your views on tourism development, reef conservation, and visitor spending along Belize's coast. This on-site survey is hosted directly on the Belize Research Panel.",
+    "category": "market",
+    "status": "published",
+    "questions": [
+      {
+        "id": "q-coastal-visit",
+        "type": "yes_no",
+        "title": "Have you visited Belize's coastal or island destinations in the past 12 months?",
+        "description": "",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "id": "q-coastal-frequency",
+        "type": "single_choice",
+        "title": "How often do you typically visit coastal tourism areas?",
+        "description": "",
+        "required": true,
+        "options": ["Never", "Once a year or less", "A few times a year", "Monthly or more"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "id": "q-reef-importance",
+        "type": "rating_scale",
+        "title": "Protecting the Belize Barrier Reef should be a top national priority.",
+        "description": "1 = Strongly disagree · 5 = Strongly agree",
+        "required": true,
+        "options": ["Option 1", "Option 2"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-spending-change",
+        "type": "dropdown",
+        "title": "Compared to last year, how has your spending on local tourism activities changed?",
+        "description": "",
+        "required": true,
+        "options": ["Spending much less", "Spending less", "About the same", "Spending more", "Spending much more"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "id": "q-priorities",
+        "type": "multiple_choice",
+        "title": "Which tourism issues matter most to you? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Cruise ship impacts",
+          "Hotel development",
+          "Local jobs for Belizeans",
+          "Environmental protection",
+          "Affordable access for residents"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "id": "q-interview-notes",
+        "type": "long_text",
+        "title": "What is one change you would recommend to improve coastal tourism in your area?",
+        "description": "Interview-style open response.",
+        "required": true,
+        "options": ["Option 1", "Option 2"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      }
+    ],
+    "createdAt": "2026-06-16T12:00:00.000Z",
+    "updatedAt": "2026-06-16T12:00:00.000Z"
+  }
+]

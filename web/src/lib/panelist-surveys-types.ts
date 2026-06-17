@@ -12,6 +12,8 @@ export interface PanelistSurveyRecord {
   progressPercent: number;
   completedDate: string | null;
   surveyUrl?: string | null;
+  surveyDefinitionId?: string | null;
+  deliveryType?: "internal" | "external";
   panelistEmail?: string;
 }
 

@@ -28,6 +28,8 @@ export interface CampaignRecord {
   category: SurveyCategory;
   status: CampaignStatus;
   surveyUrl: string;
+  surveyDefinitionId?: string;
+  deliveryType: "internal" | "external";
   points: number;
   assignedDate: string;
   completeByDate: string;
@@ -75,7 +77,9 @@ export interface CreateCampaignInput {
   title: string;
   description?: string;
   category: SurveyCategory;
-  surveyUrl: string;
+  surveyUrl?: string;
+  surveyDefinitionId?: string;
+  deliveryType: "internal" | "external";
   points: number;
   assignedDate: string;
   completeByDate: string;
