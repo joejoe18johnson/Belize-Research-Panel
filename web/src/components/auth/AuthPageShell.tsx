@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { AUTH_CONTENT_MAX } from "@/lib/layout-widths";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
 export function AuthPageShell({
   title,
@@ -25,8 +25,8 @@ export function AuthPageShell({
       <main className="flex flex-1 items-start justify-center px-3 py-8 sm:items-center sm:px-4 sm:py-16">
         <div className={`w-full ${AUTH_CONTENT_MAX}`}>
           <div className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.04] sm:p-8">
-            <h1 className="text-xl font-bold text-teal-950 sm:text-2xl">{formatHeadingCase(title)}</h1>
-            {subtitle ? <p className="mt-2 text-sm text-zinc-600">{formatHeadingCase(subtitle)}</p> : null}
+            <h1 className="text-xl font-bold text-teal-950 sm:text-2xl">{formatSiteCase(title)}</h1>
+            {subtitle ? <p className="mt-2 text-sm text-zinc-600">{formatSiteCase(subtitle)}</p> : null}
             <div className="mt-6">{children}</div>
             {footer ? (
               <div className="mt-6 border-t border-zinc-100 pt-6 text-sm text-zinc-600">{footer}</div>

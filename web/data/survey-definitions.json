@@ -133,5 +133,75 @@
     ],
     "createdAt": "2026-06-17T04:11:54.814Z",
     "updatedAt": "2026-06-17T04:13:00.974Z"
+  },
+  {
+    "id": "survey-fuel-prices-mqhkl4b2",
+    "title": "Fuel Prices",
+    "description": "Fuel Prices",
+    "category": "civic",
+    "status": "published",
+    "questions": [
+      {
+        "id": "q-2fxu1c8l",
+        "type": "short_text",
+        "title": "Is the War to Blame for high Fuel Prices",
+        "description": "fuel prices",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-9sphfuzf",
+        "type": "multiple_choice",
+        "title": "What is more essential",
+        "description": "",
+        "required": true,
+        "options": [
+          "Flour",
+          "Sugar"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-8p3avayh",
+        "type": "multiple_choice",
+        "title": "Who is to Blame for the War?",
+        "description": "",
+        "required": false,
+        "options": [
+          "US",
+          "RUSSIA"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-lbbw9hyk",
+        "type": "multiple_choice",
+        "title": "",
+        "description": "",
+        "required": true,
+        "options": [
+          "Food"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      }
+    ],
+    "createdAt": "2026-06-17T04:27:33.518Z",
+    "updatedAt": "2026-06-17T04:27:33.518Z"
   }
 ]

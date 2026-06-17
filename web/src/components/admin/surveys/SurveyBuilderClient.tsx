@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { SurveyOptionListEditor } from "@/components/admin/surveys/SurveyOptionListEditor";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BUILDER_QUESTION_TYPES, SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
 import {
   createEmptyQuestion,
+  sanitizeQuestionOptions,
   SURVEY_QUESTION_TYPE_LABELS,
   type SurveyDefinition,
   type SurveyQuestion,
@@ -82,7 +84,13 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
     setMessage("");
 
     try {
-      const payload = { title, description, category, status: nextStatus, questions };
+      const payload = {
+        title,
+        description,
+        category,
+        status: nextStatus,
+        questions: questions.map(sanitizeQuestionOptions),
+      };
       const url = isEdit
         ? `/api/admin/survey-definitions/${encodeURIComponent(initialSurvey!.id)}`
         : "/api/admin/survey-definitions";
@@ -256,19 +264,11 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               {question.type === "single_choice" ||
               question.type === "multiple_choice" ||
               question.type === "dropdown" ? (
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Options (one per line)</label>
-                  <textarea
-                    rows={4}
-                    value={question.options.join("\n")}
-                    onChange={(event) =>
-                      updateQuestion(question.id, {
-                        options: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean),
-                      })
-                    }
-                    className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-                  />
-                </div>
+                <SurveyOptionListEditor
+                  options={question.options}
+                  multipleAnswers={question.type === "multiple_choice"}
+                  onChange={(options) => updateQuestion(question.id, { options })}
+                />
               ) : null}
 
               {question.type === "rating_scale" ? (
@@ -313,7 +313,12 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Preview</p>
                 <div className="mt-2">
-                  <SurveyQuestionField question={question} value={undefined} onChange={() => undefined} disabled />
+                  <SurveyQuestionField
+                    question={sanitizeQuestionOptions(question)}
+                    value={undefined}
+                    onChange={() => undefined}
+                    disabled
+                  />
                 </div>
               </div>
             </div>

@@ -40,8 +40,8 @@ export interface SurveyDefinition {
 export const SURVEY_QUESTION_TYPE_LABELS: Record<SurveyQuestionType, string> = {
   short_text: "Short answer",
   long_text: "Paragraph",
-  single_choice: "Multiple choice",
-  multiple_choice: "Checkboxes",
+  single_choice: "Single choice (one answer)",
+  multiple_choice: "Checkboxes (pick multiple)",
   dropdown: "Dropdown",
   rating_scale: "Linear scale",
   yes_no: "Yes / No",
@@ -66,6 +66,16 @@ export function createEmptyQuestion(type: SurveyQuestionType = "short_text"): Su
     scaleMinLabel: "Strongly disagree",
     scaleMaxLabel: "Strongly agree",
   };
+}
+
+const CHOICE_TYPES = new Set<SurveyQuestionType>(["single_choice", "multiple_choice", "dropdown"]);
+
+export function sanitizeQuestionOptions(question: SurveyQuestion): SurveyQuestion {
+  if (!CHOICE_TYPES.has(question.type)) return question;
+  const options = question.options.map((option) => option.trim()).filter(Boolean);
+  if (options.length >= 2) return { ...question, options };
+  if (options.length === 1) return { ...question, options: [...options, "Option 2"] };
+  return { ...question, options: ["Option 1", "Option 2"] };
 }
 
 export function hasAnswerForQuestion(question: SurveyQuestion, value: SurveyAnswerValue | undefined): boolean {

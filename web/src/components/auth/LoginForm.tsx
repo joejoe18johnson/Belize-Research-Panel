@@ -11,6 +11,7 @@ import {
   DEMO_UNVERIFIED_REGISTERED_ACCOUNT,
   isDemoAccountsEnabled,
 } from "@/lib/demo-accounts";
+import { formatSiteCase } from "@/lib/sentence-case";
 import type { FieldErrors } from "@/lib/validation";
 
 export function LoginForm({
@@ -154,20 +155,20 @@ export function LoginForm({
         />
       </Field>
 
-      {errors.submit ? <p className="text-sm text-red-600" role="alert">{errors.submit}</p> : null}
+      {errors.submit ? <p className="text-sm text-red-600" role="alert">{formatSiteCase(errors.submit)}</p> : null}
 
       <button
         type="submit"
         disabled={submitting}
         className="w-full rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
       >
-        {submitting ? "Signing in…" : "Log in"}
+        {submitting ? formatSiteCase("Signing in…") : formatSiteCase("Log in")}
       </button>
 
       <p className="text-center text-sm text-zinc-600">
-        Need an account?{" "}
+        {formatSiteCase("Need an account?")}{" "}
         <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900">
-          Create account
+          {formatSiteCase("Create account")}
         </Link>
       </p>
 

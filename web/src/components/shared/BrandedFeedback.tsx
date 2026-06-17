@@ -10,7 +10,7 @@ import {
   brandedModalPanelClass,
   type FeedbackTone,
 } from "@/lib/site-alerts";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatHeadingCase, formatSiteText } from "@/lib/sentence-case";
 
 function FeedbackIcon({ tone }: { tone: FeedbackTone }) {
   if (tone === "success") {
@@ -71,7 +71,7 @@ export function BrandedAlert({
         ) : null}
         <div className="min-w-0 flex-1">
           {title ? <p className="font-semibold">{formatHeadingCase(title)}</p> : null}
-          <div className={title ? "mt-1 leading-relaxed opacity-90" : "leading-relaxed"}>{children}</div>
+          <div className={title ? "mt-1 leading-relaxed opacity-90" : "leading-relaxed"}>{formatSiteText(children)}</div>
         </div>
       </div>
     </div>
@@ -177,7 +177,7 @@ export function BrandedConfirmDialog({
       footer={
         <>
           <button type="button" disabled={loading} onClick={onConfirm} className={confirmClass}>
-            {loading ? "Working…" : confirmLabel}
+            {loading ? "Working…" : formatHeadingCase(confirmLabel)}
           </button>
           <button
             type="button"
@@ -185,7 +185,7 @@ export function BrandedConfirmDialog({
             onClick={onCancel}
             className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60"
           >
-            {cancelLabel}
+            {formatHeadingCase(cancelLabel)}
           </button>
         </>
       }

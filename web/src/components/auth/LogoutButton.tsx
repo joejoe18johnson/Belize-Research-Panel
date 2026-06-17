@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatSiteCase } from "@/lib/sentence-case";
 
 export function LogoutButton({ className = "" }: { className?: string }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function LogoutButton({ className = "" }: { className?: string }) {
       aria-label={loading ? "Logging out" : "Log out"}
       className={className}
     >
-      {loading ? "Logging out…" : "Log out"}
+      {loading ? formatSiteCase("Logging out…") : formatSiteCase("Log out")}
     </button>
   );
 }

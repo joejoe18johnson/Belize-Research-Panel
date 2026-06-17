@@ -27,5 +27,19 @@
     "startedAt": "2026-06-17T04:14:46.041Z",
     "updatedAt": "2026-06-17T04:14:46.041Z",
     "submittedAt": "2026-06-17T04:14:46.041Z"
+  },
+  {
+    "assignmentId": "campaign-fuel-prices-mqhknfs4",
+    "surveyDefinitionId": "survey-fuel-prices-mqhkl4b2",
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "answers": {
+      "q-2fxu1c8l": "Russia",
+      "q-lbbw9hyk": [
+        "Food"
+      ]
+    },
+    "startedAt": "2026-06-17T04:30:08.941Z",
+    "updatedAt": "2026-06-17T04:30:11.272Z",
+    "submittedAt": null
   }
 ]

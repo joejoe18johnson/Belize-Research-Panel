@@ -62,7 +62,7 @@ export function Field({ label, required, error, hint, children, id }: FieldProps
         {required ? <span className="text-red-600"> *</span> : null}
       </label>
       {children}
-      {error ? <p className={errorClass} role="alert">{error}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
       {!error && hint ? <p className={hintClass}>{formatHeadingCase(hint)}</p> : null}
     </div>
   );
@@ -160,7 +160,7 @@ export function CheckboxField({
         />
         <span>{formatHeadingCase(label)}</span>
       </label>
-      {error ? <p className={`${errorClass} ml-2 mt-1.5`} role="alert">{error}</p> : null}
+      {error ? <p className={`${errorClass} ml-2 mt-1.5`} role="alert">{formatHeadingCase(error)}</p> : null}
     </div>
   );
 }
@@ -202,7 +202,7 @@ export function MultiSelect({
           </label>
         ))}
       </div>
-      {error ? <p className={errorClass} role="alert">{error}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
     </div>
   );
 }
@@ -241,7 +241,7 @@ export function FileInput({
         className={`block w-full text-sm text-zinc-700 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-800 ${error ? "rounded-lg ring-2 ring-red-500/30" : ""}`}
       />
       {optional ? <p className={hintClass}>{formatHeadingCase("Optional")}</p> : null}
-      {error ? <p className={errorClass} role="alert">{error}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
     </div>
   );
 }

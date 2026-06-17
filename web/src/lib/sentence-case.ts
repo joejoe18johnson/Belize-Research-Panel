@@ -78,7 +78,16 @@ export function formatHeadingCase(value: string): string {
 
 export const formatTitleCase = formatHeadingCase;
 
+/** Site-wide label and body copy — same title-case rules as headings. */
+export const formatSiteCase = formatHeadingCase;
+
 export function formatHeadingChildren(children: ReactNode): ReactNode {
   if (typeof children === "string") return formatHeadingCase(children);
+  return children;
+}
+
+export function formatSiteText(children: ReactNode): ReactNode {
+  if (typeof children === "string") return formatSiteCase(children);
+  if (Array.isArray(children)) return children.map((child) => formatSiteText(child));
   return children;
 }

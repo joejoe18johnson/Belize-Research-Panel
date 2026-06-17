@@ -56,5 +56,24 @@
     },
     "createdAt": "2026-06-17T04:14:26.352Z",
     "launchedAt": "2026-06-17T04:14:26.352Z"
+  },
+  {
+    "id": "campaign-fuel-prices-mqhknfs4",
+    "title": "Fuel Prices",
+    "description": "Fuel Prices",
+    "category": "civic",
+    "status": "active",
+    "surveyUrl": "",
+    "surveyDefinitionId": "survey-fuel-prices-mqhkl4b2",
+    "deliveryType": "internal",
+    "points": 100,
+    "assignedDate": "2026-06-17",
+    "completeByDate": "2026-07-01",
+    "deliveryMethod": "External Survey Link",
+    "targeting": {
+      "mode": "all_verified"
+    },
+    "createdAt": "2026-06-17T04:29:21.700Z",
+    "launchedAt": "2026-06-17T04:29:21.700Z"
   }
 ]
