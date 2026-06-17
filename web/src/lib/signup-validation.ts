@@ -10,6 +10,7 @@ import {
   type FieldErrors,
 } from "./validation";
 import { COMMONWEALTH_COUNTRIES } from "./constants";
+import { validateEmailForBotSignup } from "./suspicious-email";
 
 export type { FieldErrors };
 
@@ -59,6 +60,12 @@ export function validateSignupForm(data: SignupFormData): FieldErrors {
     errors.email = "Email address is required.";
   } else if (!validEmail(data.email)) {
     errors.email = "Please enter a valid email address.";
+  } else {
+    const suspiciousEmailError = validateEmailForBotSignup(data.email, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+    if (suspiciousEmailError) errors.email = suspiciousEmailError;
   }
 
   if (!data.password) {
