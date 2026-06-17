@@ -2,8 +2,8 @@ import { AdminCampaignsDashboard } from "@/components/admin/campaigns/AdminCampa
 import {
   buildCampaignAssignmentDetails,
   buildCampaignSummaries,
-  loadCampaignRecords,
-} from "@/lib/campaigns";
+} from "@/lib/campaign-targeting";
+import { loadCampaignRecords } from "@/lib/campaigns";
 import { panelistByEmailMap } from "@/lib/admin-data-hub";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 import { loadPanelists } from "@/lib/panelists";
