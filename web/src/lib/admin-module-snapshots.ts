@@ -712,8 +712,8 @@ function buildSystemSettings(hub: AdminDataHub): AdminModuleSnapshot {
     eyebrow: "Configuration",
     title: "System settings",
     description:
-      "Operational defaults for panel rewards and redemption — edit live values under Campaigns → Reward settings.",
-    links: [{ label: "Open reward settings", href: "/admin/campaigns/reward-settings" }],
+      "Operational defaults for panel rewards and redemption — edit live values under Admin → Reward settings.",
+    links: [{ label: "Open reward settings", href: "/admin/reward-settings" }],
     metrics: [
       { label: "Redemption minimum", value: `${DEFAULT_REWARD_SETTINGS.redemptionMinimumPoints} pts` },
       { label: "Redemption rate", value: redemptionRateLabel(DEFAULT_REWARD_SETTINGS) },

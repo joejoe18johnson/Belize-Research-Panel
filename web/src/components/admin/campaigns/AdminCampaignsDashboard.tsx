@@ -94,12 +94,6 @@ export function AdminCampaignsDashboard({
           >
             Create campaign
           </Link>
-          <Link
-            href="/admin/campaigns/reward-settings"
-            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:bg-teal-950"
-          >
-            Reward settings
-          </Link>
         </div>
       </div>
 

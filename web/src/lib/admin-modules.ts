@@ -5,7 +5,7 @@ export type AdminModuleKind = "page" | "module";
 
 export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
-export type AdminNavSectionId = "panelists" | "campaigns" | "research" | "operations" | "platform";
+export type AdminNavSectionId = "panelists" | "campaigns" | "rewards" | "research" | "operations" | "platform";
 
 export interface AdminNavSection {
   id: AdminNavSectionId;
@@ -28,6 +28,7 @@ export interface AdminModule {
 export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   { id: "panelists", label: "Panelists" },
   { id: "campaigns", label: "Campaigns" },
+  { id: "rewards", label: "Rewards" },
   { id: "research", label: "Research" },
   { id: "operations", label: "Operations" },
   { id: "platform", label: "Platform" },
@@ -110,20 +111,19 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
-    slug: "reward-settings",
-    label: "Reward Settings",
-    kind: "page",
-    href: "/admin/campaigns/reward-settings",
-    section: "campaigns",
-    parentSlug: "campaigns",
-    status: "working",
-  },
-  {
     slug: "survey-builder",
     label: "Survey Builder",
     kind: "page",
     href: "/admin/surveys",
     section: "campaigns",
+    status: "working",
+  },
+  {
+    slug: "reward-settings",
+    label: "Reward Settings",
+    kind: "page",
+    href: "/admin/reward-settings",
+    section: "rewards",
     status: "working",
   },
   {

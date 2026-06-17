@@ -80,7 +80,7 @@ const ADMIN_PATH_TO_SLUG: Record<string, string> = {
   "/admin/sample-selection": "sample-selection",
   "/admin/campaigns": "campaigns",
   "/admin/campaigns/create": "create-campaign",
-  "/admin/campaigns/reward-settings": "reward-settings",
+  "/admin/reward-settings": "reward-settings",
   "/admin/survey-distribution": "survey-distribution",
   "/admin/analytics": "advanced-analytics",
 };
@@ -121,7 +121,7 @@ export function pathnameToAdminModuleSlug(pathname: string): string | null {
   if (pathname.startsWith("/admin/surveys")) return "survey-builder";
   if (ADMIN_PATH_TO_SLUG[pathname]) return ADMIN_PATH_TO_SLUG[pathname];
 
-  if (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create" && pathname !== "/admin/campaigns/reward-settings") {
+  if (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create") {
     return "campaigns";
   }
 
