@@ -45,7 +45,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
     );
   }, [requirementFiltered, search]);
 
-  const pagination = useTablePagination(filtered, 2);
+  const pagination = useTablePagination(filtered);
 
   const incompleteRequirements = rows.filter(
     (row) =>

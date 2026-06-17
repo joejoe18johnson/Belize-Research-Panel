@@ -46,9 +46,9 @@ export function AdminDashboardClient({
   recentPanelists: RecentPanelistRow[];
   recentPayouts: PayoutQueueRow[];
 }) {
-  const panelistsPagination = useTablePagination(recentPanelists, 2);
-  const usersPagination = useTablePagination(recentPanelists, 2);
-  const payoutsPagination = useTablePagination(recentPayouts, 2);
+  const panelistsPagination = useTablePagination(recentPanelists);
+  const usersPagination = useTablePagination(recentPanelists);
+  const payoutsPagination = useTablePagination(recentPayouts);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-8">

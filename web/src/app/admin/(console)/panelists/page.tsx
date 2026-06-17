@@ -1,7 +1,11 @@
 import { AdminPanelistsClient } from "@/components/admin/panelists/AdminPanelistsClient";
 import { getUniqueFilterValues } from "@/lib/admin-panelists";
 import { loadPanelists } from "@/lib/panelists";
-import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
+import {
+  loadPanelistPhotoUploadUsernames,
+  loadPanelistResidenceUploadUsernames,
+  requirementContextForPanelist,
+} from "@/lib/panelist-requirement-context";
 import { assessPanelistRequirements } from "@/lib/panelist-requirements";
 import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import { promises as fs } from "fs";
@@ -29,10 +33,11 @@ export default async function AdminPanelistsPage({
   searchParams: Promise<{ email?: string; verification?: string }>;
 }) {
   const params = await searchParams;
-  const [rows, accounts, photoUploadUsernames] = await Promise.all([
+  const [rows, accounts, photoUploadUsernames, residenceUploadUsernames] = await Promise.all([
     loadPanelists(),
     loadAccounts(),
     loadPanelistPhotoUploadUsernames(),
+    loadPanelistResidenceUploadUsernames(),
   ]);
 
   if (rows.length === 0) {
@@ -70,6 +75,8 @@ export default async function AdminPanelistsPage({
       requirementByEmail={requirementByEmail}
       initialEmail={params.email}
       initialVerification={params.verification}
+      photoUploadUsernames={photoUploadUsernames}
+      residenceUploadUsernames={residenceUploadUsernames}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),
         district: getUniqueFilterValues(rows, "district"),

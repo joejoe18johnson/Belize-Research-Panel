@@ -11,12 +11,14 @@ const REQUIREMENT_KINDS: Record<string, RequirementKind> = {
 function requirementDisplayLabel(status: RequirementApprovalStatus): string {
   if (status === "approved") return "Verified";
   if (status === "under_review") return "Under review";
+  if (status === "denied") return "Denied";
   return "Not submitted";
 }
 
 function statusTextClass(status: RequirementApprovalStatus): string {
   if (status === "approved") return "text-emerald-600";
   if (status === "under_review") return "text-amber-700";
+  if (status === "denied") return "text-red-700";
   return "text-zinc-500";
 }
 
@@ -76,7 +78,9 @@ function StatusCircleIcon({
       ? "bg-emerald-500 text-white"
       : status === "under_review"
         ? "bg-amber-500 text-white"
-        : "bg-zinc-400 text-white";
+        : status === "denied"
+          ? "bg-red-500 text-white"
+          : "bg-zinc-400 text-white";
 
   return (
     <span

@@ -377,6 +377,23 @@ export async function markAccountPanelistRegistered(accountId: string): Promise<
   await saveAccountsRaw(accounts);
 }
 
+export async function setAccountEmailVerifiedByAdmin(email: string, verified: boolean): Promise<boolean> {
+  const normalized = cleanText(email).toLowerCase();
+  if (!normalized) return false;
+
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((account) => cleanText(account.email).toLowerCase() === normalized);
+  if (index < 0) return false;
+
+  accounts[index] = {
+    ...accounts[index],
+    email_verified: verified ? "true" : "false",
+    ...(verified ? { verification_token: "" } : {}),
+  };
+  await saveAccountsRaw(accounts);
+  return true;
+}
+
 export async function verifyAccountPassword(
   email: string,
   password: string

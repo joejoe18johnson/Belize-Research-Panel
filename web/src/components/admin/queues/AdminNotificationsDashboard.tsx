@@ -40,7 +40,7 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
     });
   }, [rows, search, typeFilter]);
 
-  const pagination = useTablePagination(filtered, 2);
+  const pagination = useTablePagination(filtered);
 
   const emailChanges = rows.filter((row) => row.type === "Email change").length;
   const phoneChanges = rows.filter((row) => row.type === "Phone change").length;

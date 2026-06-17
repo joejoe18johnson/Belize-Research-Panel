@@ -18,7 +18,13 @@ import { FilterMultiSelect } from "@/components/admin/shared/AdminUi";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert, BrandedConfirmDialog, BrandedModal } from "@/components/shared/BrandedFeedback";
-import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
+import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
+import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
+import {
+  ADMIN_REQUIREMENT_FIELDS,
+  requirementOnFile,
+  verificationStatusFromRequirementApprovals,
+} from "@/lib/panelist-requirements";
 
 const DUPLICATE_REVIEW_COLUMNS = [
   "first_name",
@@ -58,6 +64,9 @@ interface EditState {
   city_town_village: string;
   constituency: string;
   notes: string;
+  admin_email_approved: AdminRequirementDecision;
+  admin_phone_approved: AdminRequirementDecision;
+  admin_photo_id_approved: AdminRequirementDecision;
 }
 
 type RowActions = {
@@ -74,6 +83,8 @@ export function AdminPanelistsClient({
   filterOptions,
   initialVerification,
   initialEmail,
+  photoUploadUsernames,
+  residenceUploadUsernames,
 }: {
   rows: PanelistRow[];
   requirementByEmail: Record<
@@ -88,6 +99,8 @@ export function AdminPanelistsClient({
   };
   initialVerification?: string;
   initialEmail?: string;
+  photoUploadUsernames: Set<string>;
+  residenceUploadUsernames: Set<string>;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"all" | "duplicates">("all");
@@ -95,7 +108,7 @@ export function AdminPanelistsClient({
   const [districtFilter, setDistrictFilter] = useState<string[]>([]);
   const [constituencyFilter, setConstituencyFilter] = useState<string[]>([]);
   const [voterFilter, setVoterFilter] = useState<string[]>([]);
-  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [editingRow, setEditingRow] = useState<PanelistRow | null>(null);
   const [editState, setEditState] = useState<EditState | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -120,23 +133,35 @@ export function AdminPanelistsClient({
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
 
-  const allPagination = useTablePagination(filteredRows, 2);
-  const duplicatePagination = useTablePagination(duplicateRows, 2);
+  const allPagination = useTablePagination(filteredRows);
+  const duplicatePagination = useTablePagination(duplicateRows);
 
   const cityOptions =
     editState?.district && editState.district in CITY_TOWN_VILLAGE
       ? ["", ...CITY_TOWN_VILLAGE[editState.district]]
       : [""];
 
+  const editingEmail = editingRow?.email ?? null;
+
   const openEdit = (email: string) => {
     setMessage("");
     setError("");
-    setEditingEmail(email);
     const row = rows.find((item) => item.email === email);
     if (!row) {
+      setEditingRow(null);
       setEditState(null);
       return;
     }
+
+    const emailKey = cleanText(row.email).toLowerCase();
+    const derived = requirementByEmail[emailKey];
+    const readDecision = (field: string, derivedApproved: boolean): AdminRequirementDecision => {
+      const stored = cleanText(row[field]).toLowerCase();
+      if (stored === "true" || stored === "false") return stored;
+      return derivedApproved ? "true" : "";
+    };
+
+    setEditingRow(row);
     setEditState({
       verification_status: row.verification_status ?? "Pending",
       status: row.status ?? "Active",
@@ -146,6 +171,9 @@ export function AdminPanelistsClient({
       city_town_village: row.city_town_village ?? "",
       constituency: row.constituency ?? "",
       notes: row.notes ?? "",
+      admin_email_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.email, derived?.email === "approved"),
+      admin_phone_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.phone, derived?.phone === "approved"),
+      admin_photo_id_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.photoId, derived?.photoId === "approved"),
     });
   };
 
@@ -163,10 +191,52 @@ export function AdminPanelistsClient({
   }, [initialEmail]);
 
   const closeEdit = () => {
-    setEditingEmail(null);
+    setEditingRow(null);
     setEditState(null);
     setError("");
     setMessage("");
+  };
+
+  const requirementReviewContext = useMemo(() => {
+    if (!editingRow) return { hasPhotoUpload: false, hasResidenceUpload: false };
+    const username = cleanText(editingRow.username);
+    return {
+      hasPhotoUpload: username ? photoUploadUsernames.has(username) : false,
+      hasResidenceUpload: username ? residenceUploadUsernames.has(username) : false,
+    };
+  }, [editingRow, photoUploadUsernames, residenceUploadUsernames]);
+
+  const applyRequirementDecision = (key: "email" | "phone" | "photoId", decision: "true" | "false") => {
+    if (!editState || !editingRow) return;
+
+    const field =
+      key === "email"
+        ? "admin_email_approved"
+        : key === "phone"
+          ? "admin_phone_approved"
+          : "admin_photo_id_approved";
+
+    const next: EditState = {
+      ...editState,
+      [field]: decision,
+    };
+
+    const mergedRow: PanelistRow = {
+      ...editingRow,
+      email: next.email,
+      phone_whatsapp: next.phone_whatsapp,
+      [ADMIN_REQUIREMENT_FIELDS.email]: next.admin_email_approved,
+      [ADMIN_REQUIREMENT_FIELDS.phone]: next.admin_phone_approved,
+      [ADMIN_REQUIREMENT_FIELDS.photoId]: next.admin_photo_id_approved,
+    };
+
+    next.verification_status = verificationStatusFromRequirementApprovals(
+      mergedRow,
+      requirementReviewContext,
+      editState.verification_status
+    );
+
+    setEditState(next);
   };
 
   const exportCsv = () => {
@@ -464,24 +534,18 @@ export function AdminPanelistsClient({
         </section>
       )}
 
-      {editingEmail && editState ? (
+      {editingEmail && editState && editingRow ? (
         <PanelistEditModal
-          label={panelistDisplayLabel(
-            rows.find((row) => row.email === editingEmail) ?? ({ email: editingEmail } as PanelistRow)
-          )}
+          label={panelistDisplayLabel(editingRow)}
           editState={editState}
           cityOptions={cityOptions}
           saving={saving}
           error={error}
           message={message}
-          requirements={
-            requirementByEmail[cleanText(editingEmail).toLowerCase()] ?? {
-              email: "missing",
-              phone: "missing",
-              photoId: "missing",
-            }
-          }
-          photoIdType={cleanText(rows.find((row) => row.email === editingEmail)?.photo_id_type)}
+          photoIdType={cleanText(editingRow.photo_id_type)}
+          panelistEmail={editingRow.email}
+          requirementContext={requirementReviewContext}
+          onRequirementDecision={applyRequirementDecision}
           onChange={setEditState}
           onClose={closeEdit}
           onSave={saveRecord}
@@ -512,8 +576,10 @@ function PanelistEditModal({
   saving,
   error,
   message,
-  requirements,
   photoIdType,
+  panelistEmail,
+  requirementContext,
+  onRequirementDecision,
   onChange,
   onClose,
   onSave,
@@ -526,18 +592,48 @@ function PanelistEditModal({
   saving: boolean;
   error: string;
   message: string;
-  requirements: {
-    email: RequirementApprovalStatus;
-    phone: RequirementApprovalStatus;
-    photoId: RequirementApprovalStatus;
-  };
   photoIdType: string;
+  panelistEmail: string;
+  requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean };
+  onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false") => void;
   onChange: (state: EditState) => void;
   onClose: () => void;
   onSave: () => void;
   onDelete: () => void;
   deleting: boolean;
 }) {
+  const reviewPanelist = {
+    email: editState.email,
+    phone_whatsapp: editState.phone_whatsapp,
+    photo_id_type: photoIdType,
+    notes: editState.notes,
+  };
+
+  const onFile = {
+    email: requirementOnFile("email", reviewPanelist, requirementContext),
+    phone: requirementOnFile("phone", reviewPanelist, requirementContext),
+    photoId: requirementOnFile("photo_id", reviewPanelist, requirementContext),
+  };
+
+  const allVerified =
+    onFile.email &&
+    onFile.phone &&
+    onFile.photoId &&
+    editState.admin_email_approved === "true" &&
+    editState.admin_phone_approved === "true" &&
+    editState.admin_photo_id_approved === "true";
+
+  const documentBase = `/api/admin/panelists/${encodeURIComponent(panelistEmail)}/document`;
+  const reviewDetail = {
+    email: editState.email,
+    phone: editState.phone_whatsapp,
+    photoIdType,
+    photoIdDocumentUrl: requirementContext.hasPhotoUpload ? `${documentBase}?kind=photo-id` : undefined,
+    residenceDocumentUrl: requirementContext.hasResidenceUpload
+      ? `${documentBase}?kind=residence-proof`
+      : undefined,
+  };
+
   return (
     <BrandedModal
       open
@@ -576,18 +672,24 @@ function PanelistEditModal({
         <div className="rounded-xl border border-teal-100 bg-teal-50/40 p-4">
           <p className="text-sm font-semibold text-teal-950">{formatHeadingCase("Required checks")}</p>
           <p className="mt-1 text-xs text-teal-900/80">
-            Panelists stay under review until email, phone, and photo ID are on file and verification is approved.
+            Verify or deny each item below. When email, phone, and photo ID are all verified, the panelist becomes fully verified.
           </p>
           <div className="mt-3">
-            <RequirementStatusGroup
-              email={requirements.email}
-              phone={requirements.phone}
-              photoId={requirements.photoId}
+            <RequirementReviewControls
+              decisions={{
+                email: editState.admin_email_approved,
+                phone: editState.admin_phone_approved,
+                photoId: editState.admin_photo_id_approved,
+              }}
+              onFile={onFile}
+              detail={reviewDetail}
+              onDecision={onRequirementDecision}
+              disabled={saving}
             />
           </div>
-          {photoIdType ? (
-            <p className="mt-2 text-xs text-zinc-600">
-              ID type on file: <span className="font-medium text-zinc-800">{photoIdType}</span>
+          {allVerified ? (
+            <p className="mt-3 text-xs font-semibold text-emerald-700">
+              All required checks verified — verification status will be set to Verified when saved.
             </p>
           ) : null}
         </div>
