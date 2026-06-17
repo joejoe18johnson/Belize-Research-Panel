@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ThemeScript } from "@/components/theme/ThemeScript";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,13 +32,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col font-sans">
-        <NetlifyDeployBanner />
-        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-        <SiteFooterGate>
-          <SiteFooter />
-        </SiteFooterGate>
+    <html lang="en" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+        <ThemeScript />
+        <ThemeProvider>
+          <NetlifyDeployBanner />
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          <SiteFooterGate>
+            <SiteFooter />
+          </SiteFooterGate>
+        </ThemeProvider>
       </body>
     </html>
   );

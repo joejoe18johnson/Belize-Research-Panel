@@ -14,7 +14,7 @@ import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
-import { UserAvatar } from "./UserAvatar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const CONTENT_CLASS = appContentClass;
 
@@ -43,22 +43,23 @@ export function DashboardShell({
             logoClassName="sm:text-base"
           />
           <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
+            <ThemeToggle compact />
             <PointsBalanceLink availablePoints={badges.availablePoints} />
             <NotificationBellLink unreadCount={badges.unreadNotifications} />
             <Link
               href="/dashboard/profile"
-              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 sm:min-h-11 sm:min-w-11 md:min-w-0 md:gap-2.5"
+              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:min-h-11 sm:min-w-11 md:min-w-0 md:gap-2.5"
               aria-label="View profile"
             >
               <UserAvatar firstName={firstName} email={email} />
               <div className="hidden min-w-0 md:block">
                 {firstName.trim() ? (
-                  <p className="truncate font-medium text-zinc-900">{firstName}</p>
+                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{firstName}</p>
                 ) : null}
                 <p className="truncate text-xs text-zinc-500">{email}</p>
               </div>
             </Link>
-            <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-2.5 text-xs font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:text-sm" />
+            <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-2.5 text-xs font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:min-h-11 sm:px-4 sm:text-sm" />
           </div>
         </div>
         <DashboardNav badges={badges} />

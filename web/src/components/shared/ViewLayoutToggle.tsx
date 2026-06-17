@@ -62,13 +62,20 @@ export function ViewLayoutToggle({
 
   if (!mounted) return null;
 
-  const labelClass = variant === "dark" ? "text-teal-100" : "text-zinc-500";
+  const labelClass =
+    variant === "dark" ? "text-teal-100" : "text-zinc-500 dark:text-zinc-400";
   const shellClass =
-    variant === "dark" ? "border-white/20 bg-white/10" : "border-zinc-200 bg-zinc-50";
+    variant === "dark"
+      ? "border-white/20 bg-white/10"
+      : "border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900";
   const activeClass =
-    variant === "dark" ? "bg-white text-teal-900 shadow-sm" : "bg-white text-teal-800 shadow-sm";
+    variant === "dark"
+      ? "bg-white text-teal-900 shadow-sm"
+      : "bg-white text-teal-800 shadow-sm dark:bg-zinc-800 dark:text-teal-200";
   const idleClass =
-    variant === "dark" ? "text-teal-100 hover:text-white" : "text-zinc-600 hover:text-teal-800";
+    variant === "dark"
+      ? "text-teal-100 hover:text-white"
+      : "text-zinc-600 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200";
 
   return (
     <div
