@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decodeAdminSessionToken } from "@/lib/admin-auth";
+import { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "@/lib/admin-session";
 import { adminPathAllowedForRole, staffDefaultAdminPath } from "@/lib/staff-roles";
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login"]);

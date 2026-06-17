@@ -1,0 +1,68 @@
+[
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000001",
+    "email": "super.admin@belizepanel.test",
+    "first_name": "Super",
+    "last_name": "Admin",
+    "role": "super_admin",
+    "password_salt": "super-admin",
+    "password_hash": "d36feec56f50b724f12750c1b38ec5b520c7f2439b42bc8ae488676b82e34722",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000002",
+    "email": "ops.manager@belizepanel.test",
+    "first_name": "Operations",
+    "last_name": "Manager",
+    "role": "operations_manager",
+    "password_salt": "ops-manager",
+    "password_hash": "2acc0dc715cd477e93854eabf5a735ef0f8377cfcd9a6959df11a9cc6dc403fc",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000003",
+    "email": "research.analyst@belizepanel.test",
+    "first_name": "Research",
+    "last_name": "Analyst",
+    "role": "research_analyst",
+    "password_salt": "research-analyst",
+    "password_hash": "8a0ad885172c9b06ae7ccb82d96ffb497478c31f7a6f3feca4985cc291c73e37",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000004",
+    "email": "field.supervisor@belizepanel.test",
+    "first_name": "Field",
+    "last_name": "Supervisor",
+    "role": "field_supervisor",
+    "password_salt": "field-supervisor",
+    "password_hash": "6bc0d82baeae7740f5aa81a4f786b80137211c43544400a69e4df530606c29cf",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000005",
+    "email": "finance.officer@belizepanel.test",
+    "first_name": "Finance",
+    "last_name": "Officer",
+    "role": "finance_officer",
+    "password_salt": "finance-officer",
+    "password_hash": "d625447934583a5992f483d75dec13269807f35bed77076ec9026ed51b104252",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "staff-00000000-0000-0000-0000-000000000006",
+    "email": "client.viewer@belizepanel.test",
+    "first_name": "Client",
+    "last_name": "Viewer",
+    "role": "client_viewer",
+    "password_salt": "client-viewer",
+    "password_hash": "70b4c4cfc01a1ecd24dabce8b20470968f31597c3a8916b90a4c0be4b93aacc0",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+]

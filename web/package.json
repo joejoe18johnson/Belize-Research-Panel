@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --webpack",
     "build": "next build",
-    "build:netlify": "npm run seed:demo && npm run build",
+    "build:netlify": "npm run seed:all && npm run build",
     "start": "next start",
     "lint": "eslint",
-    "seed:demo": "node scripts/seed-demo-accounts.mjs"
+    "seed:demo": "node scripts/seed-demo-accounts.mjs",
+    "seed:roles": "node scripts/seed-role-users.mjs",
+    "seed:campaign": "node scripts/seed-sample-campaign.mjs",
+    "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign"
   },
   "dependencies": {
     "next": "16.2.6",

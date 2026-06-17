@@ -15,16 +15,17 @@
   },
   "johannesjohnsonj@gmail.com": {
     "surveys": {
-      "read": false,
-      "updatedAt": "2026-05-30T17:33:04.667Z"
+      "read": true,
+      "updatedAt": "2026-06-17T03:33:02.937Z"
     },
     "verification": {
-      "read": false,
-      "updatedAt": "2026-05-30T17:33:02.080Z"
+      "read": true,
+      "updatedAt": "2026-06-17T03:33:02.937Z"
     },
     "rewards": {
-      "read": false,
-      "updatedAt": "2026-05-30T17:33:07.428Z"
+      "read": true,
+      "updatedAt": "2026-06-17T03:33:02.937Z"
     }
   }
+}
 }
