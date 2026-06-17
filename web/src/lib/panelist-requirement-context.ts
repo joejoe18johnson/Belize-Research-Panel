@@ -6,12 +6,20 @@ import { cleanText } from "./validation";
 const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 
 export async function loadPanelistPhotoUploadUsernames(): Promise<Set<string>> {
+  return loadPanelistUploadUsernamesForPrefix("photo-id-");
+}
+
+export async function loadPanelistResidenceUploadUsernames(): Promise<Set<string>> {
+  return loadPanelistUploadUsernamesForPrefix("residence-proof-");
+}
+
+async function loadPanelistUploadUsernamesForPrefix(prefix: string): Promise<Set<string>> {
   try {
     const files = await fs.readdir(UPLOADS_DIR);
     const usernames = new Set<string>();
     for (const file of files) {
-      if (!file.startsWith("photo-id-")) continue;
-      const rest = file.slice("photo-id-".length);
+      if (!file.startsWith(prefix)) continue;
+      const rest = file.slice(prefix.length);
       const dot = rest.lastIndexOf(".");
       const stem = dot >= 0 ? rest.slice(0, dot) : rest;
       if (stem) usernames.add(stem);

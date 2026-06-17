@@ -78,6 +78,119 @@ function legacyPhotoIdApproved(panelist: PanelistRow): boolean {
   return isPanelistVerified(panelist.verification_status);
 }
 
+function assessEmail(panelist: PanelistRow, context: RequirementContext): RequirementItem {
+  const email = cleanText(panelist.email).toLowerCase();
+  const onFile = Boolean(email && validEmail(email));
+  const status = resolveRequirementStatus(
+    onFile,
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email),
+    legacyEmailApproved(panelist, context)
+  );
+
+  return {
+    key: "email",
+    label: "Email",
+    status,
+    detail: onFile ? email : "Not provided",
+  };
+}
+
+function assessPhone(panelist: PanelistRow, context: RequirementContext): RequirementItem {
+  const phone = cleanText(panelist.phone_whatsapp);
+  const onFile = phoneDigits(phone).length === 10;
+  const status = resolveRequirementStatus(
+    onFile,
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.phone),
+    legacyPhoneApproved(panelist, context)
+  );
+
+  return {
+    key: "phone",
+    label: "Phone",
+    status,
+    detail: onFile ? phone : "Not provided",
+  };
+}
+
+function assessPhotoId(panelist: PanelistRow, context: RequirementContext): RequirementItem {
+  const onFile = photoIdOnFile(panelist, context);
+  const photoIdType = cleanText(panelist.photo_id_type);
+  const status = resolveRequirementStatus(
+    onFile,
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.photoId),
+    legacyPhotoIdApproved(panelist)
+  );
+
+  let detail = "Not provided";
+  if (onFile) {
+    detail = photoIdType || "Submitted — review in progress";
+  }
+
+  return {
+    key: "photo_id",
+    label: "Photo ID",
+    status,
+    detail,
+  };
+}
+
+export function requirementOnFile(
+  key: RequirementKey,
+  panelist: PanelistRow,
+  context: RequirementContext = {}
+): boolean {
+  if (key === "email") {
+    const email = cleanText(panelist.email).toLowerCase();
+    return Boolean(email && validEmail(email));
+  }
+  if (key === "phone") {
+    return phoneDigits(cleanText(panelist.phone_whatsapp)).length === 10;
+  }
+  return photoIdOnFile(panelist, context);
+}
+
+export function allAdminRequirementsApproved(
+  panelist: PanelistRow,
+  context: RequirementContext = {}
+): boolean {
+  return (
+    requirementOnFile("email", panelist, context) &&
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email) === "true" &&
+    requirementOnFile("phone", panelist, context) &&
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.phone) === "true" &&
+    requirementOnFile("photo_id", panelist, context) &&
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.photoId) === "true"
+  );
+}
+
+export function verificationStatusFromRequirementApprovals(
+  panelist: PanelistRow,
+  context: RequirementContext = {},
+  currentStatus = cleanText(panelist.verification_status)
+): string {
+  if (currentStatus === "Possible Duplicate" || currentStatus === "Rejected") {
+    return currentStatus;
+  }
+  if (allAdminRequirementsApproved(panelist, context)) {
+    return "Verified";
+  }
+  const anyDenied =
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email) === "false" ||
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.phone) === "false" ||
+    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.photoId) === "false";
+  if (anyDenied) {
+    return currentStatus === "Needs Follow-up" ? "Needs Follow-up" : "Pending";
+  }
+  return currentStatus || "Pending";
+}
+
+export function readAdminRequirementDecision(
+  panelist: PanelistRow,
+  key: keyof typeof ADMIN_REQUIREMENT_FIELDS
+): AdminRequirementDecision {
+  return readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS[key]);
+}
+
 export function requirementContextFromAccount(account: AccountRecord | undefined): RequirementContext {
   if (!account) return {};
   return {
@@ -104,7 +217,11 @@ export function assessPanelistRequirements(
 
   const incompleteParts = items
     .filter((item) => item.status !== "approved")
-    .map((item) => `${item.label} ${item.status === "missing" ? "missing" : "under review"}`);
+    .map((item) => {
+      if (item.status === "missing") return `${item.label} missing`;
+      if (item.status === "denied") return `${item.label} denied`;
+      return `${item.label} under review`;
+    });
 
   return {
     email,
@@ -133,6 +250,7 @@ export function buildPanelistReviewReasons(
 
   for (const item of requirements.items) {
     if (item.status === "missing") reasons.push(`${item.label} missing`);
+    else if (item.status === "denied") reasons.push(`${item.label} denied`);
     else if (item.status === "under_review") reasons.push(`${item.label} under review`);
   }
 
@@ -179,5 +297,6 @@ export function canApprovePanelistVerification(
 export function requirementStatusLabel(status: RequirementApprovalStatus): string {
   if (status === "approved") return "Approved";
   if (status === "under_review") return "Under review";
+  if (status === "denied") return "Denied";
   return "Missing";
 }

@@ -70,7 +70,7 @@ export function AdminPayoutsDashboard({ rows }: { rows: PayoutQueueRow[] }) {
     .filter((row) => row.status === "pending" || row.status === "approved")
     .reduce((sum, row) => sum + row.amountBz, 0);
 
-  const pagination = useTablePagination(filtered, 2);
+  const pagination = useTablePagination(filtered);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">

@@ -123,6 +123,9 @@ export async function updatePanelistAdminFields(
     city_town_village?: string;
     constituency?: string;
     notes?: string;
+    admin_email_approved?: string;
+    admin_phone_approved?: string;
+    admin_photo_id_approved?: string;
   }
 ): Promise<boolean> {
   const normalized = cleanText(accountEmail).toLowerCase();
@@ -231,14 +234,35 @@ export async function panelistHasUpload(
   username: string,
   prefix: "photo-id" | "residence-proof"
 ): Promise<boolean> {
+  const file = await findPanelistUpload(username, prefix);
+  return Boolean(file);
+}
+
+export async function findPanelistUpload(
+  username: string,
+  prefix: "photo-id" | "residence-proof"
+): Promise<{ filename: string; absolutePath: string } | null> {
   const safeUsername = cleanText(username);
-  if (!safeUsername) return false;
+  if (!safeUsername) return null;
 
   try {
     const files = await fs.readdir(UPLOADS_DIR);
-    return files.some((file) => file.startsWith(`${prefix}-${safeUsername}`));
+    const matches = files.filter((file) => file.startsWith(`${prefix}-${safeUsername}`));
+    if (matches.length === 0) return null;
+
+    const ranked = await Promise.all(
+      matches.map(async (filename) => {
+        const absolutePath = path.join(UPLOADS_DIR, filename);
+        const stat = await fs.stat(absolutePath);
+        return { filename, absolutePath, mtimeMs: stat.mtimeMs };
+      })
+    );
+
+    ranked.sort((a, b) => b.mtimeMs - a.mtimeMs);
+    const latest = ranked[0];
+    return { filename: latest.filename, absolutePath: latest.absolutePath };
   } catch {
-    return false;
+    return null;
   }
 }
 
