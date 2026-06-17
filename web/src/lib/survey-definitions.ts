@@ -1,56 +1,33 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
+import {
+  createEmptyQuestion,
+  type SurveyDefinition,
+  type SurveyDefinitionStatus,
+  type SurveyQuestion,
+  SURVEY_QUESTION_TYPES,
+  type SurveyQuestionType,
+} from "./survey-types";
 import type { SurveyCategory } from "./panelist-surveys-types";
 import { cleanText } from "./validation";
 
-export const SURVEY_QUESTION_TYPES = [
-  "short_text",
-  "long_text",
-  "single_choice",
-  "multiple_choice",
-  "dropdown",
-  "rating_scale",
-  "yes_no",
-] as const;
+export type {
+  SurveyAnswerValue,
+  SurveyDefinition,
+  SurveyDefinitionStatus,
+  SurveyQuestion,
+  SurveyQuestionType,
+} from "./survey-types";
 
-export type SurveyQuestionType = (typeof SURVEY_QUESTION_TYPES)[number];
-
-export type SurveyDefinitionStatus = "draft" | "published" | "closed";
-
-export interface SurveyQuestion {
-  id: string;
-  type: SurveyQuestionType;
-  title: string;
-  description: string;
-  required: boolean;
-  options: string[];
-  scaleMin: number;
-  scaleMax: number;
-  scaleMinLabel: string;
-  scaleMaxLabel: string;
-}
-
-export interface SurveyDefinition {
-  id: string;
-  title: string;
-  description: string;
-  category: SurveyCategory;
-  status: SurveyDefinitionStatus;
-  questions: SurveyQuestion[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export const SURVEY_QUESTION_TYPE_LABELS: Record<SurveyQuestionType, string> = {
-  short_text: "Short answer",
-  long_text: "Paragraph",
-  single_choice: "Multiple choice",
-  multiple_choice: "Checkboxes",
-  dropdown: "Dropdown",
-  rating_scale: "Linear scale",
-  yes_no: "Yes / No",
-};
+export {
+  SURVEY_QUESTION_TYPES,
+  SURVEY_QUESTION_TYPE_LABELS,
+  calculateSurveyProgress,
+  createEmptyQuestion,
+  hasAnswerForQuestion,
+  validateSurveySubmission,
+} from "./survey-types";
 
 const DATA_FILE = path.join(process.cwd(), "data", "survey-definitions.json");
 
@@ -62,28 +39,13 @@ function slugify(value: string): string {
     .slice(0, 40);
 }
 
-export function createEmptyQuestion(type: SurveyQuestionType = "short_text"): SurveyQuestion {
-  return {
-    id: `q-${randomUUID().slice(0, 8)}`,
-    type,
-    title: "",
-    description: "",
-    required: false,
-    options: type === "yes_no" ? ["Yes", "No"] : ["Option 1", "Option 2"],
-    scaleMin: 1,
-    scaleMax: 5,
-    scaleMinLabel: "Strongly disagree",
-    scaleMaxLabel: "Strongly agree",
-  };
-}
-
 export function normalizeSurveyQuestion(input: Partial<SurveyQuestion>): SurveyQuestion {
   const type = SURVEY_QUESTION_TYPES.includes(input.type as SurveyQuestionType)
     ? (input.type as SurveyQuestionType)
     : "short_text";
 
   return {
-    id: cleanText(input.id) || `q-${randomUUID().slice(0, 8)}`,
+    id: cleanText(input.id) || createEmptyQuestion(type).id,
     type,
     title: cleanText(input.title),
     description: cleanText(input.description),
@@ -195,41 +157,4 @@ export async function updateSurveyDefinition(
   definitions[index] = updated;
   await saveSurveyDefinitions(definitions);
   return updated;
-}
-
-export type SurveyAnswerValue = string | string[] | number;
-
-export function hasAnswerForQuestion(question: SurveyQuestion, value: SurveyAnswerValue | undefined): boolean {
-  if (value === undefined || value === null) return false;
-  if (question.type === "multiple_choice") {
-    return Array.isArray(value) && value.length > 0;
-  }
-  if (question.type === "rating_scale") {
-    return typeof value === "number" && !Number.isNaN(value);
-  }
-  if (typeof value === "string") return value.trim().length > 0;
-  return false;
-}
-
-export function calculateSurveyProgress(
-  questions: SurveyQuestion[],
-  answers: Record<string, SurveyAnswerValue>
-): number {
-  if (questions.length === 0) return 0;
-  const answered = questions.filter((question) => hasAnswerForQuestion(question, answers[question.id])).length;
-  return Math.round((answered / questions.length) * 100);
-}
-
-export function validateSurveySubmission(
-  questions: SurveyQuestion[],
-  answers: Record<string, SurveyAnswerValue>
-): string[] {
-  const errors: string[] = [];
-  for (const question of questions) {
-    if (!question.required) continue;
-    if (!hasAnswerForQuestion(question, answers[question.id])) {
-      errors.push(`"${question.title || "Untitled question"}" is required.`);
-    }
-  }
-  return errors;
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import type { SurveyAnswerValue, SurveyQuestion, SurveyQuestionType } from "@/lib/survey-definitions";
-import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-definitions";
+import type { SurveyAnswerValue, SurveyQuestion, SurveyQuestionType } from "@/lib/survey-types";
+import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function SurveyQuestionField({

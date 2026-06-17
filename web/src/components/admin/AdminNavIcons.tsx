@@ -66,6 +66,13 @@ const ICONS: Record<string, ReactNode> = {
       <rect x="3" y="3" width="18" height="18" rx="2" />
     </IconBase>
   ),
+  "survey-builder": (
+    <IconBase>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
+      <path strokeLinecap="round" d="M9 12h6M9 16h4" />
+    </IconBase>
+  ),
   "survey-distribution": (
     <IconBase>
       <path strokeLinecap="round" strokeLinejoin="round" d="m22 2-7 20-4-9-9-4 20-7Z" />

@@ -89,9 +89,18 @@ export function isStaffRole(value: string | null | undefined): value is StaffRol
   return STAFF_ROLES.includes(value as StaffRole);
 }
 
+/** Maps legacy session roles and unknown values to a valid staff role. */
+export function normalizeStaffRole(value: string | null | undefined): StaffRole | null {
+  if (!value) return null;
+  if (value === "admin") return "super_admin";
+  return isStaffRole(value) ? value : null;
+}
+
 export function staffCanAccessModule(role: StaffRole, moduleSlug: string): boolean {
   if (role === "super_admin") return true;
-  return ROLE_MODULE_ACCESS[role].includes(moduleSlug);
+  const access = ROLE_MODULE_ACCESS[role];
+  if (!access) return false;
+  return access.includes(moduleSlug);
 }
 
 export function staffAccessibleModules(role: StaffRole): AdminModule[] {

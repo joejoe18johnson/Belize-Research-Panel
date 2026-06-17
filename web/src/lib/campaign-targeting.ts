@@ -172,6 +172,8 @@ function inferCampaignFromAssignments(id: string, records: PanelistSurveyRecord[
     category: sample.category,
     status: "active",
     surveyUrl: cleanText(sample.surveyUrl ?? ""),
+    surveyDefinitionId: sample.surveyDefinitionId ?? undefined,
+    deliveryType: sample.surveyDefinitionId ? "internal" : sample.surveyUrl ? "external" : "external",
     points: sample.points,
     assignedDate: sample.assignedDate,
     completeByDate: sample.completeByDate,

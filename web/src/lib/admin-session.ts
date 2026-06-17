@@ -1,4 +1,5 @@
 import type { StaffRole } from "./staff-roles";
+import { normalizeStaffRole } from "./staff-roles";
 
 export const ADMIN_SESSION_COOKIE = "brp_admin_session";
 export const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
@@ -82,8 +83,9 @@ export async function decodeAdminSessionToken(token: string): Promise<AdminSessi
 
   try {
     const parsed = JSON.parse(base64UrlToString(payload)) as AdminSession;
-    if (!parsed.role || !parsed.exp || parsed.exp < Date.now()) return null;
-    return parsed;
+    const role = normalizeStaffRole(parsed.role);
+    if (!role || !parsed.exp || parsed.exp < Date.now()) return null;
+    return { ...parsed, role };
   } catch {
     return null;
   }

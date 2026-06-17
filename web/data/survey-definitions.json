@@ -12,7 +12,10 @@
         "title": "Have you visited Belize's coastal or island destinations in the past 12 months?",
         "description": "",
         "required": true,
-        "options": ["Yes", "No"],
+        "options": [
+          "Yes",
+          "No"
+        ],
         "scaleMin": 1,
         "scaleMax": 5,
         "scaleMinLabel": "Low",
@@ -24,7 +27,12 @@
         "title": "How often do you typically visit coastal tourism areas?",
         "description": "",
         "required": true,
-        "options": ["Never", "Once a year or less", "A few times a year", "Monthly or more"],
+        "options": [
+          "Never",
+          "Once a year or less",
+          "A few times a year",
+          "Monthly or more"
+        ],
         "scaleMin": 1,
         "scaleMax": 5,
         "scaleMinLabel": "Low",
@@ -36,7 +44,10 @@
         "title": "Protecting the Belize Barrier Reef should be a top national priority.",
         "description": "1 = Strongly disagree · 5 = Strongly agree",
         "required": true,
-        "options": ["Option 1", "Option 2"],
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
         "scaleMin": 1,
         "scaleMax": 5,
         "scaleMinLabel": "Strongly disagree",
@@ -48,7 +59,13 @@
         "title": "Compared to last year, how has your spending on local tourism activities changed?",
         "description": "",
         "required": true,
-        "options": ["Spending much less", "Spending less", "About the same", "Spending more", "Spending much more"],
+        "options": [
+          "Spending much less",
+          "Spending less",
+          "About the same",
+          "Spending more",
+          "Spending much more"
+        ],
         "scaleMin": 1,
         "scaleMax": 5,
         "scaleMinLabel": "Low",
@@ -78,7 +95,10 @@
         "title": "What is one change you would recommend to improve coastal tourism in your area?",
         "description": "Interview-style open response.",
         "required": true,
-        "options": ["Option 1", "Option 2"],
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
         "scaleMin": 1,
         "scaleMax": 5,
         "scaleMinLabel": "Low",
@@ -87,5 +107,31 @@
     ],
     "createdAt": "2026-06-16T12:00:00.000Z",
     "updatedAt": "2026-06-16T12:00:00.000Z"
+  },
+  {
+    "id": "survey-belize-as-a-country-mqhk0zzy",
+    "title": "Belize as a country",
+    "description": "My views of Belize as a country",
+    "category": "civic",
+    "status": "published",
+    "questions": [
+      {
+        "id": "q-m5fuxb56",
+        "type": "short_text",
+        "title": "",
+        "description": "",
+        "required": false,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      }
+    ],
+    "createdAt": "2026-06-17T04:11:54.814Z",
+    "updatedAt": "2026-06-17T04:13:00.974Z"
   }
 ]

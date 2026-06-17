@@ -15,7 +15,7 @@ import { DELIVERY_METHODS } from "@/lib/admin-survey-distribution";
 import { BELIZE_DISTRICTS, getConstituencyOptions } from "@/lib/constants";
 import type { PanelistRow } from "@/lib/panelists";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
-import type { SurveyDefinition } from "@/lib/survey-definitions";
+import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 const CATEGORIES: SurveyCategory[] = ["political", "market", "civic"];
