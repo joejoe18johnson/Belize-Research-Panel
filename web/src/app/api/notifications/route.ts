@@ -7,6 +7,7 @@ import {
 } from "@/lib/panelist-dashboard";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { loadRedemptionRequests } from "@/lib/redemption-requests";
+import { getPanelistSurveys } from "@/lib/panelist-surveys";
 import {
   loadNotificationReadState,
   markAllNotificationsRead,
@@ -43,7 +44,8 @@ export async function PATCH(request: NextRequest) {
     const profile = panelistRowToDashboardProfile(result.panelist);
     const readState = await loadNotificationReadState(result.session.email);
     const redemptionRequests = await loadRedemptionRequests(result.session.email);
-    const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests });
+    const { inbox } = await getPanelistSurveys(result.session.email);
+    const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests, inboxSurveys: inbox });
 
     if (body.markAllRead) {
       await markAllNotificationsRead(
@@ -68,6 +70,7 @@ export async function PATCH(request: NextRequest) {
     const updatedNotifications = buildDashboardNotifications(profile, {
       readState: updatedReadState,
       redemptionRequests,
+      inboxSurveys: inbox,
     });
 
     return NextResponse.json({ ok: true, notifications: updatedNotifications });

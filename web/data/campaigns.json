@@ -75,5 +75,24 @@
     },
     "createdAt": "2026-06-17T04:29:21.700Z",
     "launchedAt": "2026-06-17T04:29:21.700Z"
+  },
+  {
+    "id": "campaign-our-lady-of-guadalope-school-survey-mqi89evn",
+    "title": "Our Lady of Guadalope School Survey",
+    "description": "belize answers",
+    "category": "civic",
+    "status": "active",
+    "surveyUrl": "",
+    "surveyDefinitionId": "survey-student-course-feedback-mqi85zqj",
+    "deliveryType": "internal",
+    "points": 100,
+    "assignedDate": "2026-06-17",
+    "completeByDate": "2026-07-01",
+    "deliveryMethod": "External Survey Link",
+    "targeting": {
+      "mode": "all_verified"
+    },
+    "createdAt": "2026-06-17T15:30:18.131Z",
+    "launchedAt": "2026-06-17T15:30:18.131Z"
   }
 ]

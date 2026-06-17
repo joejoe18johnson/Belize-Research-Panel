@@ -16,10 +16,12 @@ import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
 import { getAvailablePoints } from "./reward-redemption";
 import { isPanelistVerified } from "./verification-status";
+import { countUnreadSurveyInvitations } from "./survey-notifications";
 
 export interface DashboardNavBadges {
   unreadNotifications: number;
   inboxSurveys: number;
+  newSurveys: number;
   verificationAttention: number;
   availablePoints: number;
 }
@@ -64,10 +66,12 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   const rewards = await resolveRewardSummary(account.email, profile);
   const readState = await loadNotificationReadState(account.email);
   const redemptionRequests = await loadRedemptionRequests(account.email);
+  const { inbox } = await getPanelistSurveys(account.email);
   const notifications = buildDashboardNotifications(profile, {
     welcome: options.welcome,
     readState,
     redemptionRequests,
+    inboxSurveys: inbox,
   });
 
   return { account, profile, rewards, notifications };
@@ -76,20 +80,22 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
 export async function getDashboardNavBadges(email: string): Promise<DashboardNavBadges> {
   const panelist = await findPanelistByEmail(email);
   if (!panelist) {
-    return { unreadNotifications: 0, inboxSurveys: 0, verificationAttention: 0, availablePoints: 0 };
+    return { unreadNotifications: 0, inboxSurveys: 0, newSurveys: 0, verificationAttention: 0, availablePoints: 0 };
   }
 
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(email, profile);
   const readState = await loadNotificationReadState(email);
   const redemptionRequests = await loadRedemptionRequests(email);
-  const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests });
   const { inbox } = await getPanelistSurveys(email);
+  const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests, inboxSurveys: inbox });
   const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
+  const newSurveys = countUnreadSurveyInvitations(notifications);
 
   return {
     unreadNotifications: countUnreadNotifications(notifications),
     inboxSurveys: inbox.length,
+    newSurveys,
     verificationAttention: isPanelistVerified(profile.verificationStatus) ? 0 : 1,
     availablePoints,
   };

@@ -21,7 +21,12 @@ import {
   type SurveyQuestionType,
 } from "@/lib/survey-types";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
+import { applySurveyTemplate, type SurveyTemplate } from "@/lib/survey-templates";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import {
+  SurveyTemplateBanner,
+  SurveyTemplatePicker,
+} from "@/components/admin/surveys/SurveyTemplatePicker";
 
 const CATEGORIES: SurveyCategory[] = ["political", "market", "civic"];
 
@@ -29,6 +34,8 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
   const router = useRouter();
   const isEdit = Boolean(initialSurvey);
 
+  const [showTemplatePicker, setShowTemplatePicker] = useState(!isEdit);
+  const [selectedTemplateTitle, setSelectedTemplateTitle] = useState<string | null>(null);
   const [title, setTitle] = useState(initialSurvey?.title ?? "");
   const [description, setDescription] = useState(initialSurvey?.description ?? "");
   const [companyIntro, setCompanyIntro] = useState(initialSurvey?.companyIntro ?? "");
@@ -50,6 +57,41 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
   const handleBrandingChange = useCallback((state: SurveyBrandingUploadState) => {
     brandingUploadRef.current = state;
   }, []);
+
+  const applyTemplate = (template: SurveyTemplate) => {
+    const applied = applySurveyTemplate(template);
+    setTitle(applied.title);
+    setDescription(applied.description);
+    setCompanyIntro(applied.companyIntro);
+    setCategory(applied.category);
+    setQuestions(applied.questions);
+    setSelectedTemplateTitle(template.title);
+    setShowTemplatePicker(false);
+    setError("");
+    setMessage("");
+  };
+
+  const startFromScratch = () => {
+    setTitle("");
+    setDescription("");
+    setCompanyIntro("");
+    setCategory("civic");
+    setQuestions([createEmptyQuestion()]);
+    setSelectedTemplateTitle(null);
+    setShowTemplatePicker(false);
+    setError("");
+    setMessage("");
+  };
+
+  const changeTemplate = () => {
+    setShowTemplatePicker(true);
+    setError("");
+    setMessage("");
+  };
+
+  if (showTemplatePicker) {
+    return <SurveyTemplatePicker onSelectTemplate={applyTemplate} onStartFromScratch={startFromScratch} />;
+  }
 
   const updateQuestion = (id: string, patch: Partial<SurveyQuestion>) => {
     setQuestions((current) => current.map((question) => (question.id === id ? { ...question, ...patch } : question)));
@@ -159,6 +201,10 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         <BrandedAlert tone="success" showIcon>
           {message}
         </BrandedAlert>
+      ) : null}
+
+      {!isEdit && selectedTemplateTitle ? (
+        <SurveyTemplateBanner templateTitle={selectedTemplateTitle} onChangeTemplate={changeTemplate} />
       ) : null}
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">

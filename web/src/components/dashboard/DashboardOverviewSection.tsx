@@ -21,8 +21,9 @@ import { UserAvatar } from "./UserAvatar";
 import { isAccountApproved, VerifiedCheckBadge, VerifiedStatusPill } from "./VerifiedCheckBadge";
 import { dashboardHeroCardClass } from "@/lib/brand";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { countUnreadSurveyInvitations } from "@/lib/survey-notifications";
 
-function SurveyPreviewRow({ survey }: { survey: PanelistSurvey }) {
+function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; isNew?: boolean }) {
   const overdue = isSurveyOverdue(survey);
   const inProgress = survey.status === "in_progress";
   const href = survey.surveyUrl ?? "/dashboard/surveys";
@@ -35,7 +36,14 @@ function SurveyPreviewRow({ survey }: { survey: PanelistSurvey }) {
       className="group flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-zinc-900 group-hover:text-teal-900">{survey.title}</p>
+        <div className="flex items-center gap-2">
+          <p className="truncate text-sm font-semibold text-zinc-900 group-hover:text-teal-900">{survey.title}</p>
+          {isNew ? (
+            <span className="shrink-0 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              New
+            </span>
+          ) : null}
+        </div>
         <p className="mt-0.5 text-xs text-zinc-500">
           {inProgress
             ? formatHeadingCase(`${survey.progressPercent}% complete`)
@@ -72,6 +80,7 @@ export function DashboardOverviewSection({
   welcome?: boolean;
 }) {
   const unreadCount = notifications.filter((notification) => notification.unread).length;
+  const newSurveyCount = countUnreadSurveyInvitations(notifications);
   const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "Panelist";
   const approved = isAccountApproved(profile.verificationStatus, accountStatus);
 
@@ -82,6 +91,19 @@ export function DashboardOverviewSection({
           {formatHeadingCase(
             "Your panelist profile has been submitted. Use the tabs above to view your profile, notifications, and rewards."
           )}
+        </DashboardAlert>
+      ) : null}
+
+      {newSurveyCount > 0 ? (
+        <DashboardAlert tone="warning" title={newSurveyCount === 1 ? "New survey invitation" : "New survey invitations"}>
+          {formatHeadingCase(
+            newSurveyCount === 1
+              ? "You have a new survey ready in your inbox."
+              : `You have ${newSurveyCount} new surveys ready in your inbox.`
+          )}{" "}
+          <Link href="/dashboard/surveys" className="font-semibold underline">
+            {formatHeadingCase("Open surveys")}
+          </Link>
         </DashboardAlert>
       ) : null}
 
@@ -161,7 +183,7 @@ export function DashboardOverviewSection({
           </div>
           <div className="space-y-2">
             {inboxSurveys.slice(0, 3).map((survey) => (
-              <SurveyPreviewRow key={survey.id} survey={survey} />
+              <SurveyPreviewRow key={survey.id} survey={survey} isNew={survey.status === "available"} />
             ))}
           </div>
         </DashboardCard>

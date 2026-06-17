@@ -3,6 +3,8 @@ import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
 import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireRegisteredPanelistSession } from "@/lib/dashboard-access";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
+import { markSurveyInvitationsSeen } from "@/lib/survey-notifications-server";
+import { revalidatePath } from "next/cache";
 
 export const metadata = {
   title: "Surveys | Belize Research Panel",
@@ -11,6 +13,9 @@ export const metadata = {
 export default async function DashboardSurveysPage() {
   const account = await requireRegisteredPanelistSession();
   const { inbox, completed } = await getPanelistSurveys(account.email);
+  await markSurveyInvitationsSeen(account.email, inbox);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/notifications");
   const surveysLocked = account.accountStatus === "on_hold";
 
   const section = dashboardSectionByHref("/dashboard/surveys");

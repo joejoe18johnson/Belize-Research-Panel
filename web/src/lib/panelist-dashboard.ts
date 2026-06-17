@@ -7,6 +7,8 @@ import { payoutShortId } from "./admin-payout-display";
 import type { PanelistRow } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
 import { cleanText } from "./validation";
+import type { PanelistSurvey } from "./panelist-surveys-types";
+import { buildSurveyInvitationNotifications } from "./survey-notifications";
 
 export interface PanelistDashboardProfile {
   firstName: string;
@@ -225,11 +227,13 @@ export function buildDashboardNotifications(
     welcome?: boolean;
     readState?: NotificationReadState;
     redemptionRequests?: RedemptionRequest[];
+    inboxSurveys?: PanelistSurvey[];
   } = {}
 ): DashboardNotification[] {
   const notifications: DashboardNotification[] = [];
   const verified = profile.verificationStatus.toLowerCase() === "verified";
   const readState = options.readState ?? {};
+  const inboxSurveys = options.inboxSurveys ?? [];
 
   const isUnread = (id: string, defaultUnread: boolean): boolean => {
     const stored = readState[id];
@@ -263,15 +267,20 @@ export function buildDashboardNotifications(
     unread: isUnread("verification", !verified),
   });
 
-  notifications.push({
-    id: "surveys",
-    title: "Survey invitations",
-    body: "Matched survey invitations will appear here when studies are available for your profile and interests.",
-    dateLabel: "Coming soon",
-    sortAt: parseNotificationSortAt("Coming soon"),
-    priority: "normal",
-    unread: isUnread("surveys", false),
-  });
+  const surveyInvitationNotifications = buildSurveyInvitationNotifications(inboxSurveys, readState);
+  notifications.push(...surveyInvitationNotifications);
+
+  if (inboxSurveys.length === 0) {
+    notifications.push({
+      id: "surveys",
+      title: "Survey invitations",
+      body: "Matched survey invitations will appear here when studies are available for your profile and interests.",
+      dateLabel: "Coming soon",
+      sortAt: parseNotificationSortAt("Coming soon"),
+      priority: "normal",
+      unread: isUnread("surveys", false),
+    });
+  }
 
   notifications.push({
     id: "rewards",
