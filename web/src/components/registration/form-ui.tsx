@@ -8,15 +8,15 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 export { siteCheckboxClass, siteRadioClass };
 
 const inputClass =
-  "w-full h-12 rounded-lg border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500";
+  "w-full h-12 rounded-lg border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus:border-teal-500 dark:disabled:bg-zinc-900 dark:disabled:text-zinc-500";
 export const choiceBoxClass =
-  "w-full h-12 appearance-none rounded-lg border border-zinc-200 bg-white bg-none px-4 pr-10 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500";
+  "w-full h-12 appearance-none rounded-lg border border-zinc-200 bg-white bg-none px-4 pr-10 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus:border-teal-500 dark:disabled:bg-zinc-900 dark:disabled:text-zinc-500";
 export const choiceBoxLabelClass =
-  "flex h-12 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 px-4 text-sm text-zinc-900 transition hover:bg-zinc-50";
+  "flex h-12 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 px-4 text-sm text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800";
 const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-500/20";
-const labelClass = "mb-1.5 block text-sm font-medium text-zinc-800";
-const errorClass = "mt-1.5 text-sm text-red-600";
-const hintClass = "mt-1.5 text-sm text-zinc-500";
+const labelClass = "mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200";
+const errorClass = "mt-1.5 text-sm text-red-600 dark:text-red-400";
+const hintClass = "mt-1.5 text-sm text-zinc-500 dark:text-zinc-400";
 
 export function FormSection({
   step,
@@ -28,8 +28,8 @@ export function FormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
-      <h2 className="mb-5 text-lg font-semibold text-zinc-900">
+    <section className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+      <h2 className="mb-5 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
         <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-teal-700 text-sm text-white">
           {step}
         </span>

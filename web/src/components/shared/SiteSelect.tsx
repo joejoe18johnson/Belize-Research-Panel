@@ -227,7 +227,9 @@ export function SiteSelect({
         onClick={() => !disabled && setOpen((current) => !current)}
         className={triggerClass}
       >
-        <span className={`truncate ${isPlaceholder ? "text-zinc-500" : "text-zinc-900"}`}>{display}</span>
+        <span className={`truncate ${isPlaceholder ? "text-zinc-500 dark:text-zinc-400" : "text-zinc-900 dark:text-zinc-100"}`}>
+          {display}
+        </span>
         <ChevronIcon open={open} />
       </button>
 
@@ -238,7 +240,7 @@ export function SiteSelect({
               id={listboxId}
               role="listbox"
               style={menuStyle}
-              className="overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10"
+              className="overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/30"
             >
               {options.map((option) => {
                 const active = option.value === value;
@@ -256,7 +258,7 @@ export function SiteSelect({
                       className={`flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition ${
                         active
                           ? "bg-teal-700 text-white"
-                          : "text-zinc-800 hover:bg-teal-50 hover:text-teal-900"
+                          : "text-zinc-800 hover:bg-teal-50 hover:text-teal-900 dark:text-zinc-200 dark:hover:bg-teal-950 dark:hover:text-teal-100"
                       } disabled:cursor-not-allowed disabled:opacity-50`}
                     >
                       {active ? <CheckIcon /> : <span className="w-4 shrink-0" aria-hidden />}
