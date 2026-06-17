@@ -31,7 +31,7 @@ function itemStatusClass(status: VerificationItemStatus): string {
     case "missing":
       return "border-red-200 bg-red-50/80";
     default:
-      return "border-zinc-200 bg-white";
+      return "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900";
   }
 }
 
@@ -79,17 +79,17 @@ function VerificationItemCard({
     return (
       <DashboardCard className={`p-4 ${itemStatusClass(item.status)}`}>
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 shadow-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 dark:text-teal-200 shadow-sm">
             <VerificationItemIcon id={item.id} />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <SectionHeading as="h3" className="text-sm font-semibold text-zinc-900">
+              <SectionHeading as="h3" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 {item.label}
               </SectionHeading>
               {statusBadge}
             </div>
-            <p className="mt-1 text-sm text-zinc-700">
+            <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
               <span className="font-medium">{item.valueLabel ?? formatHeadingCase("On file")}: </span>
               {item.valueOnFile}
             </p>
@@ -103,26 +103,26 @@ function VerificationItemCard({
     <DashboardCard className={itemStatusClass(item.status)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 shadow-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 dark:text-teal-200 shadow-sm">
             <VerificationItemIcon id={item.id} />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <SectionHeading as="h3" className="text-base font-semibold text-zinc-900">
+              <SectionHeading as="h3" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                 {item.label}
               </SectionHeading>
               {item.essential ? (
-                <span className="rounded-full bg-zinc-900/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
+                <span className="rounded-full bg-zinc-900/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   {formatHeadingCase("Essential")}
                 </span>
               ) : null}
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-zinc-600">{item.description}</p>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{item.description}</p>
             <p className="mt-3 text-sm">
-              <span className="font-medium text-zinc-800">
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">
                 {item.valueLabel ?? formatHeadingCase("On file")}:{" "}
               </span>
-              <span className="text-zinc-700">{item.valueOnFile}</span>
+              <span className="text-zinc-700 dark:text-zinc-300">{item.valueOnFile}</span>
             </p>
             {item.status === "pending_approval" ? (
               <p className="mt-2 text-sm text-amber-900">

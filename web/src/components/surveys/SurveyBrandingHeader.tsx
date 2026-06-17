@@ -43,7 +43,7 @@ export function SurveyBrandingHeader({
 
   return (
     <div
-      className={`overflow-hidden border border-zinc-200 bg-white shadow-sm ${
+      className={`overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm ${
         compact ? "rounded-xl" : "rounded-2xl"
       }`}
     >
@@ -90,10 +90,10 @@ export function SurveyBrandingHeader({
 
       <div className={compact ? "space-y-1.5 p-3" : "space-y-3 p-5 sm:p-6"}>
         <div>
-          <h1 className={`font-bold text-zinc-900 ${compact ? "text-sm leading-snug" : "text-2xl"}`}>{title}</h1>
+          <h1 className={`font-bold text-zinc-900 dark:text-zinc-100 ${compact ? "text-sm leading-snug" : "text-2xl"}`}>{title}</h1>
           {companyIntro ? (
             <p
-              className={`leading-relaxed text-zinc-700 ${
+              className={`leading-relaxed text-zinc-700 dark:text-zinc-300 ${
                 compact ? "mt-1 line-clamp-2 text-[11px]" : "mt-2 text-sm"
               }`}
             >
@@ -102,7 +102,7 @@ export function SurveyBrandingHeader({
           ) : null}
           {description ? (
             <p
-              className={`leading-relaxed text-zinc-600 ${
+              className={`leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${
                 compact ? "mt-1 line-clamp-2 text-[11px]" : "mt-2 text-sm"
               }`}
             >

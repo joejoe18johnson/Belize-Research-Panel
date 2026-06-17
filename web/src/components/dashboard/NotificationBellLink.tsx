@@ -12,7 +12,7 @@ export function NotificationBellLink({ unreadCount }: { unreadCount: number }) {
   return (
     <Link
       href="/dashboard/notifications"
-      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-zinc-600 transition hover:bg-zinc-100 hover:text-teal-800"
+      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 transition hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-800 dark:text-teal-200"
       aria-label={label}
       title={label}
     >

@@ -11,7 +11,7 @@ export function RegistrationProgress({
 
   return (
     <div
-      className="sticky top-14 z-20 rounded-2xl border border-zinc-200 bg-white/95 px-4 py-5 shadow-sm backdrop-blur sm:top-16 sm:px-6 sm:py-4"
+      className="sticky top-14 z-20 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/95 px-4 py-5 shadow-sm backdrop-blur sm:top-16 sm:px-6 sm:py-4"
       aria-label="Registration progress"
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-2 sm:mb-3">
@@ -19,12 +19,12 @@ export function RegistrationProgress({
           <p className="text-xs font-semibold tracking-wide text-teal-700">
             Step {progress.currentIndex + 1} of {progress.totalPhases}
           </p>
-          <p className="text-sm font-semibold text-zinc-900">{formatHeadingCase(progress.currentPhase.label)}</p>
-          <p className="text-xs leading-relaxed text-zinc-500">{formatHeadingCase(progress.currentPhase.description)}</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(progress.currentPhase.label)}</p>
+          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(progress.currentPhase.description)}</p>
         </div>
       </div>
 
-      <div className="mb-5 h-2 overflow-hidden rounded-full bg-zinc-100 sm:mb-4">
+      <div className="mb-5 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800 sm:mb-4">
         <div
           className="h-full rounded-full bg-teal-700 transition-all duration-500 ease-out"
           style={{ width: `${progress.percent}%` }}
@@ -44,8 +44,8 @@ export function RegistrationProgress({
                 phase.status === "complete"
                   ? "border-teal-700 bg-teal-700 text-white"
                   : phase.status === "current"
-                    ? "border-teal-700 bg-teal-50 text-teal-800 ring-2 ring-teal-300/60"
-                    : "border-zinc-200 bg-white text-zinc-400"
+                    ? "border-teal-700 bg-teal-50 text-teal-800 dark:text-teal-200 ring-2 ring-teal-300/60"
+                    : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500"
               }`}
               aria-current={phase.status === "current" ? "step" : undefined}
             >
@@ -64,10 +64,10 @@ export function RegistrationProgress({
             <span
               className={`mt-2 hidden text-[11px] leading-tight font-medium sm:block ${
                 phase.status === "current"
-                  ? "text-teal-800"
+                  ? "text-teal-800 dark:text-teal-200"
                   : phase.status === "complete"
-                    ? "text-zinc-700"
-                    : "text-zinc-400"
+                    ? "text-zinc-700 dark:text-zinc-300"
+                    : "text-zinc-400 dark:text-zinc-500"
               }`}
             >
               {formatHeadingCase(phase.label)}

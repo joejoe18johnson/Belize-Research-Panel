@@ -23,7 +23,7 @@ export function UsernameAvailabilityStatus({
 
   if (availability === "checking") {
     return (
-      <p className="mt-1.5 text-sm text-zinc-500" role="status">
+      <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500" role="status">
         Checking availability…
       </p>
     );

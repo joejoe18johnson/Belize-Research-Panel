@@ -33,18 +33,18 @@ function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; i
       href={href}
       target={survey.surveyUrl ? "_blank" : undefined}
       rel={survey.surveyUrl ? "noopener noreferrer" : undefined}
-      className="group flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
+      className="group flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-semibold text-zinc-900 group-hover:text-teal-900">{survey.title}</p>
+          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-teal-900 dark:text-teal-100">{survey.title}</p>
           {isNew ? (
             <span className="shrink-0 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
               New
             </span>
           ) : null}
         </div>
-        <p className="mt-0.5 text-xs text-zinc-500">
+        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
           {inProgress
             ? formatHeadingCase(`${survey.progressPercent}% complete`)
             : formatHeadingCase("Not started")}
@@ -55,10 +55,10 @@ function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; i
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800">
+        <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
           +{survey.points} pts
         </span>
-        <ChevronRightIcon className="h-4 w-4 text-zinc-400 transition group-hover:text-teal-700" />
+        <ChevronRightIcon className="h-4 w-4 text-zinc-400 dark:text-zinc-500 transition group-hover:text-teal-700" />
       </div>
     </a>
   );
@@ -171,12 +171,12 @@ export function DashboardOverviewSection({
               </span>
               <div>
                 <SectionHeading as="h3">Active surveys</SectionHeading>
-                <p className="text-xs text-zinc-500">{inboxSurveys.length} waiting in your inbox</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{inboxSurveys.length} waiting in your inbox</p>
               </div>
             </div>
             <Link
               href="/dashboard/surveys"
-              className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+              className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
             >
               {formatHeadingCase("View all")}
             </Link>

@@ -22,7 +22,7 @@ export function PasswordStrengthBar({ strength }: { strength: PasswordStrengthRe
   return (
     <div className="mt-2" aria-live="polite">
       <div className="mb-1.5 flex items-center justify-between gap-2 text-xs font-medium">
-        <span className="text-zinc-600">Password strength</span>
+        <span className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Password strength</span>
         <span className={labelStyles[strength.label]}>{strength.label}</span>
       </div>
       <div
@@ -42,7 +42,7 @@ export function PasswordStrengthBar({ strength }: { strength: PasswordStrengthRe
         <p className={`mt-1.5 text-sm ${labelStyles[strength.label]}`}>{strength.message}</p>
       ) : null}
       {!strength.meetsRequirement ? (
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
           Password must reach at least moderate strength (orange) before you can continue.
         </p>
       ) : null}

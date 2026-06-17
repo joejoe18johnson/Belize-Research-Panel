@@ -119,14 +119,14 @@ export function BrandedModal({
             {eyebrow ? (
               <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">{eyebrow}</p>
             ) : null}
-            <h2 className={`font-semibold text-teal-950 ${eyebrow ? "mt-0.5 text-lg" : "text-lg"}`}>
+            <h2 className={`font-semibold text-teal-950 dark:text-teal-100 ${eyebrow ? "mt-0.5 text-lg" : "text-lg"}`}>
               {formatHeadingCase(title)}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-teal-700/70 transition hover:bg-teal-100 hover:text-teal-900"
+            className="rounded-lg p-2 text-teal-700/70 transition hover:bg-teal-100 hover:text-teal-900 dark:text-teal-100"
             aria-label="Close"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
@@ -183,7 +183,7 @@ export function BrandedConfirmDialog({
             type="button"
             disabled={loading}
             onClick={onCancel}
-            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60"
           >
             {formatHeadingCase(cancelLabel)}
           </button>

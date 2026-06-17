@@ -136,11 +136,11 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
     return (
       <div className="space-y-5">
         <div>
-          <p className="mb-1.5 block text-sm font-medium text-zinc-800">
+          <p className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200">
             Citizenship / residency status <span className="text-red-600">*</span>
           </p>
-          <p className="mb-3 text-sm text-zinc-600">{CITIZENSHIP_PANEL_INTRO}</p>
-          <p className="mb-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+          <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{CITIZENSHIP_PANEL_INTRO}</p>
+          <p className="mb-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
             You will be required to provide proof of your citizenship or residency during panelist registration.
           </p>
           <div className="flex flex-col gap-3">
@@ -197,7 +197,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         </Field>
 
         {ageIneligible ? (
-          <div className="border-t border-zinc-100 pt-4">
+          <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
             <Link
               href="/"
               className="flex min-h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 sm:ml-auto sm:w-auto"
@@ -206,7 +206,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
             </Link>
           </div>
         ) : (
-          <div className="border-t border-zinc-100 pt-4">
+          <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
             <button
               type="button"
               onClick={handleContinueEligibility}
@@ -217,9 +217,9 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
           </div>
         )}
 
-        <p className="text-center text-sm text-zinc-600">
+        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Already have an account?{" "}
-          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900">
+          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
             Log in
           </Link>
         </p>
@@ -237,7 +237,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         <button
           type="button"
           onClick={() => setStep("eligibility")}
-          className="mt-2 text-sm font-medium text-teal-700 hover:text-teal-900"
+          className="mt-2 text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100"
         >
           Change eligibility answers
         </button>
@@ -304,11 +304,11 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
 
       {errors.submit ? <p className="text-sm text-red-600" role="alert">{errors.submit}</p> : null}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={() => setStep("eligibility")}
-          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 sm:w-auto"
+          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 sm:w-auto"
         >
           Back
         </button>
@@ -321,9 +321,9 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         </button>
       </div>
 
-      <p className="text-center text-sm text-zinc-600">
+      <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         Already have an account?{" "}
-        <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900">
+        <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
           Log in
         </Link>
       </p>

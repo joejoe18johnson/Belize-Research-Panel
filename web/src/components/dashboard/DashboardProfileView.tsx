@@ -30,12 +30,12 @@ function ProfileCardHeader({
   editLabel?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
-      <h3 className="min-w-0 flex-1 text-base font-semibold text-zinc-900">{formatHeadingCase(title)}</h3>
+    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+      <h3 className="min-w-0 flex-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(title)}</h3>
       <button
         type="button"
         onClick={onEdit}
-        className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 hover:text-teal-900"
+        className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100"
       >
         {formatHeadingCase(editLabel)}
       </button>
@@ -103,7 +103,7 @@ export function DashboardProfileView({
           <StatusBadge label={profile.verificationStatus} tone={verificationBadgeTone(profile.verificationStatus)} />
           <StatusBadge label={profile.panelistStatus} tone="info" />
           {profile.registrationDate !== "Not provided" ? (
-            <span className="text-xs text-zinc-500">Registered {profile.registrationDate}</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Registered {profile.registrationDate}</span>
           ) : null}
         </div>
         <button
@@ -120,7 +120,7 @@ export function DashboardProfileView({
       <div className="grid gap-6 lg:grid-cols-2">
         <DashboardCard>
           <ProfileCardHeader title="Personal details" onEdit={() => onEditSection("personal")} />
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Name, date of birth, sex, and ethnicity cannot be changed online. Education can be updated when you edit
             your profile.
           </p>

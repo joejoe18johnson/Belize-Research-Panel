@@ -137,29 +137,29 @@ export function AdminExternalDataImportDashboard({
   return (
     <div className="space-y-6">
       <AdminDataModuleDashboard snapshot={snapshot} />
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-base font-semibold text-teal-950">Import & match external CSV</h2>
-        <p className="mt-1 text-sm text-zinc-600">
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Import & match external CSV</h2>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Upload a voter roll, census extract, or client list. Rows are matched against the live panel by email, phone, or name + DOB.
         </p>
         <input
           type="file"
           accept=".csv,text/csv"
           onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-          className="mt-4 block w-full text-sm text-zinc-600 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800"
+          className="mt-4 block w-full text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800"
         />
         {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
         {summary ? (
-          <p className="mt-3 text-sm text-zinc-700">
+          <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
             Processed <strong>{summary.total}</strong> rows — <strong>{summary.matched}</strong> matched,{" "}
             <strong>{summary.unmatched}</strong> unmatched.
           </p>
         ) : null}
         {results.length > 0 ? (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   <th className="px-3 py-3">Row</th>
                   <th className="px-3 py-3">Name</th>
                   <th className="px-3 py-3">Email</th>
@@ -182,7 +182,7 @@ export function AdminExternalDataImportDashboard({
               </tbody>
             </table>
             {results.length > 100 ? (
-              <p className="px-4 py-2 text-xs text-zinc-500">Showing first 100 matches.</p>
+              <p className="px-4 py-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Showing first 100 matches.</p>
             ) : null}
           </div>
         ) : null}

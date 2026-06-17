@@ -86,17 +86,17 @@ export function AdminLoginForm() {
       </header>
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">
         <div className="w-full max-w-2xl space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 shadow-xl sm:p-8">
+          <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 dark:text-zinc-100 shadow-xl sm:p-8">
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">
               {formatHeadingCase("Admin access")}
             </p>
-            <h1 className="mt-2 text-2xl font-bold text-teal-950">{formatHeadingCase("Staff login")}</h1>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+            <h1 className="mt-2 text-2xl font-bold text-teal-950 dark:text-teal-100">{formatHeadingCase("Staff login")}</h1>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               Sign in with a staff email and password. Each role only sees the admin modules assigned to that role.
             </p>
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div>
-                <label htmlFor="admin-email" className="block text-sm font-medium text-zinc-800">
+                <label htmlFor="admin-email" className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
                   Staff email
                 </label>
                 <input
@@ -106,11 +106,11 @@ export function AdminLoginForm() {
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
                   placeholder="name.role@belizepanel.test"
-                  className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                  className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="admin-password" className="block text-sm font-medium text-zinc-800">
+                <label htmlFor="admin-password" className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
                   Password
                 </label>
                 <input
@@ -119,7 +119,7 @@ export function AdminLoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                  className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                 />
               </div>
               {error ? (
@@ -135,12 +135,12 @@ export function AdminLoginForm() {
                 {submitting ? "Signing in…" : "Enter admin console"}
               </button>
             </form>
-            <p className="mt-4 text-xs text-zinc-500">
+            <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               Legacy fallback: leave email blank and use the shared <code>ADMIN_PASSWORD</code> env value for super
               admin access.
             </p>
-            <p className="mt-6 text-center text-sm text-zinc-600">
-              <Link href="/" className="font-medium text-teal-700 hover:text-teal-900">
+            <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <Link href="/" className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
                 ← Back to public site
               </Link>
             </p>
@@ -163,18 +163,18 @@ export function RoleTestAccountsReference({
   compact?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 shadow-xl sm:p-8">
-      <h2 className="text-lg font-semibold text-teal-950">Role test accounts</h2>
-      <p className="mt-2 text-sm text-zinc-600">
+    <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 dark:text-zinc-100 shadow-xl sm:p-8">
+      <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">Role test accounts</h2>
+      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         Use these accounts to see what each role can access. Staff password:{" "}
-        <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs">{STAFF_DEMO_PASSWORD}</code> · Panelist password:{" "}
-        <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs">DemoPass1!</code>
+        <code className="rounded bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs">{STAFF_DEMO_PASSWORD}</code> · Panelist password:{" "}
+        <code className="rounded bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs">DemoPass1!</code>
       </p>
 
-      <div className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
+      <div className="mt-5 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
+            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               <th className="px-4 py-3 font-semibold">Role</th>
               <th className="px-4 py-3 font-semibold">Login</th>
               {!compact ? <th className="px-4 py-3 font-semibold">Access</th> : null}
@@ -184,19 +184,19 @@ export function RoleTestAccountsReference({
           <tbody>
             {STAFF_LOGIN_ROWS.map((row) => (
               <tr key={row.email} className="border-b border-zinc-50">
-                <td className="px-4 py-3 font-medium text-zinc-900">{STAFF_ROLE_LABELS[row.role]}</td>
-                <td className="px-4 py-3 text-zinc-700">
+                <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{STAFF_ROLE_LABELS[row.role]}</td>
+                <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
                   <div>{row.email}</div>
                 </td>
                 {!compact ? (
-                  <td className="px-4 py-3 text-zinc-600">{STAFF_ROLE_DESCRIPTIONS[row.role]}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{STAFF_ROLE_DESCRIPTIONS[row.role]}</td>
                 ) : null}
                 {onSelectStaff ? (
                   <td className="px-4 py-3">
                     <button
                       type="button"
                       onClick={() => onSelectStaff(row.email)}
-                      className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                      className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                     >
                       Fill login
                     </button>
@@ -209,12 +209,12 @@ export function RoleTestAccountsReference({
       </div>
 
       <div className="mt-6">
-        <h3 className="text-sm font-semibold text-teal-950">Panelist personas</h3>
-        <p className="mt-1 text-xs text-zinc-500">Sign in at the public panelist login page.</p>
-        <div className="mt-3 overflow-x-auto rounded-xl border border-zinc-200">
+        <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">Panelist personas</h3>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Sign in at the public panelist login page.</p>
+        <div className="mt-3 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
           <table className="min-w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
+              <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 <th className="px-4 py-3 font-semibold">Persona</th>
                 <th className="px-4 py-3 font-semibold">Email</th>
                 {!compact ? <th className="px-4 py-3 font-semibold">What you can access</th> : null}
@@ -223,16 +223,16 @@ export function RoleTestAccountsReference({
             <tbody>
               {PANELIST_LOGIN_ROWS.map((row) => (
                 <tr key={row.email} className="border-b border-zinc-50">
-                  <td className="px-4 py-3 font-medium text-zinc-900">{row.label}</td>
-                  <td className="px-4 py-3 text-zinc-700">{row.email}</td>
-                  {!compact ? <td className="px-4 py-3 text-zinc-600">{row.access}</td> : null}
+                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.label}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
+                  {!compact ? <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.access}</td> : null}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-sm text-zinc-600">
-          <Link href="/login" className="font-semibold text-teal-700 hover:text-teal-900">
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <Link href="/login" className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100">
             Open panelist login →
           </Link>
         </p>

@@ -33,7 +33,7 @@ function notificationIcon(id: string) {
 }
 
 function notificationIconTone(id: string, unread: boolean): string {
-  if (!unread) return "bg-zinc-100 text-zinc-500";
+  if (!unread) return "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 dark:text-zinc-500";
   if (isSurveyInvitationNotificationId(id)) return "bg-amber-100 text-amber-700";
   if (id === "verification" || id === "welcome") return "bg-teal-100 text-teal-700";
   if (id === "surveys") return "bg-sky-100 text-sky-700";
@@ -57,7 +57,7 @@ function NotificationCard({
       type="button"
       onClick={() => onToggle(notification)}
       disabled={updatingId === notification.id}
-      className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 disabled:opacity-60"
+      className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100 disabled:opacity-60"
     >
       {updatingId === notification.id
         ? formatHeadingCase("Saving…")
@@ -78,12 +78,12 @@ function NotificationCard({
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(notification.title)}</h3>
               {notification.unread ? <span className={brandedNotificationBadgeClass}>{formatHeadingCase("New")}</span> : null}
             </div>
-            <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{formatHeadingCase(notification.body)}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(notification.body)}</p>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-zinc-500">{notification.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{notification.dateLabel}</p>
               {action}
             </div>
           </div>
@@ -104,7 +104,7 @@ function NotificationCard({
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(notification.title)}</h3>
                 {notification.unread ? (
                   <span className={brandedNotificationBadgeClass}>
                     {formatHeadingCase("New")}
@@ -116,12 +116,12 @@ function NotificationCard({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 {formatHeadingCase(notification.body)}
               </p>
             </div>
             <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 sm:w-auto sm:flex-col sm:items-end">
-              <p className="text-xs text-zinc-500">{notification.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{notification.dateLabel}</p>
               {action}
             </div>
           </div>
@@ -188,11 +188,11 @@ export function DashboardNotificationsClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           {unreadCount > 0 ? (
             <>
               {formatHeadingCase("You have")}{" "}
-              <span className="font-semibold text-zinc-900">{unreadCount}</span>{" "}
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">{unreadCount}</span>{" "}
               {formatHeadingCase(unreadCount === 1 ? "unread notification." : "unread notifications.")}
             </>
           ) : (
@@ -204,7 +204,7 @@ export function DashboardNotificationsClient({
             type="button"
             onClick={markAllRead}
             disabled={markingAll}
-            className="flex min-h-11 w-full items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60 sm:w-auto"
+            className="flex min-h-11 w-full items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 sm:w-auto"
           >
             {markingAll ? formatHeadingCase("Updating…") : formatHeadingCase("Mark all as read")}
           </button>

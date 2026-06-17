@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function CheckEmailPage() {
   return (
-    <Suspense fallback={<p className="p-8 text-center text-sm text-zinc-500">Loading…</p>}>
+    <Suspense fallback={<p className="p-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Loading…</p>}>
       <CheckEmailClient />
     </Suspense>
   );

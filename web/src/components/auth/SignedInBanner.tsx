@@ -44,7 +44,7 @@ export function SignedInBanner({
               Continue to registration
             </Link>
           )}
-          <LogoutButton className="rounded-lg border border-teal-300 bg-white px-4 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-100" />
+          <LogoutButton className="rounded-lg border border-teal-300 bg-white dark:bg-zinc-900 px-4 py-2 text-xs font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-100" />
         </div>
       </BrandedAlert>
     </div>

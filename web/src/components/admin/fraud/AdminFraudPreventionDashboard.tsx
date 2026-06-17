@@ -51,13 +51,13 @@ function DuplicateTable({
   ];
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-zinc-100">
+    <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             {headers.map(([key, label]) => (
               <th key={key} className="px-3 py-3">
-                <button type="button" onClick={() => onSort(key)} className="font-semibold hover:text-teal-800">
+                <button type="button" onClick={() => onSort(key)} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                   {label}
                   {indicator(key)}
                 </button>
@@ -69,21 +69,21 @@ function DuplicateTable({
         <tbody>
           {sorted.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
+              <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 No duplicate records for this category.
               </td>
             </tr>
           ) : (
             sorted.map((row) => (
               <tr key={`${row.duplicateType}:${row.email}:${row.phone}`} className="border-b border-zinc-50 hover:bg-teal-50/30">
-                <td className="px-3 py-2.5 font-medium text-zinc-800">
+                <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                   {row.firstName} {row.lastName}
                 </td>
-                <td className="px-3 py-2.5 text-zinc-700">{row.email}</td>
-                <td className="px-3 py-2.5 text-zinc-700">{row.phone || "—"}</td>
+                <td className="px-3 py-2.5 text-zinc-700 dark:text-zinc-300">{row.email}</td>
+                <td className="px-3 py-2.5 text-zinc-700 dark:text-zinc-300">{row.phone || "—"}</td>
                 <td className="px-3 py-2.5">{row.verificationStatus}</td>
                 <td className="px-3 py-2.5">{row.district || "—"}</td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-600">{row.dob || "—"}</td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.dob || "—"}</td>
               </tr>
             ))
           )}
@@ -119,10 +119,10 @@ function SuspiciousEmailTable({
   onDelete: (row: SuspiciousEmailRow) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-zinc-100">
+    <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             <th className="px-3 py-3">Risk</th>
             <th className="px-3 py-3">Name</th>
             <th className="px-3 py-3">Email</th>
@@ -135,7 +135,7 @@ function SuspiciousEmailTable({
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-zinc-500">
+              <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 No suspicious-looking emails matched the current filters.
               </td>
             </tr>
@@ -146,23 +146,23 @@ function SuspiciousEmailTable({
                 <tr key={row.email} className="border-b border-zinc-50 align-top hover:bg-amber-50/30">
                   <td className="px-3 py-3">
                     <RiskBadge level={row.riskLevel} />
-                    <p className="mt-1 text-xs tabular-nums text-zinc-500">Score {row.riskScore}</p>
+                    <p className="mt-1 text-xs tabular-nums text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Score {row.riskScore}</p>
                   </td>
-                  <td className="px-3 py-3 font-medium text-zinc-800">
+                  <td className="px-3 py-3 font-medium text-zinc-800 dark:text-zinc-200">
                     {row.firstName} {row.lastName}
                   </td>
-                  <td className="px-3 py-3 text-zinc-700">{row.email}</td>
-                  <td className="px-3 py-3 text-zinc-600">{row.domain}</td>
-                  <td className="max-w-xs px-3 py-3 text-xs leading-relaxed text-zinc-600">
+                  <td className="px-3 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
+                  <td className="px-3 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.domain}</td>
+                  <td className="max-w-xs px-3 py-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                     <ul className="space-y-1">
                       {row.signals.map((signal) => (
                         <li key={signal.id}>
-                          <span className="font-medium text-zinc-800">{signal.label}:</span> {signal.detail}
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200">{signal.label}:</span> {signal.detail}
                         </li>
                       ))}
                     </ul>
                   </td>
-                  <td className="px-3 py-3 text-zinc-700">
+                  <td className="px-3 py-3 text-zinc-700 dark:text-zinc-300">
                     {row.verificationStatus || "—"}
                     {row.flagged ? (
                       <p className="mt-1 text-[11px] font-semibold text-amber-800">Already flagged</p>
@@ -172,7 +172,7 @@ function SuspiciousEmailTable({
                     <div className="flex flex-col gap-2">
                       <Link
                         href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                        className="text-xs font-semibold text-teal-700 hover:text-teal-900 hover:underline"
+                        className="text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100 hover:underline"
                       >
                         Open record
                       </Link>
@@ -365,15 +365,15 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         </button>
         <Link
           href="/admin/panelists?tab=flagged"
-          className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+          className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
         >
           Open flagged panelists
         </Link>
       </div>
-      {message ? <p className="text-sm text-teal-900">{message}</p> : null}
-      {actionMessage ? <p className="text-sm text-teal-900">{actionMessage}</p> : null}
+      {message ? <p className="text-sm text-teal-900 dark:text-teal-100">{message}</p> : null}
+      {actionMessage ? <p className="text-sm text-teal-900 dark:text-teal-100">{actionMessage}</p> : null}
 
-      <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -381,8 +381,8 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
             onClick={() => setTab(item.id)}
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
-                ? "border border-b-0 border-teal-200 bg-white text-teal-900"
-                : "text-zinc-600 hover:bg-teal-50/50 hover:text-teal-800"
+                ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
+                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -394,10 +394,10 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
       {tab === "overview" ? (
         <DonutBreakdown rows={verificationChart} title="Verification status" />
       ) : tab === "suspicious-emails" ? (
-        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div>
-            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Suspicious emails")}</h2>
-            <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Suspicious emails")}</h2>
+            <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               Flags disposable providers, bot-like local parts, random aliases, and addresses that do not match the
               panelist name. New signups with high-risk patterns are blocked automatically. Review, flag, or delete as
               needed.
@@ -405,13 +405,13 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           </div>
           <div className="grid gap-4 lg:grid-cols-[1fr_280px_220px]">
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Search</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Search</label>
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Name, email, domain, signal…"
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
               />
             </div>
             <FilterMultiSelect
@@ -427,7 +427,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
               onChange={(values) => setRiskLevels(values as Array<"medium" | "high">)}
             />
           </div>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Showing <strong>{filteredSuspicious.length}</strong> suspicious email
             {filteredSuspicious.length === 1 ? "" : "s"}
           </p>
@@ -440,16 +440,16 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           />
         </section>
       ) : (
-        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Search</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Search</label>
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Name, email, phone, username…"
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
               />
             </div>
             <FilterMultiSelect
@@ -459,7 +459,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
               onChange={setVerificationStatuses}
             />
           </div>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Showing <strong>{activeRows.length}</strong> rows
           </p>
           <DuplicateTable

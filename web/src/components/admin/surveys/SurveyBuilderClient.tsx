@@ -203,29 +203,29 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         <SurveyTemplateBanner templateTitle={selectedTemplateTitle} onChangeTemplate={changeTemplate} />
       ) : null}
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Survey details")}</h2>
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Survey details")}</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-zinc-600">Title</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Title</label>
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Belize coastal tourism attitudes"
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+              className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-zinc-600">Description</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Description</label>
             <textarea
               rows={3}
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+              className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-zinc-600">Category</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Category</label>
             <SiteSelect
               value={category}
               onChange={(value) => setCategory(value as SurveyCategory)}
@@ -237,8 +237,8 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-zinc-600">Status</label>
-            <p className="mt-2 text-sm font-medium text-zinc-700">{formatHeadingCase(status)}</p>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Status</label>
+            <p className="mt-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">{formatHeadingCase(status)}</p>
           </div>
         </div>
       </section>
@@ -256,17 +256,17 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Questions")}</h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Questions")}</h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Use <strong>Add question</strong> below any item to insert the next question in place — no need to scroll back up.
           </p>
         </div>
 
         {questions.map((question, index) => (
           <div key={question.id} className="space-y-3">
-            <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <article className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-teal-900">Question {index + 1}</p>
+              <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">Question {index + 1}</p>
               <div className="flex flex-wrap gap-1.5">
                 <QuestionActionButton label="Move up" onClick={() => moveQuestion(question.id, -1)}>
                   <ChevronUpIcon />
@@ -285,7 +285,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
 
             <div className="mt-4 grid gap-4">
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Question type</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Question type</label>
                 <SiteSelect
                   value={question.type}
                   onChange={(type) => {
@@ -307,22 +307,22 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Question</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Question</label>
                 <input
                   value={question.title}
                   onChange={(event) => updateQuestion(question.id, { title: event.target.value })}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Help text (optional)</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Help text (optional)</label>
                 <input
                   value={question.description}
                   onChange={(event) => updateQuestion(question.id, { description: event.target.value })}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                 />
               </div>
-              <label className="inline-flex items-center gap-2 text-sm text-zinc-700">
+              <label className="inline-flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
                 <input
                   type="checkbox"
                   checked={question.required}
@@ -345,44 +345,44 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               {question.type === "rating_scale" ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-semibold text-zinc-600">Scale min</label>
+                    <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Scale min</label>
                     <input
                       type="number"
                       value={question.scaleMin}
                       onChange={(event) => updateQuestion(question.id, { scaleMin: Number(event.target.value) })}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-zinc-600">Scale max</label>
+                    <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Scale max</label>
                     <input
                       type="number"
                       value={question.scaleMax}
                       onChange={(event) => updateQuestion(question.id, { scaleMax: Number(event.target.value) })}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-zinc-600">Low label</label>
+                    <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Low label</label>
                     <input
                       value={question.scaleMinLabel}
                       onChange={(event) => updateQuestion(question.id, { scaleMinLabel: event.target.value })}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-zinc-600">High label</label>
+                    <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">High label</label>
                     <input
                       value={question.scaleMaxLabel}
                       onChange={(event) => updateQuestion(question.id, { scaleMaxLabel: event.target.value })}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
                     />
                   </div>
                 </div>
               ) : null}
 
-              <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
-                <p className="text-xs font-semibold text-zinc-600">Preview</p>
+              <div className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4">
+                <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Preview</p>
                 <div className="mt-2">
                   <SurveyQuestionField
                     question={sanitizeQuestionOptions(question)}
@@ -399,12 +399,12 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         ))}
       </section>
 
-      <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
+      <div className="flex flex-wrap gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
         <button
           type="button"
           disabled={saving}
           onClick={() => saveSurvey("draft")}
-          className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60"
+          className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60"
         >
           {saving ? "Saving…" : "Save draft"}
         </button>
@@ -418,7 +418,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         </button>
         <Link
           href="/admin/surveys"
-          className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+          className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
         >
           Back to library
         </Link>
@@ -436,7 +436,7 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-dashed border-teal-300 bg-teal-50/50 px-5 text-sm font-semibold text-teal-800 transition hover:border-teal-400 hover:bg-teal-50"
+          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-dashed border-teal-300 bg-teal-50/50 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 transition hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/40"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-700 text-base leading-none text-white">
             +
@@ -449,7 +449,7 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
 
   return (
     <div className="rounded-2xl border border-dashed border-teal-200 bg-teal-50/40 p-4">
-      <p className="text-center text-xs font-semibold text-teal-800">
+      <p className="text-center text-xs font-semibold text-teal-800 dark:text-teal-200">
         Choose question type
       </p>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -461,7 +461,7 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
               onAdd(type);
               setOpen(false);
             }}
-            className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold text-teal-900 hover:bg-teal-100"
+            className="rounded-lg border border-teal-200 bg-white dark:bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-teal-900 dark:text-teal-100 hover:bg-teal-100"
           >
             {SURVEY_QUESTION_TYPE_LABELS[type]}
           </button>
@@ -471,7 +471,7 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-xs font-semibold text-zinc-500 hover:text-zinc-700"
+          className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:text-zinc-300"
         >
           Cancel
         </button>
@@ -500,7 +500,7 @@ function QuestionActionButton({
       className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border transition ${
         tone === "danger"
           ? "border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-800"
-          : "border-zinc-200 text-zinc-500 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800"
+          : "border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:border-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-800 dark:text-teal-200"
       }`}
     >
       {children}

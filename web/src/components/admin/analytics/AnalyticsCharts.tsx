@@ -22,27 +22,27 @@ export function HorizontalBarChart({
 
   if (display.length === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-teal-950">{formatHeadingCase(title)}</h3>
-        <p className="mt-4 text-sm text-zinc-500">{emptyMessage}</p>
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+        <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
+        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-teal-950">{formatHeadingCase(title)}</h3>
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+      <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
       <ul className="mt-4 space-y-3">
         {display.map((row) => {
           const width = maxCount > 0 ? Math.max(4, (row.count / maxCount) * 100) : 0;
           return (
             <li key={row.label}>
               <div className="mb-1 flex items-center justify-between gap-2 text-xs">
-                <span className="min-w-0 truncate font-medium text-zinc-800" title={row.label}>
+                <span className="min-w-0 truncate font-medium text-zinc-800 dark:text-zinc-200" title={row.label}>
                   {formatAdminLabel(row.label)}
                 </span>
-                <span className="shrink-0 tabular-nums text-zinc-600">
-                  {row.count} <span className="text-zinc-400">({row.percent}%)</span>
+                <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                  {row.count} <span className="text-zinc-400 dark:text-zinc-500">({row.percent}%)</span>
                 </span>
               </div>
               <div className="h-2.5 overflow-hidden rounded-full bg-teal-50">
@@ -72,9 +72,9 @@ export function DonutBreakdown({
 
   if (segments.length === 0 || total === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-teal-950">{formatHeadingCase(title)}</h3>
-        <p className="mt-4 text-sm text-zinc-500">No data for current filters.</p>
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+        <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
+        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">No data for current filters.</p>
       </div>
     );
   }
@@ -87,15 +87,15 @@ export function DonutBreakdown({
   });
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-teal-950">{formatHeadingCase(title)}</h3>
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+      <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
       <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
         <div
           className="relative h-32 w-32 shrink-0 rounded-full"
           style={{ background: `conic-gradient(${gradientParts.join(", ")})` }}
         >
-          <div className="absolute inset-[18%] flex items-center justify-center rounded-full bg-white text-center">
-            <span className="text-lg font-bold text-teal-950">{total}</span>
+          <div className="absolute inset-[18%] flex items-center justify-center rounded-full bg-white dark:bg-zinc-900 text-center">
+            <span className="text-lg font-bold text-teal-950 dark:text-teal-100">{total}</span>
           </div>
         </div>
         <ul className="min-w-0 flex-1 space-y-2 text-sm">
@@ -108,7 +108,7 @@ export function DonutBreakdown({
                 />
                 <span className="truncate">{formatAdminLabel(row.label)}</span>
               </span>
-              <span className="shrink-0 tabular-nums text-zinc-600">{row.percent}%</span>
+              <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.percent}%</span>
             </li>
           ))}
         </ul>
@@ -166,29 +166,29 @@ export function SortableAnalyticsTable({
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
-      <div className="border-b border-zinc-100 px-5 py-4">
-        <h3 className="text-sm font-semibold text-teal-950">{formatHeadingCase(title)}</h3>
-        <p className="mt-1 text-xs text-zinc-500">{sorted.length} rows · click headers to sort</p>
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+      <div className="border-b border-zinc-100 dark:border-zinc-800 px-5 py-4">
+        <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{sorted.length} rows · click headers to sort</p>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               <th className="px-4 py-3">
-                <button type="button" onClick={() => toggleSort("label")} className="font-semibold hover:text-teal-800">
+                <button type="button" onClick={() => toggleSort("label")} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                   {formatAdminLabel(labelHeader)}
                   {sortIndicator("label")}
                 </button>
               </th>
               <th className="px-4 py-3 text-right">
-                <button type="button" onClick={() => toggleSort("count")} className="font-semibold hover:text-teal-800">
+                <button type="button" onClick={() => toggleSort("count")} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                   Count
                   {sortIndicator("count")}
                 </button>
               </th>
               <th className="px-4 py-3 text-right">
-                <button type="button" onClick={() => toggleSort("percent")} className="font-semibold hover:text-teal-800">
+                <button type="button" onClick={() => toggleSort("percent")} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                   Share
                   {sortIndicator("percent")}
                 </button>
@@ -198,18 +198,18 @@ export function SortableAnalyticsTable({
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={3} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                   No data for current filters.
                 </td>
               </tr>
             ) : (
               sorted.map((row) => (
                 <tr key={row.label} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
-                  <td className="max-w-[16rem] truncate px-4 py-2.5 font-medium text-zinc-800" title={row.label}>
+                  <td className="max-w-[16rem] truncate px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200" title={row.label}>
                     {formatAdminLabel(row.label)}
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-700">{row.count}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600">{row.percent}%</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{row.count}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.percent}%</td>
                 </tr>
               ))
             )}

@@ -35,7 +35,7 @@ export function BrpLogoText({
       aria-label="Belize Research Panel"
     >
       <span className={isDark ? "text-teal-200" : "text-teal-700"}>Belize</span>
-      <span className={isDark ? "text-white" : "text-teal-950"}>Research Panel</span>
+      <span className={isDark ? "text-white" : "text-teal-950 dark:text-teal-100"}>Research Panel</span>
     </span>
   );
 }

@@ -88,13 +88,13 @@ export function AdminDistributionEngineDashboard({
     <div className="space-y-6">
       <AdminDataModuleDashboard snapshot={snapshot} />
       <section className="rounded-2xl border border-teal-200 bg-teal-50/40 p-5 sm:p-6">
-        <h2 className="text-base font-semibold text-teal-950">Prepare distribution export</h2>
-        <p className="mt-1 text-sm text-zinc-600">
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Prepare distribution export</h2>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Select mode and study, then download the contact CSV for manual sending or gateway import.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs font-semibold text-zinc-600">Distribution mode</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Distribution mode</label>
             <SiteSelect
               value={mode}
               onChange={(value) => setMode(value as (typeof MODES)[number])}
@@ -103,7 +103,7 @@ export function AdminDistributionEngineDashboard({
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-zinc-600">Survey assignment</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey assignment</label>
             <SiteSelect
               value={surveyFilter}
               onChange={setSurveyFilter}

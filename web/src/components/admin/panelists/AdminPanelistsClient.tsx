@@ -406,14 +406,14 @@ export function AdminPanelistsClient({
     <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
       <div className="border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel register</p>
-        <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-zinc-600">
+        <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
+        <p className="mt-2 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Browse, filter, edit, flag, and delete panelist records. Use row actions on each record.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Filters")}</h2>
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Filters")}</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FilterMultiSelect
             label="Verification status"
@@ -444,12 +444,12 @@ export function AdminPanelistsClient({
             counts={voterCounts}
           />
         </div>
-        <p className="mt-4 text-sm text-zinc-600">
+        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           <strong>{filteredRows.length}</strong> panelists match filters · <strong>{rows.length}</strong> total in register
         </p>
       </section>
 
-      <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -457,8 +457,8 @@ export function AdminPanelistsClient({
             onClick={() => setTab(item.id)}
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
-                ? "border border-b-0 border-teal-200 bg-white text-teal-900"
-                : "text-zinc-600 hover:bg-teal-50/50 hover:text-teal-800"
+                ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
+                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label} ({item.count})
@@ -467,11 +467,11 @@ export function AdminPanelistsClient({
       </div>
 
       {tab === "duplicates" ? (
-        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Duplicate Review")}</h2>
-              <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+              <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Duplicate Review")}</h2>
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 Records that share the same name and exact date of birth are grouped here for comparison. Flag a record
                 to set its verification status to Possible Duplicate.
               </p>
@@ -536,11 +536,11 @@ export function AdminPanelistsClient({
           )}
         </section>
       ) : tab === "flagged" ? (
-        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Flagged panelists")}</h2>
-              <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+              <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Flagged panelists")}</h2>
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 Panelists with verification status Possible Duplicate. Their accounts are placed on hold until an
                 administrator clears the review.
               </p>
@@ -555,7 +555,7 @@ export function AdminPanelistsClient({
           ) : null}
           {flaggedRows.length > 0 ? (
             <>
-              <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+              <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
                 <DataTable
                   rows={flaggedPagination.paginatedRows}
                   columns={TABLE_COLUMNS}
@@ -581,11 +581,11 @@ export function AdminPanelistsClient({
           )}
         </section>
       ) : (
-        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("All panelists")}</h2>
-              <p className="mt-1 text-sm text-zinc-500">Edit, flag, or delete from the actions column.</p>
+              <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("All panelists")}</h2>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Edit, flag, or delete from the actions column.</p>
             </div>
             <button
               type="button"
@@ -602,7 +602,7 @@ export function AdminPanelistsClient({
               </BrandedAlert>
             </div>
           ) : null}
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <DataTable
               rows={allPagination.paginatedRows}
               columns={TABLE_COLUMNS}
@@ -748,7 +748,7 @@ function PanelistEditModal({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
           >
             Cancel
           </button>
@@ -756,8 +756,8 @@ function PanelistEditModal({
       }
     >
       <div className="space-y-6">
-        <div className="rounded-xl border border-teal-100 bg-teal-50/40 p-4">
-          <p className="text-sm font-semibold text-teal-950">{formatHeadingCase("Required checks")}</p>
+        <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 p-4">
+          <p className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Required checks")}</p>
           <p className="mt-1 text-xs text-teal-900/80">
             Verify or deny each item below. When email, phone, and photo ID are all verified, the panelist becomes fully verified.
           </p>
@@ -819,7 +819,7 @@ function PanelistEditModal({
           />
         </div>
         <div>
-          <label htmlFor="admin-notes" className="block text-sm font-medium text-zinc-800">
+          <label htmlFor="admin-notes" className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
             Admin notes
           </label>
           <textarea
@@ -827,7 +827,7 @@ function PanelistEditModal({
             rows={4}
             value={editState.notes}
             onChange={(e) => onChange({ ...editState, notes: e.target.value })}
-            className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           />
         </div>
         {error ? (
@@ -896,7 +896,7 @@ function IconButton({
         ? "text-red-700 hover:bg-red-50"
         : tone === "muted"
           ? "text-zinc-300 cursor-not-allowed"
-          : "text-teal-700 hover:bg-teal-50";
+          : "text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40";
 
   return (
     <button
@@ -929,9 +929,9 @@ function DataTable({
   return (
     <table className="min-w-[1100px] text-left text-xs sm:text-sm">
       <thead>
-        <tr className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
+        <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           {actions ? (
-            <th className="sticky left-0 z-10 whitespace-nowrap bg-zinc-50 px-2 py-2 font-semibold">Actions</th>
+            <th className="sticky left-0 z-10 whitespace-nowrap bg-zinc-50 dark:bg-zinc-950 px-2 py-2 font-semibold">Actions</th>
           ) : null}
           {columns.map((column) => (
             <th key={column} className="whitespace-nowrap px-3 py-2 font-semibold">
@@ -944,7 +944,7 @@ function DataTable({
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length + (actions ? 2 : 1)} className="px-4 py-8 text-center text-zinc-500">
+            <td colSpan={columns.length + (actions ? 2 : 1)} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               No records on this page.
             </td>
           </tr>
@@ -955,7 +955,7 @@ function DataTable({
             return (
               <tr
                 key={`${row.email}-${index}`}
-                className={`border-b border-zinc-100 ${isFlagged ? "bg-amber-50/80" : ""}`}
+                className={`border-b border-zinc-100 dark:border-zinc-800 ${isFlagged ? "bg-amber-50/80" : ""}`}
               >
                 {actions ? (
                   <td className="sticky left-0 z-10 bg-inherit px-2 py-2">
@@ -963,7 +963,7 @@ function DataTable({
                   </td>
                 ) : null}
                 {columns.map((column) => (
-                  <td key={column} className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-zinc-700">
+                  <td key={column} className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-zinc-700 dark:text-zinc-300">
                     {row[column] ?? ""}
                   </td>
                 ))}
@@ -1028,12 +1028,12 @@ function FieldInput({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-zinc-800">{formatHeadingCase(label)}</label>
+      <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">{formatHeadingCase(label)}</label>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+        className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
       />
     </div>
   );
@@ -1052,7 +1052,7 @@ function FieldSelect({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-zinc-800">{formatHeadingCase(label)}</label>
+      <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">{formatHeadingCase(label)}</label>
       <SiteSelect
         value={value}
         onChange={onChange}

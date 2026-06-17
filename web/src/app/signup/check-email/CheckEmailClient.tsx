@@ -16,10 +16,10 @@ export default function CheckEmailClient() {
       title="Verify your email"
       subtitle="Panelist registration is available once your email address is verified."
     >
-      <div className="space-y-4 text-sm text-zinc-700">
+      <div className="space-y-4 text-sm text-zinc-700 dark:text-zinc-300">
         <p>
           We sent a verification link to{" "}
-          <span className="font-medium text-zinc-900">{email || "your email address"}</span>.
+          <span className="font-medium text-zinc-900 dark:text-zinc-100">{email || "your email address"}</span>.
           Open the link in that message to continue.
         </p>
         <p>After verification, you can complete your panelist registration profile.</p>
@@ -27,7 +27,7 @@ export default function CheckEmailClient() {
         {verifyUrl ? (
           <BrandedAlert tone="warning" title="Development verification link" showIcon>
             Email delivery is not configured yet. Use this link to verify your account:{" "}
-            <Link href={verifyUrl} className="mt-2 inline-block break-all font-medium text-teal-700 hover:text-teal-900">
+            <Link href={verifyUrl} className="mt-2 inline-block break-all font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
               {verifyUrl}
             </Link>
           </BrandedAlert>
@@ -40,7 +40,7 @@ export default function CheckEmailClient() {
           >
             Back to login
           </Link>
-          <Link href="/" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+          <Link href="/" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
             Back to home
           </Link>
         </div>

@@ -116,6 +116,113 @@ const GENERIC_LOCAL_PARTS = new Set([
 
 const SUSPICIOUS_TLDS = new Set(["xyz", "top", "click", "icu", "buzz", "rest", "surf", "gq", "tk", "ml", "cf", "ga"]);
 
+/** Consumer webmail domains treated as trusted — addresses on other domains are flagged for review. */
+const MAJOR_EMAIL_PROVIDER_DOMAINS = new Set(
+  [
+    // Google
+    "gmail.com",
+    "googlemail.com",
+    // Yahoo
+    "yahoo.com",
+    "yahoo.co.uk",
+    "yahoo.ca",
+    "yahoo.com.au",
+    "yahoo.com.mx",
+    "yahoo.com.br",
+    "yahoo.de",
+    "yahoo.fr",
+    "yahoo.es",
+    "yahoo.it",
+    "yahoo.in",
+    "ymail.com",
+    "rocketmail.com",
+    // Microsoft
+    "outlook.com",
+    "outlook.co.uk",
+    "outlook.fr",
+    "outlook.de",
+    "outlook.es",
+    "outlook.it",
+    "hotmail.com",
+    "hotmail.co.uk",
+    "hotmail.fr",
+    "hotmail.de",
+    "hotmail.es",
+    "hotmail.it",
+    "live.com",
+    "live.co.uk",
+    "msn.com",
+    // Apple
+    "icloud.com",
+    "icloudmail.com",
+    "me.com",
+    "mac.com",
+    // AOL
+    "aol.com",
+    "aim.com",
+    // Other major global webmail
+    "protonmail.com",
+    "proton.me",
+    "pm.me",
+    "zoho.com",
+    "zohomail.com",
+    "mail.com",
+    "email.com",
+    "gmx.com",
+    "gmx.de",
+    "gmx.net",
+    "gmx.at",
+    "gmx.ch",
+    "fastmail.com",
+    "fastmail.fm",
+    "tutanota.com",
+    "tuta.io",
+    "yandex.com",
+    "yandex.ru",
+    "ya.ru",
+    "mail.ru",
+    "inbox.ru",
+    "list.ru",
+    "bk.ru",
+    "qq.com",
+    "163.com",
+    "126.com",
+    "sina.com",
+    "naver.com",
+    "daum.net",
+    "hanmail.net",
+    "rediffmail.com",
+    "libero.it",
+    "virgilio.it",
+    "web.de",
+    "t-online.de",
+    "freenet.de",
+    "orange.fr",
+    "free.fr",
+    "laposte.net",
+    "sfr.fr",
+    "sky.com",
+    "btinternet.com",
+    "virginmedia.com",
+    "talktalk.net",
+    "att.net",
+    "sbcglobal.net",
+    "bellsouth.net",
+    "comcast.net",
+    "verizon.net",
+    "charter.net",
+    "cox.net",
+    "earthlink.net",
+    "shaw.ca",
+    "rogers.com",
+    "bell.net",
+  ].map((domain) => domain.toLowerCase())
+);
+
+export function isMajorEmailProvider(domain: string): boolean {
+  return MAJOR_EMAIL_PROVIDER_DOMAINS.has(cleanText(domain).toLowerCase());
+}
+
 function splitEmail(email: string): { localPart: string; domain: string } | null {
   const value = cleanText(email).toLowerCase();
   const at = value.lastIndexOf("@");
@@ -183,6 +290,15 @@ export function assessSuspiciousEmail(
 
   if (DISPOSABLE_DOMAINS.has(domain)) {
     add("disposable-domain", "Disposable email domain", `${domain} is a known throwaway email provider.`, 70);
+  }
+
+  if (!isMajorEmailProvider(domain) && !DISPOSABLE_DOMAINS.has(domain)) {
+    add(
+      "non-major-provider",
+      "Possible bot — uncommon email provider",
+      `${domain} is not from a recognized major email service (Gmail, Yahoo, Outlook, iCloud, AOL, and similar).`,
+      35
+    );
   }
 
   for (const keyword of SUSPICIOUS_DOMAIN_KEYWORDS) {

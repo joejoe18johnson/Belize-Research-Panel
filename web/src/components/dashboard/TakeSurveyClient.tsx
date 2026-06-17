@@ -79,7 +79,7 @@ export function TakeSurveyClient({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/dashboard/surveys" className="text-sm font-semibold text-teal-700 hover:text-teal-900">
+      <Link href="/dashboard/surveys" className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100">
         ← Back to surveys
       </Link>
 
@@ -92,12 +92,12 @@ export function TakeSurveyClient({
         definition={definition}
       />
 
-      <div className="rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3 text-sm text-teal-900">
+      <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/50 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
         <strong>+{assignment.points} points</strong> · Complete by {assignment.completeByDate}
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between text-sm font-medium text-zinc-600">
+        <div className="mb-2 flex items-center justify-between text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           <span>{formatHeadingCase("Progress")}</span>
           <span>{done ? 100 : progressPercent}%</span>
         </div>
@@ -122,13 +122,13 @@ export function TakeSurveyClient({
 
       <div className="space-y-4">
         {definition.questions.map((question: SurveyQuestion, index: number) => (
-          <section key={question.id} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-            <label className="block text-sm font-semibold text-zinc-900">
+          <section key={question.id} className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {index + 1}. {question.title || "Untitled question"}
               {question.required ? <span className="text-red-600"> *</span> : null}
             </label>
             {question.description ? (
-              <p className="mt-1 text-sm text-zinc-500">{question.description}</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p>
             ) : null}
             <SurveyQuestionField
               question={question}
@@ -141,12 +141,12 @@ export function TakeSurveyClient({
       </div>
 
       {!done ? (
-        <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
+        <div className="flex flex-wrap gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
           <button
             type="button"
             disabled={saving || submitting}
             onClick={() => persist(false)}
-            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save progress"}
           </button>

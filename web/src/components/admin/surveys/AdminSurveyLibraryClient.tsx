@@ -32,10 +32,10 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
           .
         </BrandedAlert>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
           <table className="min-w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
+              <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 <th className="px-4 py-3 font-semibold">Title</th>
                 <th className="px-4 py-3 font-semibold">Category</th>
                 <th className="px-4 py-3 font-semibold">Questions</th>
@@ -47,27 +47,27 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
             <tbody>
               {surveys.map((survey) => (
                 <tr key={survey.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
-                  <td className="px-4 py-3 font-medium text-zinc-900">{survey.title}</td>
-                  <td className="px-4 py-3 text-zinc-600">{formatAdminLabel(survey.category)}</td>
-                  <td className="px-4 py-3 text-zinc-600">{survey.questions.length}</td>
+                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{survey.title}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(survey.category)}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{survey.questions.length}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                         survey.status === "published"
                           ? "bg-emerald-100 text-emerald-800"
                           : survey.status === "closed"
-                            ? "bg-zinc-100 text-zinc-700"
+                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                             : "bg-amber-100 text-amber-900"
                       }`}
                     >
                       {formatHeadingCase(survey.status)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-zinc-600">{survey.updatedAt.slice(0, 10)}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{survey.updatedAt.slice(0, 10)}</td>
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/surveys/${encodeURIComponent(survey.id)}/edit`}
-                      className="font-semibold text-teal-700 hover:text-teal-900"
+                      className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                     >
                       Edit
                     </Link>

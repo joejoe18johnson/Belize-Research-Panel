@@ -136,18 +136,18 @@ export function AdminNotificationsDashboard({
         </BrandedAlert>
       ) : null}
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Notification queue")}</h2>
-            <p className="mt-1 text-sm text-zinc-500">{filtered.length} items</p>
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Notification queue")}</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{filtered.length} items</p>
           </div>
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search name, email, type…"
-            className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            className="w-full max-w-xs rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           />
         </div>
 
@@ -159,10 +159,10 @@ export function AdminNotificationsDashboard({
           </div>
         ) : (
           <>
-            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
               <table className="min-w-[900px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+                  <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Email</th>
@@ -181,16 +181,16 @@ export function AdminNotificationsDashboard({
                       key={actionKey}
                       className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
                     >
-                      <td className="px-4 py-2.5 font-medium text-zinc-800">
+                      <td className="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                         <span className="inline-flex items-center gap-2">
                           {row.type}
                           {isNew ? <AdminNewBadge /> : null}
                         </span>
                       </td>
                       <td className="px-4 py-2.5">{row.name}</td>
-                      <td className="px-4 py-2.5 text-zinc-700">{row.email}</td>
-                      <td className="px-4 py-2.5 text-zinc-600">{row.detail}</td>
-                      <td className="px-4 py-2.5 tabular-nums text-zinc-600">{row.requestedAt}</td>
+                      <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{row.email}</td>
+                      <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.detail}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.requestedAt}</td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap items-center gap-2">
                           {canApprove ? (
@@ -205,7 +205,7 @@ export function AdminNotificationsDashboard({
                           ) : null}
                           <Link
                             href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                            className="text-xs font-semibold text-teal-700 hover:text-teal-900"
+                            className="text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                             onClick={() => void markNotificationRead(row.id)}
                           >
                             Open record

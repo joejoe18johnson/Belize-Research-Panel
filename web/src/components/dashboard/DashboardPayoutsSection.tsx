@@ -24,7 +24,7 @@ function statusTone(status: RedemptionRequest["status"]): string {
     case "fulfilled":
       return "bg-emerald-50 text-emerald-800 border-emerald-200";
     case "approved":
-      return "bg-teal-50 text-teal-800 border-teal-200";
+      return "bg-teal-50 text-teal-800 dark:text-teal-200 border-teal-200";
     case "rejected":
       return "bg-red-50 text-red-800 border-red-200";
     default:
@@ -54,29 +54,29 @@ function PayoutRequestCard({ request, layout }: { request: RedemptionRequest; la
 
   if (layout === "cards") {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="font-semibold text-zinc-900">{formatHeadingCase(request.optionLabel)}</p>
-            <p className="mt-1 text-sm text-zinc-600">{payoutStatusDetail(request)}</p>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(request.optionLabel)}</p>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{payoutStatusDetail(request)}</p>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               Ref {payoutShortId(request.id)} · Submitted {formatPayoutDate(request.submittedAt)}
             </p>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
-            <span className="text-sm font-bold tabular-nums text-teal-900">{formatBz(amountBz)}</span>
-            <span className="text-xs tabular-nums text-zinc-500">{request.points.toLocaleString()} pts</span>
+            <span className="text-sm font-bold tabular-nums text-teal-900 dark:text-teal-100">{formatBz(amountBz)}</span>
+            <span className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{request.points.toLocaleString()} pts</span>
             <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(request.status)}`}>
               {formatHeadingCase(statusLabel)}
             </span>
           </div>
         </div>
         {payment.fields.length > 0 ? (
-          <dl className="mt-4 space-y-1.5 border-t border-zinc-200 pt-3 text-xs">
+          <dl className="mt-4 space-y-1.5 border-t border-zinc-200 dark:border-zinc-800 pt-3 text-xs">
             {payment.fields.map((field) => (
               <div key={field.label} className="flex justify-between gap-3">
-                <dt className="text-zinc-500">{field.label}</dt>
-                <dd className="font-medium text-zinc-800">{field.value}</dd>
+                <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{field.label}</dt>
+                <dd className="font-medium text-zinc-800 dark:text-zinc-200">{field.value}</dd>
               </div>
             ))}
           </dl>
@@ -89,21 +89,21 @@ function PayoutRequestCard({ request, layout }: { request: RedemptionRequest; la
     <div className="flex flex-wrap items-start justify-between gap-3 py-1">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-zinc-900">{formatHeadingCase(request.optionLabel)}</p>
+          <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(request.optionLabel)}</p>
           <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(request.status)}`}>
             {formatHeadingCase(statusLabel)}
           </span>
         </div>
-        <p className="mt-1 text-sm text-zinc-600">{payoutStatusDetail(request)}</p>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{payoutStatusDetail(request)}</p>
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
           <span>Ref {payoutShortId(request.id)}</span>
           <span>Submitted {formatPayoutDate(request.submittedAt)}</span>
           <span>{payment.title}</span>
         </div>
       </div>
       <div className="shrink-0 text-right">
-        <p className="text-sm font-bold tabular-nums text-teal-900">{formatBz(amountBz)}</p>
-        <p className="text-xs tabular-nums text-zinc-500">{request.points.toLocaleString()} pts</p>
+        <p className="text-sm font-bold tabular-nums text-teal-900 dark:text-teal-100">{formatBz(amountBz)}</p>
+        <p className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{request.points.toLocaleString()} pts</p>
       </div>
     </div>
   );
@@ -128,9 +128,9 @@ function PayoutList({
         <ViewLayoutToggle value={layout} onChange={setLayout} />
       </div>
       {requests.length === 0 ? (
-        <div className="mt-4 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-8 text-center">
-          <p className="font-medium text-zinc-800">{formatHeadingCase(emptyTitle)}</p>
-          <p className="mt-1 text-sm text-zinc-500">{emptyDescription}</p>
+        <div className="mt-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-8 text-center">
+          <p className="font-medium text-zinc-800 dark:text-zinc-200">{formatHeadingCase(emptyTitle)}</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{emptyDescription}</p>
           {action ? <div className="mt-4">{action}</div> : null}
         </div>
       ) : (
@@ -182,31 +182,31 @@ export function DashboardPayoutsSection({ requests }: { requests: RedemptionRequ
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
         <DashboardCard className="border-amber-200 bg-gradient-to-br from-amber-50/80 to-white">
-          <p className="text-sm font-medium text-zinc-600">{formatHeadingCase("Pending review")}</p>
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Pending review")}</p>
           <p className="mt-2 text-3xl font-bold tabular-nums text-amber-900">{pendingCount}</p>
-          <p className="mt-1 text-xs text-zinc-500">Waiting for admin approval</p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Waiting for admin approval</p>
         </DashboardCard>
         <DashboardCard className="border-teal-200 bg-gradient-to-br from-teal-50/80 to-white">
-          <p className="text-sm font-medium text-zinc-600">{formatHeadingCase("In processing")}</p>
-          <p className="mt-2 text-3xl font-bold tabular-nums text-teal-900">{processingCount}</p>
-          <p className="mt-1 text-xs text-zinc-500">Approved and being paid out</p>
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("In processing")}</p>
+          <p className="mt-2 text-3xl font-bold tabular-nums text-teal-900 dark:text-teal-100">{processingCount}</p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Approved and being paid out</p>
         </DashboardCard>
         <DashboardCard className="border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-white">
-          <p className="text-sm font-medium text-zinc-600">{formatHeadingCase("Completed payouts")}</p>
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Completed payouts")}</p>
           <p className="mt-2 text-3xl font-bold tabular-nums text-emerald-900">{completedCount}</p>
-          <p className="mt-1 text-xs text-zinc-500">Successfully fulfilled</p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Successfully fulfilled</p>
         </DashboardCard>
       </div>
 
       <DashboardCard>
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-100 pb-3">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
               <BanknotesIcon className="h-5 w-5" />
             </span>
             <div>
               <SectionHeading as="h3">Active payouts</SectionHeading>
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 Open redemption requests that are pending review or being processed.
               </p>
             </div>
@@ -221,9 +221,9 @@ export function DashboardPayoutsSection({ requests }: { requests: RedemptionRequ
       </DashboardCard>
 
       <DashboardCard>
-        <div className="border-b border-zinc-100 pb-3">
+        <div className="border-b border-zinc-100 dark:border-zinc-800 pb-3">
           <SectionHeading as="h3">Payment history</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Completed and declined payouts on your account.
           </p>
         </div>

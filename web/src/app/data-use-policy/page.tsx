@@ -138,7 +138,7 @@ export default function DataUsePolicyPage() {
             "We may update this data use policy when our practices or legal obligations change. The current version will always be published on this page."
           )}
         </p>
-        <p className="text-xs text-zinc-500">{formatHeadingCase("Effective date")}: 30 May 2026</p>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Effective date")}: 30 May 2026</p>
       </PolicySection>
     </PolicyPageShell>
   );
