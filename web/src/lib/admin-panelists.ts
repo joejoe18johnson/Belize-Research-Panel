@@ -107,6 +107,19 @@ export function applyAdminPanelistFilters(
   });
 }
 
+export function countPanelistsByField(
+  rows: PanelistRow[],
+  field: keyof PanelistRow,
+  options: string[]
+): Record<string, number> {
+  const counts = Object.fromEntries(options.map((option) => [option, 0])) as Record<string, number>;
+  for (const row of rows) {
+    const value = cleanText(row[field]);
+    if (value in counts) counts[value] += 1;
+  }
+  return counts;
+}
+
 export function getUniqueFilterValues(rows: PanelistRow[], field: keyof PanelistRow): string[] {
   const values = new Set<string>();
   for (const row of rows) {
