@@ -4,11 +4,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { DonutBreakdown } from "@/components/admin/analytics/AnalyticsCharts";
+import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteConfirmDialog";
 import { FilterMultiSelect, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
-import { filterFraudRows, type FraudDuplicateRow, type FraudPreventionDetail } from "@/lib/admin-fraud";
+import { buildAdminDeleteCode, extractYearFromDate } from "@/lib/admin-delete-confirmation";
+import {
+  filterFraudRows,
+  filterSuspiciousEmailRows,
+  type FraudDuplicateRow,
+  type FraudPreventionDetail,
+  type SuspiciousEmailRow,
+} from "@/lib/admin-fraud";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
-type Tab = "overview" | "email" | "phone" | "name-dob";
+type Tab = "overview" | "suspicious-emails" | "email" | "phone" | "name-dob";
 
 type SortKey = keyof Pick<
   FraudDuplicateRow,
@@ -85,21 +93,141 @@ function DuplicateTable({
   );
 }
 
+function RiskBadge({ level }: { level: SuspiciousEmailRow["riskLevel"] }) {
+  const className =
+    level === "high"
+      ? "bg-red-100 text-red-900"
+      : "bg-amber-100 text-amber-950";
+  return (
+    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase ${className}`}>
+      {level}
+    </span>
+  );
+}
+
+function SuspiciousEmailTable({
+  rows,
+  flaggingEmail,
+  deletingEmail,
+  onFlag,
+  onDelete,
+}: {
+  rows: SuspiciousEmailRow[];
+  flaggingEmail: string;
+  deletingEmail: string;
+  onFlag: (email: string) => void;
+  onDelete: (row: SuspiciousEmailRow) => void;
+}) {
+  return (
+    <div className="overflow-x-auto rounded-xl border border-zinc-100">
+      <table className="min-w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+            <th className="px-3 py-3">Risk</th>
+            <th className="px-3 py-3">Name</th>
+            <th className="px-3 py-3">Email</th>
+            <th className="px-3 py-3">Domain</th>
+            <th className="px-3 py-3">Signals</th>
+            <th className="px-3 py-3">Verification</th>
+            <th className="px-3 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 ? (
+            <tr>
+              <td colSpan={7} className="px-4 py-8 text-center text-zinc-500">
+                No suspicious-looking emails matched the current filters.
+              </td>
+            </tr>
+          ) : (
+            rows.map((row) => {
+              const busy = flaggingEmail === row.email || deletingEmail === row.email;
+              return (
+                <tr key={row.email} className="border-b border-zinc-50 align-top hover:bg-amber-50/30">
+                  <td className="px-3 py-3">
+                    <RiskBadge level={row.riskLevel} />
+                    <p className="mt-1 text-xs tabular-nums text-zinc-500">Score {row.riskScore}</p>
+                  </td>
+                  <td className="px-3 py-3 font-medium text-zinc-800">
+                    {row.firstName} {row.lastName}
+                  </td>
+                  <td className="px-3 py-3 text-zinc-700">{row.email}</td>
+                  <td className="px-3 py-3 text-zinc-600">{row.domain}</td>
+                  <td className="max-w-xs px-3 py-3 text-xs leading-relaxed text-zinc-600">
+                    <ul className="space-y-1">
+                      {row.signals.map((signal) => (
+                        <li key={signal.id}>
+                          <span className="font-medium text-zinc-800">{signal.label}:</span> {signal.detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td className="px-3 py-3 text-zinc-700">
+                    {row.verificationStatus || "—"}
+                    {row.flagged ? (
+                      <p className="mt-1 text-[11px] font-semibold text-amber-800">Already flagged</p>
+                    ) : null}
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                        className="text-xs font-semibold text-teal-700 hover:text-teal-900 hover:underline"
+                      >
+                        Open record
+                      </Link>
+                      <button
+                        type="button"
+                        disabled={busy || row.flagged}
+                        onClick={() => onFlag(row.email)}
+                        className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-100 disabled:opacity-50"
+                      >
+                        {flaggingEmail === row.email ? "Flagging…" : "Flag"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => onDelete(row)}
+                        className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-50"
+                      >
+                        {deletingEmail === row.email ? "Deleting…" : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPreventionDetail }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("overview");
   const [search, setSearch] = useState("");
   const [verificationStatuses, setVerificationStatuses] = useState<string[]>([]);
+  const [riskLevels, setRiskLevels] = useState<Array<"medium" | "high">>([]);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("lastName");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [flaggingEmail, setFlaggingEmail] = useState("");
+  const [deletingEmail, setDeletingEmail] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<SuspiciousEmailRow | null>(null);
 
   const verificationOptions = useMemo(
     () => detail.verificationSummary.map((row) => row.status),
     [detail.verificationSummary]
   );
 
+  const filteredSuspicious = useMemo(
+    () => filterSuspiciousEmailRows(detail.suspiciousEmailRows, search, verificationStatuses, riskLevels),
+    [detail.suspiciousEmailRows, search, verificationStatuses, riskLevels]
+  );
   const filteredEmail = useMemo(
     () => filterFraudRows(detail.emailDuplicateRows, search, verificationStatuses),
     [detail.emailDuplicateRows, search, verificationStatuses]
@@ -134,6 +262,54 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
     }
   };
 
+  const flagRecord = async (email: string) => {
+    setFlaggingEmail(email);
+    setActionMessage("");
+    try {
+      const res = await fetch(`/api/admin/panelists/${encodeURIComponent(email)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verification_status: "Possible Duplicate" }),
+      });
+      const data = (await res.json()) as { message?: string };
+      if (!res.ok) {
+        setActionMessage(data.message ?? "Could not flag record.");
+        return;
+      }
+      setActionMessage(`Flagged ${email} as Possible Duplicate.`);
+      router.refresh();
+    } catch {
+      setActionMessage("Network error while flagging record.");
+    } finally {
+      setFlaggingEmail("");
+    }
+  };
+
+  const confirmDelete = async (confirmCode: string) => {
+    if (!deleteTarget) return;
+    setDeletingEmail(deleteTarget.email);
+    setActionMessage("");
+    try {
+      const res = await fetch(`/api/admin/panelists/${encodeURIComponent(deleteTarget.email)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmCode }),
+      });
+      const data = (await res.json()) as { message?: string };
+      if (!res.ok) {
+        setActionMessage(data.message ?? "Could not delete record.");
+        return;
+      }
+      setDeleteTarget(null);
+      setActionMessage(`Deleted ${deleteTarget.email}.`);
+      router.refresh();
+    } catch {
+      setActionMessage("Network error while deleting record.");
+    } finally {
+      setDeletingEmail("");
+    }
+  };
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     else {
@@ -144,23 +320,35 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
 
   const TABS: { id: Tab; label: string; count: number }[] = [
     { id: "overview", label: "Overview", count: 0 },
+    { id: "suspicious-emails", label: "Suspicious emails", count: detail.suspiciousEmails },
     { id: "email", label: "Duplicate emails", count: detail.emailDuplicateRows.length },
     { id: "phone", label: "Duplicate phones", count: detail.phoneDuplicateRows.length },
     { id: "name-dob", label: "Name + DOB", count: detail.nameDobDuplicateRows.length },
   ];
 
   const activeRows =
-    tab === "email" ? filteredEmail : tab === "phone" ? filteredPhone : tab === "name-dob" ? filteredNameDob : [];
+    tab === "email"
+      ? filteredEmail
+      : tab === "phone"
+        ? filteredPhone
+        : tab === "name-dob"
+          ? filteredNameDob
+          : [];
+
+  const deleteConfirmCode = deleteTarget
+    ? buildAdminDeleteCode(deleteTarget.firstName, extractYearFromDate(deleteTarget.registrationDate))
+    : "";
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageIntro
         eyebrow="Panel quality"
         title={formatHeadingCase("Fraud prevention")}
-        description="Duplicate detection, verification breakdowns, and bulk quality actions — aligned with the Streamlit MVP Fraud Prevention module."
+        description="Duplicate detection, suspicious email screening, verification breakdowns, and admin quality actions."
       />
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Suspicious emails" value={detail.suspiciousEmails} />
         <MetricCard label="Duplicate emails" value={detail.duplicateEmails} />
         <MetricCard label="Duplicate phones" value={detail.duplicatePhones} />
         <MetricCard label="Same name + DOB" value={detail.duplicateNameDob} />
@@ -176,13 +364,14 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           {submitting ? "Updating…" : "Mark name + DOB duplicates as Possible Duplicate"}
         </button>
         <Link
-          href="/admin/panelists"
+          href="/admin/panelists?tab=flagged"
           className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50"
         >
-          Open panelists register
+          Open flagged panelists
         </Link>
       </div>
       {message ? <p className="text-sm text-teal-900">{message}</p> : null}
+      {actionMessage ? <p className="text-sm text-teal-900">{actionMessage}</p> : null}
 
       <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-1">
         {TABS.map((item) => (
@@ -204,6 +393,52 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
 
       {tab === "overview" ? (
         <DonutBreakdown rows={verificationChart} title="Verification status" />
+      ) : tab === "suspicious-emails" ? (
+        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Suspicious emails")}</h2>
+            <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+              Flags disposable providers, bot-like local parts, random aliases, and addresses that do not match the
+              panelist name. New signups with high-risk patterns are blocked automatically. Review, flag, or delete as
+              needed.
+            </p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-[1fr_280px_220px]">
+            <div>
+              <label className="text-xs font-semibold text-zinc-600">Search</label>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Name, email, domain, signal…"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+              />
+            </div>
+            <FilterMultiSelect
+              label="Verification"
+              options={verificationOptions}
+              selected={verificationStatuses}
+              onChange={setVerificationStatuses}
+            />
+            <FilterMultiSelect
+              label="Risk level"
+              options={["high", "medium"]}
+              selected={riskLevels}
+              onChange={(values) => setRiskLevels(values as Array<"medium" | "high">)}
+            />
+          </div>
+          <p className="text-sm text-zinc-500">
+            Showing <strong>{filteredSuspicious.length}</strong> suspicious email
+            {filteredSuspicious.length === 1 ? "" : "s"}
+          </p>
+          <SuspiciousEmailTable
+            rows={filteredSuspicious}
+            flaggingEmail={flaggingEmail}
+            deletingEmail={deletingEmail}
+            onFlag={flagRecord}
+            onDelete={setDeleteTarget}
+          />
+        </section>
       ) : (
         <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -235,6 +470,20 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           />
         </section>
       )}
+
+      <AdminDeleteConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={deleteTarget ? `Delete ${deleteTarget.firstName} ${deleteTarget.lastName}`.trim() : "Delete record"}
+        description={
+          deleteTarget
+            ? `This permanently removes the panelist record for ${deleteTarget.email} and related account data.`
+            : ""
+        }
+        confirmCode={deleteConfirmCode}
+        loading={Boolean(deletingEmail)}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
