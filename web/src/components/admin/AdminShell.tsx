@@ -63,10 +63,10 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)]">
-      <div className="flex min-h-screen flex-col lg:flex-row">
-        <aside className="safe-top shrink-0 border-b border-teal-100 bg-teal-950 text-white lg:w-72 lg:border-b-0 lg:border-r">
-          <div className="h-1 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400 lg:hidden" aria-hidden />
-          <div className="border-b border-white/10 px-4 py-4">
+      <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
+        <aside className="safe-top z-40 flex shrink-0 flex-col border-b border-teal-100 bg-teal-950 text-white lg:h-screen lg:w-72 lg:border-b-0 lg:border-r">
+          <div className="h-1 shrink-0 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400 lg:hidden" aria-hidden />
+          <div className="shrink-0 border-b border-white/10 px-4 py-4">
             <BrpLogoLink href="/admin/dashboard" variant="dark" className="block" />
             <p className="mt-2 text-xs font-medium tracking-[0.14em] text-teal-200/90">
               {formatHeadingCase("Admin console")}
@@ -76,7 +76,10 @@ export function AdminShell({
               <span className="mt-0.5 block text-teal-200/90">{STAFF_ROLE_LABELS[session.role]}</span>
             </p>
           </div>
-          <nav className="nav-scroll max-h-[40vh] overflow-y-auto px-2 py-3 lg:max-h-[calc(100vh-7rem)] lg:py-4" aria-label="Admin modules">
+          <nav
+            className="nav-scroll min-h-0 max-h-[40vh] flex-1 overflow-y-auto px-2 py-3 lg:max-h-none lg:py-4"
+            aria-label="Admin modules"
+          >
             <div className="space-y-5">
               {ADMIN_NAV_SECTIONS.map((section) => {
                 const modules = getAdminModulesBySection(section.id).filter((module) =>
@@ -127,7 +130,7 @@ export function AdminShell({
               })}
             </div>
           </nav>
-          <div className="border-t border-white/10 px-4 py-4">
+          <div className="shrink-0 border-t border-white/10 px-4 py-4">
             <Link href="/" className="block text-sm text-teal-100/80 transition hover:text-white">
               ← Public site
             </Link>
@@ -142,8 +145,8 @@ export function AdminShell({
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1">
-          <header className="border-b border-teal-100 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:overflow-y-auto">
+          <header className="shrink-0 border-b border-teal-100 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6">
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">
               Belize Research Panel
             </p>
@@ -152,7 +155,7 @@ export function AdminShell({
               governance studies.
             </p>
           </header>
-          <main className="overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main className="min-h-0 flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </div>
       </div>
     </div>

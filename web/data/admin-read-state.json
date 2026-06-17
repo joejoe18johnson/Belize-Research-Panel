@@ -12,5 +12,33 @@
       "readAt": "2026-06-17T16:01:04.962Z"
     }
   },
-  "campaigns": {}
+  "campaigns": {
+    "campaign-sample-coastal-tourism-2026": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-glen-welcome-bonus": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-tourism-retail": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-municipal-services": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-energy-policy": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-healthcare-access": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-agriculture-market": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "survey-youth-employment": {
+      "readAt": "2026-06-17T17:48:51.405Z"
+    },
+    "campaign-vocational-training-mqi959ur": {
+      "readAt": "2026-06-17T17:48:56.333Z"
+    }
+  }
 }

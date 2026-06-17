@@ -1,9 +1,11 @@
 {
   "CITIZENSHIP_STATUS": [
     "Citizen of Belize",
+    "Citizen of Belize living in Belize not registered to vote",
     "Citizen of a Commonwealth country living in Belize",
-    "Foreign national not living in Belize",
-    "Other resident of Belize"
+    "Other resident of Belize",
+    "Other national living in Belize not registered to vote",
+    "Foreign national not living in Belize"
   ],
   "VOTING_STATUS": [
     "Yes",
