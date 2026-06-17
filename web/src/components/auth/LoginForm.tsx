@@ -6,6 +6,7 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 import { Field, TextInput } from "@/components/registration/form-ui";
 import {
   DEMO_ACCOUNT_PASSWORD,
+  DEMO_ADMIN_ACCOUNT,
   DEMO_REGISTERED_ACCOUNT,
   DEMO_REGISTRATION_READY_ACCOUNT,
   DEMO_UNVERIFIED_REGISTERED_ACCOUNT,
@@ -13,9 +14,15 @@ import {
 } from "@/lib/demo-accounts";
 import type { FieldErrors } from "@/lib/validation";
 
-export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
+export function LoginForm({
+  nextPath = "/register",
+  initialEmail = "",
+}: {
+  nextPath?: string;
+  initialEmail?: string;
+}) {
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -166,13 +173,24 @@ export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
       </p>
 
       {isDemoAccountsEnabled() ? (
-        <div className="space-y-2 text-center text-xs text-zinc-500">
+        <div className="space-y-2 rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3 text-center text-xs text-teal-900/80">
+          <p className="font-semibold text-teal-900">Testing accounts</p>
           <p>
-            Dev:{" "}
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-900 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
+              onClick={() => loginWithDemo(DEMO_ADMIN_ACCOUNT.email)}
+            >
+              Log in as admin demo
+            </button>
+            {" "}(Glen Avilez · verified dashboard)
+          </p>
+          <p>
+            <button
+              type="button"
+              disabled={submitting}
+              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_REGISTRATION_READY_ACCOUNT.email)}
             >
               Log in as registration demo
@@ -180,11 +198,10 @@ export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
             {" "}(verified, ready to register)
           </p>
           <p>
-            Dev:{" "}
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-900 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_REGISTERED_ACCOUNT.email)}
             >
               Log in as registered demo
@@ -192,19 +209,18 @@ export function LoginForm({ nextPath = "/register" }: { nextPath?: string }) {
             {" "}(verified, dashboard ready)
           </p>
           <p>
-            Dev:{" "}
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-900 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_UNVERIFIED_REGISTERED_ACCOUNT.email)}
             >
               Log in as unverified demo
             </button>
             {" "}(registered, pending verification)
           </p>
-          <p className="text-[11px] leading-relaxed text-zinc-400">
-            {DEMO_REGISTERED_ACCOUNT.email} · {DEMO_UNVERIFIED_REGISTERED_ACCOUNT.email} · {DEMO_ACCOUNT_PASSWORD}
+          <p className="text-[11px] leading-relaxed text-teal-800/70">
+            {DEMO_ADMIN_ACCOUNT.email} · {DEMO_ACCOUNT_PASSWORD}
           </p>
         </div>
       ) : null}

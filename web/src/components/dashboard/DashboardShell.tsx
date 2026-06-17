@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
+import { dashboardCardClass, dashboardHeaderClass, dashboardShellClass } from "@/lib/brand";
 import { appContentClass, MEDIUM_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
 import { DashboardNav } from "./DashboardNav";
@@ -27,8 +28,9 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-zinc-100">
-      <header className="safe-top sticky top-0 z-20 border-b border-zinc-200 bg-white">
+    <div className={dashboardShellClass}>
+      <header className={dashboardHeaderClass}>
+        <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`${CONTENT_CLASS} flex min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-4 sm:py-4`}>
           <BrpLogoLink
             href="/dashboard"
@@ -40,7 +42,7 @@ export function DashboardShell({
             <NotificationBellLink unreadCount={badges.unreadNotifications} />
             <Link
               href="/dashboard/profile"
-              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl transition hover:bg-zinc-100 sm:min-h-11 sm:min-w-11 md:min-w-0 md:gap-2.5"
+              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 sm:min-h-11 sm:min-w-11 md:min-w-0 md:gap-2.5"
               aria-label="View profile"
             >
               <UserAvatar firstName={firstName} email={email} />
@@ -51,7 +53,7 @@ export function DashboardShell({
                 <p className="truncate text-xs text-zinc-500">{email}</p>
               </div>
             </Link>
-            <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white px-2.5 text-xs font-semibold text-zinc-700 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:text-sm" />
+            <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-2.5 text-xs font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:text-sm" />
           </div>
         </div>
         <DashboardNav badges={badges} />
@@ -79,8 +81,9 @@ export function DashboardPageHeader({
 }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-      <div className="min-w-0 flex-1">
-        <h1 className="text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl md:text-3xl">
+      <div className="min-w-0 flex-1 border-l-4 border-teal-600 pl-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Belize Research Panel</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-teal-950 sm:text-2xl md:text-3xl">
           {formatHeadingCase(title)}
         </h1>
         {description ? (
@@ -97,11 +100,7 @@ export function DashboardPageHeader({
 }
 
 export function DashboardCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-6 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`${dashboardCardClass} ${className}`.trim()}>{children}</div>;
 }
 
 /** Clips top-of-card media (images, gradients) to the card corner radius. */
@@ -122,7 +121,7 @@ export function DashboardCardMedia({
 
 export function DashboardCardTitle({ children }: { children: ReactNode }) {
   return (
-    <h3 className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+    <h3 className="border-b border-teal-100 pb-3 text-base font-semibold text-teal-950">
       {formatHeadingChildren(children)}
     </h3>
   );
@@ -142,7 +141,7 @@ export function SectionHeading({
 
 export function DashboardInfoNote({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-relaxed text-zinc-600">
+    <p className="rounded-lg border border-teal-100 bg-teal-50/60 px-4 py-3 text-sm leading-relaxed text-teal-900/80">
       {typeof children === "string" ? formatHeadingCase(children) : children}
     </p>
   );
@@ -208,10 +207,10 @@ export function StatCard({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-emerald-200 bg-emerald-50/80"
+      ? "border-emerald-200 bg-emerald-50/90 shadow-sm shadow-emerald-950/[0.03]"
       : tone === "warning"
-        ? "border-amber-200 bg-amber-50/80"
-        : "border-zinc-200 bg-white";
+        ? "border-amber-200 bg-amber-50/90 shadow-sm shadow-amber-950/[0.03]"
+        : "border-teal-100 bg-white shadow-sm shadow-teal-950/[0.03]";
 
   const iconToneClass =
     tone === "success"
@@ -279,9 +278,9 @@ export function QuickLinkCard({
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-teal-200 hover:bg-teal-50/40 hover:shadow-md"
+      className="group rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10"
     >
-      <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-900">{formatHeadingCase(label)}</p>
+      <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
       <p className="mt-1 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
     </Link>
   );

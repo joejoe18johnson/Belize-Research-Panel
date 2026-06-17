@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrpLogoLink } from "@/components/BrpLogo";
+import { HomeDemoAccess } from "@/components/home/HomeDemoAccess";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export default function HomePage() {
@@ -64,6 +65,8 @@ export default function HomePage() {
             </div>
           ))}
         </section>
+
+        <HomeDemoAccess />
       </main>
     </div>
   );

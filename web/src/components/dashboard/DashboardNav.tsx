@@ -42,7 +42,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
   const pathname = usePathname();
 
   return (
-    <nav className="border-t border-zinc-100 bg-white" aria-label="Dashboard sections">
+    <nav className="border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30" aria-label="Dashboard sections">
       <div className="nav-scroll overflow-x-auto overscroll-x-contain">
         <div
           className={`mx-auto flex w-max min-w-full max-w-none snap-x snap-mandatory justify-start gap-1.5 px-3 py-2.5 sm:w-full sm:justify-center sm:gap-2 sm:px-4 sm:py-3 ${APP_CONTENT_MAX}`}
@@ -59,8 +59,8 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
                   item.mobileIcon === "home" ? "min-w-10 justify-center px-2.5 sm:min-w-0 sm:justify-start sm:px-4" : "px-3"
                 } ${
                   active
-                    ? "bg-teal-700 text-white shadow-sm"
-                    : "text-zinc-600 hover:bg-zinc-100 hover:text-teal-800"
+                    ? "bg-teal-700 text-white shadow-md shadow-teal-900/20"
+                    : "text-teal-900/70 hover:bg-teal-50 hover:text-teal-900"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
