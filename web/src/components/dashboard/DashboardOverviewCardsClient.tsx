@@ -96,29 +96,25 @@ export function DashboardOverviewStats({
 }
 
 export function DashboardOverviewQuickLinks() {
-  const [layout, setLayout] = useViewLayout("dashboard-overview-links");
-
   return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
-        <ViewLayoutToggle value={layout} onChange={setLayout} />
-      </div>
-      <div className={viewLayoutContainerClass(layout, "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5")}>
-        {QUICK_LINKS.map((link) => {
-          const Icon = link.icon;
-          return (
-            <div key={link.href} className={viewLayoutItemClass(layout, "w-[min(72vw,12rem)]")}>
-              <QuickLinkCard
-                href={link.href}
-                label={link.label}
-                description={link.description}
-                icon={<Icon className="h-5 w-5" />}
-                layout={layout}
-              />
-            </div>
-          );
-        })}
-      </div>
+    <div className="flex gap-3 overflow-x-auto pb-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-4 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:pb-0">
+      {QUICK_LINKS.map((link) => {
+        const Icon = link.icon;
+        return (
+          <div
+            key={link.href}
+            className="w-[10.75rem] shrink-0 snap-start sm:w-[11.5rem] lg:w-auto lg:shrink"
+          >
+            <QuickLinkCard
+              href={link.href}
+              label={link.label}
+              description={link.description}
+              icon={<Icon className="h-5 w-5" />}
+              layout="horizontal"
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

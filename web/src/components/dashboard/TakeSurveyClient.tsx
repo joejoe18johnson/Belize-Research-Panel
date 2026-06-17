@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { SurveyBrandingHeader } from "@/components/surveys/SurveyBrandingHeader";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
 import {
@@ -79,17 +79,21 @@ export function TakeSurveyClient({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <Link href="/dashboard/surveys" className="text-sm font-semibold text-teal-700 hover:text-teal-900">
-          ← Back to surveys
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold text-zinc-900">{definition.title}</h1>
-        {definition.description ? (
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600">{definition.description}</p>
-        ) : null}
-        <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3 text-sm text-teal-900">
-          <strong>+{assignment.points} points</strong> · Complete by {assignment.completeByDate}
-        </div>
+      <Link href="/dashboard/surveys" className="text-sm font-semibold text-teal-700 hover:text-teal-900">
+        ← Back to surveys
+      </Link>
+
+      <SurveyBrandingHeader
+        title={definition.title}
+        description={definition.description}
+        companyIntro={definition.companyIntro}
+        category={definition.category}
+        surveyId={definition.id}
+        definition={definition}
+      />
+
+      <div className="rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3 text-sm text-teal-900">
+        <strong>+{assignment.points} points</strong> · Complete by {assignment.completeByDate}
       </div>
 
       <div>

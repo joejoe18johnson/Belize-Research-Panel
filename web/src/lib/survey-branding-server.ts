@@ -1,6 +1,5 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { SurveyDefinition } from "./survey-types";
 
 const UPLOADS_ROOT = path.join(process.cwd(), "data", "uploads", "surveys");
 
@@ -30,18 +29,6 @@ function basenameForKind(kind: SurveyBrandingAssetKind): string {
 function normalizeExtension(filename: string): string {
   const ext = path.extname(filename).toLowerCase();
   return ALLOWED_EXTENSIONS.has(ext) ? ext : ".png";
-}
-
-export function surveyBrandingAssetUrl(surveyId: string, kind: SurveyBrandingAssetKind): string {
-  return `/api/surveys/${encodeURIComponent(surveyId)}/assets/${kind}`;
-}
-
-export function surveyHasLogo(definition: Pick<SurveyDefinition, "companyLogoFile">): boolean {
-  return Boolean(definition.companyLogoFile);
-}
-
-export function surveyHasCover(definition: Pick<SurveyDefinition, "coverImageFile">): boolean {
-  return Boolean(definition.coverImageFile);
 }
 
 export async function findSurveyBrandingAsset(

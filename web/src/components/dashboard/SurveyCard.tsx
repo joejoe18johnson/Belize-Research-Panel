@@ -2,29 +2,15 @@ import Link from "next/link";
 import type { PanelistSurvey, SurveyCategory } from "@/lib/panelist-surveys-types";
 import { isSurveyOverdue } from "@/lib/panelist-surveys-types";
 import type { ViewLayout } from "@/lib/view-layout";
+import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, DashboardCardMedia } from "./DashboardShell";
 
-const CATEGORY_STYLES: Record<
-  SurveyCategory,
-  { gradient: string; label: string; icon: string }
-> = {
-  political: {
-    gradient: "from-teal-700 via-teal-800 to-teal-950",
-    label: "Political poll",
-    icon: "🗳️",
-  },
-  market: {
-    gradient: "from-orange-600 via-orange-700 to-amber-800",
-    label: "Market research",
-    icon: "📊",
-  },
-  civic: {
-    gradient: "from-emerald-600 via-teal-700 to-teal-900",
-    label: "Civic study",
-    icon: "🏛️",
-  },
-};
+const CATEGORY_STYLES = {
+  political: getSurveyCategoryStyle("political"),
+  market: getSurveyCategoryStyle("market"),
+  civic: getSurveyCategoryStyle("civic"),
+} satisfies Record<SurveyCategory, ReturnType<typeof getSurveyCategoryStyle>>;
 
 function SurveyProgressBar({
   percent,

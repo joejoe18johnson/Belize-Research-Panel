@@ -12,6 +12,7 @@ import { DashboardNav } from "./DashboardNav";
 import { AccountNotVerifiedBanner } from "./AccountNotVerifiedBanner";
 import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
+import { PointsBalanceLink } from "./PointsBalanceLink";
 import { UserAvatar } from "./UserAvatar";
 
 const CONTENT_CLASS = appContentClass;
@@ -40,7 +41,8 @@ export function DashboardShell({
             className="min-w-0"
             logoClassName="sm:text-base"
           />
-          <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
+            <PointsBalanceLink availablePoints={badges.availablePoints} />
             <NotificationBellLink unreadCount={badges.unreadNotifications} />
             <Link
               href="/dashboard/profile"

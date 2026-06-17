@@ -14,12 +14,14 @@ import { findPanelistByEmail } from "./panelists";
 import { loadNotificationReadState } from "./notification-state";
 import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
+import { getAvailablePoints } from "./reward-redemption";
 import { isPanelistVerified } from "./verification-status";
 
 export interface DashboardNavBadges {
   unreadNotifications: number;
   inboxSurveys: number;
   verificationAttention: number;
+  availablePoints: number;
 }
 
 export interface DashboardContext {
@@ -74,18 +76,21 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
 export async function getDashboardNavBadges(email: string): Promise<DashboardNavBadges> {
   const panelist = await findPanelistByEmail(email);
   if (!panelist) {
-    return { unreadNotifications: 0, inboxSurveys: 0, verificationAttention: 0 };
+    return { unreadNotifications: 0, inboxSurveys: 0, verificationAttention: 0, availablePoints: 0 };
   }
 
   const profile = panelistRowToDashboardProfile(panelist);
+  const rewards = await resolveRewardSummary(email, profile);
   const readState = await loadNotificationReadState(email);
   const redemptionRequests = await loadRedemptionRequests(email);
   const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests });
   const { inbox } = await getPanelistSurveys(email);
+  const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
 
   return {
     unreadNotifications: countUnreadNotifications(notifications),
     inboxSurveys: inbox.length,
     verificationAttention: isPanelistVerified(profile.verificationStatus) ? 0 : 1,
+    availablePoints,
   };
 }
