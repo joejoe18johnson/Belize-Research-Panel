@@ -1,5 +1,25 @@
 [
   {
+    "id": "ff5b7f5a-b465-4748-9267-1cd437a7c718",
+    "sentAt": "2026-06-17T16:01:04.955Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "whatsapp",
+    "subject": "Payout processing",
+    "body": "Your Bank/ Cash payout redemption (BZ$20) is now being processed. Reference D6A645.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  },
+  {
+    "id": "9fc8b93f-df1f-4ec9-9351-1717bfe7c3ce",
+    "sentAt": "2026-06-17T16:01:04.944Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "email",
+    "subject": "Payout processing",
+    "body": "Your Bank/ Cash payout redemption (BZ$20) is now being processed. Reference D6A645.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  },
+  {
     "id": "fb2687af-e7a8-4bfa-8d2e-0ada2ce5bcf1",
     "sentAt": "2026-06-17T05:11:05.869Z",
     "email": "johannesjohnsonj@gmail.com",

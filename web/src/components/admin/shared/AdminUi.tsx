@@ -3,6 +3,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siteCheckboxClass } from "@/lib/site-controls";
+import { formatAdminLabel, formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
+
+/** Form and filter labels in the admin console (title case, not all caps). */
+export const adminFieldLabelClass = "text-xs font-semibold text-zinc-600";
+
+export function AdminFieldLabel({ children }: { children: ReactNode }) {
+  return <span className={adminFieldLabelClass}>{formatHeadingChildren(children)}</span>;
+}
 
 export function FilterMultiSelect({
   label,
@@ -19,7 +27,7 @@ export function FilterMultiSelect({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
+      <p className={adminFieldLabelClass}>{formatAdminLabel(label)}</p>
       <div className="mt-1.5 max-h-36 space-y-0.5 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-2">
         {options.length === 0 ? (
           <p className="px-2 py-1 text-xs text-zinc-400">None</p>
@@ -39,7 +47,7 @@ export function FilterMultiSelect({
                   }
                   className={`${siteCheckboxClass} shrink-0`}
                 />
-                <span className="min-w-0 flex-1 truncate">{option}</span>
+                <span className="min-w-0 flex-1 truncate">{formatAdminLabel(option)}</span>
                 {counts && counts[option] !== undefined ? (
                   <span className="shrink-0 tabular-nums text-xs font-medium text-zinc-400">({counts[option]})</span>
                 ) : null}
@@ -75,7 +83,7 @@ export function MetricCard({
 
   const content = (
     <>
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+      <p className="text-xs font-medium text-zinc-600">{formatAdminLabel(label)}</p>
       <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950">{value}</p>
       {hint ? <p className="mt-1 text-xs text-zinc-500">{hint}</p> : null}
     </>
@@ -125,7 +133,7 @@ export function IconMetricCard({
         {icon}
       </span>
       <span className="min-w-0">
-        <p className="text-sm font-medium text-zinc-600">{label}</p>
+        <p className="text-sm font-medium text-zinc-600">{formatAdminLabel(label)}</p>
         <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-900">{value}</p>
         {hint ? <p className="mt-0.5 text-xs text-zinc-500">{hint}</p> : null}
       </span>
@@ -163,7 +171,9 @@ export function AdminStatusPill({
           : "bg-zinc-100 text-zinc-700";
 
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${toneClass}`}>{label}</span>
+    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${toneClass}`}>
+      {formatAdminLabel(label)}
+    </span>
   );
 }
 
@@ -207,7 +217,7 @@ export function AdminSectionPanel({
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
       <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-3 sm:px-5">
-        <h2 className="text-base font-semibold text-zinc-900">{title}</h2>
+        <h2 className="text-base font-semibold text-zinc-900">{formatHeadingCase(title)}</h2>
         {viewAllHref ? (
           <Link href={viewAllHref} className="text-sm font-semibold text-sky-700 hover:text-sky-900">
             View all →
@@ -232,7 +242,7 @@ export function AdminDataTable({
 export function AdminTableHead({ children }: { children: ReactNode }) {
   return (
     <thead>
-      <tr className="border-b border-zinc-100 bg-zinc-50/80 text-[11px] uppercase tracking-wide text-zinc-500">
+      <tr className="border-b border-zinc-100 bg-zinc-50/80 text-[11px] font-semibold text-zinc-600">
         {children}
       </tr>
     </thead>
@@ -248,7 +258,7 @@ export function AdminTableTh({
 }) {
   const alignClass =
     align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
-  return <th className={`whitespace-nowrap px-4 py-3 font-semibold ${alignClass}`}>{children}</th>;
+  return <th className={`whitespace-nowrap px-4 py-3 font-semibold ${alignClass}`}>{formatHeadingChildren(children)}</th>;
 }
 
 export function AdminDownloadButton({
@@ -311,9 +321,9 @@ export function PageIntro({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 border-l-4 border-teal-600 pl-4">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">{eyebrow}</p>
-        <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{title}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{description}</p>
+        <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">{formatHeadingCase(eyebrow)}</p>
+        <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{formatHeadingCase(title)}</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
@@ -327,8 +337,8 @@ export function adminNewItemRowClass(isNew: boolean, base = ""): string {
 
 export function AdminNewBadge({ label = "New" }: { label?: string }) {
   return (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-      {label}
+    <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white">
+      {formatAdminLabel(label)}
     </span>
   );
 }

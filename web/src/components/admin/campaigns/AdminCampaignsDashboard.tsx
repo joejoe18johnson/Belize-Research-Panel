@@ -8,7 +8,7 @@ import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButt
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { isCampaignAdminNotifiable } from "@/lib/admin-campaign-notifications";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadgeClass(status: CampaignSummary["status"]): string {
   if (status === "active") return "bg-teal-100 text-teal-900";
@@ -94,8 +94,11 @@ export function AdminCampaignsDashboard({
 
       {newCompletedCount > 0 ? (
         <BrandedAlert tone="success" showIcon>
-          {newCompletedCount} newly completed campaign{newCompletedCount === 1 ? "" : "s"} highlighted in green below.
-          Open <span className="font-semibold">View results</span> to review and clear the notification.
+          <p>
+            <span className="font-semibold">{newCompletedCount}</span>{" "}
+            {newCompletedCount === 1 ? "newly completed campaign" : "newly completed campaigns"} highlighted in green
+            below. Open <span className="font-semibold">View results</span> to review and clear the notification.
+          </p>
         </BrandedAlert>
       ) : null}
 
@@ -141,7 +144,7 @@ export function AdminCampaignsDashboard({
           <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
                   <th className="px-4 py-3">Campaign</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Assigned</th>
@@ -167,11 +170,11 @@ export function AdminCampaignsDashboard({
                         {row.title}
                         {isNew ? <AdminNewBadge label="Completed" /> : null}
                       </p>
-                      <p className="text-xs capitalize text-zinc-500">{row.category}</p>
+                      <p className="text-xs text-zinc-500">{formatAdminLabel(row.category)}</p>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusBadgeClass(row.status)}`}>
-                        {row.status}
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(row.status)}`}>
+                        {formatAdminLabel(row.status)}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.assigned}</td>

@@ -86,8 +86,20 @@ export function formatHeadingChildren(children: ReactNode): ReactNode {
   return children;
 }
 
+/** Admin console labels, table values, chart rows, and badges. */
+export const formatAdminLabel = formatHeadingCase;
+
 export function formatSiteText(children: ReactNode): ReactNode {
   if (typeof children === "string") return formatSiteCase(children);
-  if (Array.isArray(children)) return children.map((child) => formatSiteText(child));
+  if (typeof children === "number" || typeof children === "boolean") return children;
+  if (children == null) return children;
+  if (Array.isArray(children)) {
+    // Mixed fragments lose boundary spaces if each string is trimmed by formatSiteCase.
+    return children.map((child) => {
+      if (typeof child === "string" || typeof child === "number" || typeof child === "boolean") return child;
+      if (child == null) return null;
+      return formatSiteText(child);
+    });
+  }
   return children;
 }

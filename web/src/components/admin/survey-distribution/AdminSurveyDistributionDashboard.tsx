@@ -17,8 +17,9 @@ import {
 } from "@/lib/admin-survey-distribution";
 import type { PanelistRow } from "@/lib/panelists";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 import { siteCheckboxClass } from "@/lib/site-controls";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 
 type Tab = "overview" | "assignments" | "planner";
 
@@ -174,7 +175,7 @@ export function AdminSurveyDistributionDashboard({
         <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Search</label>
+              <label className="text-xs font-semibold text-zinc-600">Search</label>
               <input
                 type="search"
                 value={search}
@@ -210,7 +211,7 @@ export function AdminSurveyDistributionDashboard({
           <div className="overflow-x-auto rounded-xl border border-zinc-100">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
                   {(
                     [
                       ["title", "Survey"],
@@ -245,7 +246,7 @@ export function AdminSurveyDistributionDashboard({
                         <p className="truncate font-medium text-zinc-800" title={row.title}>
                           {row.title}
                         </p>
-                        <p className="text-xs capitalize text-zinc-500">{row.category}</p>
+                        <p className="text-xs text-zinc-500">{formatAdminLabel(row.category)}</p>
                       </td>
                       <td className="px-3 py-2.5">
                         <p className="font-medium text-zinc-800">{row.panelistName}</p>
@@ -253,7 +254,7 @@ export function AdminSurveyDistributionDashboard({
                       </td>
                       <td className="px-3 py-2.5">
                         <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
                             row.overdue
                               ? "bg-red-100 text-red-800"
                               : row.status === "completed"
@@ -261,7 +262,7 @@ export function AdminSurveyDistributionDashboard({
                                 : "bg-teal-100 text-teal-800"
                           }`}
                         >
-                          {row.overdue ? "overdue" : row.status.replace(/_/g, " ")}
+                          {formatAdminLabel(row.overdue ? "overdue" : row.status.replace(/_/g, " "))}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 tabular-nums">{row.points}</td>
@@ -288,7 +289,7 @@ export function AdminSurveyDistributionDashboard({
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey title</label>
+              <label className="text-xs font-semibold text-zinc-600">Survey title</label>
               <input
                 type="text"
                 value={plannerTitle}
@@ -298,66 +299,52 @@ export function AdminSurveyDistributionDashboard({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Delivery method</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Delivery method</label>
+              <SiteSelect
                 value={deliveryMethod}
-                onChange={(e) => setDeliveryMethod(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              >
-                {DELIVERY_METHODS.map((method) => (
-                  <option key={method} value={method}>
-                    {method}
-                  </option>
-                ))}
-              </select>
+                onChange={setDeliveryMethod}
+                options={mapStringOptions(DELIVERY_METHODS)}
+                className="mt-1.5"
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Target group</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Target group</label>
+              <SiteSelect
                 value={targetGroup}
-                onChange={(e) => setTargetGroup(e.target.value as TargetGroup)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              >
-                {TARGET_GROUPS.map((group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setTargetGroup(value as TargetGroup)}
+                options={TARGET_GROUPS.map((group) => ({
+                  value: group.id,
+                  label: group.label,
+                }))}
+                className="mt-1.5"
+              />
             </div>
             {targetGroup === "specific_constituency" ? (
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Constituency</label>
-                <select
+                <label className="text-xs font-semibold text-zinc-600">Constituency</label>
+                <SiteSelect
                   value={constituency}
-                  onChange={(e) => setConstituency(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-                >
-                  <option value="">Select constituency</option>
-                  {constituencyOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setConstituency}
+                  placeholder="Select constituency"
+                  options={[
+                    { value: "", label: "Select constituency" },
+                    ...mapStringOptions(constituencyOptions.filter(Boolean)),
+                  ]}
+                  className="mt-1.5"
+                />
               </div>
             ) : null}
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Reward</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Reward</label>
+              <SiteSelect
                 value={reward}
-                onChange={(e) => setReward(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              >
-                {REWARD_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                onChange={setReward}
+                options={mapStringOptions(REWARD_OPTIONS)}
+                className="mt-1.5"
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Reminder (days before due)</label>
+              <label className="text-xs font-semibold text-zinc-600">Reminder (days before due)</label>
               <input
                 type="number"
                 min={0}

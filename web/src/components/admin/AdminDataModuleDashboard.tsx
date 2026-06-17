@@ -51,7 +51,7 @@ function SortableTable({
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+            <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
               {columns.map((column) => (
                 <th key={column.key} className={`px-4 py-3 ${column.align === "right" ? "text-right" : ""}`}>
                   <button type="button" onClick={() => toggle(column.key)} className="font-semibold hover:text-teal-800">

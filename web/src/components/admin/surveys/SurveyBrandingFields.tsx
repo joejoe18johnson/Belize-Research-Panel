@@ -83,7 +83,7 @@ export function SurveyBrandingFields({
       <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Company intro</label>
+            <label className="text-xs font-semibold text-zinc-600">Company intro</label>
             <textarea
               rows={3}
               value={companyIntro}
@@ -94,7 +94,7 @@ export function SurveyBrandingFields({
           </div>
 
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Company logo</label>
+            <label className="text-xs font-semibold text-zinc-600">Company logo</label>
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
@@ -124,7 +124,7 @@ export function SurveyBrandingFields({
           </div>
 
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Cover image (optional)</label>
+            <label className="text-xs font-semibold text-zinc-600">Cover image (optional)</label>
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
@@ -155,7 +155,7 @@ export function SurveyBrandingFields({
         </div>
 
         <div className="lg:sticky lg:top-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Preview</p>
+          <p className="text-xs font-semibold text-zinc-600">Preview</p>
           <div className="mt-2 max-w-[220px]">
             <SurveyBrandingHeader
               variant="compact"

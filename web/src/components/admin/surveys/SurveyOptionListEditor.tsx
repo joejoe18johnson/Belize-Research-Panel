@@ -38,7 +38,7 @@ export function SurveyOptionListEditor({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <label className="text-xs font-semibold text-zinc-600">
             {formatHeadingCase("Answer choices")}
           </label>
           <p className="mt-1 text-sm text-zinc-500">

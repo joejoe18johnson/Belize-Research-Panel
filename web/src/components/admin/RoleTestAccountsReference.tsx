@@ -87,7 +87,7 @@ export function AdminLoginForm() {
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">
         <div className="w-full max-w-2xl space-y-6">
           <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 shadow-xl sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">
+            <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">
               {formatHeadingCase("Admin access")}
             </p>
             <h1 className="mt-2 text-2xl font-bold text-teal-950">{formatHeadingCase("Staff login")}</h1>
@@ -174,7 +174,7 @@ export function RoleTestAccountsReference({
       <div className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] uppercase tracking-wide text-zinc-500">
+            <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
               <th className="px-4 py-3 font-semibold">Role</th>
               <th className="px-4 py-3 font-semibold">Login</th>
               {!compact ? <th className="px-4 py-3 font-semibold">Access</th> : null}
@@ -214,7 +214,7 @@ export function RoleTestAccountsReference({
         <div className="mt-3 overflow-x-auto rounded-xl border border-zinc-200">
           <table className="min-w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] uppercase tracking-wide text-zinc-500">
+              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
                 <th className="px-4 py-3 font-semibold">Persona</th>
                 <th className="px-4 py-3 font-semibold">Email</th>
                 {!compact ? <th className="px-4 py-3 font-semibold">What you can access</th> : null}

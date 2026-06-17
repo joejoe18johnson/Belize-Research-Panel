@@ -21,6 +21,7 @@ import {
 import type { PanelistRow } from "@/lib/panelists";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { siteCheckboxClass } from "@/lib/site-controls";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 
 type Tab = "filters" | "calculator" | "sample";
 type SortKey = keyof Pick<
@@ -169,7 +170,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Age min</label>
+                <label className="text-xs font-semibold text-zinc-600">Age min</label>
                 <input
                   type="number"
                   min={18}
@@ -180,7 +181,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Age max</label>
+                <label className="text-xs font-semibold text-zinc-600">Age max</label>
                 <input
                   type="number"
                   min={filters.ageMin}
@@ -206,18 +207,13 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Draw sample")}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Sampling method</label>
-                <select
+                <label className="text-xs font-semibold text-zinc-600">Sampling method</label>
+                <SiteSelect
                   value={samplingMethod}
-                  onChange={(e) => setSamplingMethod(e.target.value as SamplingMethod)}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-                >
-                  {SAMPLING_METHODS.map((method) => (
-                    <option key={method} value={method}>
-                      {method}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setSamplingMethod(value as SamplingMethod)}
+                  options={mapStringOptions(SAMPLING_METHODS)}
+                  className="mt-1.5"
+                />
                 {samplingMethod !== "Simple Random Sample" ? (
                   <p className="mt-1 text-xs text-amber-700">
                     Stratified, quota, and cluster methods use simple random draw in this portal build.
@@ -225,7 +221,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 ) : null}
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Sample size</label>
+                <label className="text-xs font-semibold text-zinc-600">Sample size</label>
                 <input
                   type="number"
                   min={1}
@@ -266,7 +262,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Population size (N)</label>
+              <label className="text-xs font-semibold text-zinc-600">Population size (N)</label>
               <input
                 type="number"
                 min={1}
@@ -276,7 +272,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Margin of error (%)</label>
+              <label className="text-xs font-semibold text-zinc-600">Margin of error (%)</label>
               <input
                 type="number"
                 min={1}
@@ -288,19 +284,20 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Confidence level</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Confidence level</label>
+              <SiteSelect
                 value={confidenceLevel}
-                onChange={(e) => setConfidenceLevel(e.target.value as "90%" | "95%" | "99%")}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              >
-                <option value="90%">90%</option>
-                <option value="95%">95%</option>
-                <option value="99%">99%</option>
-              </select>
+                onChange={(value) => setConfidenceLevel(value as "90%" | "95%" | "99%")}
+                options={[
+                  { value: "90%", label: "90%" },
+                  { value: "95%", label: "95%" },
+                  { value: "99%", label: "99%" },
+                ]}
+                className="mt-1.5"
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Expected response rate (%)</label>
+              <label className="text-xs font-semibold text-zinc-600">Expected response rate (%)</label>
               <input
                 type="number"
                 min={1}
@@ -355,7 +352,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           <div className="overflow-x-auto rounded-xl border border-zinc-100">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
                   {(
                     [
                       ["lastName", "Name"],

@@ -75,7 +75,7 @@ export function AdminDeleteConfirmDialog({
             Use the panelist&apos;s first name and registration year with no spaces (for example,{" "}
             <span className="font-mono font-semibold text-zinc-700">{confirmCode}</span>).
           </p>
-          <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <label className="mt-3 block text-xs font-semibold text-zinc-600">
             {formatHeadingCase("Confirmation code")}
           </label>
           <input

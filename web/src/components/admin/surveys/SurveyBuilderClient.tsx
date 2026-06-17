@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
 import {
   SurveyBrandingFields,
@@ -11,6 +11,7 @@ import {
 } from "@/components/admin/surveys/SurveyBrandingFields";
 import { SurveyOptionListEditor } from "@/components/admin/surveys/SurveyOptionListEditor";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import { BUILDER_QUESTION_TYPES, SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
 import {
   createEmptyQuestion,
@@ -171,12 +172,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
       }
 
       setStatus(data.survey.status);
-      setMessage(nextStatus === "published" ? "Survey published." : "Survey saved.");
-      if (!isEdit) {
-        router.push(`/admin/surveys/${encodeURIComponent(data.survey.id)}/edit`);
-      } else {
-        router.refresh();
-      }
+      router.push("/admin/surveys");
     } catch {
       setError("Network error while saving.");
     } finally {
@@ -211,7 +207,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Survey details")}</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Title</label>
+            <label className="text-xs font-semibold text-zinc-600">Title</label>
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
@@ -220,7 +216,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Description</label>
+            <label className="text-xs font-semibold text-zinc-600">Description</label>
             <textarea
               rows={3}
               value={description}
@@ -229,21 +225,19 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Category</label>
-            <select
+            <label className="text-xs font-semibold text-zinc-600">Category</label>
+            <SiteSelect
               value={category}
-              onChange={(event) => setCategory(event.target.value as SurveyCategory)}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-            >
-              {CATEGORIES.map((item) => (
-                <option key={item} value={item}>
-                  {formatHeadingCase(item)}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setCategory(value as SurveyCategory)}
+              options={CATEGORIES.map((item) => ({
+                value: item,
+                label: formatHeadingCase(item),
+              }))}
+              className="mt-1.5"
+            />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Status</label>
+            <label className="text-xs font-semibold text-zinc-600">Status</label>
             <p className="mt-2 text-sm font-medium text-zinc-700">{formatHeadingCase(status)}</p>
           </div>
         </div>
@@ -273,32 +267,31 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
             <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <p className="text-sm font-semibold text-teal-900">Question {index + 1}</p>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => moveQuestion(question.id, -1)} className="text-xs font-semibold text-zinc-500 hover:text-teal-800">
-                  Move up
-                </button>
-                <button type="button" onClick={() => moveQuestion(question.id, 1)} className="text-xs font-semibold text-zinc-500 hover:text-teal-800">
-                  Move down
-                </button>
-                <button type="button" onClick={() => duplicateQuestion(question.id)} className="text-xs font-semibold text-zinc-500 hover:text-teal-800">
-                  Duplicate
-                </button>
-                <button type="button" onClick={() => removeQuestion(question.id)} className="text-xs font-semibold text-red-600 hover:text-red-800">
-                  Remove
-                </button>
+              <div className="flex flex-wrap gap-1.5">
+                <QuestionActionButton label="Move up" onClick={() => moveQuestion(question.id, -1)}>
+                  <ChevronUpIcon />
+                </QuestionActionButton>
+                <QuestionActionButton label="Move down" onClick={() => moveQuestion(question.id, 1)}>
+                  <ChevronDownIcon />
+                </QuestionActionButton>
+                <QuestionActionButton label="Duplicate" onClick={() => duplicateQuestion(question.id)}>
+                  <DuplicateIcon />
+                </QuestionActionButton>
+                <QuestionActionButton label="Remove" tone="danger" onClick={() => removeQuestion(question.id)}>
+                  <TrashIcon />
+                </QuestionActionButton>
               </div>
             </div>
 
             <div className="mt-4 grid gap-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Question type</label>
-                <select
+                <label className="text-xs font-semibold text-zinc-600">Question type</label>
+                <SiteSelect
                   value={question.type}
-                  onChange={(event) => {
-                    const type = event.target.value as SurveyQuestionType;
-                    const blank = createEmptyQuestion(type);
+                  onChange={(type) => {
+                    const blank = createEmptyQuestion(type as SurveyQuestionType);
                     updateQuestion(question.id, {
-                      type,
+                      type: type as SurveyQuestionType,
                       options: blank.options,
                       scaleMin: blank.scaleMin,
                       scaleMax: blank.scaleMax,
@@ -306,17 +299,15 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                       scaleMaxLabel: blank.scaleMaxLabel,
                     });
                   }}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-                >
-                  {BUILDER_QUESTION_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {SURVEY_QUESTION_TYPE_LABELS[type]}
-                    </option>
-                  ))}
-                </select>
+                  options={BUILDER_QUESTION_TYPES.map((type) => ({
+                    value: type,
+                    label: SURVEY_QUESTION_TYPE_LABELS[type],
+                  }))}
+                  className="mt-1.5"
+                />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Question</label>
+                <label className="text-xs font-semibold text-zinc-600">Question</label>
                 <input
                   value={question.title}
                   onChange={(event) => updateQuestion(question.id, { title: event.target.value })}
@@ -324,7 +315,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Help text (optional)</label>
+                <label className="text-xs font-semibold text-zinc-600">Help text (optional)</label>
                 <input
                   value={question.description}
                   onChange={(event) => updateQuestion(question.id, { description: event.target.value })}
@@ -354,7 +345,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               {question.type === "rating_scale" ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Scale min</label>
+                    <label className="text-xs font-semibold text-zinc-600">Scale min</label>
                     <input
                       type="number"
                       value={question.scaleMin}
@@ -363,7 +354,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Scale max</label>
+                    <label className="text-xs font-semibold text-zinc-600">Scale max</label>
                     <input
                       type="number"
                       value={question.scaleMax}
@@ -372,7 +363,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Low label</label>
+                    <label className="text-xs font-semibold text-zinc-600">Low label</label>
                     <input
                       value={question.scaleMinLabel}
                       onChange={(event) => updateQuestion(question.id, { scaleMinLabel: event.target.value })}
@@ -380,7 +371,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">High label</label>
+                    <label className="text-xs font-semibold text-zinc-600">High label</label>
                     <input
                       value={question.scaleMaxLabel}
                       onChange={(event) => updateQuestion(question.id, { scaleMaxLabel: event.target.value })}
@@ -391,7 +382,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               ) : null}
 
               <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Preview</p>
+                <p className="text-xs font-semibold text-zinc-600">Preview</p>
                 <div className="mt-2">
                   <SurveyQuestionField
                     question={sanitizeQuestionOptions(question)}
@@ -458,7 +449,7 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
 
   return (
     <div className="rounded-2xl border border-dashed border-teal-200 bg-teal-50/40 p-4">
-      <p className="text-center text-xs font-semibold uppercase tracking-wide text-teal-800">
+      <p className="text-center text-xs font-semibold text-teal-800">
         Choose question type
       </p>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -486,5 +477,77 @@ function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void
         </button>
       </div>
     </div>
+  );
+}
+
+function QuestionActionButton({
+  label,
+  onClick,
+  tone = "default",
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  tone?: "default" | "danger";
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border transition ${
+        tone === "danger"
+          ? "border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-800"
+          : "border-zinc-200 text-zinc-500 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BuilderIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75">
+      {children}
+    </svg>
+  );
+}
+
+function ChevronUpIcon() {
+  return (
+    <BuilderIcon>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+    </BuilderIcon>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <BuilderIcon>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </BuilderIcon>
+  );
+}
+
+function DuplicateIcon() {
+  return (
+    <BuilderIcon>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125H5.625c-.621 0-1.125-.504-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125h3.75m3 12h7.125c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9H5.625a1.125 1.125 0 0 0-1.125 1.125v3.75"
+      />
+    </BuilderIcon>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <BuilderIcon>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+    </BuilderIcon>
   );
 }

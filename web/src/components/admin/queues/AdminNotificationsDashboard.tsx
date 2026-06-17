@@ -162,7 +162,7 @@ export function AdminNotificationsDashboard({
             <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
               <table className="min-w-[900px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Email</th>

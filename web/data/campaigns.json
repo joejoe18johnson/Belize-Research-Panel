@@ -94,5 +94,24 @@
     },
     "createdAt": "2026-06-17T15:30:18.131Z",
     "launchedAt": "2026-06-17T15:30:18.131Z"
+  },
+  {
+    "id": "campaign-vocational-training-mqi959ur",
+    "title": "Vocational Training",
+    "description": "Vocational Training",
+    "category": "civic",
+    "status": "active",
+    "surveyUrl": "",
+    "surveyDefinitionId": "survey-vo-tech-training-program-interest-mqi8zha7",
+    "deliveryType": "internal",
+    "points": 500,
+    "assignedDate": "2026-06-17",
+    "completeByDate": "2026-07-01",
+    "deliveryMethod": "External Survey Link",
+    "targeting": {
+      "mode": "all_verified"
+    },
+    "createdAt": "2026-06-17T15:55:04.611Z",
+    "launchedAt": "2026-06-17T15:55:04.611Z"
   }
 ]

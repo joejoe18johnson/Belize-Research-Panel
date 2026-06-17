@@ -13,6 +13,7 @@ import {
 } from "@/lib/admin-panelists";
 import { BELIZE_DISTRICTS, CITY_TOWN_VILLAGE, getConstituencyOptions } from "@/lib/constants";
 import type { PanelistRow } from "@/lib/panelists";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
 import { buildPanelistDeleteCode } from "@/lib/admin-delete-confirmation";
@@ -397,7 +398,7 @@ export function AdminPanelistsClient({
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
       <div className="border-l-4 border-teal-600 pl-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Panel register</p>
+        <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel register</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
         <p className="mt-2 max-w-3xl text-sm text-zinc-600">
           Browse, filter, edit, flag, and delete panelist records. Use row actions on each record.
@@ -872,7 +873,7 @@ function DataTable({
   return (
     <table className="min-w-[1100px] text-left text-xs sm:text-sm">
       <thead>
-        <tr className="border-b border-zinc-200 bg-zinc-50 text-[11px] uppercase tracking-wide text-zinc-500">
+        <tr className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
           {actions ? (
             <th className="sticky left-0 z-10 whitespace-nowrap bg-zinc-50 px-2 py-2 font-semibold">Actions</th>
           ) : null}
@@ -997,17 +998,12 @@ function FieldSelect({
   return (
     <div>
       <label className="block text-sm font-medium text-zinc-800">{formatHeadingCase(label)}</label>
-      <select
+      <SiteSelect
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm"
-      >
-        {options.map((option) => (
-          <option key={option || "empty"} value={option}>
-            {option || "—"}
-          </option>
-        ))}
-      </select>
+        onChange={onChange}
+        options={mapStringOptions(options)}
+        className="mt-2"
+      />
     </div>
   );
 }

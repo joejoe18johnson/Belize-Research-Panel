@@ -46,7 +46,7 @@ function DuplicateTable({
     <div className="overflow-x-auto rounded-xl border border-zinc-100">
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
             {headers.map(([key, label]) => (
               <th key={key} className="px-3 py-3">
                 <button type="button" onClick={() => onSort(key)} className="font-semibold hover:text-teal-800">
@@ -208,7 +208,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Search</label>
+              <label className="text-xs font-semibold text-zinc-600">Search</label>
               <input
                 type="search"
                 value={search}

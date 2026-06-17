@@ -41,7 +41,7 @@ export function AdminPayoutsDashboard({
           icon={<MetricCheckIcon />}
         />
         <IconMetricCard
-          label="Open liability"
+          label="Payouts Pending"
           value={formatBz(openAmount)}
           hint={`${completed} completed · ${declined} declined`}
           tone="violet"
