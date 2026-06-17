@@ -1,0 +1,259 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
+import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import type { CampaignAssignmentDetail, CampaignSummary } from "@/lib/campaign-targeting";
+import { formatHeadingCase } from "@/lib/sentence-case";
+
+function statusBadgeClass(status: CampaignSummary["status"]): string {
+  if (status === "active") return "bg-teal-100 text-teal-900";
+  if (status === "closed") return "bg-zinc-100 text-zinc-700";
+  return "bg-amber-100 text-amber-900";
+}
+
+export function AdminCampaignsDashboard({
+  summaries,
+  selectedCampaignId,
+  assignmentDetails,
+}: {
+  summaries: CampaignSummary[];
+  selectedCampaignId: string | null;
+  assignmentDetails: CampaignAssignmentDetail[];
+}) {
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return summaries;
+    return summaries.filter(
+      (row) =>
+        row.title.toLowerCase().includes(query) ||
+        row.category.toLowerCase().includes(query) ||
+        row.targetingLabel.toLowerCase().includes(query)
+    );
+  }, [summaries, search]);
+
+  const selected = summaries.find((row) => row.id === selectedCampaignId) ?? null;
+
+  const totals = useMemo(() => {
+    return summaries.reduce(
+      (acc, row) => ({
+        assigned: acc.assigned + row.assigned,
+        pending: acc.pending + row.pending,
+        opened: acc.opened + row.opened,
+        completed: acc.completed + row.completed,
+        overdue: acc.overdue + row.overdue,
+      }),
+      { assigned: 0, pending: 0, opened: 0, completed: 0, overdue: 0 }
+    );
+  }, [summaries]);
+
+  const responseRate = totals.assigned ? Math.round((totals.completed / totals.assigned) * 1000) / 10 : 0;
+
+  const statusChart = [
+    { label: "Pending", count: totals.pending, percent: totals.assigned ? Math.round((totals.pending / totals.assigned) * 1000) / 10 : 0 },
+    { label: "Opened", count: totals.opened, percent: totals.assigned ? Math.round((totals.opened / totals.assigned) * 1000) / 10 : 0 },
+    { label: "Completed", count: totals.completed, percent: responseRate },
+    { label: "Overdue", count: totals.overdue, percent: totals.assigned ? Math.round((totals.overdue / totals.assigned) * 1000) / 10 : 0 },
+  ];
+
+  const categoryChart = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const row of summaries) {
+      map.set(row.category, (map.get(row.category) ?? 0) + row.assigned);
+    }
+    const total = totals.assigned || 1;
+    return [...map.entries()].map(([label, count]) => ({
+      label,
+      count,
+      percent: Math.round((count / total) * 1000) / 10,
+    }));
+  }, [summaries, totals.assigned]);
+
+  return (
+    <div className="mx-auto max-w-[1400px] space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageIntro
+          eyebrow="Survey campaigns"
+          title="Campaigns"
+          description="Track live and historical survey campaigns with delivery results — pending, opened, completed, and overdue counts per campaign."
+        />
+        <Link
+          href="/admin/campaigns/create"
+          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+        >
+          Create campaign
+        </Link>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <MetricCard label="Campaigns" value={summaries.length} />
+        <MetricCard label="Total assigned" value={totals.assigned} />
+        <MetricCard label="Pending" value={totals.pending} hint="Not yet opened" />
+        <MetricCard label="Opened" value={totals.opened} hint="In progress" />
+        <MetricCard label="Completed" value={totals.completed} hint={`${responseRate}% response rate`} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <DonutBreakdown rows={statusChart} title="All campaigns — result mix" />
+        <HorizontalBarChart rows={categoryChart} title="Assignments by category" />
+      </div>
+
+      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Campaign register")}</h2>
+            <p className="mt-1 text-sm text-zinc-500">{filtered.length} campaigns</p>
+          </div>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search campaigns…"
+            className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+          />
+        </div>
+
+        {summaries.length === 0 ? (
+          <div className="mt-4">
+            <BrandedAlert tone="info" title="No campaigns yet" showIcon>
+              Create your first campaign to assign surveys to targeted panelists by district, constituency, or specific
+              people.
+              <Link href="/admin/campaigns/create" className="mt-2 inline-block font-semibold text-teal-700 underline">
+                Create campaign
+              </Link>
+            </BrandedAlert>
+          </div>
+        ) : (
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                  <th className="px-4 py-3">Campaign</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Assigned</th>
+                  <th className="px-4 py-3 text-right">Pending</th>
+                  <th className="px-4 py-3 text-right">Opened</th>
+                  <th className="px-4 py-3 text-right">Completed</th>
+                  <th className="px-4 py-3 text-right">Overdue</th>
+                  <th className="px-4 py-3 text-right">Response</th>
+                  <th className="px-4 py-3">Targeting</th>
+                  <th className="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                    <td className="px-4 py-2.5">
+                      <p className="font-medium text-zinc-900">{row.title}</p>
+                      <p className="text-xs capitalize text-zinc-500">{row.category}</p>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusBadgeClass(row.status)}`}>
+                        {row.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.assigned}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.pending}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.opened}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.completed}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.overdue}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{row.responseRate}%</td>
+                    <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600">{row.targetingLabel}</td>
+                    <td className="px-4 py-2.5">
+                      <Link
+                        href={`/admin/campaigns?campaign=${encodeURIComponent(row.id)}`}
+                        className="font-semibold text-teal-700 hover:text-teal-900"
+                      >
+                        View results
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {selected ? (
+        <section className="rounded-2xl border border-teal-200 bg-teal-50/30 p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-teal-950">{selected.title}</h2>
+              <p className="mt-1 text-sm text-zinc-600">
+                {selected.targetingLabel} · Due {selected.completeByDate} · {selected.points} points
+              </p>
+            </div>
+            <Link href="/admin/campaigns" className="text-sm font-semibold text-teal-700 hover:text-teal-900">
+              Close detail
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <MetricCard label="Assigned" value={selected.assigned} />
+            <MetricCard label="Pending" value={selected.pending} />
+            <MetricCard label="Opened" value={selected.opened} />
+            <MetricCard label="Completed" value={selected.completed} />
+            <MetricCard label="Overdue" value={selected.overdue} />
+          </div>
+
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 bg-white">
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                  <th className="px-4 py-3">Panelist</th>
+                  <th className="px-4 py-3">District</th>
+                  <th className="px-4 py-3">Constituency</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Progress</th>
+                  <th className="px-4 py-3">Due</th>
+                </tr>
+              </thead>
+              <tbody>
+                {assignmentDetails.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
+                      No assignments found for this campaign.
+                    </td>
+                  </tr>
+                ) : (
+                  assignmentDetails.map((row) => (
+                    <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20">
+                      <td className="px-4 py-2.5">
+                        <p className="font-medium text-zinc-800">{row.panelistName}</p>
+                        <p className="text-xs text-zinc-500">{row.panelistEmail}</p>
+                      </td>
+                      <td className="px-4 py-2.5">{row.district || "—"}</td>
+                      <td className="px-4 py-2.5">{row.constituency || "—"}</td>
+                      <td className="px-4 py-2.5">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                            row.overdue
+                              ? "bg-red-100 text-red-800"
+                              : row.status === "completed"
+                                ? "bg-teal-700 text-white"
+                                : row.status === "in_progress"
+                                  ? "bg-teal-100 text-teal-900"
+                                  : "bg-zinc-100 text-zinc-700"
+                          }`}
+                        >
+                          {row.overdue ? "overdue" : row.status === "available" ? "pending" : row.status.replace(/_/g, " ")}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums">{row.progressPercent}%</td>
+                      <td className="px-4 py-2.5 tabular-nums text-zinc-600">{row.completeByDate}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}

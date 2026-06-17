@@ -1,15 +1,16 @@
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
-import { getAdminPanelOverview } from "@/lib/admin-panelists";
-import { loadPanelists } from "@/lib/panelists";
+import { buildAdminDashboardMetrics } from "@/lib/admin-dashboard-metrics";
+import { loadAdminDataHub } from "@/lib/admin-data-hub";
 
 export const metadata = {
   title: "Admin Dashboard | Belize Research Panel",
 };
 
 export default async function AdminDashboardPage() {
-  const rows = await loadPanelists();
+  const hub = await loadAdminDataHub();
+  const metrics = buildAdminDashboardMetrics(hub);
 
-  if (rows.length === 0) {
+  if (metrics.total === 0 && hub.accounts.length === 0) {
     return (
       <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-600">
         No panelists registered yet.
@@ -17,5 +18,5 @@ export default async function AdminDashboardPage() {
     );
   }
 
-  return <AdminDashboardClient overview={getAdminPanelOverview(rows)} />;
+  return <AdminDashboardClient metrics={metrics} />;
 }

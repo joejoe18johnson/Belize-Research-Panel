@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminSessionActive } from "@/lib/admin-auth";
 import {
   approveAccountEmailChange,
   findAccountByEmail,
@@ -8,7 +9,8 @@ import {
 import { updatePanelistEmail } from "@/lib/panelists";
 import { cleanText } from "@/lib/validation";
 
-function isAuthorized(request: NextRequest): boolean {
+async function isAuthorized(request: NextRequest): Promise<boolean> {
+  if (await isAdminSessionActive()) return true;
   const adminKey = process.env.ADMIN_API_KEY?.trim();
   if (!adminKey) return process.env.NODE_ENV !== "production";
   const provided = request.headers.get("x-admin-key") ?? "";
@@ -16,7 +18,7 @@ function isAuthorized(request: NextRequest): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  if (!(await isAuthorized(request))) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
   }
 
