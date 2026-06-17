@@ -160,7 +160,7 @@ export function assessSuspiciousEmail(
   context: SuspiciousEmailContext = {}
 ): SuspiciousEmailAssessment {
   const parts = splitEmail(email);
-  if !parts) {
+  if (!parts) {
     return {
       email: cleanText(email),
       localPart: "",

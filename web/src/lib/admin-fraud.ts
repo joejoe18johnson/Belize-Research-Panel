@@ -1,5 +1,6 @@
-import { duplicateNameDobKey } from "./admin-panelists";
+import { duplicateNameDobKey, isFlaggedPanelist } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
+import { assessSuspiciousEmail, type SuspiciousEmailAssessment } from "./suspicious-email";
 import { cleanText } from "./validation";
 
 export interface FraudDuplicateRow {
@@ -14,13 +15,24 @@ export interface FraudDuplicateRow {
   duplicateType: string;
 }
 
+export interface SuspiciousEmailRow extends FraudDuplicateRow {
+  domain: string;
+  riskScore: number;
+  riskLevel: "medium" | "high";
+  signalSummary: string;
+  signals: SuspiciousEmailAssessment["signals"];
+  flagged: boolean;
+}
+
 export interface FraudPreventionDetail {
   duplicateEmails: number;
   duplicatePhones: number;
   duplicateNameDob: number;
+  suspiciousEmails: number;
   emailDuplicateRows: FraudDuplicateRow[];
   phoneDuplicateRows: FraudDuplicateRow[];
   nameDobDuplicateRows: FraudDuplicateRow[];
+  suspiciousEmailRows: SuspiciousEmailRow[];
   verificationSummary: { status: string; count: number; percent: number }[];
 }
 
@@ -58,6 +70,41 @@ function rowsForFieldDuplicates(
   return result.sort((a, b) => a.email.localeCompare(b.email));
 }
 
+function buildSuspiciousEmailRows(rows: PanelistRow[]): SuspiciousEmailRow[] {
+  const result: SuspiciousEmailRow[] = [];
+
+  for (const row of rows) {
+    const email = cleanText(row.email);
+    if (!email) continue;
+
+    const assessment = assessSuspiciousEmail(email, {
+      firstName: cleanText(row.first_name),
+      lastName: cleanText(row.last_name),
+    });
+    if (!assessment.suspicious || !assessment.riskLevel) continue;
+
+    result.push({
+      email,
+      phone: cleanText(row.phone_whatsapp),
+      firstName: cleanText(row.first_name),
+      lastName: cleanText(row.last_name),
+      dob: cleanText(row.dob),
+      username: cleanText(row.username),
+      verificationStatus: cleanText(row.verification_status),
+      district: cleanText(row.district),
+      duplicateType: "Suspicious email",
+      domain: assessment.domain,
+      riskScore: assessment.riskScore,
+      riskLevel: assessment.riskLevel,
+      signalSummary: assessment.signals.map((signal) => signal.label).join(" · "),
+      signals: assessment.signals,
+      flagged: isFlaggedPanelist(row),
+    });
+  }
+
+  return result.sort((a, b) => b.riskScore - a.riskScore || a.email.localeCompare(b.email));
+}
+
 export function buildFraudPreventionDetail(rows: PanelistRow[]): FraudPreventionDetail {
   const keyGroups = new Map<string, PanelistRow[]>();
   for (const row of rows) {
@@ -88,6 +135,7 @@ export function buildFraudPreventionDetail(rows: PanelistRow[]): FraudPrevention
 
   const emailDuplicateRows = rowsForFieldDuplicates(rows, "email", "Email");
   const phoneDuplicateRows = rowsForFieldDuplicates(rows, "phone_whatsapp", "Phone");
+  const suspiciousEmailRows = buildSuspiciousEmailRows(rows);
 
   const verificationMap = new Map<string, number>();
   for (const row of rows) {
@@ -100,11 +148,13 @@ export function buildFraudPreventionDetail(rows: PanelistRow[]): FraudPrevention
     duplicateEmails: emailDuplicateRows.length,
     duplicatePhones: phoneDuplicateRows.length,
     duplicateNameDob: nameDobDuplicateRows.length,
+    suspiciousEmails: suspiciousEmailRows.length,
     emailDuplicateRows,
     phoneDuplicateRows,
     nameDobDuplicateRows: nameDobDuplicateRows.sort((a, b) =>
       `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`)
     ),
+    suspiciousEmailRows,
     verificationSummary: [...verificationMap.entries()]
       .map(([status, count]) => ({
         status,
@@ -113,6 +163,23 @@ export function buildFraudPreventionDetail(rows: PanelistRow[]): FraudPrevention
       }))
       .sort((a, b) => b.count - a.count),
   };
+}
+
+export function filterSuspiciousEmailRows(
+  rows: SuspiciousEmailRow[],
+  search: string,
+  verificationStatuses: string[],
+  riskLevels: Array<"medium" | "high"> = []
+): SuspiciousEmailRow[] {
+  const q = search.trim().toLowerCase();
+  return rows.filter((row) => {
+    if (verificationStatuses.length && !verificationStatuses.includes(row.verificationStatus)) return false;
+    if (riskLevels.length && !riskLevels.includes(row.riskLevel)) return false;
+    if (!q) return true;
+    const haystack =
+      `${row.firstName} ${row.lastName} ${row.email} ${row.domain} ${row.signalSummary} ${row.username}`.toLowerCase();
+    return haystack.includes(q);
+  });
 }
 
 export function filterFraudRows(
