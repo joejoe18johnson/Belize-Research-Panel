@@ -12,6 +12,7 @@ import {
 import { getPanelistSurveys } from "./panelist-surveys";
 import { findPanelistByEmail } from "./panelists";
 import { loadNotificationReadState } from "./notification-state";
+import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
 import { isPanelistVerified } from "./verification-status";
 
@@ -60,9 +61,11 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(account.email, profile);
   const readState = await loadNotificationReadState(account.email);
+  const redemptionRequests = await loadRedemptionRequests(account.email);
   const notifications = buildDashboardNotifications(profile, {
     welcome: options.welcome,
     readState,
+    redemptionRequests,
   });
 
   return { account, profile, rewards, notifications };
@@ -76,7 +79,8 @@ export async function getDashboardNavBadges(email: string): Promise<DashboardNav
 
   const profile = panelistRowToDashboardProfile(panelist);
   const readState = await loadNotificationReadState(email);
-  const notifications = buildDashboardNotifications(profile, { readState });
+  const redemptionRequests = await loadRedemptionRequests(email);
+  const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests });
   const { inbox } = await getPanelistSurveys(email);
 
   return {

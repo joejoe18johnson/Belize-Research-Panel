@@ -1,5 +1,6 @@
 import { DashboardOverviewSection } from "@/components/dashboard/DashboardOverviewSection";
 import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
+import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireDashboardContext } from "@/lib/dashboard-access";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
 
@@ -18,11 +19,15 @@ export default async function DashboardOverviewPage({
   });
   const { inbox } = await getPanelistSurveys(account.email);
 
+  const section = dashboardSectionByHref("/dashboard");
+  const SectionIcon = section?.icon;
+
   return (
     <>
       <DashboardPageHeader
         title="Overview"
         description="Your panel status at a glance."
+        icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />
       <DashboardOverviewSection
         profile={profile}

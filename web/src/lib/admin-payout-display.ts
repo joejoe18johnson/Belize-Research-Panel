@@ -1,4 +1,4 @@
-import type { RedemptionOptionId, RedemptionRequest } from "./reward-redemption";
+import type { RedemptionRequest, StoredRedemptionOptionId } from "./reward-redemption";
 import { formatBz, getRedemptionOption } from "./reward-redemption";
 import { formatHeadingCase } from "./sentence-case";
 import { cleanText } from "./validation";
@@ -41,7 +41,7 @@ export function payoutStatusLabel(status: RedemptionRequest["status"]): string {
     case "pending":
       return "Pending review";
     case "approved":
-      return "Approved";
+      return "Processing";
     case "fulfilled":
       return "Completed";
     case "rejected":
@@ -57,37 +57,59 @@ export function maskAccountNumber(value: string): string {
   return `****${digits.slice(-4)}`;
 }
 
+function formatAccountNumber(value: string, maskSensitive: boolean): string {
+  const raw = cleanText(value);
+  if (!raw) return "—";
+  return maskSensitive ? maskAccountNumber(raw) : raw;
+}
+
+export interface PayoutPaymentField {
+  label: string;
+  value: string;
+}
+
 export function formatPayoutPaymentDetails(
-  optionId: RedemptionOptionId,
-  details: Record<string, string>
-): { title: string; lines: string[] } {
+  optionId: StoredRedemptionOptionId,
+  details: Record<string, string>,
+  options: { maskSensitive?: boolean } = {}
+): { title: string; lines: string[]; fields: PayoutPaymentField[] } {
+  const maskSensitive = options.maskSensitive ?? false;
   const option = getRedemptionOption(optionId);
 
   if (optionId === "bank_transfer") {
     const bankName = BANK_LABELS[cleanText(details.bankName)] ?? (cleanText(details.bankName) || "Bank account");
-    const holder = cleanText(details.accountHolderName) || "Account holder";
-    const account = maskAccountNumber(details.accountNumber ?? "");
+    const holder = cleanText(details.accountHolderName) || "—";
+    const account = formatAccountNumber(details.accountNumber ?? "", maskSensitive);
+    const fields: PayoutPaymentField[] = [
+      { label: "Account holder", value: holder },
+      { label: "Account number", value: account },
+    ];
     return {
       title: bankName,
-      lines: [holder, account].filter((line) => line && line !== "—"),
+      lines: fields.filter((field) => field.value !== "—").map((field) => `${field.label}: ${field.value}`),
+      fields: fields.filter((field) => field.value !== "—"),
     };
   }
 
   if (optionId === "mobile_top_up") {
     const carrier = CARRIER_LABELS[cleanText(details.carrier)] ?? (cleanText(details.carrier) || "Mobile top-up");
     const phone = cleanText(details.phone) || "—";
+    const fields: PayoutPaymentField[] = [{ label: "Mobile number", value: phone }];
     return {
       title: carrier,
-      lines: phone !== "—" ? [phone] : [],
+      lines: phone !== "—" ? [`Mobile number: ${phone}`] : [],
+      fields: phone !== "—" ? fields : [],
     };
   }
 
   if (optionId === "gift_card") {
     const retailer = cleanText(details.retailer) || "Gift card";
     const deliveryEmail = cleanText(details.deliveryEmail);
+    const fields: PayoutPaymentField[] = deliveryEmail ? [{ label: "Delivery email", value: deliveryEmail }] : [];
     return {
       title: retailer,
-      lines: deliveryEmail ? [deliveryEmail] : [],
+      lines: deliveryEmail ? [`Delivery email: ${deliveryEmail}`] : [],
+      fields,
     };
   }
 
@@ -96,20 +118,33 @@ export function formatPayoutPaymentDetails(
       UTILITY_LABELS[cleanText(details.utilityProvider)] ??
       UTILITY_LABELS[cleanText(details.provider)] ??
       (cleanText(details.utilityProvider) || "Utility account");
-    const account = maskAccountNumber(details.accountNumber ?? "");
+    const account = formatAccountNumber(details.accountNumber ?? "", maskSensitive);
     const holder = cleanText(details.accountName);
     const address = cleanText(details.serviceAddress);
+    const fields: PayoutPaymentField[] = [
+      ...(holder ? [{ label: "Account holder", value: holder }] : []),
+      ...(account !== "—" ? [{ label: "Utility account number", value: account }] : []),
+      ...(address ? [{ label: "Service address", value: address }] : []),
+    ];
     return {
       title: provider,
-      lines: [holder, account, address].filter((line) => line && line !== "—"),
+      lines: fields.map((field) => `${field.label}: ${field.value}`),
+      fields,
     };
   }
 
+  const fields = Object.entries(details)
+    .map(([key, value]) => {
+      const cleaned = cleanText(value);
+      if (!cleaned) return null;
+      return { label: formatHeadingCase(key.replace(/([A-Z])/g, " $1")), value: cleaned };
+    })
+    .filter((field): field is PayoutPaymentField => field !== null);
+
   return {
     title: option?.label ?? "Redemption details",
-    lines: Object.values(details)
-      .map((value) => cleanText(value))
-      .filter(Boolean),
+    lines: fields.map((field) => `${field.label}: ${field.value}`),
+    fields,
   };
 }
 

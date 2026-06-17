@@ -1,5 +1,9 @@
 import { formatDobDisplay } from "./dob";
 import type { NotificationReadState } from "./notification-state";
+import type { RedemptionRequest } from "./reward-redemption";
+import { formatBz } from "./reward-redemption";
+import { redemptionNotificationId } from "./payout-panelist-notify";
+import { payoutShortId } from "./admin-payout-display";
 import type { PanelistRow } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
 import { cleanText } from "./validation";
@@ -132,9 +136,73 @@ export function calculateMvpRewardPoints(profile: Pick<PanelistDashboardProfile,
   };
 }
 
+export function buildRedemptionNotifications(
+  requests: RedemptionRequest[],
+  readState: NotificationReadState
+): DashboardNotification[] {
+  const isUnread = (id: string, defaultUnread: boolean): boolean => {
+    const stored = readState[id];
+    if (stored) return !stored.read;
+    return defaultUnread;
+  };
+
+  return requests
+    .filter((request) => request.status !== "pending")
+    .map((request) => {
+      const id = redemptionNotificationId(request.id);
+      const shortId = payoutShortId(request.id);
+      const amount = formatBz(request.amountBz ?? request.points / 25);
+      const date = new Date(request.updatedAt);
+      const dateLabel = Number.isNaN(date.getTime())
+        ? request.updatedAt
+        : date.toLocaleDateString("en-BZ", { dateStyle: "medium" });
+
+      if (request.status === "approved") {
+        return {
+          id,
+          title: "Payout processing",
+          body: `Your ${request.optionLabel} redemption (${amount}) is being processed. Reference ${shortId}.`,
+          dateLabel,
+          priority: "normal" as const,
+          unread: isUnread(id, true),
+        };
+      }
+
+      if (request.status === "fulfilled") {
+        return {
+          id,
+          title: "Payout completed",
+          body: `Your ${request.optionLabel} redemption of ${amount} has been completed. Reference ${shortId}.`,
+          dateLabel,
+          priority: "high" as const,
+          unread: isUnread(id, true),
+        };
+      }
+
+      if (request.status === "rejected") {
+        return {
+          id,
+          title: "Payout request declined",
+          body: `Your ${request.optionLabel} redemption request (${shortId}) was not approved. Points remain in your balance.`,
+          dateLabel,
+          priority: "high" as const,
+          unread: isUnread(id, true),
+        };
+      }
+
+      return null;
+    })
+    .filter((notification): notification is DashboardNotification => notification !== null)
+    .sort((a, b) => b.dateLabel.localeCompare(a.dateLabel));
+}
+
 export function buildDashboardNotifications(
   profile: PanelistDashboardProfile,
-  options: { welcome?: boolean; readState?: NotificationReadState } = {}
+  options: {
+    welcome?: boolean;
+    readState?: NotificationReadState;
+    redemptionRequests?: RedemptionRequest[];
+  } = {}
 ): DashboardNotification[] {
   const notifications: DashboardNotification[] = [];
   const verified = profile.verificationStatus.toLowerCase() === "verified";
@@ -187,6 +255,9 @@ export function buildDashboardNotifications(
     priority: "normal",
     unread: isUnread("rewards", false),
   });
+
+  const redemptionNotifications = buildRedemptionNotifications(options.redemptionRequests ?? [], readState);
+  notifications.push(...redemptionNotifications);
 
   return notifications;
 }

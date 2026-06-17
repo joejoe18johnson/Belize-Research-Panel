@@ -8,11 +8,10 @@ export const REDEMPTION_MINIMUM_POINTS = 500;
 
 export const REDEMPTION_RATE_LABEL = "500 points = BZ$20";
 
-export type RedemptionOptionId =
-  | "mobile_top_up"
-  | "gift_card"
-  | "bank_transfer"
-  | "utility_credit";
+export type RedemptionOptionId = "mobile_top_up" | "bank_transfer" | "utility_credit";
+
+/** Includes retired options still present in historical redemption records. */
+export type StoredRedemptionOptionId = RedemptionOptionId | "gift_card";
 
 export type RedemptionFieldType = "text" | "tel" | "email" | "select" | "textarea";
 
@@ -65,31 +64,6 @@ export const REDEMPTION_OPTIONS: RedemptionOption[] = [
           { value: "digicell", label: "DigiCell" },
           { value: "smart", label: "Smart!" },
         ],
-      },
-    ],
-  },
-  {
-    id: "gift_card",
-    label: "Gift card",
-    description: "Digital gift card delivered by email in BZ$50 increments.",
-    amountMode: "increments_50",
-    minAmountBz: 50,
-    incrementLabel: "BZ$50 increments",
-    fields: [
-      {
-        name: "retailer",
-        label: "Gift card type",
-        type: "text",
-        required: true,
-        placeholder: "e.g. Amazon, Brodi's, Save-U",
-        hint: "Tell us which gift card you would like.",
-      },
-      {
-        name: "deliveryEmail",
-        label: "Delivery email",
-        type: "email",
-        required: true,
-        placeholder: "you@example.com",
       },
     ],
   },
@@ -177,7 +151,7 @@ export type RedemptionRequestStatus = "pending" | "approved" | "rejected" | "ful
 export interface RedemptionRequest {
   id: string;
   email: string;
-  optionId: RedemptionOptionId;
+  optionId: StoredRedemptionOptionId;
   optionLabel: string;
   points: number;
   amountBz?: number;
@@ -187,7 +161,10 @@ export interface RedemptionRequest {
   notes: string;
   submittedAt: string;
   updatedAt: string;
+  processedBy?: string;
 }
+
+export type PayoutProcessAction = "start" | "complete" | "reject";
 
 export interface RedemptionAmountChoice {
   amountBz: number;

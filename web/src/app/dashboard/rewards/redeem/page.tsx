@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { RedemptionRequestForm } from "@/components/dashboard/RedemptionRequestForm";
-import { RedemptionRequestHistory } from "@/components/dashboard/RedemptionOptionsCatalog";
+import { RewardsHistory } from "@/components/dashboard/RewardsHistory";
 import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
+import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireDashboardContext } from "@/lib/dashboard-access";
 import { loadRedemptionRequests } from "@/lib/redemption-requests";
+import { getPanelistSurveys } from "@/lib/panelist-surveys";
+import { buildRewardsHistory } from "@/lib/rewards-history";
 import { REDEMPTION_RATE_LABEL, getRedemptionOption } from "@/lib/reward-redemption";
 
 export const metadata = {
@@ -17,15 +20,28 @@ export default async function RedeemPointsPage({
 }) {
   const { option: optionParam } = await searchParams;
   const { account, profile, rewards } = await requireDashboardContext();
-  const redemptionRequests = await loadRedemptionRequests(account.email);
+  const [redemptionRequests, { completed }] = await Promise.all([
+    loadRedemptionRequests(account.email),
+    getPanelistSurveys(account.email),
+  ]);
+  const rewardsHistory = buildRewardsHistory({
+    rewards,
+    profile,
+    completedSurveys: completed,
+    redemptionRequests,
+  });
 
   const initialOptionId = optionParam ? getRedemptionOption(optionParam)?.id : undefined;
+
+  const section = dashboardSectionByHref("/dashboard/rewards");
+  const SectionIcon = section?.icon;
 
   return (
     <>
       <DashboardPageHeader
         title="Redeem points"
         description={`${REDEMPTION_RATE_LABEL}. Submit your details for the reward you want — requests are reviewed before payout.`}
+        icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
         action={
           <Link
             href="/dashboard/rewards"
@@ -45,7 +61,7 @@ export default async function RedeemPointsPage({
           initialOptionId={initialOptionId}
           standalone
         />
-        <RedemptionRequestHistory requests={redemptionRequests} />
+        <RewardsHistory entries={rewardsHistory} />
       </div>
     </>
   );

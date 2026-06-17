@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { AdminNotificationsDashboard } from "@/components/admin/queues/AdminNotificationsDashboard";
 import { buildNotificationQueueRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
+import { unreadAdminNotificationIds } from "@/lib/admin-nav-badges";
+import { loadAdminReadState } from "@/lib/admin-read-state";
 
 export const metadata = {
   title: "Notifications | Admin",
@@ -9,6 +11,9 @@ export const metadata = {
 
 export default async function AdminNotificationsPage() {
   const hub = await loadAdminDataHub();
+  const readState = await loadAdminReadState();
+  const rows = buildNotificationQueueRows(hub);
+  const unreadIds = unreadAdminNotificationIds(hub, readState);
 
   return (
     <Suspense
@@ -18,7 +23,7 @@ export default async function AdminNotificationsPage() {
         </div>
       }
     >
-      <AdminNotificationsDashboard rows={buildNotificationQueueRows(hub)} />
+      <AdminNotificationsDashboard rows={rows} unreadIds={unreadIds} />
     </Suspense>
   );
 }

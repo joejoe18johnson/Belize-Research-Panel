@@ -68,5 +68,42 @@
       "submittedAt": "2026-01-15T12:00:00.000Z",
       "updatedAt": "2026-01-18T09:00:00.000Z"
     }
+  ],
+  "johannesjohnsonj@gmail.com": [
+    {
+      "id": "2226b8b5-74cd-4f42-a1fb-b4eac8bb4f3c",
+      "email": "johannesjohnsonj@gmail.com",
+      "optionId": "bank_transfer",
+      "optionLabel": "Bank/ Cash payout",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 bank/ cash payout",
+      "status": "fulfilled",
+      "details": {
+        "bankName": "belize_bank",
+        "accountNumber": "21545454",
+        "accountHolderName": "Johannes"
+      },
+      "notes": "Please Deposit to Savings",
+      "submittedAt": "2026-06-17T05:06:22.178Z",
+      "updatedAt": "2026-06-17T05:11:05.232Z"
+    },
+    {
+      "id": "16529bf2-d390-4269-956a-ea67fd0531dd",
+      "email": "johannesjohnsonj@gmail.com",
+      "optionId": "mobile_top_up",
+      "optionLabel": "Mobile top-up",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 mobile top-up",
+      "status": "fulfilled",
+      "details": {
+        "phone": "+61 23234234234",
+        "carrier": "digicell"
+      },
+      "notes": "Thank you",
+      "submittedAt": "2026-06-17T04:38:20.172Z",
+      "updatedAt": "2026-06-17T04:48:30.843Z"
+    }
   ]
 }

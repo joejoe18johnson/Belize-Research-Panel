@@ -3,6 +3,10 @@ import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/l
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { approveAccountPhoneChange, findAccountByEmail, setAccountEmailVerifiedByAdmin } from "@/lib/accounts";
 import {
+  buildPanelistDeleteCode,
+  matchesDeleteConfirmation,
+} from "@/lib/admin-delete-confirmation";
+import {
   ADMIN_REQUIREMENT_FIELDS,
   allAdminRequirementsApproved,
   canApprovePanelistVerification,
@@ -135,7 +139,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ email: string }> }
 ) {
   if (!(await isAdminSessionActive())) {
@@ -144,6 +148,31 @@ export async function DELETE(
 
   const { email } = await context.params;
   const accountEmail = decodeURIComponent(email);
+
+  const panelist = await findPanelistByEmail(accountEmail);
+  if (!panelist) {
+    return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+  }
+
+  let confirmCode = "";
+  try {
+    const body = (await request.json()) as { confirmCode?: string };
+    confirmCode = body.confirmCode ?? "";
+  } catch {
+    confirmCode = "";
+  }
+
+  const expectedCode = buildPanelistDeleteCode(panelist);
+  if (!matchesDeleteConfirmation(confirmCode, expectedCode)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: `Deletion not confirmed. Type ${expectedCode} to delete this record.`,
+      },
+      { status: 400 }
+    );
+  }
+
   const deleted = await deletePanelistByEmail(accountEmail);
 
   if (!deleted) {

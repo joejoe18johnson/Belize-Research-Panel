@@ -15,10 +15,12 @@ import { BELIZE_DISTRICTS, CITY_TOWN_VILLAGE, getConstituencyOptions } from "@/l
 import type { PanelistRow } from "@/lib/panelists";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
+import { buildPanelistDeleteCode } from "@/lib/admin-delete-confirmation";
 import { FilterMultiSelect } from "@/components/admin/shared/AdminUi";
+import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteConfirmDialog";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
-import { BrandedAlert, BrandedConfirmDialog, BrandedModal } from "@/components/shared/BrandedFeedback";
+import { BrandedAlert, BrandedModal } from "@/components/shared/BrandedFeedback";
 import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import {
@@ -310,7 +312,7 @@ export function AdminPanelistsClient({
     setDeleteConfirmEmail(email);
   };
 
-  const confirmDeleteRecord = async () => {
+  const confirmDeleteRecord = async (confirmCode: string) => {
     const email = deleteConfirmEmail;
     if (!email) return;
 
@@ -319,14 +321,18 @@ export function AdminPanelistsClient({
 
     setDeletingEmail(email);
     setRowActionMessage("");
-    setDeleteConfirmEmail(null);
     try {
-      const res = await fetch(`/api/admin/panelists/${encodeURIComponent(email)}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/panelists/${encodeURIComponent(email)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmCode }),
+      });
       const data = (await res.json()) as { message?: string };
       if (!res.ok) {
         setRowActionMessage(data.message ?? "Could not delete record.");
         return;
       }
+      setDeleteConfirmEmail(null);
       if (editingEmail === email) closeEdit();
       setRowActionMessage(`Deleted ${label}.`);
       router.refresh();
@@ -382,11 +388,11 @@ export function AdminPanelistsClient({
       ? "error"
       : "success";
 
-  const deleteConfirmLabel = deleteConfirmEmail
-    ? panelistDisplayLabel(
-        rows.find((row) => row.email === deleteConfirmEmail) ?? ({ email: deleteConfirmEmail } as PanelistRow)
-      )
-    : "";
+  const deleteConfirmRow = deleteConfirmEmail
+    ? rows.find((row) => row.email === deleteConfirmEmail) ?? ({ email: deleteConfirmEmail } as PanelistRow)
+    : null;
+  const deleteConfirmLabel = deleteConfirmRow ? panelistDisplayLabel(deleteConfirmRow) : "";
+  const deleteConfirmCode = deleteConfirmRow ? buildPanelistDeleteCode(deleteConfirmRow) : "";
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
@@ -576,13 +582,13 @@ export function AdminPanelistsClient({
         />
       ) : null}
 
-      <BrandedConfirmDialog
-        open={Boolean(deleteConfirmEmail)}
+      <AdminDeleteConfirmDialog
+        open={Boolean(deleteConfirmEmail && deleteConfirmCode)}
         title="Delete panelist record"
         description={`Delete panelist record for ${deleteConfirmLabel}? This removes the register entry and related survey data.`}
+        confirmCode={deleteConfirmCode}
         confirmLabel="Delete record"
         cancelLabel="Keep record"
-        tone="error"
         loading={Boolean(deletingEmail)}
         onConfirm={confirmDeleteRecord}
         onCancel={() => setDeleteConfirmEmail(null)}

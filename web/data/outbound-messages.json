@@ -1,0 +1,82 @@
+[
+  {
+    "id": "fb2687af-e7a8-4bfa-8d2e-0ada2ce5bcf1",
+    "sentAt": "2026-06-17T05:11:05.869Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "whatsapp",
+    "subject": "Payout completed",
+    "body": "Your Bank/ Cash payout redemption of BZ$20 has been completed. Reference BB4F3C.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-complete"
+  },
+  {
+    "id": "7e4aedda-85ce-4e01-8601-59fb4324b2b2",
+    "sentAt": "2026-06-17T05:11:05.747Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "email",
+    "subject": "Payout completed",
+    "body": "Your Bank/ Cash payout redemption of BZ$20 has been completed. Reference BB4F3C.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-complete"
+  },
+  {
+    "id": "172aa082-c20f-41cd-80f9-f8053752032a",
+    "sentAt": "2026-06-17T05:06:59.504Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "whatsapp",
+    "subject": "Payout processing",
+    "body": "Your Bank/ Cash payout redemption (BZ$20) is now being processed. Reference BB4F3C.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  },
+  {
+    "id": "f3746517-196c-4aa0-8c24-61d10fe54ef7",
+    "sentAt": "2026-06-17T05:06:59.363Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "email",
+    "subject": "Payout processing",
+    "body": "Your Bank/ Cash payout redemption (BZ$20) is now being processed. Reference BB4F3C.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  },
+  {
+    "id": "562281b1-ff8d-49f1-8495-5a172e25ced1",
+    "sentAt": "2026-06-17T04:48:30.878Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "whatsapp",
+    "subject": "Payout completed",
+    "body": "Your Mobile top-up redemption of BZ$20 has been completed. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-complete"
+  },
+  {
+    "id": "1e0a6dcd-9afc-43db-8ed5-b43b03488f02",
+    "sentAt": "2026-06-17T04:48:30.874Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "email",
+    "subject": "Payout completed",
+    "body": "Your Mobile top-up redemption of BZ$20 has been completed. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-complete"
+  },
+  {
+    "id": "94f55fbe-b1ab-4acc-907b-b72484157ee3",
+    "sentAt": "2026-06-17T04:47:59.018Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "whatsapp",
+    "subject": "Payout processing",
+    "body": "Your Mobile top-up redemption (BZ$20) is now being processed. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  },
+  {
+    "id": "15278835-eb47-47d2-a035-203cd8d004a8",
+    "sentAt": "2026-06-17T04:47:58.919Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "+61 23234234234",
+    "channel": "email",
+    "subject": "Payout processing",
+    "body": "Your Mobile top-up redemption (BZ$20) is now being processed. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  }
+]

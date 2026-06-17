@@ -94,7 +94,7 @@ export function AdminDashboardClient({
         />
         <IconMetricCard
           href={ADMIN_DASHBOARD_LINKS.payouts}
-          label="Payout requests"
+          label="Payouts"
           value={metrics.totalRedemptionRequests}
           tone="rose"
           icon={
@@ -289,7 +289,7 @@ export function AdminDashboardClient({
           <AdminDataTable className="min-w-[640px]">
             <AdminTableHead>
               <AdminTableTh>Request ID</AdminTableTh>
-              <AdminTableTh>Panelist</AdminTableTh>
+              <AdminTableTh>Payment</AdminTableTh>
               <AdminTableTh>Option</AdminTableTh>
               <AdminTableTh align="right">Amount</AdminTableTh>
               <AdminTableTh>Status</AdminTableTh>
@@ -305,12 +305,18 @@ export function AdminDashboardClient({
                 payoutsPagination.paginatedRows.map((row) => (
                   <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60">
                     <td className="px-4 py-3 font-semibold text-zinc-900">{row.shortId}</td>
-                    <td className="px-4 py-3 text-zinc-700">{row.name}</td>
+                    <td className="px-4 py-3 text-zinc-700">{row.paymentTitle}</td>
                     <td className="px-4 py-3 text-zinc-700">{row.optionLabel}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-zinc-700">{formatBz(row.amountBz)}</td>
                     <td className="px-4 py-3">
                       <AdminStatusPill
-                        label={formatHeadingCase(row.status === "fulfilled" ? "Completed" : row.status)}
+                        label={formatHeadingCase(
+                          row.status === "fulfilled"
+                            ? "Completed"
+                            : row.status === "approved"
+                              ? "Processing"
+                              : row.status
+                        )}
                         tone={
                           row.status === "fulfilled"
                             ? "success"

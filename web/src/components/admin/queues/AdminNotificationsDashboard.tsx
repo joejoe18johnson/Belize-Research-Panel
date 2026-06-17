@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/components/admin/shared/AdminUi";
+import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { NotificationQueueRow } from "@/lib/admin-dashboard-metrics";
@@ -18,13 +19,20 @@ function matchesNotificationType(row: NotificationQueueRow, typeFilter: string |
   return row.type.toLowerCase().includes(normalized);
 }
 
-export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueRow[] }) {
+export function AdminNotificationsDashboard({
+  rows,
+  unreadIds = [],
+}: {
+  rows: NotificationQueueRow[];
+  unreadIds?: string[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const typeFilter = searchParams.get("type");
   const [search, setSearch] = useState("");
   const [approvingKey, setApprovingKey] = useState("");
   const [message, setMessage] = useState("");
+  const unreadSet = useMemo(() => new Set(unreadIds), [unreadIds]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -45,9 +53,20 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
   const emailChanges = rows.filter((row) => row.type === "Email change").length;
   const phoneChanges = rows.filter((row) => row.type === "Phone change").length;
   const emailVerification = rows.filter((row) => row.type === "Email verification").length;
+  const newCount = rows.filter((row) => unreadSet.has(row.id)).length;
+
+  const markNotificationRead = async (id: string) => {
+    if (!unreadSet.has(id)) return;
+    await fetch("/api/admin/read-state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scope: "notifications", ids: [id] }),
+    });
+    router.refresh();
+  };
 
   const approveChange = async (row: NotificationQueueRow) => {
-    const key = `${row.type}:${row.email}`;
+    const key = row.id;
     setApprovingKey(key);
     setMessage("");
 
@@ -86,6 +105,7 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
         eyebrow="Admin action queue"
         title="Notifications"
         description="Contact change approvals and signup email verification backlog requiring administrator attention."
+        action={<AdminMarkReadButton scope="notifications" />}
       />
 
       {typeFilter ? (
@@ -94,6 +114,12 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
           <Link href="/admin/notifications" className="font-semibold underline">
             Show all notifications
           </Link>
+        </BrandedAlert>
+      ) : null}
+
+      {newCount > 0 ? (
+        <BrandedAlert tone="success" compact showIcon>
+          {newCount} new notification{newCount === 1 ? "" : "s"} highlighted in green below.
         </BrandedAlert>
       ) : null}
 
@@ -147,11 +173,20 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
                 </thead>
                 <tbody>
                   {pagination.paginatedRows.map((row) => {
-                  const actionKey = `${row.type}:${row.email}`;
+                  const actionKey = row.id;
                   const canApprove = row.type === "Email change" || row.type === "Phone change";
+                  const isNew = unreadSet.has(row.id);
                   return (
-                    <tr key={actionKey} className="border-b border-zinc-50 hover:bg-teal-50/30">
-                      <td className="px-4 py-2.5 font-medium text-zinc-800">{row.type}</td>
+                    <tr
+                      key={actionKey}
+                      className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
+                    >
+                      <td className="px-4 py-2.5 font-medium text-zinc-800">
+                        <span className="inline-flex items-center gap-2">
+                          {row.type}
+                          {isNew ? <AdminNewBadge /> : null}
+                        </span>
+                      </td>
                       <td className="px-4 py-2.5">{row.name}</td>
                       <td className="px-4 py-2.5 text-zinc-700">{row.email}</td>
                       <td className="px-4 py-2.5 text-zinc-600">{row.detail}</td>
@@ -171,6 +206,7 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
                           <Link
                             href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
                             className="text-xs font-semibold text-teal-700 hover:text-teal-900"
+                            onClick={() => void markNotificationRead(row.id)}
                           >
                             Open record
                           </Link>

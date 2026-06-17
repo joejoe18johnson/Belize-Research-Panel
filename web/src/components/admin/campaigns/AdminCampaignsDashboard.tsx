@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
-import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/components/admin/shared/AdminUi";
+import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { isCampaignAdminNotifiable } from "@/lib/admin-campaign-notifications";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -14,8 +16,15 @@ function statusBadgeClass(status: CampaignSummary["status"]): string {
   return "bg-amber-100 text-amber-900";
 }
 
-export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSummary[] }) {
+export function AdminCampaignsDashboard({
+  summaries,
+  unreadCampaignIds = [],
+}: {
+  summaries: CampaignSummary[];
+  unreadCampaignIds?: string[];
+}) {
   const [search, setSearch] = useState("");
+  const unreadSet = useMemo(() => new Set(unreadCampaignIds), [unreadCampaignIds]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -42,6 +51,9 @@ export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSumm
   }, [summaries]);
 
   const responseRate = totals.assigned ? Math.round((totals.completed / totals.assigned) * 1000) / 10 : 0;
+  const newCompletedCount = summaries.filter(
+    (row) => isCampaignAdminNotifiable(row) && unreadSet.has(row.id)
+  ).length;
 
   const statusChart = [
     { label: "Pending", count: totals.pending, percent: totals.assigned ? Math.round((totals.pending / totals.assigned) * 1000) / 10 : 0 },
@@ -70,6 +82,7 @@ export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSumm
           eyebrow="Survey campaigns"
           title="Campaigns"
           description="Track live and historical survey campaigns with delivery results — pending, opened, completed, and overdue counts per campaign."
+          action={<AdminMarkReadButton scope="campaigns" label="Mark completed as read" />}
         />
         <Link
           href="/admin/campaigns/create"
@@ -78,6 +91,13 @@ export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSumm
           Create campaign
         </Link>
       </div>
+
+      {newCompletedCount > 0 ? (
+        <BrandedAlert tone="success" showIcon>
+          {newCompletedCount} newly completed campaign{newCompletedCount === 1 ? "" : "s"} highlighted in green below.
+          Open <span className="font-semibold">View results</span> to review and clear the notification.
+        </BrandedAlert>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard label="Campaigns" value={summaries.length} />
@@ -135,10 +155,18 @@ export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSumm
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((row) => (
-                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                {filtered.map((row) => {
+                  const isNew = isCampaignAdminNotifiable(row) && unreadSet.has(row.id);
+                  return (
+                  <tr
+                    key={row.id}
+                    className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
+                  >
                     <td className="px-4 py-2.5">
-                      <p className="font-medium text-zinc-900">{row.title}</p>
+                      <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900">
+                        {row.title}
+                        {isNew ? <AdminNewBadge label="Completed" /> : null}
+                      </p>
                       <p className="text-xs capitalize text-zinc-500">{row.category}</p>
                     </td>
                     <td className="px-4 py-2.5">
@@ -162,7 +190,8 @@ export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSumm
                       </Link>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

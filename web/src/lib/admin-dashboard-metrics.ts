@@ -3,7 +3,7 @@ import type { AdminDataHub } from "./admin-data-hub";
 import { duplicateNameDobKey } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import type { RedemptionRequest } from "./reward-redemption";
-import type { RedemptionOptionId } from "./reward-redemption";
+import type { StoredRedemptionOptionId } from "./reward-redemption";
 import type { RequirementApprovalStatus } from "./panelist-requirements";
 import {
   assessPanelistRequirements,
@@ -17,6 +17,7 @@ import {
   formatPayoutPaymentDetails,
   payoutShortId,
 } from "./admin-payout-display";
+import { adminNotificationId } from "./admin-read-state";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -69,6 +70,7 @@ export interface UnderReviewRow {
 }
 
 export interface NotificationQueueRow {
+  id: string;
   email: string;
   name: string;
   type: "Email change" | "Phone change" | "Email verification";
@@ -80,8 +82,7 @@ export interface PayoutQueueRow {
   id: string;
   shortId: string;
   email: string;
-  name: string;
-  optionId: RedemptionOptionId;
+  optionId: StoredRedemptionOptionId;
   optionLabel: string;
   points: number;
   amountBz: number;
@@ -90,6 +91,8 @@ export interface PayoutQueueRow {
   formattedDate: string;
   paymentTitle: string;
   paymentLines: string[];
+  paymentFields: { label: string; value: string }[];
+  panelistNotes: string;
 }
 
 function panelistName(row: PanelistRow | undefined, account?: AccountRecord): string {
@@ -330,6 +333,7 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
     const pendingEmail = cleanText(account.pending_email);
     if (pendingEmail) {
       rows.push({
+        id: adminNotificationId("Email change", email),
         email,
         name,
         type: "Email change",
@@ -341,6 +345,7 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
     const pendingPhone = cleanText(account.pending_phone_whatsapp);
     if (pendingPhone) {
       rows.push({
+        id: adminNotificationId("Phone change", email),
         email,
         name,
         type: "Phone change",
@@ -351,6 +356,7 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
 
     if (account.email_verified !== "true") {
       rows.push({
+        id: adminNotificationId("Email verification", email),
         email,
         name,
         type: "Email verification",
@@ -364,23 +370,15 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
 }
 
 export function buildPayoutQueueRows(hub: AdminDataHub): PayoutQueueRow[] {
-  const panelistByEmail = new Map<string, PanelistRow>();
-  for (const row of hub.panelists) {
-    const email = cleanText(row.email).toLowerCase();
-    if (email) panelistByEmail.set(email, row);
-  }
-
   return hub.redemptionRequests
     .filter((request) => request.status !== "rejected")
     .map((request) => {
       const email = cleanText(request.email).toLowerCase();
-      const panelist = panelistByEmail.get(email);
       const payment = formatPayoutPaymentDetails(request.optionId, request.details);
       return {
         id: request.id,
         shortId: payoutShortId(request.id),
         email,
-        name: panelistName(panelist),
         optionId: request.optionId,
         optionLabel: request.optionLabel,
         points: request.points,
@@ -390,6 +388,8 @@ export function buildPayoutQueueRows(hub: AdminDataHub): PayoutQueueRow[] {
         formattedDate: formatAdminPayoutDate(request.submittedAt),
         paymentTitle: payment.title,
         paymentLines: payment.lines,
+        paymentFields: payment.fields,
+        panelistNotes: cleanText(request.notes),
       };
     })
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));

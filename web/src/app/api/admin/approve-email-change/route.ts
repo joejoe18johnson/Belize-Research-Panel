@@ -7,6 +7,7 @@ import {
   getPendingEmailForApproval,
 } from "@/lib/accounts";
 import { updatePanelistEmail } from "@/lib/panelists";
+import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
 import { cleanText } from "@/lib/validation";
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Could not approve email change." }, { status: 500 });
     }
 
+    await markAdminNotificationsRead([adminNotificationId("Email change", email)]);
+
+    revalidatePath("/admin", "layout");
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/account-on-hold");

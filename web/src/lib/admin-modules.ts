@@ -18,6 +18,8 @@ export interface AdminModule {
   kind: AdminModuleKind;
   href?: string;
   section: AdminNavSectionId;
+  /** Renders indented beneath the parent item in the admin sidebar. */
+  parentSlug?: string;
   /** Opens the panelist-facing flow in a new tab when set. */
   externalHref?: string;
   status?: AdminModuleStatus;
