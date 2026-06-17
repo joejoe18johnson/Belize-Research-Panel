@@ -335,5 +335,182 @@
     ],
     "createdAt": "2026-06-17T15:27:38.539Z",
     "updatedAt": "2026-06-17T15:27:38.539Z"
+  },
+  {
+    "id": "survey-vo-tech-training-program-interest-mqi8zha7",
+    "title": "Vo-Tech Training program interest",
+    "description": "Gauge interest in workshops, courses, and professional development programs.",
+    "companyIntro": "Test Survey",
+    "companyLogoFile": "company-logo.jpeg",
+    "coverImageFile": "",
+    "category": "civic",
+    "status": "published",
+    "questions": [
+      {
+        "id": "q-ar5zb5f0",
+        "type": "yes_no",
+        "title": "Are you currently employed or studying?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-g5bv0fep",
+        "type": "single_choice",
+        "title": "Which training format interests you most?",
+        "description": "",
+        "required": true,
+        "options": [
+          "In-person workshop",
+          "Online live session",
+          "Self-paced online",
+          "Hybrid"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-5zw9li8i",
+        "type": "multiple_choice",
+        "title": "Which subject areas interest you? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Digital skills",
+          "Leadership & management",
+          "Financial literacy",
+          "Customer service",
+          "Technical / vocational",
+          "Language skills"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-sl0y2l8o",
+        "type": "rating_scale",
+        "title": "I would pay a fee for high-quality professional training.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-0ybwk9bb",
+        "type": "single_choice",
+        "title": "Preferred session length",
+        "description": "",
+        "required": true,
+        "options": [
+          "1–2 hours",
+          "Half day",
+          "Full day",
+          "Multi-day program"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-voocslg5",
+        "type": "dropdown",
+        "title": "How soon would you like to start?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Within 1 month",
+          "1–3 months",
+          "3–6 months",
+          "No specific timeline"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-dkqpb9xx",
+        "type": "rating_scale",
+        "title": "Weekend sessions are convenient for me.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-sxuo5wmo",
+        "type": "single_choice",
+        "title": "Maximum budget per course (BZ$)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Free only",
+          "Under BZ$50",
+          "BZ$50–150",
+          "BZ$150–300",
+          "Over BZ$300"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-j6yo89gr",
+        "type": "yes_no",
+        "title": "Would you recommend employer-sponsored training?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-j4w7jcqi",
+        "type": "long_text",
+        "title": "Describe the training topic you need most right now.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      }
+    ],
+    "createdAt": "2026-06-17T15:50:34.303Z",
+    "updatedAt": "2026-06-17T15:50:40.912Z"
   }
 ]

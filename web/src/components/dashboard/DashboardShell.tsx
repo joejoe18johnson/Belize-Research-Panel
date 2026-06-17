@@ -253,23 +253,6 @@ export function StatCard({
     );
   }
 
-  if (layout === "horizontal") {
-    return (
-      <div className={`flex h-full flex-col rounded-2xl border p-4 shadow-sm ${toneClass}`}>
-        <div className="flex items-start justify-between gap-2">
-          {icon ? (
-            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconToneClass}`}>
-              {icon}
-            </span>
-          ) : null}
-          <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">{formatHeadingCase(label)}</p>
-        </div>
-        <p className="mt-3 text-2xl font-bold text-zinc-900">{value}</p>
-        {hint ? <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{formatHeadingCase(hint)}</p> : null}
-      </div>
-    );
-  }
-
   return (
     <div className={`rounded-2xl border p-5 shadow-sm ${toneClass}`}>
       <div className="flex items-start justify-between gap-3">
@@ -343,21 +326,6 @@ export function QuickLinkCard({
           <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
           <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
         </div>
-      </Link>
-    );
-  }
-
-  if (layout === "horizontal") {
-    return (
-      <Link
-        href={href}
-        className="group flex h-full flex-col rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition hover:border-teal-300 hover:bg-teal-50/50"
-      >
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
-          {icon}
-        </span>
-        <p className="mt-3 text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
-        <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
       </Link>
     );
   }

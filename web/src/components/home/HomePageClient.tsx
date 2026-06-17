@@ -39,15 +39,6 @@ function HomeFeatureCard({
     );
   }
 
-  if (layout === "horizontal") {
-    return (
-      <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4">
-        <h2 className="text-sm font-semibold">{title}</h2>
-        <p className="mt-2 line-clamp-4 flex-1 text-xs leading-relaxed text-teal-100">{body}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
       <h2 className="text-lg font-semibold">{title}</h2>
@@ -77,18 +68,6 @@ function HomeRewardPerkCard({
           <h3 className="text-sm font-bold text-white">{title}</h3>
           <p className="mt-1 text-xs leading-relaxed text-teal-100">{body}</p>
         </div>
-      </div>
-    );
-  }
-
-  if (layout === "horizontal") {
-    return (
-      <div className="flex h-full flex-col rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm">
-        <p className="text-2xl" aria-hidden>
-          {icon}
-        </p>
-        <h3 className="mt-2 text-sm font-bold text-white">{title}</h3>
-        <p className="mt-1 line-clamp-4 flex-1 text-xs leading-relaxed text-teal-100">{body}</p>
       </div>
     );
   }

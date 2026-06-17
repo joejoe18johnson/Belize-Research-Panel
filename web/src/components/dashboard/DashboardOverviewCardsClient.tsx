@@ -110,7 +110,7 @@ export function DashboardOverviewQuickLinks() {
               label={link.label}
               description={link.description}
               icon={<Icon className="h-5 w-5" />}
-              layout="horizontal"
+              layout="cards"
             />
           </div>
         );

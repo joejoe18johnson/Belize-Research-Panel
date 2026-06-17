@@ -99,21 +99,6 @@ function VerificationItemCard({
     );
   }
 
-  if (layout === "horizontal") {
-    return (
-      <DashboardCard className={`flex h-full flex-col p-4 ${itemStatusClass(item.status)}`}>
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 text-teal-800 shadow-sm">
-          <VerificationItemIcon id={item.id} />
-        </span>
-        <SectionHeading as="h3" className="mt-3 text-sm font-semibold text-zinc-900">
-          {item.label}
-        </SectionHeading>
-        <p className="mt-2 line-clamp-2 flex-1 text-xs text-zinc-600">{item.description}</p>
-        <div className="mt-3">{statusBadge}</div>
-      </DashboardCard>
-    );
-  }
-
   return (
     <DashboardCard className={itemStatusClass(item.status)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

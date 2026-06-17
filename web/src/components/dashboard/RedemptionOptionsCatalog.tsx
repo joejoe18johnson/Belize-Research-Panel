@@ -98,22 +98,14 @@ function RedemptionOptionCard({
               </span>
             )}
           </div>
-          {layout !== "horizontal" ? (
-            <>
-              <p className="mt-1 text-sm text-zinc-600">{option.description}</p>
-              <p className="mt-1 text-xs font-medium text-teal-800">{option.incrementLabel}</p>
-            </>
-          ) : (
-            <p className="mt-1 text-xs text-zinc-600">{formatBz(option.minAmountBz)} from {minPoints} pts</p>
-          )}
+          <p className="mt-1 text-sm text-zinc-600">{option.description}</p>
+          <p className="mt-1 text-xs font-medium text-teal-800">{option.incrementLabel}</p>
         </div>
         <div className={`flex shrink-0 flex-col gap-2 ${layout === "list" ? "items-end" : "w-full sm:w-auto sm:items-end"}`}>
-          {layout !== "horizontal" ? (
-            <div className="text-left sm:text-right">
-              <p className="text-sm font-bold text-zinc-900">{minPoints} pts</p>
-              <p className="text-xs text-zinc-500">from {formatBz(option.minAmountBz)}</p>
-            </div>
-          ) : null}
+          <div className="text-left sm:text-right">
+            <p className="text-sm font-bold text-zinc-900">{minPoints} pts</p>
+            <p className="text-xs text-zinc-500">from {formatBz(option.minAmountBz)}</p>
+          </div>
           {unlocked ? (
             <Link
               href={`/dashboard/rewards/redeem?option=${option.id}`}
@@ -176,7 +168,7 @@ function RedemptionOptionCard({
           : eligible
             ? "border-zinc-200 bg-zinc-50/50"
             : "border-zinc-200 bg-white"
-      } ${layout === "horizontal" ? "h-full" : ""}`}
+      }`}
     >
       {content}
     </div>

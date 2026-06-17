@@ -178,30 +178,6 @@ export function SurveyCard({
     );
   }
 
-  if (layout === "horizontal") {
-    return (
-      <DashboardCard className={`flex h-full flex-col overflow-hidden p-0 ${locked ? "opacity-50 grayscale" : ""}`}>
-        <SurveyCategoryBadge category={survey.category} />
-        <div className="flex flex-1 flex-col gap-3 p-4">
-          <div>
-            <h3 className="line-clamp-2 text-sm font-semibold text-zinc-900">{survey.title}</h3>
-            <p className="mt-1 text-xs text-zinc-600">
-              {formatHeadingCase(completed ? "Completed" : "Due")}{" "}
-              <span className={overdue && !completed ? "text-red-600" : "text-zinc-800"}>
-                {completed ? survey.completedDateLabel : survey.completeByDateLabel}
-              </span>
-            </p>
-            <p className="mt-1 text-xs font-semibold text-teal-800">+{survey.points} points</p>
-          </div>
-          <SurveyProgressBar percent={survey.progressPercent} completed={completed} compact />
-          <div className="mt-auto">
-            <SurveyAction survey={survey} locked={locked} compact />
-          </div>
-        </div>
-      </DashboardCard>
-    );
-  }
-
   return (
     <DashboardCard className={`overflow-hidden p-0 ${locked ? "opacity-50 grayscale" : ""}`}>
       {locked ? (
