@@ -1,13 +1,34 @@
 import { AdminPanelistsClient } from "@/components/admin/panelists/AdminPanelistsClient";
 import { getUniqueFilterValues } from "@/lib/admin-panelists";
 import { loadPanelists } from "@/lib/panelists";
+import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
+import { assessPanelistRequirements } from "@/lib/panelist-requirements";
+import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
+import { promises as fs } from "fs";
+import path from "path";
+import type { AccountRecord } from "@/lib/auth-types";
+import { cleanText } from "@/lib/validation";
+
+async function loadAccounts(): Promise<AccountRecord[]> {
+  try {
+    const content = await fs.readFile(path.join(process.cwd(), "data", "accounts.json"), "utf-8");
+    const parsed = JSON.parse(content) as AccountRecord[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export const metadata = {
   title: "Panelists | Admin | Belize Research Panel",
 };
 
 export default async function AdminPanelistsPage() {
-  const rows = await loadPanelists();
+  const [rows, accounts, photoUploadUsernames] = await Promise.all([
+    loadPanelists(),
+    loadAccounts(),
+    loadPanelistPhotoUploadUsernames(),
+  ]);
 
   if (rows.length === 0) {
     return (
@@ -17,9 +38,31 @@ export default async function AdminPanelistsPage() {
     );
   }
 
+  const accountsByEmail = new Map(
+    accounts.map((account) => [cleanText(account.email).toLowerCase(), account] as const)
+  );
+
+  const requirementByEmail: Record<
+    string,
+    { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
+  > = {};
+
+  for (const row of rows) {
+    const email = cleanText(row.email).toLowerCase();
+    if (!email) continue;
+    const context = requirementContextForPanelist(row, accountsByEmail, photoUploadUsernames);
+    const requirements = assessPanelistRequirements(row, context);
+    requirementByEmail[email] = {
+      email: requirements.email,
+      phone: requirements.phone,
+      photoId: requirements.photoId,
+    };
+  }
+
   return (
     <AdminPanelistsClient
       rows={rows}
+      requirementByEmail={requirementByEmail}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),
         district: getUniqueFilterValues(rows, "district"),
