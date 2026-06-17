@@ -83,45 +83,73 @@ function usePortalMenuPosition(
   open: boolean,
   rootRef: React.RefObject<HTMLDivElement | null>,
   menuRef: React.RefObject<HTMLUListElement | null>,
-  placement: SiteSelectMenuPlacement
+  placement: SiteSelectMenuPlacement,
+  optionCount: number
 ) {
   const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setStyle({ visibility: "hidden" });
+      return;
+    }
+
+    let frameId = 0;
 
     const update = () => {
       const trigger = rootRef.current;
       if (!trigger) return;
 
       const rect = trigger.getBoundingClientRect();
-      const menuHeight = menuRef.current?.offsetHeight ?? Math.min(240, 42 * 4);
       const gap = 4;
+      const menuHeight = menuRef.current?.offsetHeight ?? optionCount * 42 + 8;
       const spaceBelow = window.innerHeight - rect.bottom - gap;
       const spaceAbove = rect.top - gap;
       const openUp =
         placement === "top" ||
         (placement === "auto" && spaceBelow < menuHeight && spaceAbove >= spaceBelow);
 
-      setStyle({
+      const base: CSSProperties = {
         position: "fixed",
         left: rect.left,
-        width: rect.width,
+        width: Math.max(rect.width, 72),
         minWidth: rect.width,
-        zIndex: 9999,
-        top: openUp ? Math.max(gap, rect.top - menuHeight - gap) : rect.bottom + gap,
+        zIndex: 10000,
         visibility: "visible",
-      });
+      };
+
+      if (openUp) {
+        setStyle({
+          ...base,
+          bottom: window.innerHeight - rect.top + gap,
+          maxHeight: Math.max(spaceAbove, 120),
+        });
+      } else {
+        setStyle({
+          ...base,
+          top: rect.bottom + gap,
+          maxHeight: Math.max(spaceBelow, 120),
+        });
+      }
     };
 
     update();
+    frameId = window.requestAnimationFrame(update);
+
+    const menu = menuRef.current;
+    const observer =
+      menu && typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
+    if (menu && observer) observer.observe(menu);
+
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
     return () => {
+      window.cancelAnimationFrame(frameId);
+      observer?.disconnect();
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [open, placement, rootRef, menuRef]);
+  }, [open, placement, optionCount, rootRef, menuRef]);
 
   return style;
 }
@@ -155,7 +183,7 @@ export function SiteSelect({
   const rootRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
   const listboxId = useId();
-  const menuStyle = usePortalMenuPosition(open, rootRef, menuRef, menuPlacement);
+  const menuStyle = usePortalMenuPosition(open, rootRef, menuRef, menuPlacement, options.length);
   const selected = options.find((option) => option.value === value);
   const display = selected?.label ?? placeholder;
   const isPlaceholder = !selected;
@@ -210,7 +238,7 @@ export function SiteSelect({
               id={listboxId}
               role="listbox"
               style={menuStyle}
-              className="max-h-60 overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10"
+              className="overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10"
             >
               {options.map((option) => {
                 const active = option.value === value;
