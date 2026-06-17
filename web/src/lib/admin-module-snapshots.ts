@@ -5,10 +5,9 @@ import type { AdminCountRow, AdminModuleSnapshot } from "./admin-snapshot-types"
 import type { PanelistRow } from "./panelists";
 import { isSurveyOverdue } from "./panelist-surveys-types";
 import {
-  POINTS_PER_BZ_DOLLAR,
-  REDEMPTION_MINIMUM_POINTS,
-  REDEMPTION_RATE_LABEL,
-} from "./reward-redemption";
+  DEFAULT_REWARD_SETTINGS,
+  redemptionRateLabel,
+} from "./reward-settings";
 import { cleanText } from "./validation";
 
 export const DATA_MODULE_SLUGS = [
@@ -107,8 +106,8 @@ function surveyProjects(hub: AdminDataHub) {
 
 function incentiveLiability(hub: AdminDataHub) {
   const verified = hub.panelists.filter((row) => cleanText(row.verification_status) === "Verified").length;
-  const registrationPoints = hub.panelists.length * 25;
-  const verificationPoints = verified * 50;
+  const registrationPoints = hub.panelists.length * DEFAULT_REWARD_SETTINGS.registrationRewardPoints;
+  const verificationPoints = verified * DEFAULT_REWARD_SETTINGS.verificationRewardPoints;
   const surveyPoints = hub.surveyRecords
     .filter((record) => record.status === "completed")
     .reduce((sum, record) => sum + record.points, 0);
@@ -116,8 +115,14 @@ function incentiveLiability(hub: AdminDataHub) {
   const fulfilledRedemptions = hub.redemptionRequests.filter((request) => request.status === "fulfilled");
   const pendingPoints = pendingRedemptions.reduce((sum, request) => sum + request.points, 0);
   const fulfilledPoints = fulfilledRedemptions.reduce((sum, request) => sum + request.points, 0);
-  const fulfilledBz = fulfilledRedemptions.reduce((sum, request) => sum + (request.amountBz ?? request.points / POINTS_PER_BZ_DOLLAR), 0);
-  const pendingBz = pendingRedemptions.reduce((sum, request) => sum + (request.amountBz ?? request.points / POINTS_PER_BZ_DOLLAR), 0);
+  const fulfilledBz = fulfilledRedemptions.reduce(
+    (sum, request) => sum + (request.amountBz ?? request.points / DEFAULT_REWARD_SETTINGS.pointsPerBzDollar),
+    0
+  );
+  const pendingBz = pendingRedemptions.reduce(
+    (sum, request) => sum + (request.amountBz ?? request.points / DEFAULT_REWARD_SETTINGS.pointsPerBzDollar),
+    0
+  );
   return {
     registrationPoints,
     verificationPoints,
@@ -289,7 +294,7 @@ function buildFinancial(hub: AdminDataHub): AdminModuleSnapshot {
       {
         label: "Unredeemed liability (pts)",
         value: Math.max(0, pointsOutstanding).toLocaleString(),
-        hint: `At ${REDEMPTION_RATE_LABEL}`,
+        hint: `At ${redemptionRateLabel(DEFAULT_REWARD_SETTINGS)}`,
       },
     ],
     charts: [
@@ -707,12 +712,13 @@ function buildSystemSettings(hub: AdminDataHub): AdminModuleSnapshot {
     eyebrow: "Configuration",
     title: "System settings",
     description:
-      "Operational defaults and environment flags currently active in the portal — values sourced from code constants and deployment env.",
+      "Operational defaults for panel rewards and redemption — edit live values under Campaigns → Reward settings.",
+    links: [{ label: "Open reward settings", href: "/admin/campaigns/reward-settings" }],
     metrics: [
-      { label: "Redemption minimum", value: `${REDEMPTION_MINIMUM_POINTS} pts` },
-      { label: "Redemption rate", value: REDEMPTION_RATE_LABEL },
-      { label: "Registration reward", value: "25 pts" },
-      { label: "Verification reward", value: "50 pts" },
+      { label: "Redemption minimum", value: `${DEFAULT_REWARD_SETTINGS.redemptionMinimumPoints} pts` },
+      { label: "Redemption rate", value: redemptionRateLabel(DEFAULT_REWARD_SETTINGS) },
+      { label: "Registration reward", value: `${DEFAULT_REWARD_SETTINGS.registrationRewardPoints} pts` },
+      { label: "Verification reward", value: `${DEFAULT_REWARD_SETTINGS.verificationRewardPoints} pts` },
     ],
     charts: [],
     tables: [

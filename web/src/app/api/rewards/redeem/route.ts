@@ -5,6 +5,7 @@ import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { resolveRewardSummary } from "@/lib/panelist-points";
 import { createRedemptionRequest, loadRedemptionRequests } from "@/lib/redemption-requests";
+import { loadRewardSettings } from "@/lib/reward-settings-store";
 import { validateRedemptionRequest } from "@/lib/reward-redemption";
 
 export async function POST(request: NextRequest) {
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
     const profile = panelistRowToDashboardProfile(panelist);
     const rewards = await resolveRewardSummary(session.email, profile);
     const existingRequests = await loadRedemptionRequests(session.email);
+    const rewardSettings = await loadRewardSettings();
 
     const body = (await request.json()) as {
       optionId?: string;
@@ -43,6 +45,7 @@ export async function POST(request: NextRequest) {
       notes: body.notes,
       totalPoints: rewards.totalPoints,
       requests: existingRequests,
+      settings: rewardSettings,
     });
 
     if (!validation.ok) {

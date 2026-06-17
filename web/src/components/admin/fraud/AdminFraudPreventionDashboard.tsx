@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { DonutBreakdown } from "@/components/admin/analytics/AnalyticsCharts";
 import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteConfirmDialog";
 import { FilterMultiSelect, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
@@ -34,11 +35,6 @@ function DuplicateTable({
   sortDirection: "asc" | "desc";
   onSort: (key: SortKey) => void;
 }) {
-  const sorted = useMemo(() => {
-    const factor = sortDirection === "asc" ? 1 : -1;
-    return [...rows].sort((a, b) => factor * String(a[sortKey]).localeCompare(String(b[sortKey])));
-  }, [rows, sortKey, sortDirection]);
-
   const indicator = (key: SortKey) =>
     sortKey === key ? (sortDirection === "asc" ? " ↑" : " ↓") : "";
 
@@ -67,14 +63,14 @@ function DuplicateTable({
           </tr>
         </thead>
         <tbody>
-          {sorted.length === 0 ? (
+          {rows.length === 0 ? (
             <tr>
               <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 No duplicate records for this category.
               </td>
             </tr>
           ) : (
-            sorted.map((row) => (
+            rows.map((row) => (
               <tr key={`${row.duplicateType}:${row.email}:${row.phone}`} className="border-b border-zinc-50 hover:bg-teal-50/30">
                 <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                   {row.firstName} {row.lastName}
@@ -241,6 +237,24 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
     [detail.nameDobDuplicateRows, search, verificationStatuses]
   );
 
+  const suspiciousPagination = useTablePagination(filteredSuspicious);
+
+  const activeRows =
+    tab === "email"
+      ? filteredEmail
+      : tab === "phone"
+        ? filteredPhone
+        : tab === "name-dob"
+          ? filteredNameDob
+          : [];
+
+  const sortedDuplicateRows = useMemo(() => {
+    const factor = sortDirection === "asc" ? 1 : -1;
+    return [...activeRows].sort((a, b) => factor * String(a[sortKey]).localeCompare(String(b[sortKey])));
+  }, [activeRows, sortKey, sortDirection]);
+
+  const duplicatePagination = useTablePagination(sortedDuplicateRows);
+
   const verificationChart = detail.verificationSummary.map((row) => ({
     label: row.status,
     count: row.count,
@@ -325,15 +339,6 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
     { id: "phone", label: "Duplicate phones", count: detail.phoneDuplicateRows.length },
     { id: "name-dob", label: "Name + DOB", count: detail.nameDobDuplicateRows.length },
   ];
-
-  const activeRows =
-    tab === "email"
-      ? filteredEmail
-      : tab === "phone"
-        ? filteredPhone
-        : tab === "name-dob"
-          ? filteredNameDob
-          : [];
 
   const deleteConfirmCode = deleteTarget
     ? buildAdminDeleteCode(deleteTarget.firstName, extractYearFromDate(deleteTarget.registrationDate))
@@ -432,11 +437,19 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
             {filteredSuspicious.length === 1 ? "" : "s"}
           </p>
           <SuspiciousEmailTable
-            rows={filteredSuspicious}
+            rows={suspiciousPagination.paginatedRows}
             flaggingEmail={flaggingEmail}
             deletingEmail={deletingEmail}
             onFlag={flagRecord}
             onDelete={setDeleteTarget}
+          />
+          <TablePagination
+            page={suspiciousPagination.page}
+            pageSize={suspiciousPagination.pageSize}
+            totalPages={suspiciousPagination.totalPages}
+            totalRows={suspiciousPagination.totalRows}
+            onPageChange={suspiciousPagination.setPage}
+            onPageSizeChange={suspiciousPagination.setPageSize}
           />
         </section>
       ) : (
@@ -463,10 +476,18 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
             Showing <strong>{activeRows.length}</strong> rows
           </p>
           <DuplicateTable
-            rows={activeRows}
+            rows={duplicatePagination.paginatedRows}
             sortKey={sortKey}
             sortDirection={sortDirection}
             onSort={toggleSort}
+          />
+          <TablePagination
+            page={duplicatePagination.page}
+            pageSize={duplicatePagination.pageSize}
+            totalPages={duplicatePagination.totalPages}
+            totalRows={duplicatePagination.totalRows}
+            onPageChange={duplicatePagination.setPage}
+            onPageSizeChange={duplicatePagination.setPageSize}
           />
         </section>
       )}

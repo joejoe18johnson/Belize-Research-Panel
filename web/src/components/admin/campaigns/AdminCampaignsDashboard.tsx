@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { isCampaignAdminNotifiable } from "@/lib/admin-campaign-notifications";
@@ -36,6 +37,8 @@ export function AdminCampaignsDashboard({
         row.targetingLabel.toLowerCase().includes(query)
     );
   }, [summaries, search]);
+
+  const pagination = useTablePagination(filtered);
 
   const totals = useMemo(() => {
     return summaries.reduce(
@@ -84,12 +87,20 @@ export function AdminCampaignsDashboard({
           description="Track live and historical survey campaigns with delivery results — pending, opened, completed, and overdue counts per campaign."
           action={<AdminMarkReadButton scope="campaigns" label="Mark completed as read" />}
         />
-        <Link
-          href="/admin/campaigns/create"
-          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
-        >
-          Create campaign
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/campaigns/create"
+            className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            Create campaign
+          </Link>
+          <Link
+            href="/admin/campaigns/reward-settings"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:bg-teal-950"
+          >
+            Reward settings
+          </Link>
+        </div>
       </div>
 
       {newCompletedCount > 0 ? (
@@ -158,7 +169,7 @@ export function AdminCampaignsDashboard({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((row) => {
+                {pagination.paginatedRows.map((row) => {
                   const isNew = isCampaignAdminNotifiable(row) && unreadSet.has(row.id);
                   return (
                   <tr
@@ -199,6 +210,16 @@ export function AdminCampaignsDashboard({
             </table>
           </div>
         )}
+        {filtered.length > 0 ? (
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            totalPages={pagination.totalPages}
+            totalRows={pagination.totalRows}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
+        ) : null}
       </section>
     </div>
   );

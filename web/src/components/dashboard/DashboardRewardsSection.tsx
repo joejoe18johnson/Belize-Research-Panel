@@ -1,7 +1,9 @@
 import type { DashboardRewardSummary } from "@/lib/panelist-dashboard";
 import type { RedemptionRequest } from "@/lib/reward-redemption";
 import type { RewardsHistoryEntry } from "@/lib/rewards-history";
-import { REDEMPTION_MINIMUM_POINTS, REDEMPTION_RATE_LABEL, getAvailablePoints, getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
+import { getAvailablePoints, getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
+import type { RewardSettings } from "@/lib/reward-settings";
+import { redemptionRateLabel } from "@/lib/reward-settings";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { GiftIcon, StarIcon } from "./DashboardIcons";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
@@ -9,9 +11,7 @@ import { DevPointsEditor } from "./DevPointsEditor";
 import { RedemptionOptionsCatalog } from "./RedemptionOptionsCatalog";
 import { RewardsHistory } from "./RewardsHistory";
 
-const REWARD_RULES = [
-  { label: "Registration completed", points: "25 points" },
-  { label: "Verified account", points: "50 points" },
+const STATIC_REWARD_RULES = [
   { label: "Survey completed", points: "100 points" },
   { label: "In-depth interview completed", points: "250 points" },
   { label: "Focus group participation", points: "300 points" },
@@ -21,16 +21,25 @@ export function DashboardRewardsSection({
   rewards,
   redemptionRequests,
   rewardsHistory,
+  rewardSettings,
   showDevPointsEditor = false,
 }: {
   rewards: DashboardRewardSummary;
   redemptionRequests: RedemptionRequest[];
   rewardsHistory: RewardsHistoryEntry[];
+  rewardSettings: RewardSettings;
   showDevPointsEditor?: boolean;
 }) {
   const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
-  const progressPercent = Math.min(100, Math.round((availablePoints / REDEMPTION_MINIMUM_POINTS) * 100));
-  const pointsToMilestone = Math.max(0, REDEMPTION_MINIMUM_POINTS - availablePoints);
+  const redemptionMinimum = rewardSettings.redemptionMinimumPoints;
+  const redemptionRateLabelText = redemptionRateLabel(rewardSettings);
+  const progressPercent = Math.min(100, Math.round((availablePoints / redemptionMinimum) * 100));
+  const pointsToMilestone = Math.max(0, redemptionMinimum - availablePoints);
+  const rewardRules = [
+    { label: "Registration completed", points: `${rewardSettings.registrationRewardPoints} points` },
+    { label: "Verified account", points: `${rewardSettings.verificationRewardPoints} points` },
+    ...STATIC_REWARD_RULES,
+  ];
 
   return (
     <div className="space-y-6">
@@ -44,7 +53,7 @@ export function DashboardRewardsSection({
                 <p className="text-sm font-medium text-teal-100">{formatHeadingCase("Available balance")}</p>
                 <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{availablePoints}</p>
                 <p className="mt-1 text-sm text-teal-100">{formatHeadingCase("Reward points")}</p>
-                <p className="mt-1 text-xs text-teal-100/90">{REDEMPTION_RATE_LABEL}</p>
+                <p className="mt-1 text-xs text-teal-100/90">{redemptionRateLabelText}</p>
                 {getReservedPoints(redemptionRequests) > 0 ? (
                   <p className="mt-2 text-xs text-teal-100/90">
                     {getReservedPoints(redemptionRequests)} pts reserved on pending requests
@@ -77,7 +86,7 @@ export function DashboardRewardsSection({
               </div>
               <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 {pointsToMilestone > 0
-                  ? `${pointsToMilestone} more points (${formatBz(pointsToBz(pointsToMilestone))}) until redemption unlocks.`
+                  ? `${pointsToMilestone} more points (${formatBz(pointsToBz(pointsToMilestone, rewardSettings))}) until redemption unlocks.`
                   : formatHeadingCase("Redemption is unlocked — choose an option below and tap Redeem points.")}
               </p>
             </div>
@@ -139,7 +148,7 @@ export function DashboardRewardsSection({
             <SectionHeading as="h3">How points are earned</SectionHeading>
           </div>
           <ul className="mt-4 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300">
-            {REWARD_RULES.map((rule) => (
+            {rewardRules.map((rule) => (
               <li
                 key={rule.label}
                 className="flex justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0"
@@ -152,7 +161,11 @@ export function DashboardRewardsSection({
         </DashboardCard>
       </div>
 
-      <RedemptionOptionsCatalog totalPoints={rewards.totalPoints} requests={redemptionRequests} />
+      <RedemptionOptionsCatalog
+        totalPoints={rewards.totalPoints}
+        requests={redemptionRequests}
+        rewardSettings={rewardSettings}
+      />
 
       <RewardsHistory entries={rewardsHistory} variant="earnings" />
     </div>

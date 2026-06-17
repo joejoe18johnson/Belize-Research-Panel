@@ -4,6 +4,8 @@ import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
 import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireDashboardContext } from "@/lib/dashboard-access";
 import { loadRedemptionRequests } from "@/lib/redemption-requests";
+import { loadRewardSettings } from "@/lib/reward-settings-store";
+import { redemptionRateLabel } from "@/lib/reward-settings";
 import { isPointsOverrideEnabled } from "@/lib/panelist-points";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
 import { buildRewardsHistory } from "@/lib/rewards-history";
@@ -14,9 +16,10 @@ export const metadata = {
 
 export default async function DashboardRewardsPage() {
   const { account, profile, rewards } = await requireDashboardContext();
-  const [redemptionRequests, { completed }] = await Promise.all([
+  const [redemptionRequests, { completed }, rewardSettings] = await Promise.all([
     loadRedemptionRequests(account.email),
     getPanelistSurveys(account.email),
+    loadRewardSettings(),
   ]);
   const rewardsHistory = buildRewardsHistory({
     rewards,
@@ -32,7 +35,7 @@ export default async function DashboardRewardsPage() {
     <>
       <DashboardPageHeader
         title="Rewards"
-        description="Track your points (500 pts = BZ$20), redeem rewards, and review your earnings history."
+        description={`Track your points (${redemptionRateLabel(rewardSettings)}), redeem rewards, and review your earnings history.`}
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
         action={
           <Link
@@ -47,6 +50,7 @@ export default async function DashboardRewardsPage() {
         rewards={rewards}
         redemptionRequests={redemptionRequests}
         rewardsHistory={rewardsHistory}
+        rewardSettings={rewardSettings}
         showDevPointsEditor={isPointsOverrideEnabled()}
       />
     </>

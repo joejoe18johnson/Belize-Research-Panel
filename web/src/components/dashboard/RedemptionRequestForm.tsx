@@ -6,9 +6,7 @@ import { Field, SelectInput, TextArea, TextInput } from "@/components/registrati
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { RedemptionOption, RedemptionRequest } from "@/lib/reward-redemption";
 import {
-  REDEMPTION_MINIMUM_POINTS,
   REDEMPTION_OPTIONS,
-  REDEMPTION_RATE_LABEL,
   bzToPoints,
   canAccessRedemption,
   formatBz,
@@ -17,6 +15,8 @@ import {
   getRedemptionAmountChoices,
   pointsToBz,
 } from "@/lib/reward-redemption";
+import type { RewardSettings } from "@/lib/reward-settings";
+import { redemptionMinimumBz, redemptionRateLabel } from "@/lib/reward-settings";
 import { DashboardAlert, DashboardCard, SectionHeading } from "./DashboardShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -33,16 +33,17 @@ function buildInitialFormState(
   initialOptionId: string | undefined,
   totalPoints: number,
   requests: RedemptionRequest[],
-  profile: Pick<PanelistDashboardProfile, "email" | "phone">
+  profile: Pick<PanelistDashboardProfile, "email" | "phone">,
+  rewardSettings: RewardSettings
 ) {
   const availablePoints = getAvailablePoints(totalPoints, requests);
-  const eligibleOptions = getEligibleRedemptionOptions(totalPoints, requests);
+  const eligibleOptions = getEligibleRedemptionOptions(totalPoints, requests, rewardSettings);
   const optionId =
     initialOptionId && REDEMPTION_OPTIONS.some((option) => option.id === initialOptionId)
       ? initialOptionId
       : (eligibleOptions[0]?.id ?? "");
   const option = REDEMPTION_OPTIONS.find((item) => item.id === optionId);
-  const choices = option ? getRedemptionAmountChoices(option, availablePoints) : [];
+  const choices = option ? getRedemptionAmountChoices(option, availablePoints, rewardSettings) : [];
   const details: Record<string, string> = {};
 
   if (option) {
@@ -62,6 +63,7 @@ export function RedemptionRequestForm({
   totalPoints,
   requests,
   profile,
+  rewardSettings,
   accountOnHold = false,
   initialOptionId,
   standalone = false,
@@ -69,16 +71,17 @@ export function RedemptionRequestForm({
   totalPoints: number;
   requests: RedemptionRequest[];
   profile: Pick<PanelistDashboardProfile, "email" | "phone" | "firstName" | "lastName">;
+  rewardSettings: RewardSettings;
   accountOnHold?: boolean;
   initialOptionId?: string;
   standalone?: boolean;
 }) {
   const router = useRouter();
-  const unlocked = canAccessRedemption(totalPoints);
+  const unlocked = canAccessRedemption(totalPoints, rewardSettings);
   const availablePoints = getAvailablePoints(totalPoints, requests);
   const eligibleOptions = useMemo(
-    () => getEligibleRedemptionOptions(totalPoints, requests),
-    [totalPoints, requests]
+    () => getEligibleRedemptionOptions(totalPoints, requests, rewardSettings),
+    [totalPoints, requests, rewardSettings]
   );
   const optionChoices = useMemo(() => {
     if (standalone && unlocked) return REDEMPTION_OPTIONS;
@@ -86,13 +89,15 @@ export function RedemptionRequestForm({
   }, [standalone, unlocked, eligibleOptions]);
 
   const initialState = useMemo(
-    () => buildInitialFormState(initialOptionId, totalPoints, requests, profile),
-    [initialOptionId, totalPoints, requests, profile]
+    () => buildInitialFormState(initialOptionId, totalPoints, requests, profile, rewardSettings),
+    [initialOptionId, totalPoints, requests, profile, rewardSettings]
   );
 
   const [optionId, setOptionId] = useState<string>(initialState.optionId);
   const selectedOption = REDEMPTION_OPTIONS.find((option) => option.id === optionId);
-  const amountChoices = selectedOption ? getRedemptionAmountChoices(selectedOption, availablePoints) : [];
+  const amountChoices = selectedOption
+    ? getRedemptionAmountChoices(selectedOption, availablePoints, rewardSettings)
+    : [];
 
   const [amountBz, setAmountBz] = useState(initialState.amountBz);
   const [customAmountBz, setCustomAmountBz] = useState("");
@@ -107,7 +112,7 @@ export function RedemptionRequestForm({
     : Number.parseFloat(amountBz);
 
   const selectedPoints =
-    Number.isFinite(selectedAmount) && selectedAmount > 0 ? bzToPoints(selectedAmount) : null;
+    Number.isFinite(selectedAmount) && selectedAmount > 0 ? bzToPoints(selectedAmount, rewardSettings) : null;
 
   const updateDetail = (name: string, value: string) => {
     setDetails((current) => ({ ...current, [name]: value }));
@@ -126,7 +131,7 @@ export function RedemptionRequestForm({
       return;
     }
 
-    const choices = getRedemptionAmountChoices(option, availablePoints);
+    const choices = getRedemptionAmountChoices(option, availablePoints, rewardSettings);
     if (choices.length > 0) {
       setAmountBz(String(choices[0].amountBz));
     }
@@ -200,8 +205,8 @@ export function RedemptionRequestForm({
       <DashboardCard className="border-dashed border-zinc-300 bg-zinc-50/80">
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
         <p className={`text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${standalone ? "" : "mt-2"}`}>
-          Redemption unlocks at <strong>{REDEMPTION_MINIMUM_POINTS} points ({formatBz(20)})</strong>. You currently
-          have <strong>{totalPoints} points</strong> ({formatBz(pointsToBz(totalPoints))}). {REDEMPTION_RATE_LABEL} —
+          Redemption unlocks at <strong>{rewardSettings.redemptionMinimumPoints} points ({formatBz(redemptionMinimumBz(rewardSettings))})</strong>. You currently
+          have <strong>{totalPoints} points</strong> ({formatBz(pointsToBz(totalPoints, rewardSettings))}). {redemptionRateLabel(rewardSettings)} —
           return to rewards to see what you can redeem and how many points each amount needs.
         </p>
       </DashboardCard>
@@ -214,7 +219,7 @@ export function RedemptionRequestForm({
         <SectionHeading as="h3">Redeem points</SectionHeading>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           You have reached the first redemption milestone, but your available balance is{" "}
-          <strong>{availablePoints} points</strong> ({formatBz(pointsToBz(availablePoints))})
+          <strong>{availablePoints} points</strong> ({formatBz(pointsToBz(availablePoints, rewardSettings))})
           {requests.some((request) => request.status === "pending" || request.status === "approved")
             ? " because points are reserved on pending requests."
             : "."}{" "}
@@ -233,7 +238,7 @@ export function RedemptionRequestForm({
         <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
           <SectionHeading as="h3">Redeem points</SectionHeading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-            {REDEMPTION_RATE_LABEL}. Submit your details for the reward you want — requests are reviewed before payout.
+            {redemptionRateLabel(rewardSettings)}. Submit your details for the reward you want — requests are reviewed before payout.
           </p>
         </div>
       ) : null}
@@ -265,9 +270,9 @@ export function RedemptionRequestForm({
 
         {insufficientAvailable ? (
           <DashboardAlert tone="info" title="Insufficient available points">
-            You need at least {selectedOption ? bzToPoints(selectedOption.minAmountBz) : REDEMPTION_MINIMUM_POINTS}{" "}
+            You need at least {selectedOption ? bzToPoints(selectedOption.minAmountBz, rewardSettings) : rewardSettings.redemptionMinimumPoints}{" "}
             available points for this option. You currently have {availablePoints} pts (
-            {formatBz(pointsToBz(availablePoints))}) available
+            {formatBz(pointsToBz(availablePoints, rewardSettings))}) available
             {requests.some((request) => request.status === "pending" || request.status === "approved")
               ? " — some points may be reserved on pending requests."
               : "."}
@@ -280,7 +285,7 @@ export function RedemptionRequestForm({
               <Field
                 label="Amount to pay toward bill"
                 required
-                hint={`Minimum ${formatBz(20)}. Enter the bill amount you want paid (up to your available balance of ${formatBz(pointsToBz(availablePoints))}).`}
+                hint={`Minimum ${formatBz(20)}. Enter the bill amount you want paid (up to your available balance of ${formatBz(pointsToBz(availablePoints, rewardSettings))}).`}
                 error={errors.amountBz}
                 id="redemption-custom-amount"
               >
@@ -319,6 +324,7 @@ export function RedemptionRequestForm({
                 amountBz={selectedAmount}
                 points={selectedPoints}
                 availablePoints={availablePoints}
+                rewardSettings={rewardSettings}
               />
             ) : null}
 
@@ -404,18 +410,20 @@ function OptionSummary({
   amountBz,
   points,
   availablePoints,
+  rewardSettings,
 }: {
   option: RedemptionOption;
   amountBz: number;
   points: number;
   availablePoints: number;
+  rewardSettings: RewardSettings;
 }) {
   return (
     <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
       <p className="font-semibold">{option.label}</p>
       <p className="mt-1 text-teal-800 dark:text-teal-200">
         {formatBz(amountBz)} · {points} points will be reserved from your balance ({availablePoints} pts /{" "}
-        {formatBz(pointsToBz(availablePoints))} available).
+        {formatBz(pointsToBz(availablePoints, rewardSettings))} available).
       </p>
     </div>
   );

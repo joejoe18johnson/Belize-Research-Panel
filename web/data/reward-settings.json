@@ -1,0 +1,9 @@
+{
+  "registrationRewardPoints": 25,
+  "verificationRewardPoints": 50,
+  "redemptionMinimumPoints": 500,
+  "pointsPerBzDollar": 25,
+  "surveyRewardPresets": [100, 150, 200],
+  "updatedAt": "2026-06-17T00:00:00.000Z",
+  "updatedBy": "system"
+}

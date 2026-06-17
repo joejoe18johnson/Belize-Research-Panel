@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-export const PAGE_SIZE_OPTIONS = [10, 20, 30, 40] as const;
+export const DEFAULT_PAGE_SIZE = 20 as const;
+export const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
 export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
 
-export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption = 10) {
+export function useTablePagination<T>(rows: T[], defaultPageSize: PageSizeOption = DEFAULT_PAGE_SIZE) {
   const [pageSize, setPageSize] = useState<PageSizeOption>(defaultPageSize);
   const [page, setPage] = useState(1);
 

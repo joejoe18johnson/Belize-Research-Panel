@@ -2,6 +2,7 @@ import { formatDobDisplay } from "./dob";
 import type { NotificationReadState } from "./notification-state";
 import type { RedemptionRequest } from "./reward-redemption";
 import { formatBz } from "./reward-redemption";
+import { DEFAULT_REWARD_SETTINGS, type RewardSettings } from "./reward-settings";
 import { redemptionNotificationId } from "./payout-panelist-notify";
 import { payoutShortId } from "./admin-payout-display";
 import type { PanelistRow } from "./panelists";
@@ -143,10 +144,13 @@ export function panelistRowToDashboardProfile(row: PanelistRow): PanelistDashboa
   };
 }
 
-export function calculateMvpRewardPoints(profile: Pick<PanelistDashboardProfile, "verificationStatus">): DashboardRewardSummary {
+export function calculateMvpRewardPoints(
+  profile: Pick<PanelistDashboardProfile, "verificationStatus">,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
+): DashboardRewardSummary {
   const verified = profile.verificationStatus.toLowerCase() === "verified";
-  const registrationPoints = 25;
-  const verificationPoints = verified ? 50 : 0;
+  const registrationPoints = settings.registrationRewardPoints;
+  const verificationPoints = verified ? settings.verificationRewardPoints : 0;
   const surveyPoints = 0;
   const totalPointsToDate = registrationPoints + verificationPoints + surveyPoints;
 
