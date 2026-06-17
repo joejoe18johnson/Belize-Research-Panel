@@ -1,7 +1,12 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import type { RedemptionOptionId, RedemptionRequest, RedemptionRequestStatus } from "./reward-redemption";
+import type {
+  PayoutProcessAction,
+  RedemptionOptionId,
+  RedemptionRequest,
+  RedemptionRequestStatus,
+} from "./reward-redemption";
 import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "redemption-requests.json");
@@ -74,10 +79,30 @@ export async function createRedemptionRequest(input: {
   return request;
 }
 
+export async function loadAllRedemptionRequests(): Promise<RedemptionRequest[]> {
+  const store = await loadStore();
+  return Object.values(store).flat();
+}
+
+export async function findRedemptionRequestById(
+  requestId: string
+): Promise<{ email: string; request: RedemptionRequest } | null> {
+  const id = cleanText(requestId);
+  if (!id) return null;
+
+  const store = await loadStore();
+  for (const [email, requests] of Object.entries(store)) {
+    const request = requests.find((entry) => entry.id === id);
+    if (request) return { email, request };
+  }
+  return null;
+}
+
 export async function updateRedemptionRequestStatus(
   email: string,
   requestId: string,
-  status: RedemptionRequestStatus
+  status: RedemptionRequestStatus,
+  options: { processedBy?: string } = {}
 ): Promise<RedemptionRequest | null> {
   const key = normalizeEmail(email);
   const id = cleanText(requestId);
@@ -92,10 +117,43 @@ export async function updateRedemptionRequestStatus(
     ...current[index],
     status,
     updatedAt: new Date().toISOString(),
+    ...(options.processedBy ? { processedBy: options.processedBy } : {}),
   };
   current[index] = updated;
   store[key] = current;
   await saveStore(store);
 
   return updated;
+}
+
+const ACTION_STATUS: Record<PayoutProcessAction, RedemptionRequestStatus> = {
+  start: "approved",
+  complete: "fulfilled",
+  reject: "rejected",
+};
+
+const ALLOWED_TRANSITIONS: Record<RedemptionRequestStatus, PayoutProcessAction[]> = {
+  pending: ["start", "reject"],
+  approved: ["complete", "reject"],
+  fulfilled: [],
+  rejected: [],
+};
+
+export async function processRedemptionRequest(input: {
+  requestId: string;
+  action: PayoutProcessAction;
+  processedBy?: string;
+}): Promise<RedemptionRequest | null> {
+  const located = await findRedemptionRequestById(input.requestId);
+  if (!located) return null;
+
+  const { email, request } = located;
+  const allowed = ALLOWED_TRANSITIONS[request.status] ?? [];
+  if (!allowed.includes(input.action)) {
+    throw new Error("invalid_transition");
+  }
+
+  return updateRedemptionRequestStatus(email, request.id, ACTION_STATUS[input.action], {
+    processedBy: input.processedBy,
+  });
 }

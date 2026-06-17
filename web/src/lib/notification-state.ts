@@ -56,6 +56,10 @@ export async function setNotificationRead(
   return current;
 }
 
+export async function markNotificationUnread(email: string, notificationId: string): Promise<NotificationReadState> {
+  return setNotificationRead(email, notificationId, false);
+}
+
 export async function markAllNotificationsRead(
   email: string,
   notificationIds: string[]

@@ -7,6 +7,7 @@ import {
   getPendingPhoneForApproval,
 } from "@/lib/accounts";
 import { updatePanelistPhone } from "@/lib/panelists";
+import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
 import { cleanText } from "@/lib/validation";
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Could not clear phone change request." }, { status: 500 });
     }
 
+    await markAdminNotificationsRead([adminNotificationId("Phone change", email)]);
+
+    revalidatePath("/admin", "layout");
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/account-on-hold");

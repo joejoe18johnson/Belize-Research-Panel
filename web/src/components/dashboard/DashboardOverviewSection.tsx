@@ -22,6 +22,7 @@ import {
   SectionHeading,
   StatCard,
 } from "./DashboardShell";
+import { DASHBOARD_QUICK_SECTIONS } from "./dashboard-sections";
 import { UserAvatar } from "./UserAvatar";
 import { isAccountApproved, VerifiedCheckBadge, VerifiedStatusPill } from "./VerifiedCheckBadge";
 import { dashboardHeroCardClass } from "@/lib/brand";
@@ -34,13 +35,7 @@ function verificationTone(status: string): "default" | "success" | "warning" {
   return "default";
 }
 
-const QUICK_LINKS = [
-  { href: "/dashboard/surveys", label: "Surveys", description: "Inbox and completed studies" },
-  { href: "/dashboard/profile", label: "Profile", description: "Registration and contact details" },
-  { href: "/dashboard/verification", label: "Verification Center", description: "Phone, ID, and verification status" },
-  { href: "/dashboard/notifications", label: "Notifications", description: "Verification and survey updates" },
-  { href: "/dashboard/rewards", label: "Rewards", description: "Points and redemption info" },
-] as const;
+const QUICK_LINKS = DASHBOARD_QUICK_SECTIONS;
 
 function SurveyPreviewRow({ survey }: { survey: PanelistSurvey }) {
   const overdue = isSurveyOverdue(survey);
@@ -208,10 +203,19 @@ export function DashboardOverviewSection({
         </DashboardCard>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {QUICK_LINKS.map((link) => (
-          <QuickLinkCard key={link.href} {...link} />
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {QUICK_LINKS.map((link) => {
+          const Icon = link.icon;
+          return (
+            <QuickLinkCard
+              key={link.href}
+              href={link.href}
+              label={link.label}
+              description={link.description}
+              icon={<Icon className="h-5 w-5" />}
+            />
+          );
+        })}
       </div>
     </div>
   );

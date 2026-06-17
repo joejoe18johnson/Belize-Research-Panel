@@ -1,6 +1,8 @@
 import { AdminPayoutsDashboard } from "@/components/admin/queues/AdminPayoutsDashboard";
 import { buildPayoutQueueRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
+import { unreadNewPayoutIds } from "@/lib/admin-nav-badges";
+import { loadAdminReadState } from "@/lib/admin-read-state";
 
 export const metadata = {
   title: "Payouts | Admin",
@@ -8,5 +10,10 @@ export const metadata = {
 
 export default async function AdminPayoutsPage() {
   const hub = await loadAdminDataHub();
-  return <AdminPayoutsDashboard rows={buildPayoutQueueRows(hub)} />;
+  const readState = await loadAdminReadState();
+  const unreadPayoutIds = unreadNewPayoutIds(hub, readState);
+
+  return (
+    <AdminPayoutsDashboard rows={buildPayoutQueueRows(hub)} unreadPayoutIds={unreadPayoutIds} />
+  );
 }

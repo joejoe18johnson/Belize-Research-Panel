@@ -1,5 +1,6 @@
 import { ProfileSectionClient } from "@/components/dashboard/ProfileSectionClient";
 import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
+import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireRegisteredPanelistSession } from "@/lib/dashboard-access";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { profileContactFromRow, profileUpdateFormFromRow } from "@/lib/profile-update";
@@ -26,11 +27,15 @@ export default async function DashboardProfilePage({
   const initialForm = profileUpdateFormFromRow(panelist);
   const contact = profileContactFromRow(panelist, account.email);
 
+  const section = dashboardSectionByHref("/dashboard/profile");
+  const SectionIcon = section?.icon;
+
   return (
     <>
       <DashboardPageHeader
         title="Profile"
         description="View and update your profile. Biographical details stay locked; email and phone changes require administrator approval."
+        icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />
       <ProfileSectionClient
         profile={profile}

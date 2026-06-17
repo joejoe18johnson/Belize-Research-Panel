@@ -271,16 +271,34 @@ export function PageIntro({
   eyebrow,
   title,
   description,
+  action,
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  action?: ReactNode;
 }) {
   return (
-    <div className="border-l-4 border-teal-600 pl-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">{eyebrow}</p>
-      <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{title}</h1>
-      <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{description}</p>
+    <div className="flex flex-wrap items-start justify-between gap-4 border-l-4 border-teal-600 pl-4">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">{eyebrow}</p>
+        <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{title}</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{description}</p>
+      </div>
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
+  );
+}
+
+export function adminNewItemRowClass(isNew: boolean, base = ""): string {
+  if (!isNew) return base;
+  return [base, "bg-emerald-50 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100/70"].filter(Boolean).join(" ");
+}
+
+export function AdminNewBadge({ label = "New" }: { label?: string }) {
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+      {label}
+    </span>
   );
 }

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { RedemptionOptionId } from "@/lib/reward-redemption";
-import type { RedemptionRequest } from "@/lib/reward-redemption";
+import type { RedemptionOption, RedemptionRequest } from "@/lib/reward-redemption";
 import {
   REDEMPTION_MINIMUM_POINTS,
   REDEMPTION_OPTIONS,
@@ -16,51 +15,15 @@ import {
   BoltIcon,
   BuildingLibraryIcon,
   CheckCircleIcon,
-  GiftIcon,
   PhoneIcon,
 } from "./DashboardIcons";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 
-function statusLabel(status: RedemptionRequest["status"]): string {
-  switch (status) {
-    case "pending":
-      return formatHeadingCase("Pending review");
-    case "approved":
-      return formatHeadingCase("Approved");
-    case "fulfilled":
-      return formatHeadingCase("Fulfilled");
-    case "rejected":
-      return formatHeadingCase("Not approved");
-    default:
-      return formatHeadingCase(status);
-  }
-}
-
-function statusTone(status: RedemptionRequest["status"]): string {
-  switch (status) {
-    case "fulfilled":
-      return "bg-emerald-50 text-emerald-800 border-emerald-200";
-    case "approved":
-      return "bg-teal-50 text-teal-800 border-teal-200";
-    case "rejected":
-      return "bg-red-50 text-red-800 border-red-200";
-    default:
-      return "bg-amber-50 text-amber-800 border-amber-200";
-  }
-}
-
-const REDEMPTION_OPTION_ICONS: Record<
-  RedemptionOptionId,
-  { icon: ReactNode; tone: string }
-> = {
+const REDEMPTION_OPTION_ICONS: Record<RedemptionOption["id"], { icon: ReactNode; tone: string }> = {
   mobile_top_up: {
     icon: <PhoneIcon className="h-5 w-5" />,
     tone: "bg-teal-100 text-teal-800",
-  },
-  gift_card: {
-    icon: <GiftIcon className="h-5 w-5" />,
-    tone: "bg-amber-100 text-amber-800",
   },
   bank_transfer: {
     icon: <BuildingLibraryIcon className="h-5 w-5" />,
@@ -72,7 +35,7 @@ const REDEMPTION_OPTION_ICONS: Record<
   },
 };
 
-function RedemptionOptionIcon({ optionId }: { optionId: RedemptionOptionId }) {
+function RedemptionOptionIcon({ optionId }: { optionId: RedemptionOption["id"] }) {
   const { icon, tone } = REDEMPTION_OPTION_ICONS[optionId];
 
   return (
@@ -228,37 +191,3 @@ export function RedemptionOptionsCatalog({
   );
 }
 
-export function RedemptionRequestHistory({ requests }: { requests: RedemptionRequest[] }) {
-  if (requests.length === 0) return null;
-
-  return (
-    <DashboardCard>
-      <SectionHeading as="h3" className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
-        Your redemption requests
-      </SectionHeading>
-      <ul className="mt-4 space-y-3">
-        {requests.map((request) => (
-          <li key={request.id} className="rounded-xl border border-zinc-200 px-4 py-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold text-zinc-900">{request.optionLabel}</p>
-                <p className="mt-0.5 text-sm text-zinc-600">
-                  {request.points} points · {request.valueLabel}
-                  {request.amountBz ? ` (${formatBz(request.amountBz)})` : ""}
-                </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Submitted {new Date(request.submittedAt).toLocaleDateString("en-BZ", { dateStyle: "medium" })}
-                </p>
-              </div>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(request.status)}`}
-              >
-                {statusLabel(request.status)}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </DashboardCard>
-  );
-}

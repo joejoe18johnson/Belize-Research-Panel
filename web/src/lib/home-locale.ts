@@ -9,11 +9,11 @@ export const HOME_COPY = {
     eyebrow: "Exclusive research panel · earn rewards",
     headline: "Share your opinion. Get rewarded.",
     description:
-      "Qualified panelists earn points for every survey they complete — then redeem for cash, mobile phone credit, gift cards, utility credit, and more. Join Belize's trusted platform for public opinion polling, market research, and governance studies.",
+      "Qualified panelists earn points for every survey they complete — then redeem for cash, mobile phone credit, utility credit, and more. Join Belize's trusted platform for public opinion polling, market research, and governance studies.",
     rewardsBadge: "Qualified panelists get paid for their opinions",
     rewardsHeadline: "Turn your views into real rewards",
     rewardsDescription:
-      "Complete verified surveys matched to your profile and stack points toward redemptions you can actually use in Belize — cash to your bank, phone credit on DigiCell or Smart!, gift cards, utility top-ups, and more.",
+      "Complete verified surveys matched to your profile and stack points toward redemptions you can actually use in Belize — cash to your bank, phone credit on DigiCell or Smart!, utility top-ups, and more.",
     rewardsCta: "Register & start earning",
     rewardPerks: [
       {
@@ -25,8 +25,8 @@ export const HOME_COPY = {
         body: "Top up DigiCell or Smart! with airtime credit in convenient BZ$ increments.",
       },
       {
-        title: "Gift cards & utility credit",
-        body: "Choose gift cards, utility bill credit, and other practical redemption options.",
+        title: "Utility credit & more",
+        body: "Choose utility bill credit, bank payout, and other practical redemption options.",
       },
       {
         title: "More coming",
@@ -38,7 +38,7 @@ export const HOME_COPY = {
     features: [
       {
         title: "Earn real rewards",
-        body: "Qualified panelists earn points on every completed survey — redeem for cash, phone credit, gift cards, and more.",
+        body: "Qualified panelists earn points on every completed survey — redeem for cash, phone credit, utility credit, and more.",
       },
       {
         title: "Verified eligibility",
@@ -63,11 +63,11 @@ export const HOME_COPY = {
     eyebrow: "Panel de investigación exclusivo · gane recompensas",
     headline: "Comparta su opinión. Reciba recompensas.",
     description:
-      "Los panelistas calificados ganan puntos por cada encuesta completada — y los canjean por efectivo, crédito telefónico, tarjetas de regalo, crédito de servicios públicos y más. Únase a la plataforma de confianza de Belice para encuestas de opinión pública, investigación de mercado y estudios de gobernanza.",
+      "Los panelistas calificados ganan puntos por cada encuesta completada — y los canjean por efectivo, crédito telefónico, crédito de servicios públicos y más. Únase a la plataforma de confianza de Belice para encuestas de opinión pública, investigación de mercado y estudios de gobernanza.",
     rewardsBadge: "Los panelistas calificados reciben pago por sus opiniones",
     rewardsHeadline: "Convierta sus opiniones en recompensas reales",
     rewardsDescription:
-      "Complete encuestas verificadas acordes a su perfil y acumule puntos para canjearlos en Belice: efectivo a su banco, crédito telefónico en DigiCell o Smart!, tarjetas de regalo, recargas de servicios públicos y más.",
+      "Complete encuestas verificadas acordes a su perfil y acumule puntos para canjearlos en Belice: efectivo a su banco, crédito telefónico en DigiCell o Smart!, recargas de servicios públicos y más.",
     rewardsCta: "Registrarse y empezar a ganar",
     rewardPerks: [
       {
@@ -79,8 +79,8 @@ export const HOME_COPY = {
         body: "Recargue DigiCell o Smart! con crédito de tiempo aire en incrementos de BZ$.",
       },
       {
-        title: "Tarjetas de regalo y servicios",
-        body: "Elija tarjetas de regalo, crédito de servicios públicos y otras opciones prácticas.",
+        title: "Servicios públicos y más",
+        body: "Elija crédito de servicios públicos, pago bancario y otras opciones prácticas.",
       },
       {
         title: "Más por venir",
@@ -92,7 +92,7 @@ export const HOME_COPY = {
     features: [
       {
         title: "Recompensas reales",
-        body: "Los panelistas calificados ganan puntos en cada encuesta completada — canjeables por efectivo, crédito telefónico, tarjetas de regalo y más.",
+        body: "Los panelistas calificados ganan puntos en cada encuesta completada — canjeables por efectivo, crédito telefónico, crédito de servicios públicos y más.",
       },
       {
         title: "Elegibilidad verificada",

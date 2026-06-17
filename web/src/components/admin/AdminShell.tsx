@@ -11,21 +11,22 @@ import {
   type AdminModule,
 } from "@/lib/admin-modules";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
+import type { AdminNavBadges } from "@/lib/admin-nav-badges";
 import { STAFF_ROLE_LABELS, staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
-function statusBadge(status?: AdminModule["status"]) {
-  if (status === "working") return "bg-emerald-100 text-emerald-800";
-  if (status === "partial") return "bg-amber-100 text-amber-900";
-  if (status === "streamlit") return "bg-violet-100 text-violet-900";
-  return "bg-zinc-100 text-zinc-600";
-}
+function AdminNavNotificationBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  const label = count > 99 ? "99+" : String(count);
 
-function statusLabel(status?: AdminModule["status"]) {
-  if (status === "working") return "Live";
-  if (status === "partial") return "Partial";
-  if (status === "streamlit") return "Streamlit";
-  return "Planned";
+  return (
+    <span
+      className="mt-0.5 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white"
+      aria-label={`${count} pending`}
+    >
+      {label}
+    </span>
+  );
 }
 
 function moduleHref(module: AdminModule): string {
@@ -39,12 +40,23 @@ function isModuleActive(pathname: string, module: AdminModule): boolean {
     if (module.href === "/admin/campaigns") {
       return pathname === "/admin/campaigns" || (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create");
     }
+    if (module.href === "/admin/payouts") {
+      return pathname === "/admin/payouts" || pathname.startsWith("/admin/payouts/");
+    }
     return pathname.startsWith(`${module.href}/`);
   }
   return pathname === `/admin/modules/${module.slug}`;
 }
 
-export function AdminShell({ children, session }: { children: ReactNode; session: AdminSession }) {
+export function AdminShell({
+  children,
+  session,
+  navBadges = {},
+}: {
+  children: ReactNode;
+  session: AdminSession;
+  navBadges?: AdminNavBadges;
+}) {
   const pathname = usePathname();
   const accessibleModules = staffAccessibleModules(session.role);
   const accessibleSlugs = new Set(accessibleModules.map((module) => module.slug));
@@ -83,14 +95,17 @@ export function AdminShell({ children, session }: { children: ReactNode; session
                         const active = isModuleActive(pathname, module);
                         const href = moduleHref(module);
                         const external = Boolean(module.externalHref);
+                        const pendingCount = navBadges[module.slug] ?? 0;
 
                         return (
-                          <li key={module.slug}>
+                          <li key={module.slug} className={module.parentSlug ? "pl-4" : undefined}>
                             <Link
                               href={href}
                               target={external ? "_blank" : undefined}
                               rel={external ? "noopener noreferrer" : undefined}
                               className={`flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-sm transition ${
+                                module.parentSlug ? "py-2" : ""
+                              } ${
                                 active
                                   ? "bg-teal-700 text-white shadow-sm"
                                   : "text-teal-50/90 hover:bg-white/10 hover:text-white"
@@ -98,14 +113,10 @@ export function AdminShell({ children, session }: { children: ReactNode; session
                               aria-current={active ? "page" : undefined}
                             >
                               <AdminNavIcon module={module} />
-                              <span className="min-w-0 flex-1 leading-snug">{module.label}</span>
-                              {module.status ? (
-                                <span
-                                  className={`mt-0.5 hidden shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide xl:inline ${statusBadge(module.status)}`}
-                                >
-                                  {statusLabel(module.status)}
-                                </span>
-                              ) : null}
+                              <span className={`min-w-0 flex-1 leading-snug ${module.parentSlug ? "text-[13px]" : ""}`}>
+                                {module.label}
+                              </span>
+                              <AdminNavNotificationBadge count={pendingCount} />
                             </Link>
                           </li>
                         );

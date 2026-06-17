@@ -1,11 +1,13 @@
 import type { DashboardRewardSummary } from "@/lib/panelist-dashboard";
 import type { RedemptionRequest } from "@/lib/reward-redemption";
+import type { RewardsHistoryEntry } from "@/lib/rewards-history";
 import { REDEMPTION_MINIMUM_POINTS, REDEMPTION_RATE_LABEL, getAvailablePoints, getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { GiftIcon, StarIcon } from "./DashboardIcons";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 import { DevPointsEditor } from "./DevPointsEditor";
-import { RedemptionOptionsCatalog, RedemptionRequestHistory } from "./RedemptionOptionsCatalog";
+import { RedemptionOptionsCatalog } from "./RedemptionOptionsCatalog";
+import { RewardsHistory } from "./RewardsHistory";
 
 const REWARD_RULES = [
   { label: "Registration completed", points: "25 points" },
@@ -18,10 +20,12 @@ const REWARD_RULES = [
 export function DashboardRewardsSection({
   rewards,
   redemptionRequests,
+  rewardsHistory,
   showDevPointsEditor = false,
 }: {
   rewards: DashboardRewardSummary;
   redemptionRequests: RedemptionRequest[];
+  rewardsHistory: RewardsHistoryEntry[];
   showDevPointsEditor?: boolean;
 }) {
   const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
@@ -150,7 +154,7 @@ export function DashboardRewardsSection({
 
       <RedemptionOptionsCatalog totalPoints={rewards.totalPoints} requests={redemptionRequests} />
 
-      <RedemptionRequestHistory requests={redemptionRequests} />
+      <RewardsHistory entries={rewardsHistory} />
     </div>
   );
 }

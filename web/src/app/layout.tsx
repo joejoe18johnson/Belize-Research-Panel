@@ -14,7 +14,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Belize Research Panel",
   description:
-    "Qualified panelists earn rewards for sharing their opinions — redeem points for cash, phone credit, gift cards, and more. Public opinion polling, market research, and governance studies in Belize.",
+    "Qualified panelists earn rewards for sharing their opinions — redeem points for cash, phone credit, utility credit, and more. Public opinion polling, market research, and governance studies in Belize.",
 };
 
 export const viewport = {

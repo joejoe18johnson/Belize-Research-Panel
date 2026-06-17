@@ -75,21 +75,34 @@ export function DashboardPageHeader({
   title,
   description,
   action,
+  icon,
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
       <div className="min-w-0 flex-1 border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Belize Research Panel</p>
-        <h1 className="mt-1 text-xl font-bold tracking-tight text-teal-950 sm:text-2xl md:text-3xl">
-          {formatHeadingCase(title)}
-        </h1>
-        {description ? (
-          <p className={`mt-2 ${MEDIUM_CONTENT_MAX} text-sm leading-relaxed text-zinc-600`}>{formatHeadingCase(description)}</p>
-        ) : null}
+        <div className="mt-1 flex items-start gap-3">
+          {icon ? (
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
+              {icon}
+            </span>
+          ) : null}
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold tracking-tight text-teal-950 sm:text-2xl md:text-3xl">
+              {formatHeadingCase(title)}
+            </h1>
+            {description ? (
+              <p className={`mt-2 ${MEDIUM_CONTENT_MAX} text-sm leading-relaxed text-zinc-600`}>
+                {formatHeadingCase(description)}
+              </p>
+            ) : null}
+          </div>
+        </div>
       </div>
       {action ? (
         <div className="w-full shrink-0 sm:w-auto [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_button]:w-full sm:[&_a]:inline-flex sm:[&_a]:w-auto sm:[&_button]:w-auto">
@@ -265,18 +278,27 @@ export function QuickLinkCard({
   href,
   label,
   description,
+  icon,
 }: {
   href: string;
   label: string;
   description: string;
+  icon: ReactNode;
 }) {
   return (
     <Link
       href={href}
       className="group rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10"
     >
-      <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
-      <p className="mt-1 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800">
+          {icon}
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
+        </div>
+      </div>
     </Link>
   );
 }
