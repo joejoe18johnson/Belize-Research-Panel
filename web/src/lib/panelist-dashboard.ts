@@ -180,8 +180,10 @@ export function buildDashboardNotifications(
   notifications.push({
     id: "rewards",
     title: "Rewards program",
-    body: "Points for registration and verification are tracked below. Survey and interview rewards will be added in the next phase.",
-    dateLabel: "Coming soon",
+    body: verified
+      ? "Points for registration, verification, and completed surveys are tracked on your Rewards page. Redeem when you reach 500 points (BZ$20)."
+      : "Registration points are tracked below. Verification and survey rewards apply once your account is verified.",
+    dateLabel: profile.registrationDate,
     priority: "normal",
     unread: isUnread("rewards", false),
   });

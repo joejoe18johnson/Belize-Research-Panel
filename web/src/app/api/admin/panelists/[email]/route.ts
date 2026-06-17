@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { deletePanelistByEmail } from "@/lib/admin-panelist-actions";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { updatePanelistAdminFields } from "@/lib/panelists";
 import { cleanText, validEmail } from "@/lib/validation";
@@ -54,4 +55,23 @@ export async function PATCH(
   }
 
   return NextResponse.json({ ok: true, message: "Record updated successfully." });
+}
+
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ email: string }> }
+) {
+  if (!(await isAdminSessionActive())) {
+    return NextResponse.json({ ok: false, message: "Unauthorized." }, { status: 401 });
+  }
+
+  const { email } = await context.params;
+  const accountEmail = decodeURIComponent(email);
+  const deleted = await deletePanelistByEmail(accountEmail);
+
+  if (!deleted) {
+    return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true, message: "Panelist record deleted." });
 }

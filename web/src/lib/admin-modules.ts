@@ -1,135 +1,136 @@
 import type { AdminModuleContent } from "./admin-module-content";
 import { getAdminModuleContent } from "./admin-module-content";
 
-export type AdminModuleKind = "page" | "external" | "module";
+export type AdminModuleKind = "page" | "module";
 
-export type AdminModuleStatus = "working" | "partial" | "planned";
+export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
 export interface AdminModule {
   slug: string;
   label: string;
   kind: AdminModuleKind;
   href?: string;
+  /** Opens the panelist-facing flow in a new tab when set. */
+  externalHref?: string;
   status?: AdminModuleStatus;
 }
 
-/** Sidebar navigation aligned with the Streamlit MVP in appfiles/app.py */
+/**
+ * Sidebar order matches appfiles/app.py (excluding removed MVP handoff items).
+ * Admin Dashboard is second-to-last; Distribution Engine is last — same as Streamlit MVP.
+ */
 export const ADMIN_MODULES: AdminModule[] = [
-  {
-    slug: "panelist-registration",
-    label: "Panelist Registration",
-    kind: "external",
-    href: "/register",
-    status: "working",
-  },
-  {
-    slug: "panelist-login",
-    label: "Panelist Login",
-    kind: "external",
-    href: "/login",
-    status: "working",
-  },
-  {
-    slug: "rewards-loyalty",
-    label: "Rewards & Loyalty",
-    kind: "module",
-    status: "partial",
-  },
   {
     slug: "survey-distribution",
     label: "Survey Distribution",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/survey-distribution",
+    status: "working",
   },
   {
     slug: "advanced-analytics",
     label: "Advanced Analytics",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/analytics",
+    status: "working",
   },
   {
     slug: "fraud-prevention",
     label: "Fraud Prevention",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/fraud-prevention",
+    status: "working",
   },
   {
     slug: "external-data-import",
     label: "External Data Import & Matching",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/external-data-import",
+    status: "working",
   },
   {
     slug: "client-project-management",
     label: "Client & Project Management",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/client-project-management",
+    status: "working",
   },
   {
     slug: "financial-revenue",
     label: "Financial & Revenue",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/financial-revenue",
+    status: "working",
   },
   {
     slug: "client-reporting",
     label: "Client Reporting Portal",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/client-reporting",
+    status: "working",
   },
   {
     slug: "communication-notifications",
     label: "Communication & Notifications",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/communication-notifications",
+    status: "working",
   },
   {
     slug: "data-protection",
     label: "Data Protection & Compliance",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/data-protection",
+    status: "working",
   },
   {
     slug: "fieldwork-management",
     label: "Fieldwork Management",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/fieldwork-management",
+    status: "working",
   },
   {
     slug: "user-roles",
     label: "User Roles & Permissions",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/user-roles",
+    status: "working",
   },
   {
     slug: "backup-recovery",
     label: "Backup & Recovery",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/backup-recovery",
+    status: "working",
   },
   {
     slug: "system-settings",
     label: "System Settings",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/system-settings",
+    status: "working",
   },
   {
     slug: "api-integrations",
     label: "API & Integrations",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/api-integrations",
+    status: "working",
   },
   {
     slug: "deployment-production",
     label: "Deployment & Production",
-    kind: "module",
-    status: "partial",
+    kind: "page",
+    href: "/admin/deployment-production",
+    status: "working",
   },
   {
     slug: "sample-selection",
     label: "Sample Selection Engine",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/sample-selection",
+    status: "working",
   },
   {
     slug: "admin-dashboard",
@@ -141,8 +142,9 @@ export const ADMIN_MODULES: AdminModule[] = [
   {
     slug: "distribution-engine",
     label: "Distribution Engine",
-    kind: "module",
-    status: "planned",
+    kind: "page",
+    href: "/admin/distribution-engine",
+    status: "working",
   },
 ];
 

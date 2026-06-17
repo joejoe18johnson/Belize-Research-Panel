@@ -1,13 +1,9 @@
-import { promises as fs } from "fs";
-import path from "path";
 import type { PanelistSurvey, PanelistSurveyRecord } from "./panelist-surveys-types";
 import { formatSurveyDate } from "./panelist-surveys-types";
 import { cleanText } from "./validation";
 
 export type { PanelistSurvey, PanelistSurveyRecord, SurveyCategory, SurveyStatus } from "./panelist-surveys-types";
 export { formatSurveyDate, isSurveyOverdue } from "./panelist-surveys-types";
-
-const DATA_FILE = path.join(process.cwd(), "data", "panelist-surveys.json");
 
 function toPanelistSurvey(record: PanelistSurveyRecord): PanelistSurvey {
   return {
@@ -20,13 +16,8 @@ function toPanelistSurvey(record: PanelistSurveyRecord): PanelistSurvey {
 }
 
 async function loadSurveyRecords(): Promise<PanelistSurveyRecord[]> {
-  try {
-    const content = await fs.readFile(DATA_FILE, "utf-8");
-    const parsed = JSON.parse(content) as PanelistSurveyRecord[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  const { loadSurveyRecordsFromFile } = await import("./panelist-surveys-store");
+  return loadSurveyRecordsFromFile();
 }
 
 export async function getPanelistSurveys(email: string): Promise<{
