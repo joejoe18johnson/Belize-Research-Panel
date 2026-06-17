@@ -6,11 +6,23 @@ export const CITIZENSHIP_STATUS = raw.CITIZENSHIP_STATUS as string[];
 
 export const ELIGIBLE_CITIZENSHIP_STATUSES = [
   "Citizen of Belize",
+  "Citizen of Belize living in Belize not registered to vote",
   "Citizen of a Commonwealth country living in Belize",
   "Other resident of Belize",
+  "Other national living in Belize not registered to vote",
+] as const;
+
+export const MARKET_RESEARCH_ONLY_CITIZENSHIP_STATUSES = [
+  "Citizen of Belize living in Belize not registered to vote",
+  "Other national living in Belize not registered to vote",
 ] as const;
 
 export const INELIGIBLE_CITIZENSHIP_STATUSES = ["Foreign national not living in Belize"] as const;
+
+export const CITIZENSHIP_PANEL_INTRO =
+  "The panel is open to citizens of Belize, Commonwealth citizens living in Belize, and other residents of Belize. " +
+  "Belizeans and other nationals residing in Belize who are not registered to vote may still join for market research surveys. " +
+  "Registered voters may also receive political and governance surveys. Foreign nationals living outside Belize cannot register.";
 
 export type EligibleCitizenshipStatus = (typeof ELIGIBLE_CITIZENSHIP_STATUSES)[number];
 export const VOTING_STATUS = raw.VOTING_STATUS as string[];
@@ -113,6 +125,20 @@ export function hasRegisteredCtvQuestion(constituency: string): boolean {
   return values.filter((v) => !["Other", "Prefer not to say"].includes(v)).length > 0;
 }
 
+export function isMarketResearchOnlyCitizenship(citizenshipStatus: string): boolean {
+  return MARKET_RESEARCH_ONLY_CITIZENSHIP_STATUSES.includes(
+    citizenshipStatus as (typeof MARKET_RESEARCH_ONLY_CITIZENSHIP_STATUSES)[number]
+  );
+}
+
+export function mustLiveInBelize(citizenshipStatus: string): boolean {
+  return (
+    citizenshipStatus === "Citizen of a Commonwealth country living in Belize" ||
+    citizenshipStatus === "Other resident of Belize" ||
+    isMarketResearchOnlyCitizenship(citizenshipStatus)
+  );
+}
+
 export function needsVoterRegistrationQuestion(citizenshipStatus: string): boolean {
   return (
     citizenshipStatus === "Citizen of Belize" ||
@@ -121,13 +147,10 @@ export function needsVoterRegistrationQuestion(citizenshipStatus: string): boole
 }
 
 export function getResidenceOptions(citizenshipStatus: string): string[] {
-  if (citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
-    return BELIZE_DISTRICTS;
-  }
   if (citizenshipStatus === "Citizen of Belize") {
     return PLACE_OPTIONS;
   }
-  if (citizenshipStatus === "Other resident of Belize") {
+  if (mustLiveInBelize(citizenshipStatus)) {
     return BELIZE_DISTRICTS;
   }
   return BELIZE_DISTRICTS;

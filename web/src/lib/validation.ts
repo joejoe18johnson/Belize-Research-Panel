@@ -6,6 +6,8 @@ import {
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
   hasRegisteredCtvQuestion,
+  mustLiveInBelize,
+  needsVoterRegistrationQuestion,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
 
@@ -369,11 +371,7 @@ export function validateRegistrationForm(
   }
 
   if (isEligibleCitizenship(data.citizenshipStatus)) {
-    if (
-      (data.citizenshipStatus === "Citizen of Belize" ||
-        data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") &&
-      !data.votingStatus
-    ) {
+    if (needsVoterRegistrationQuestion(data.citizenshipStatus) && !data.votingStatus) {
       errors.votingStatus = "Please indicate your voter registration status.";
     }
   }
@@ -386,12 +384,9 @@ export function validateRegistrationForm(
     }
   }
 
-  if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" && data.placeOfResidence === "Abroad") {
-    errors.placeOfResidence = "Commonwealth citizens must be living in Belize to be eligible under this registration category.";
-  }
-
-  if (data.citizenshipStatus === "Other resident of Belize" && data.placeOfResidence === "Abroad") {
-    errors.placeOfResidence = "Other residents of Belize must currently live in Belize to be eligible.";
+  if (mustLiveInBelize(data.citizenshipStatus) && data.placeOfResidence === "Abroad") {
+    errors.placeOfResidence =
+      "You must currently live in Belize to be eligible under this citizenship / residency category.";
   }
 
   if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
@@ -550,7 +545,7 @@ export function validateProfileUpdateForm(
     if (citizenshipError) errors.citizenshipStatus = citizenshipError;
   }
 
-  if (isEligibleCitizenship(data.citizenshipStatus) && !data.votingStatus) {
+  if (needsVoterRegistrationQuestion(data.citizenshipStatus) && !data.votingStatus) {
     errors.votingStatus = "Please indicate your voter registration status.";
   }
 
@@ -562,12 +557,9 @@ export function validateProfileUpdateForm(
     }
   }
 
-  if (
-    data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" &&
-    data.placeOfResidence === "Abroad"
-  ) {
+  if (mustLiveInBelize(data.citizenshipStatus) && data.placeOfResidence === "Abroad") {
     errors.placeOfResidence =
-      "Commonwealth citizens must be living in Belize to be eligible under this registration category.";
+      "You must currently live in Belize to be eligible under this citizenship / residency category.";
   }
 
   if (!data.placeOfResidence) {

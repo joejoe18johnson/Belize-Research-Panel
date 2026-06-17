@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { CITIZENSHIP_PANEL_INTRO } from "@/lib/constants";
 
 interface CitizenshipEligibilityBannerProps {
   citizenshipStatus: string;
@@ -48,10 +49,7 @@ export function CitizenshipEligibilityBanner({
       <div aria-live="polite">
         <BrandedAlert tone="error" title="Citizenship requirement not met" compact showIcon>
           <p className="font-medium">{citizenshipStatus}</p>
-          <p className="mt-1">
-            Only citizens of Belize, Commonwealth citizens living in Belize, and other qualifying residents of Belize may
-            join the panel. Foreign nationals living outside Belize cannot register.
-          </p>
+          <p className="mt-1">{CITIZENSHIP_PANEL_INTRO}</p>
           <Link
             href="/"
             className="mt-3 inline-flex rounded-lg bg-teal-700 px-4 py-2 text-xs font-semibold text-white hover:bg-teal-800"
@@ -67,9 +65,7 @@ export function CitizenshipEligibilityBanner({
     <div className="mt-4 text-center" aria-live="polite">
       <BrandedAlert tone="error" title="Citizenship requirement not met" showIcon className="px-6 py-8">
         <p className="text-base font-semibold">{citizenshipStatus}</p>
-        <p className="mt-3 font-semibold leading-relaxed">
-          Only citizens of Belize and Commonwealth citizens living in Belize may join the panel.
-        </p>
+        <p className="mt-3 font-semibold leading-relaxed">{CITIZENSHIP_PANEL_INTRO}</p>
         <p className="mt-4">
           You cannot continue registration. Choose a different citizenship status or return home.
         </p>

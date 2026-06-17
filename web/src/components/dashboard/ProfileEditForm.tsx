@@ -20,6 +20,7 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
+  needsVoterRegistrationQuestion,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   POLITICAL_INTERESTS,
@@ -29,7 +30,7 @@ import {
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { ProfileContactDisplay, ProfileUpdateFormData } from "@/lib/profile-update-types";
-import { isEligibleCitizenship, isRegisteredVoter, type FieldErrors } from "@/lib/validation";
+import { isRegisteredVoter, type FieldErrors } from "@/lib/validation";
 import { ProfileContactChangePanel } from "./ProfileContactChangePanel";
 import { SectionHeading } from "./DashboardShell";
 
@@ -63,7 +64,7 @@ export function ProfileEditForm({
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [focusSection]);
 
-  const needsVoterQuestion = isEligibleCitizenship(form.citizenshipStatus);
+  const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
   const needsCommonwealthCountry =
     form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";

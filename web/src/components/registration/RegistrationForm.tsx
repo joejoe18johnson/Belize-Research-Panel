@@ -40,6 +40,7 @@ import {
   getResidenceOptions,
   hasRegisteredCtvQuestion,
   needsVoterRegistrationQuestion,
+  CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
 import {
   initialRegistrationForm,
@@ -387,10 +388,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
       <div id="citizenship-section">
         <FormSection step={1} title="Citizenship / residency">
-          <p className="text-sm text-zinc-600">
-            The panel is open to citizens of Belize, Commonwealth citizens living in Belize, and other residents of
-            Belize who qualify under our eligibility rules. Foreign nationals living outside Belize cannot register.
-          </p>
+          <p className="text-sm text-zinc-600">{CITIZENSHIP_PANEL_INTRO}</p>
           <div className="flex flex-col gap-3">
             {CITIZENSHIP_STATUS.map((status) => (
               <label key={status} className={choiceBoxLabelClass}>
