@@ -198,7 +198,7 @@ function buildExternalDataImport(hub: AdminDataHub): AdminModuleSnapshot {
           .map((row) => ({ district: row.label, count: row.count })),
       },
     ],
-    links: [{ label: "Export panel CSV", href: "/admin/dashboard" }],
+    links: [{ label: "Open panelists register", href: "/admin/panelists" }],
   };
 }
 
@@ -697,7 +697,7 @@ function buildBackup(hub: AdminDataHub): AdminModuleSnapshot {
         })),
       },
     ],
-    links: [{ label: "Export panel CSV", href: "/admin/dashboard" }],
+    links: [{ label: "Open panelists register", href: "/admin/panelists" }],
   };
 }
 

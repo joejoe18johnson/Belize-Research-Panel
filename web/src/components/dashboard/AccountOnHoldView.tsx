@@ -7,19 +7,32 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 export function AccountOnHoldView({ account }: { account: SessionAccount }) {
   const pendingEmail = account.pendingEmail;
   const pendingPhone = account.pendingPhone;
+  const fraudReview = account.holdReason === "fraud_review";
 
   return (
     <div className="w-full space-y-6">
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-amber-950">{formatHeadingCase("Account on hold")}</h1>
         <p className="mt-3 text-sm leading-relaxed text-amber-900">
-          Your panelist account is temporarily on hold while we verify a contact detail change. Dashboard access,
-          surveys, and profile editing are paused until an administrator approves the update.
+          {fraudReview
+            ? "Your panelist account is on hold while an administrator reviews a possible duplicate registration. Dashboard access, surveys, profile editing, and rewards are paused until the review is complete."
+            : "Your panelist account is temporarily on hold while we verify a contact detail change. Dashboard access, surveys, and profile editing are paused until an administrator approves the update."}
         </p>
       </div>
 
       <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
         <h2 className="text-base font-semibold text-zinc-900">{formatHeadingCase("What is pending")}</h2>
+
+        {fraudReview ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+            <p className="font-semibold text-amber-950">{formatHeadingCase("Duplicate review")}</p>
+            <p className="mt-1 text-amber-900">
+              An administrator flagged this account for possible duplicate registration (same name, date of birth, or
+              contact details). No action is required from you right now — we will notify you when the review is
+              complete.
+            </p>
+          </div>
+        ) : null}
 
         {pendingEmail ? (
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm">
@@ -67,7 +80,7 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
           </div>
         ) : null}
 
-        {!pendingEmail && !pendingPhone ? (
+        {!fraudReview && !pendingEmail && !pendingPhone ? (
           <p className="text-sm text-zinc-600">No pending contact changes were found. Try logging in again.</p>
         ) : null}
       </div>

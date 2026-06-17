@@ -1,5 +1,7 @@
 "use client";
 
+import { siteCheckboxClass } from "@/lib/site-controls";
+
 export function FilterMultiSelect({
   label,
   options,
@@ -31,7 +33,7 @@ export function FilterMultiSelect({
                   onChange={() =>
                     onChange(checked ? selected.filter((v) => v !== option) : [...selected, option])
                   }
-                  className="rounded border-zinc-300 text-teal-700"
+                  className={`${siteCheckboxClass} shrink-0`}
                 />
                 <span className="truncate">{option}</span>
               </label>

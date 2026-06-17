@@ -1,5 +1,5 @@
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
-import { getAdminPanelOverview, getUniqueFilterValues } from "@/lib/admin-panelists";
+import { getAdminPanelOverview } from "@/lib/admin-panelists";
 import { loadPanelists } from "@/lib/panelists";
 
 export const metadata = {
@@ -17,16 +17,5 @@ export default async function AdminDashboardPage() {
     );
   }
 
-  return (
-    <AdminDashboardClient
-      rows={rows}
-      overview={getAdminPanelOverview(rows)}
-      filterOptions={{
-        verification: getUniqueFilterValues(rows, "verification_status"),
-        district: getUniqueFilterValues(rows, "district"),
-        constituency: getUniqueFilterValues(rows, "constituency"),
-        voterStatus: getUniqueFilterValues(rows, "voter_status"),
-      }}
-    />
-  );
+  return <AdminDashboardClient overview={getAdminPanelOverview(rows)} />;
 }

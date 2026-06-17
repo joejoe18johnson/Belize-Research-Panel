@@ -5,131 +5,41 @@ export type AdminModuleKind = "page" | "module";
 
 export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
+export type AdminNavSectionId = "panelists" | "research" | "operations" | "platform";
+
+export interface AdminNavSection {
+  id: AdminNavSectionId;
+  label: string;
+}
+
 export interface AdminModule {
   slug: string;
   label: string;
   kind: AdminModuleKind;
   href?: string;
+  section: AdminNavSectionId;
   /** Opens the panelist-facing flow in a new tab when set. */
   externalHref?: string;
   status?: AdminModuleStatus;
 }
 
+export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
+  { id: "panelists", label: "Panelists" },
+  { id: "research", label: "Research" },
+  { id: "operations", label: "Operations" },
+  { id: "platform", label: "Platform" },
+];
+
 /**
  * Sidebar order matches appfiles/app.py (excluding removed MVP handoff items).
- * Admin Dashboard is second-to-last; Distribution Engine is last — same as Streamlit MVP.
  */
 export const ADMIN_MODULES: AdminModule[] = [
   {
-    slug: "survey-distribution",
-    label: "Survey Distribution",
+    slug: "panelists",
+    label: "Panelists",
     kind: "page",
-    href: "/admin/survey-distribution",
-    status: "working",
-  },
-  {
-    slug: "advanced-analytics",
-    label: "Advanced Analytics",
-    kind: "page",
-    href: "/admin/analytics",
-    status: "working",
-  },
-  {
-    slug: "fraud-prevention",
-    label: "Fraud Prevention",
-    kind: "page",
-    href: "/admin/fraud-prevention",
-    status: "working",
-  },
-  {
-    slug: "external-data-import",
-    label: "External Data Import & Matching",
-    kind: "page",
-    href: "/admin/external-data-import",
-    status: "working",
-  },
-  {
-    slug: "client-project-management",
-    label: "Client & Project Management",
-    kind: "page",
-    href: "/admin/client-project-management",
-    status: "working",
-  },
-  {
-    slug: "financial-revenue",
-    label: "Financial & Revenue",
-    kind: "page",
-    href: "/admin/financial-revenue",
-    status: "working",
-  },
-  {
-    slug: "client-reporting",
-    label: "Client Reporting Portal",
-    kind: "page",
-    href: "/admin/client-reporting",
-    status: "working",
-  },
-  {
-    slug: "communication-notifications",
-    label: "Communication & Notifications",
-    kind: "page",
-    href: "/admin/communication-notifications",
-    status: "working",
-  },
-  {
-    slug: "data-protection",
-    label: "Data Protection & Compliance",
-    kind: "page",
-    href: "/admin/data-protection",
-    status: "working",
-  },
-  {
-    slug: "fieldwork-management",
-    label: "Fieldwork Management",
-    kind: "page",
-    href: "/admin/fieldwork-management",
-    status: "working",
-  },
-  {
-    slug: "user-roles",
-    label: "User Roles & Permissions",
-    kind: "page",
-    href: "/admin/user-roles",
-    status: "working",
-  },
-  {
-    slug: "backup-recovery",
-    label: "Backup & Recovery",
-    kind: "page",
-    href: "/admin/backup-recovery",
-    status: "working",
-  },
-  {
-    slug: "system-settings",
-    label: "System Settings",
-    kind: "page",
-    href: "/admin/system-settings",
-    status: "working",
-  },
-  {
-    slug: "api-integrations",
-    label: "API & Integrations",
-    kind: "page",
-    href: "/admin/api-integrations",
-    status: "working",
-  },
-  {
-    slug: "deployment-production",
-    label: "Deployment & Production",
-    kind: "page",
-    href: "/admin/deployment-production",
-    status: "working",
-  },
-  {
-    slug: "sample-selection",
-    label: "Sample Selection Engine",
-    kind: "page",
-    href: "/admin/sample-selection",
+    href: "/admin/panelists",
+    section: "panelists",
     status: "working",
   },
   {
@@ -137,6 +47,39 @@ export const ADMIN_MODULES: AdminModule[] = [
     label: "Admin Dashboard",
     kind: "page",
     href: "/admin/dashboard",
+    section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "fraud-prevention",
+    label: "Fraud Prevention",
+    kind: "page",
+    href: "/admin/fraud-prevention",
+    section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "sample-selection",
+    label: "Sample Selection Engine",
+    kind: "page",
+    href: "/admin/sample-selection",
+    section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "survey-distribution",
+    label: "Survey Distribution",
+    kind: "page",
+    href: "/admin/survey-distribution",
+    section: "research",
+    status: "working",
+  },
+  {
+    slug: "advanced-analytics",
+    label: "Advanced Analytics",
+    kind: "page",
+    href: "/admin/analytics",
+    section: "research",
     status: "working",
   },
   {
@@ -144,12 +87,113 @@ export const ADMIN_MODULES: AdminModule[] = [
     label: "Distribution Engine",
     kind: "page",
     href: "/admin/distribution-engine",
+    section: "research",
+    status: "working",
+  },
+  {
+    slug: "external-data-import",
+    label: "External Data Import & Matching",
+    kind: "page",
+    href: "/admin/external-data-import",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "client-project-management",
+    label: "Client & Project Management",
+    kind: "page",
+    href: "/admin/client-project-management",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "financial-revenue",
+    label: "Financial & Revenue",
+    kind: "page",
+    href: "/admin/financial-revenue",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "client-reporting",
+    label: "Client Reporting Portal",
+    kind: "page",
+    href: "/admin/client-reporting",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "communication-notifications",
+    label: "Communication & Notifications",
+    kind: "page",
+    href: "/admin/communication-notifications",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "fieldwork-management",
+    label: "Fieldwork Management",
+    kind: "page",
+    href: "/admin/fieldwork-management",
+    section: "operations",
+    status: "working",
+  },
+  {
+    slug: "data-protection",
+    label: "Data Protection & Compliance",
+    kind: "page",
+    href: "/admin/data-protection",
+    section: "platform",
+    status: "working",
+  },
+  {
+    slug: "user-roles",
+    label: "User Roles & Permissions",
+    kind: "page",
+    href: "/admin/user-roles",
+    section: "platform",
+    status: "working",
+  },
+  {
+    slug: "backup-recovery",
+    label: "Backup & Recovery",
+    kind: "page",
+    href: "/admin/backup-recovery",
+    section: "platform",
+    status: "working",
+  },
+  {
+    slug: "system-settings",
+    label: "System Settings",
+    kind: "page",
+    href: "/admin/system-settings",
+    section: "platform",
+    status: "working",
+  },
+  {
+    slug: "api-integrations",
+    label: "API & Integrations",
+    kind: "page",
+    href: "/admin/api-integrations",
+    section: "platform",
+    status: "working",
+  },
+  {
+    slug: "deployment-production",
+    label: "Deployment & Production",
+    kind: "page",
+    href: "/admin/deployment-production",
+    section: "platform",
     status: "working",
   },
 ];
 
 export function getAdminModule(slug: string): AdminModule | undefined {
   return ADMIN_MODULES.find((module) => module.slug === slug);
+}
+
+export function getAdminModulesBySection(sectionId: AdminNavSectionId): AdminModule[] {
+  return ADMIN_MODULES.filter((module) => module.section === sectionId);
 }
 
 export function getAdminModuleWithContent(slug: string): {

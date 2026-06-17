@@ -1,5 +1,5 @@
 export type AccountStatus = "active" | "on_hold";
-export type AccountHoldReason = "" | "email_change" | "phone_change" | "email_and_phone";
+export type AccountHoldReason = "" | "email_change" | "phone_change" | "email_and_phone" | "fraud_review";
 
 export interface AccountRecord {
   id: string;

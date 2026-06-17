@@ -18,25 +18,18 @@ export interface MvpAlignmentEntry {
 
 export const MVP_ALIGNMENT: MvpAlignmentEntry[] = [
   {
-    slug: "panelist-registration",
-    mvpLabel: "Panelist Registration",
-    mvpOriginalStatus: "Working MVP",
+    slug: "panelists",
+    mvpLabel: "Panel register",
+    mvpOriginalStatus: "Admin Dashboard (MVP)",
     portalStatus: "working",
-    rationale: "Multi-step registration, eligibility checks, duplicate blocking, and panelists.csv persistence are live at /register.",
-  },
-  {
-    slug: "panelist-login",
-    mvpLabel: "Panelist Login",
-    mvpOriginalStatus: "Working MVP",
-    portalStatus: "working",
-    rationale: "Email/password auth, verified session, and full dashboard exceed MVP read-only profile (profile edit, verification center, surveys, rewards).",
+    rationale: "Dedicated /admin/panelists with filters, paginated tables (25/30/50 rows), row edit/flag/delete, and duplicate review tab.",
   },
   {
     slug: "admin-dashboard",
     mvpLabel: "Admin Dashboard",
     mvpOriginalStatus: "Working MVP",
     portalStatus: "working",
-    rationale: "Overview metrics, filters, duplicate review, CSV export, and record editing match MVP admin dashboard behaviour.",
+    rationale: "Overview metrics and quick links; detailed panelist management lives under Panelists in the sidebar.",
   },
   {
     slug: "fraud-prevention",
