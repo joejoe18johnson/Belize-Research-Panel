@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { UnderReviewRow } from "@/lib/admin-dashboard-metrics";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -22,6 +23,12 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
     );
   }, [rows, search]);
 
+  const incompleteRequirements = rows.filter(
+    (row) =>
+      row.emailRequirement !== "approved" ||
+      row.phoneRequirement !== "approved" ||
+      row.photoIdRequirement !== "approved"
+  ).length;
   const pending = rows.filter((row) => row.verificationStatus === "Pending").length;
   const flagged = rows.filter((row) => row.verificationStatus === "Possible Duplicate").length;
   const onHold = rows.filter((row) => row.accountStatus === "on_hold").length;
@@ -31,12 +38,12 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
       <PageIntro
         eyebrow="Panel review"
         title="Under review"
-        description="Panelists pending verification, flagged as possible duplicates, needing follow-up, or with login accounts on hold."
+        description="Panelists with incomplete email, phone, or photo ID requirements, plus flagged, pending, or on-hold accounts."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total in queue" value={rows.length} />
-        <MetricCard label="Pending verification" value={pending} />
+        <MetricCard label="Requirements incomplete" value={incompleteRequirements} hint="Email, phone, or ID" />
         <MetricCard label="Flagged" value={flagged} />
         <MetricCard label="Accounts on hold" value={onHold} />
       </div>
@@ -69,6 +76,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                 <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Email · Phone · ID</th>
                   <th className="px-4 py-3">Verification</th>
                   <th className="px-4 py-3">Account</th>
                   <th className="px-4 py-3">Reason</th>
@@ -81,6 +89,14 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                   <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
                     <td className="px-4 py-2.5 font-medium text-zinc-800">{row.name}</td>
                     <td className="px-4 py-2.5 text-zinc-700">{row.email}</td>
+                    <td className="px-4 py-2.5">
+                      <RequirementStatusGroup
+                        email={row.emailRequirement}
+                        phone={row.phoneRequirement}
+                        photoId={row.photoIdRequirement}
+                        compact
+                      />
+                    </td>
                     <td className="px-4 py-2.5">{row.verificationStatus}</td>
                     <td className="px-4 py-2.5">
                       {row.accountStatus === "on_hold" ? (

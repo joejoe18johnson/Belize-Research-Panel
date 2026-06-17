@@ -3,6 +3,14 @@ import type { AdminDataHub } from "./admin-data-hub";
 import { duplicateNameDobKey } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import type { RedemptionRequest } from "./reward-redemption";
+import type { RequirementApprovalStatus } from "./panelist-requirements";
+import {
+  assessPanelistRequirements,
+  buildPanelistReviewReasons,
+  panelistRequiresAdminReview,
+  requirementContextFromAccount,
+} from "./panelist-requirements";
+import { requirementContextForPanelist } from "./panelist-requirement-context";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -33,6 +41,9 @@ export interface UnderReviewRow {
   accountStatus: string;
   reason: string;
   registrationDate: string;
+  emailRequirement: RequirementApprovalStatus;
+  phoneRequirement: RequirementApprovalStatus;
+  photoIdRequirement: RequirementApprovalStatus;
 }
 
 export interface NotificationQueueRow {
@@ -100,15 +111,14 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
   const pendingPayouts = redemptionRequests.filter((request) => request.status === "pending").length;
   const approvedPayouts = redemptionRequests.filter((request) => request.status === "approved").length;
 
-  const underReviewTotal = new Set([
-    ...panelists
-      .filter((row) => {
-        const status = cleanText(row.verification_status);
-        return status === "Pending" || status === "Possible Duplicate" || status === "Needs Follow-up";
-      })
-      .map((row) => cleanText(row.email).toLowerCase()),
-    ...onHoldAccounts.map((account) => cleanText(account.email).toLowerCase()),
-  ]).size;
+  const underReviewTotal = hub.panelists.filter((row) => {
+    const email = cleanText(row.email).toLowerCase();
+    const account = hub.accounts.find((item) => cleanText(item.email).toLowerCase() === email);
+    const context = requirementContextFromAccount(account);
+    return panelistRequiresAdminReview(row, context, {
+      accountOnHold: cleanText(account?.account_status) === "on_hold",
+    });
+  }).length;
 
   return {
     total: panelists.length,
@@ -130,77 +140,90 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
   };
 }
 
-export function buildUnderReviewRows(hub: AdminDataHub): UnderReviewRow[] {
+export function buildUnderReviewRows(
+  hub: AdminDataHub,
+  photoUploadUsernames: Set<string> = new Set()
+): UnderReviewRow[] {
   const panelistByEmail = new Map<string, PanelistRow>();
   for (const row of hub.panelists) {
     const email = cleanText(row.email).toLowerCase();
     if (email) panelistByEmail.set(email, row);
   }
 
+  const accountsByEmail = new Map(
+    hub.accounts.map((account) => [cleanText(account.email).toLowerCase(), account] as const)
+  );
+
   const rows = new Map<string, UnderReviewRow>();
 
   for (const row of hub.panelists) {
-    const status = cleanText(row.verification_status);
-    if (status !== "Pending" && status !== "Possible Duplicate" && status !== "Needs Follow-up") continue;
-
     const email = cleanText(row.email).toLowerCase();
     if (!email) continue;
+
+    const account = accountsByEmail.get(email);
+    const context = requirementContextForPanelist(row, accountsByEmail, photoUploadUsernames);
+    const accountOnHold = cleanText(account?.account_status) === "on_hold";
+
+    if (!panelistRequiresAdminReview(row, context, { accountOnHold })) continue;
+
+    const requirements = assessPanelistRequirements(row, context);
+    const reasons = buildPanelistReviewReasons(row, context, { accountOnHold });
 
     rows.set(email, {
       email,
       name: panelistName(row),
-      verificationStatus: status,
+      verificationStatus: cleanText(row.verification_status) || "Pending",
       panelistStatus: cleanText(row.status) || "Active",
-      holdReason: "",
-      accountStatus: "active",
-      reason:
-        status === "Possible Duplicate"
-          ? "Flagged as possible duplicate"
-          : status === "Needs Follow-up"
-            ? "Needs administrator follow-up"
-            : "Verification pending",
+      holdReason: (account?.hold_reason ?? "") as AccountHoldReason,
+      accountStatus: accountOnHold ? "on_hold" : "active",
+      reason: reasons.join("; "),
       registrationDate: cleanText(row.registration_date),
+      emailRequirement: requirements.email,
+      phoneRequirement: requirements.phone,
+      photoIdRequirement: requirements.photoId,
     });
   }
 
   for (const account of hub.accounts) {
     if (cleanText(account.account_status) !== "on_hold") continue;
     const email = cleanText(account.email).toLowerCase();
-    if (!email) continue;
+    if (!email || rows.has(email)) continue;
 
     const panelist = panelistByEmail.get(email);
-    const holdReason = (account.hold_reason ?? "") as AccountHoldReason;
-    const holdLabel =
-      holdReason === "fraud_review"
-        ? "Account on hold — fraud review"
-        : holdReason === "email_change"
-          ? "Account on hold — email change"
-          : holdReason === "phone_change"
-            ? "Account on hold — phone change"
-            : holdReason === "email_and_phone"
-              ? "Account on hold — email and phone change"
-              : "Account on hold";
-
-    const existing = rows.get(email);
-    if (existing) {
-      rows.set(email, {
-        ...existing,
-        holdReason,
-        accountStatus: "on_hold",
-        reason: existing.reason.includes("hold") ? existing.reason : `${existing.reason}; ${holdLabel}`,
-      });
-    } else {
+    if (!panelist) {
       rows.set(email, {
         email,
-        name: panelistName(panelist, account),
-        verificationStatus: cleanText(panelist?.verification_status) || "—",
-        panelistStatus: cleanText(panelist?.status) || "—",
-        holdReason,
+        name: panelistName(undefined, account),
+        verificationStatus: "—",
+        panelistStatus: "—",
+        holdReason: (account.hold_reason ?? "") as AccountHoldReason,
         accountStatus: "on_hold",
-        reason: holdLabel,
-        registrationDate: cleanText(panelist?.registration_date),
+        reason: "Account on hold",
+        registrationDate: "",
+        emailRequirement: "missing",
+        phoneRequirement: "missing",
+        photoIdRequirement: "missing",
       });
+      continue;
     }
+
+    const context = requirementContextForPanelist(panelist, accountsByEmail, photoUploadUsernames);
+    const requirements = assessPanelistRequirements(panelist, context);
+    const reasons = buildPanelistReviewReasons(panelist, context, { accountOnHold: true });
+
+    rows.set(email, {
+      email,
+      name: panelistName(panelist, account),
+      verificationStatus: cleanText(panelist.verification_status) || "—",
+      panelistStatus: cleanText(panelist.status) || "—",
+      holdReason: (account.hold_reason ?? "") as AccountHoldReason,
+      accountStatus: "on_hold",
+      reason: reasons.join("; "),
+      registrationDate: cleanText(panelist.registration_date),
+      emailRequirement: requirements.email,
+      phoneRequirement: requirements.phone,
+      photoIdRequirement: requirements.photoId,
+    });
   }
 
   return [...rows.values()].sort((a, b) => a.name.localeCompare(b.name));
