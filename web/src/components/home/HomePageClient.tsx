@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AdminEntryButton } from "@/components/admin/AdminEntryButton";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
 import {
@@ -46,7 +45,6 @@ export function HomePageClient() {
             <LanguageSwitcher locale={locale} onChange={handleLocaleChange} />
 
             <div className="hidden items-center gap-3 sm:flex">
-              <AdminEntryButton variant="header" />
               <Link
                 href="/login"
                 className="flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
@@ -63,8 +61,7 @@ export function HomePageClient() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 sm:hidden">
-          <AdminEntryButton variant="header" />
+        <div className="mt-4 sm:hidden">
           <div className="grid grid-cols-2 gap-2">
             <Link
               href="/login"
@@ -103,7 +100,6 @@ export function HomePageClient() {
             >
               {t(copy.loginCta)}
             </Link>
-            <AdminEntryButton variant="inline" />
           </div>
         </div>
 

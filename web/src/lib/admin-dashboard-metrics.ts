@@ -89,6 +89,9 @@ export interface PayoutQueueRow {
   status: RedemptionRequest["status"];
   submittedAt: string;
   formattedDate: string;
+  updatedAt: string;
+  formattedUpdatedDate: string;
+  processedBy?: string;
   paymentTitle: string;
   paymentLines: string[];
   paymentFields: { label: string; value: string }[];
@@ -393,28 +396,52 @@ function parseNotificationSortTime(requestedAt: string): number {
   return Number.isNaN(ms) ? 0 : ms;
 }
 
+function mapRedemptionToPayoutRow(request: RedemptionRequest): PayoutQueueRow {
+  const email = cleanText(request.email).toLowerCase();
+  const payment = formatPayoutPaymentDetails(request.optionId, request.details);
+  const processedBy = cleanText(request.processedBy);
+
+  return {
+    id: request.id,
+    shortId: payoutShortId(request.id),
+    email,
+    optionId: request.optionId,
+    optionLabel: request.optionLabel,
+    points: request.points,
+    amountBz: request.amountBz ?? request.points / 25,
+    status: request.status,
+    submittedAt: request.submittedAt,
+    formattedDate: formatAdminPayoutDate(request.submittedAt),
+    updatedAt: request.updatedAt,
+    formattedUpdatedDate: formatAdminPayoutDate(request.updatedAt),
+    ...(processedBy ? { processedBy } : {}),
+    paymentTitle: payment.title,
+    paymentLines: payment.lines,
+    paymentFields: payment.fields,
+    panelistNotes: cleanText(request.notes),
+  };
+}
+
 export function buildPayoutQueueRows(hub: AdminDataHub): PayoutQueueRow[] {
   return hub.redemptionRequests
-    .filter((request) => request.status !== "rejected")
-    .map((request) => {
-      const email = cleanText(request.email).toLowerCase();
-      const payment = formatPayoutPaymentDetails(request.optionId, request.details);
-      return {
-        id: request.id,
-        shortId: payoutShortId(request.id),
-        email,
-        optionId: request.optionId,
-        optionLabel: request.optionLabel,
-        points: request.points,
-        amountBz: request.amountBz ?? request.points / 25,
-        status: request.status,
-        submittedAt: request.submittedAt,
-        formattedDate: formatAdminPayoutDate(request.submittedAt),
-        paymentTitle: payment.title,
-        paymentLines: payment.lines,
-        paymentFields: payment.fields,
-        panelistNotes: cleanText(request.notes),
-      };
-    })
+    .filter((request) => request.status === "pending" || request.status === "approved")
+    .map(mapRedemptionToPayoutRow)
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+}
+
+export function buildPayoutHistoryRows(hub: AdminDataHub): PayoutQueueRow[] {
+  return hub.redemptionRequests
+    .filter((request) => request.status === "fulfilled" || request.status === "rejected")
+    .map(mapRedemptionToPayoutRow)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export function buildRecentPayoutRows(hub: AdminDataHub, limit = 8): PayoutQueueRow[] {
+  return [...buildPayoutQueueRows(hub), ...buildPayoutHistoryRows(hub)]
+    .sort((a, b) => {
+      const aKey = a.status === "pending" || a.status === "approved" ? a.submittedAt : a.updatedAt;
+      const bKey = b.status === "pending" || b.status === "approved" ? b.submittedAt : b.updatedAt;
+      return bKey.localeCompare(aKey);
+    })
+    .slice(0, limit);
 }
