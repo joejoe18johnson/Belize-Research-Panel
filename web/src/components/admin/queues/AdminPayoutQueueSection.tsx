@@ -20,12 +20,26 @@ import type { PayoutProcessAction } from "@/lib/reward-redemption";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export type PayoutQueueFilter = "new" | "open" | "all";
+export type PayoutHistoryFilter = "all" | "fulfilled" | "rejected";
 
 function payoutStatusTone(status: PayoutQueueRow["status"]): "success" | "warning" | "info" | "neutral" {
   if (status === "fulfilled") return "success";
   if (status === "approved") return "info";
   if (status === "pending") return "warning";
+  if (status === "rejected") return "neutral";
   return "neutral";
+}
+
+function filterQueueRows(rows: PayoutQueueRow[], statusFilter: PayoutQueueFilter): PayoutQueueRow[] {
+  if (statusFilter === "new") return rows.filter((row) => row.status === "pending");
+  if (statusFilter === "open") return rows.filter((row) => row.status === "pending" || row.status === "approved");
+  return rows;
+}
+
+function filterHistoryRows(rows: PayoutQueueRow[], statusFilter: PayoutHistoryFilter): PayoutQueueRow[] {
+  if (statusFilter === "fulfilled") return rows.filter((row) => row.status === "fulfilled");
+  if (statusFilter === "rejected") return rows.filter((row) => row.status === "rejected");
+  return rows;
 }
 
 function downloadPayoutStatement(row: PayoutQueueRow) {
@@ -47,12 +61,6 @@ function downloadPayoutStatement(row: PayoutQueueRow) {
   anchor.download = `payout-${row.shortId}.txt`;
   anchor.click();
   URL.revokeObjectURL(url);
-}
-
-function filterRows(rows: PayoutQueueRow[], statusFilter: PayoutQueueFilter): PayoutQueueRow[] {
-  if (statusFilter === "new") return rows.filter((row) => row.status === "pending");
-  if (statusFilter === "open") return rows.filter((row) => row.status === "pending" || row.status === "approved");
-  return rows;
 }
 
 function PayoutProcessDialog({
@@ -80,7 +88,13 @@ function PayoutProcessDialog({
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Payout request</p>
             <h3 className="mt-1 text-xl font-semibold text-zinc-900">{row.shortId}</h3>
-            <p className="mt-1 text-sm text-zinc-500">{row.formattedDate}</p>
+            <p className="mt-1 text-sm text-zinc-500">Submitted {row.formattedDate}</p>
+            {readOnly && row.formattedUpdatedDate ? (
+              <p className="mt-0.5 text-sm text-zinc-500">
+                Processed {row.formattedUpdatedDate}
+                {row.processedBy ? ` by ${row.processedBy}` : ""}
+              </p>
+            ) : null}
           </div>
           <button
             type="button"
@@ -188,41 +202,57 @@ export function AdminPayoutQueueSection({
   emptyTitle = "Queue clear",
   emptyMessage = "No redemption requests on file.",
   unreadPayoutIds = [],
+  mode = "queue",
+  sectionId,
 }: {
   rows: PayoutQueueRow[];
   title: string;
   description: string;
-  defaultStatusFilter?: PayoutQueueFilter;
+  defaultStatusFilter?: PayoutQueueFilter | PayoutHistoryFilter;
   showStatusFilter?: boolean;
   emptyTitle?: string;
   emptyMessage?: string;
   unreadPayoutIds?: string[];
+  mode?: "queue" | "history";
+  sectionId?: string;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<PayoutQueueFilter>(defaultStatusFilter);
+  const [queueStatusFilter, setQueueStatusFilter] = useState<PayoutQueueFilter>(
+    mode === "queue" ? (defaultStatusFilter as PayoutQueueFilter) ?? "all" : "all"
+  );
+  const [historyStatusFilter, setHistoryStatusFilter] = useState<PayoutHistoryFilter>(
+    mode === "history" ? (defaultStatusFilter as PayoutHistoryFilter) ?? "all" : "all"
+  );
   const [activeRow, setActiveRow] = useState<PayoutQueueRow | null>(null);
   const [busyAction, setBusyAction] = useState<PayoutProcessAction | "">("");
   const [dialogMessage, setDialogMessage] = useState("");
   const unreadSet = useMemo(() => new Set(unreadPayoutIds), [unreadPayoutIds]);
 
-  const statusFiltered = useMemo(() => filterRows(rows, statusFilter), [rows, statusFilter]);
+  const statusFiltered = useMemo(() => {
+    if (mode === "history") return filterHistoryRows(rows, historyStatusFilter);
+    return filterQueueRows(rows, queueStatusFilter);
+  }, [rows, mode, queueStatusFilter, historyStatusFilter]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return statusFiltered;
     return statusFiltered.filter(
       (row) =>
+        row.email.toLowerCase().includes(query) ||
         row.optionLabel.toLowerCase().includes(query) ||
         row.shortId.toLowerCase().includes(query) ||
         row.status.toLowerCase().includes(query) ||
-        row.paymentTitle.toLowerCase().includes(query)
+        row.paymentTitle.toLowerCase().includes(query) ||
+        (row.processedBy ?? "").toLowerCase().includes(query)
     );
   }, [statusFiltered, search]);
 
   const pagination = useTablePagination(filtered);
   const newCount = rows.filter((row) => row.status === "pending").length;
   const openCount = rows.filter((row) => row.status === "pending" || row.status === "approved").length;
+  const fulfilledCount = rows.filter((row) => row.status === "fulfilled").length;
+  const rejectedCount = rows.filter((row) => row.status === "rejected").length;
   const unreadNewCount = rows.filter((row) => row.status === "pending" && unreadSet.has(row.id)).length;
 
   const markPayoutRead = async (id: string) => {
@@ -264,7 +294,10 @@ export function AdminPayoutQueueSection({
   };
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+    <section
+      id={sectionId}
+      className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+    >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900">{formatHeadingCase(title)}</h2>
@@ -274,33 +307,54 @@ export function AdminPayoutQueueSection({
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search ID, option, payment…"
+          placeholder={mode === "history" ? "Search ID, email, option, processor…" : "Search ID, option, payment…"}
           className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
         />
       </div>
 
       {showStatusFilter ? (
         <div className="mt-4 flex flex-wrap gap-2">
-          {(
-            [
-              { id: "new" as const, label: `New requests (${newCount})` },
-              { id: "open" as const, label: `Open (${openCount})` },
-              { id: "all" as const, label: `All (${rows.length})` },
-            ] as const
-          ).map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setStatusFilter(item.id)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                statusFilter === item.id
-                  ? "bg-teal-700 text-white"
-                  : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+          {mode === "history"
+            ? (
+                [
+                  { id: "all" as const, label: `All (${rows.length})` },
+                  { id: "fulfilled" as const, label: `Completed (${fulfilledCount})` },
+                  { id: "rejected" as const, label: `Declined (${rejectedCount})` },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setHistoryStatusFilter(item.id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                    historyStatusFilter === item.id
+                      ? "bg-teal-700 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))
+            : (
+                [
+                  { id: "new" as const, label: `New requests (${newCount})` },
+                  { id: "open" as const, label: `Open (${openCount})` },
+                  { id: "all" as const, label: `All (${rows.length})` },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setQueueStatusFilter(item.id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                    queueStatusFilter === item.id
+                      ? "bg-teal-700 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
         </div>
       ) : null}
 
@@ -324,11 +378,14 @@ export function AdminPayoutQueueSection({
             <AdminDataTable className="min-w-[960px]">
               <AdminTableHead>
                 <AdminTableTh>Request ID</AdminTableTh>
+                {mode === "history" ? <AdminTableTh>Panelist email</AdminTableTh> : null}
                 <AdminTableTh>Status</AdminTableTh>
                 <AdminTableTh>Redemption option</AdminTableTh>
                 <AdminTableTh align="right">Amount</AdminTableTh>
                 <AdminTableTh>Payment details</AdminTableTh>
-                <AdminTableTh>Date</AdminTableTh>
+                <AdminTableTh>{mode === "history" ? "Submitted" : "Date"}</AdminTableTh>
+                {mode === "history" ? <AdminTableTh>Processed</AdminTableTh> : null}
+                {mode === "history" ? <AdminTableTh>Processed by</AdminTableTh> : null}
                 <AdminTableTh align="center">Statement</AdminTableTh>
                 <AdminTableTh align="center">Action</AdminTableTh>
               </AdminTableHead>
@@ -343,6 +400,9 @@ export function AdminPayoutQueueSection({
                         {isNew ? <AdminNewBadge /> : null}
                       </span>
                     </td>
+                    {mode === "history" ? (
+                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700">{row.email}</td>
+                    ) : null}
                     <td className="px-4 py-3">
                       <AdminStatusPill label={payoutStatusLabel(row.status)} tone={payoutStatusTone(row.status)} />
                     </td>
@@ -357,6 +417,12 @@ export function AdminPayoutQueueSection({
                       ))}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.formattedDate}</td>
+                    {mode === "history" ? (
+                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.formattedUpdatedDate}</td>
+                    ) : null}
+                    {mode === "history" ? (
+                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.processedBy ?? "—"}</td>
+                    ) : null}
                     <td className="px-4 py-3 text-center">
                       <AdminDownloadButton onClick={() => downloadPayoutStatement(row)} />
                     </td>

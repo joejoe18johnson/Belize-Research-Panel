@@ -7,18 +7,19 @@ import { formatBz } from "@/lib/reward-redemption";
 import { AdminPayoutQueueSection } from "./AdminPayoutQueueSection";
 
 export function AdminPayoutsDashboard({
-  rows,
+  queueRows,
+  historyRows,
   unreadPayoutIds = [],
 }: {
-  rows: PayoutQueueRow[];
+  queueRows: PayoutQueueRow[];
+  historyRows: PayoutQueueRow[];
   unreadPayoutIds?: string[];
 }) {
-  const pending = rows.filter((row) => row.status === "pending").length;
-  const approved = rows.filter((row) => row.status === "approved").length;
-  const completed = rows.filter((row) => row.status === "fulfilled").length;
-  const openAmount = rows
-    .filter((row) => row.status === "pending" || row.status === "approved")
-    .reduce((sum, row) => sum + row.amountBz, 0);
+  const pending = queueRows.filter((row) => row.status === "pending").length;
+  const approved = queueRows.filter((row) => row.status === "approved").length;
+  const completed = historyRows.filter((row) => row.status === "fulfilled").length;
+  const declined = historyRows.filter((row) => row.status === "rejected").length;
+  const openAmount = queueRows.reduce((sum, row) => sum + row.amountBz, 0);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
@@ -42,18 +43,29 @@ export function AdminPayoutsDashboard({
         <IconMetricCard
           label="Open liability"
           value={formatBz(openAmount)}
-          hint={`${completed} completed`}
+          hint={`${completed} completed · ${declined} declined`}
           tone="violet"
           icon={<MetricCashIcon />}
         />
       </div>
 
       <AdminPayoutQueueSection
-        rows={rows}
+        rows={queueRows}
         title="Payout queue"
         description={`${pending} new request${pending === 1 ? "" : "s"} waiting for review.`}
         defaultStatusFilter="new"
         unreadPayoutIds={unreadPayoutIds}
+      />
+
+      <AdminPayoutQueueSection
+        sectionId="payout-history"
+        rows={historyRows}
+        title="Fulfillment history"
+        description={`${completed} completed and ${declined} declined payout${completed + declined === 1 ? "" : "s"} for reference.`}
+        mode="history"
+        defaultStatusFilter="all"
+        emptyTitle="No payout history yet"
+        emptyMessage="Completed and declined requests will appear here after processing."
       />
     </div>
   );

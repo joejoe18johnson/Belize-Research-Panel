@@ -1,5 +1,5 @@
 import { AdminPayoutsDashboard } from "@/components/admin/queues/AdminPayoutsDashboard";
-import { buildPayoutQueueRows } from "@/lib/admin-dashboard-metrics";
+import { buildPayoutHistoryRows, buildPayoutQueueRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
 import { unreadNewPayoutIds } from "@/lib/admin-nav-badges";
 import { loadAdminReadState } from "@/lib/admin-read-state";
@@ -14,6 +14,10 @@ export default async function AdminPayoutsPage() {
   const unreadPayoutIds = unreadNewPayoutIds(hub, readState);
 
   return (
-    <AdminPayoutsDashboard rows={buildPayoutQueueRows(hub)} unreadPayoutIds={unreadPayoutIds} />
+    <AdminPayoutsDashboard
+      queueRows={buildPayoutQueueRows(hub)}
+      historyRows={buildPayoutHistoryRows(hub)}
+      unreadPayoutIds={unreadPayoutIds}
+    />
   );
 }

@@ -1,7 +1,7 @@
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
 import {
   buildAdminDashboardMetrics,
-  buildPayoutQueueRows,
+  buildRecentPayoutRows,
   buildRecentPanelistRows,
 } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   const photoUploadUsernames = await loadPanelistPhotoUploadUsernames();
   const metrics = buildAdminDashboardMetrics(hub);
   const recentPanelists = buildRecentPanelistRows(hub, photoUploadUsernames);
-  const recentPayouts = buildPayoutQueueRows(hub);
+  const recentPayouts = buildRecentPayoutRows(hub);
 
   if (metrics.total === 0 && hub.accounts.length === 0) {
     return (
