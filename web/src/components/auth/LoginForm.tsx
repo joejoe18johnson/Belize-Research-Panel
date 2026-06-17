@@ -6,7 +6,6 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 import { Field, TextInput } from "@/components/registration/form-ui";
 import {
   DEMO_ACCOUNT_PASSWORD,
-  DEMO_ADMIN_ACCOUNT,
   DEMO_REGISTERED_ACCOUNT,
   DEMO_REGISTRATION_READY_ACCOUNT,
   DEMO_UNVERIFIED_REGISTERED_ACCOUNT,
@@ -180,17 +179,6 @@ export function LoginForm({
               type="button"
               disabled={submitting}
               className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
-              onClick={() => loginWithDemo(DEMO_ADMIN_ACCOUNT.email)}
-            >
-              Log in as admin demo
-            </button>
-            {" "}(Glen Avilez · verified dashboard)
-          </p>
-          <p>
-            <button
-              type="button"
-              disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_REGISTRATION_READY_ACCOUNT.email)}
             >
               Log in as registration demo
@@ -220,7 +208,7 @@ export function LoginForm({
             {" "}(registered, pending verification)
           </p>
           <p className="text-[11px] leading-relaxed text-teal-800/70">
-            {DEMO_ADMIN_ACCOUNT.email} · {DEMO_ACCOUNT_PASSWORD}
+            {DEMO_REGISTERED_ACCOUNT.email} · {DEMO_ACCOUNT_PASSWORD}
           </p>
         </div>
       ) : null}
