@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import {
+  BanknotesIcon,
   BellIcon,
   ClipboardIcon,
   GiftIcon,
@@ -56,6 +57,13 @@ export const DASHBOARD_QUICK_SECTIONS: DashboardSectionMeta[] = [
     description: "Verification and survey updates",
     shortLabel: "Alerts",
     icon: BellIcon,
+  },
+  {
+    href: "/dashboard/payouts",
+    label: "Payouts",
+    description: "Payout requests and payment history",
+    shortLabel: "Payouts",
+    icon: BanknotesIcon,
   },
   {
     href: "/dashboard/rewards",

@@ -154,7 +154,7 @@ export function DashboardRewardsSection({
 
       <RedemptionOptionsCatalog totalPoints={rewards.totalPoints} requests={redemptionRequests} />
 
-      <RewardsHistory entries={rewardsHistory} />
+      <RewardsHistory entries={rewardsHistory} variant="earnings" />
     </div>
   );
 }

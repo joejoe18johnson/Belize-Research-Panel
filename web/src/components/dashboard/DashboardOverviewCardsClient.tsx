@@ -97,7 +97,7 @@ export function DashboardOverviewStats({
 
 export function DashboardOverviewQuickLinks() {
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-4 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:pb-0">
+    <div className="flex gap-3 overflow-x-auto pb-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-4 lg:grid lg:grid-cols-3 lg:gap-4 lg:overflow-visible lg:pb-0 xl:grid-cols-6">
       {QUICK_LINKS.map((link) => {
         const Icon = link.icon;
         return (
