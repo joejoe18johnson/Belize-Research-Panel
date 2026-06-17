@@ -4,12 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
+import type { AdminSession } from "@/lib/admin-auth";
 import {
   ADMIN_NAV_SECTIONS,
   getAdminModulesBySection,
   type AdminModule,
 } from "@/lib/admin-modules";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
+import { STAFF_ROLE_LABELS } from "@/lib/staff-roles";
+import { staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadge(status?: AdminModule["status"]) {
@@ -42,8 +45,10 @@ function isModuleActive(pathname: string, module: AdminModule): boolean {
   return pathname === `/admin/modules/${module.slug}`;
 }
 
-export function AdminShell({ children }: { children: ReactNode }) {
+export function AdminShell({ children, session }: { children: ReactNode; session: AdminSession }) {
   const pathname = usePathname();
+  const accessibleModules = staffAccessibleModules(session.role);
+  const accessibleSlugs = new Set(accessibleModules.map((module) => module.slug));
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)]">
@@ -55,11 +60,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <p className="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-teal-200/90">
               {formatHeadingCase("Admin console")}
             </p>
+            <p className="mt-2 rounded-lg bg-white/10 px-2.5 py-2 text-xs text-teal-50">
+              <span className="font-semibold">{session.displayName}</span>
+              <span className="mt-0.5 block text-teal-200/90">{STAFF_ROLE_LABELS[session.role]}</span>
+            </p>
           </div>
           <nav className="nav-scroll max-h-[40vh] overflow-y-auto px-2 py-3 lg:max-h-[calc(100vh-7rem)] lg:py-4" aria-label="Admin modules">
             <div className="space-y-5">
               {ADMIN_NAV_SECTIONS.map((section) => {
-                const modules = getAdminModulesBySection(section.id);
+                const modules = getAdminModulesBySection(section.id).filter((module) =>
+                  accessibleSlugs.has(module.slug)
+                );
                 if (modules.length === 0) return null;
 
                 return (
@@ -69,6 +80,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                     </p>
                     <ul className="space-y-0.5">
                       {modules.map((module) => {
+                        if (!staffCanAccessModule(session.role, module.slug)) return null;
                         const active = isModuleActive(pathname, module);
                         const href = moduleHref(module);
                         const external = Boolean(module.externalHref);
