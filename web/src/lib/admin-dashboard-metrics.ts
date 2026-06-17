@@ -3,6 +3,7 @@ import type { AdminDataHub } from "./admin-data-hub";
 import { duplicateNameDobKey } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import type { RedemptionRequest } from "./reward-redemption";
+import type { RedemptionOptionId } from "./reward-redemption";
 import type { RequirementApprovalStatus } from "./panelist-requirements";
 import {
   assessPanelistRequirements,
@@ -11,6 +12,11 @@ import {
   requirementContextFromAccount,
 } from "./panelist-requirements";
 import { requirementContextForPanelist } from "./panelist-requirement-context";
+import {
+  formatAdminPayoutDate,
+  formatPayoutPaymentDetails,
+  payoutShortId,
+} from "./admin-payout-display";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -30,6 +36,21 @@ export interface AdminDashboardMetrics {
   pendingPayouts: number;
   approvedPayouts: number;
   underReviewTotal: number;
+  phoneNumbersToReview: number;
+  idDocumentsToReview: number;
+  addressDocumentsToReview: number;
+  totalRedemptionRequests: number;
+}
+
+export interface RecentPanelistRow {
+  email: string;
+  name: string;
+  panelistStatus: string;
+  verificationStatus: string;
+  phone: string;
+  phoneApproved: boolean;
+  hasIdDoc: boolean;
+  hasAddressDoc: boolean;
 }
 
 export interface UnderReviewRow {
@@ -56,13 +77,18 @@ export interface NotificationQueueRow {
 
 export interface PayoutQueueRow {
   id: string;
+  shortId: string;
   email: string;
   name: string;
+  optionId: RedemptionOptionId;
   optionLabel: string;
   points: number;
   amountBz: number;
   status: RedemptionRequest["status"];
   submittedAt: string;
+  formattedDate: string;
+  paymentTitle: string;
+  paymentLines: string[];
 }
 
 function panelistName(row: PanelistRow | undefined, account?: AccountRecord): string {
@@ -120,6 +146,22 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
     });
   }).length;
 
+  let phoneNumbersToReview = pendingPhoneChanges;
+  let idDocumentsToReview = 0;
+  let addressDocumentsToReview = 0;
+
+  for (const row of hub.panelists) {
+    const email = cleanText(row.email).toLowerCase();
+    const account = hub.accounts.find((item) => cleanText(item.email).toLowerCase() === email);
+    const context = requirementContextFromAccount(account);
+    const requirements = assessPanelistRequirements(row, context);
+    if (requirements.phone === "under_review") phoneNumbersToReview += 1;
+    if (requirements.photoId === "under_review") idDocumentsToReview += 1;
+    if (cleanText(row.place_of_residence) && requirements.photoId !== "approved") {
+      addressDocumentsToReview += 1;
+    }
+  }
+
   return {
     total: panelists.length,
     verified: panelists.filter((row) => cleanText(row.verification_status) === "Verified").length,
@@ -137,7 +179,44 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
     pendingPayouts,
     approvedPayouts,
     underReviewTotal,
+    phoneNumbersToReview,
+    idDocumentsToReview,
+    addressDocumentsToReview,
+    totalRedemptionRequests: hub.redemptionRequests.length,
   };
+}
+
+export function buildRecentPanelistRows(
+  hub: AdminDataHub,
+  photoUploadUsernames: Set<string> = new Set(),
+  limit = 5
+): RecentPanelistRow[] {
+  const accountsByEmail = new Map(
+    hub.accounts.map((account) => [cleanText(account.email).toLowerCase(), account] as const)
+  );
+
+  return [...hub.panelists]
+    .sort((a, b) => cleanText(b.registration_date).localeCompare(cleanText(a.registration_date)))
+    .slice(0, limit)
+    .map((row) => {
+      const email = cleanText(row.email).toLowerCase();
+      const context = requirementContextForPanelist(row, accountsByEmail, photoUploadUsernames);
+      const requirements = assessPanelistRequirements(row, context);
+      const username = cleanText(row.username);
+      const hasIdDoc = Boolean(cleanText(row.photo_id_type) || (username && photoUploadUsernames.has(username)));
+      const hasAddressDoc = Boolean(cleanText(row.place_of_residence));
+
+      return {
+        email,
+        name: panelistName(row),
+        panelistStatus: cleanText(row.status) || "Active",
+        verificationStatus: cleanText(row.verification_status) || "Pending",
+        phone: cleanText(row.phone_whatsapp) || "—",
+        phoneApproved: requirements.phone === "approved",
+        hasIdDoc,
+        hasAddressDoc,
+      };
+    });
 }
 
 export function buildUnderReviewRows(
@@ -288,19 +367,25 @@ export function buildPayoutQueueRows(hub: AdminDataHub): PayoutQueueRow[] {
   }
 
   return hub.redemptionRequests
-    .filter((request) => request.status === "pending" || request.status === "approved")
+    .filter((request) => request.status !== "rejected")
     .map((request) => {
       const email = cleanText(request.email).toLowerCase();
       const panelist = panelistByEmail.get(email);
+      const payment = formatPayoutPaymentDetails(request.optionId, request.details);
       return {
         id: request.id,
+        shortId: payoutShortId(request.id),
         email,
         name: panelistName(panelist),
+        optionId: request.optionId,
         optionLabel: request.optionLabel,
         points: request.points,
         amountBz: request.amountBz ?? request.points / 25,
         status: request.status,
         submittedAt: request.submittedAt,
+        formattedDate: formatAdminPayoutDate(request.submittedAt),
+        paymentTitle: payment.title,
+        paymentLines: payment.lines,
       };
     })
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
