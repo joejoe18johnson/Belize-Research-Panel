@@ -1,7 +1,8 @@
 import { ProfileSectionClient } from "@/components/dashboard/ProfileSectionClient";
 import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
+import { NewSurveyProfileBanner } from "@/components/dashboard/NewSurveyProfileBanner";
 import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
-import { requireRegisteredPanelistSession } from "@/lib/dashboard-access";
+import { getDashboardNavBadges, requireRegisteredPanelistSession } from "@/lib/dashboard-access";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { profileContactFromRow, profileUpdateFormFromRow } from "@/lib/profile-update";
 import { findPanelistByEmail } from "@/lib/panelists";
@@ -23,6 +24,7 @@ export default async function DashboardProfilePage({
   }
 
   const { emailUpdated } = await searchParams;
+  const badges = await getDashboardNavBadges(account.email);
   const profile = panelistRowToDashboardProfile(panelist);
   const initialForm = profileUpdateFormFromRow(panelist);
   const contact = profileContactFromRow(panelist, account.email);
@@ -37,6 +39,7 @@ export default async function DashboardProfilePage({
         description="View and update your profile. Biographical details stay locked; email and phone changes require administrator approval."
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />
+      <NewSurveyProfileBanner newSurveyCount={badges.newSurveys} />
       <ProfileSectionClient
         profile={profile}
         account={account}

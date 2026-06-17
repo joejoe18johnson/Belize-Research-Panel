@@ -47,5 +47,26 @@
     "startedAt": "2026-06-17T04:30:08.941Z",
     "updatedAt": "2026-06-17T05:04:01.248Z",
     "submittedAt": "2026-06-17T05:04:01.248Z"
+  },
+  {
+    "assignmentId": "campaign-our-lady-of-guadalope-school-survey-mqi89evn",
+    "surveyDefinitionId": "survey-student-course-feedback-mqi85zqj",
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "answers": {
+      "q-qxur9syo": 5,
+      "q-0pg5rxd2": 5,
+      "q-i4ooht57": 4,
+      "q-hs5ibr1k": "Too easy",
+      "q-s2hxbg7p": [
+        "Lectures",
+        "Readings",
+        "Group work"
+      ],
+      "q-5can7eyr": "Yes",
+      "q-3or9ndjw": "The teacher was lazy!"
+    },
+    "startedAt": "2026-06-17T15:32:10.467Z",
+    "updatedAt": "2026-06-17T15:32:10.467Z",
+    "submittedAt": "2026-06-17T15:32:10.467Z"
   }
 ]

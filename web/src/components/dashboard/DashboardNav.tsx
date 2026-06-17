@@ -8,7 +8,7 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 import { DASHBOARD_NAV_SECTIONS } from "./dashboard-sections";
 
 const NAV_BADGE_KEYS: Partial<Record<string, keyof DashboardNavBadges>> = {
-  "/dashboard/surveys": "inboxSurveys",
+  "/dashboard/surveys": "newSurveys",
   "/dashboard/notifications": "unreadNotifications",
   "/dashboard/verification": "verificationAttention",
 };
@@ -50,10 +50,24 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
                 {badgeCount > 0 ? (
                   <span
                     className={`inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none ${
-                      active ? "bg-white/20 text-white" : "bg-teal-100 text-teal-800"
+                      badgeKey === "newSurveys"
+                        ? active
+                          ? "bg-amber-300 text-amber-950 ring-2 ring-white/50"
+                          : "animate-pulse bg-amber-500 text-white shadow-sm"
+                        : active
+                          ? "bg-white/20 text-white"
+                          : "bg-teal-100 text-teal-800"
                     }`}
                   >
-                    {badgeCount > 9 ? "9+" : badgeCount}
+                    {badgeKey === "newSurveys"
+                        ? badgeCount === 1
+                          ? "NEW"
+                          : badgeCount > 9
+                            ? "9+"
+                            : badgeCount
+                        : badgeCount > 9
+                          ? "9+"
+                          : badgeCount}
                   </span>
                 ) : null}
               </Link>

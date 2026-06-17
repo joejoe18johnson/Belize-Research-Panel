@@ -12,6 +12,7 @@ import { DashboardNav } from "./DashboardNav";
 import { AccountNotVerifiedBanner } from "./AccountNotVerifiedBanner";
 import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
+import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
 import { UserAvatar } from "./UserAvatar";
 
@@ -62,6 +63,7 @@ export function DashboardShell({
         </div>
         <DashboardNav badges={badges} />
       </header>
+      <NewSurveyAlertBanner newSurveyCount={badges.newSurveys} />
       <main className={`${CONTENT_CLASS} px-3 py-5 sm:px-4 sm:py-8`}>
         {verificationStatus && !isAccountVerified(verificationStatus) ? (
           <div className="mb-6">

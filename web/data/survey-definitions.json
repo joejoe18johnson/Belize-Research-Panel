@@ -106,7 +106,10 @@
       }
     ],
     "createdAt": "2026-06-16T12:00:00.000Z",
-    "updatedAt": "2026-06-16T12:00:00.000Z"
+    "updatedAt": "2026-06-16T12:00:00.000Z",
+    "companyIntro": "",
+    "companyLogoFile": "",
+    "coverImageFile": ""
   },
   {
     "id": "survey-belize-as-a-country-mqhk0zzy",
@@ -132,7 +135,10 @@
       }
     ],
     "createdAt": "2026-06-17T04:11:54.814Z",
-    "updatedAt": "2026-06-17T04:13:00.974Z"
+    "updatedAt": "2026-06-17T04:13:00.974Z",
+    "companyIntro": "",
+    "companyLogoFile": "",
+    "coverImageFile": ""
   },
   {
     "id": "survey-fuel-prices-mqhkl4b2",
@@ -202,6 +208,132 @@
       }
     ],
     "createdAt": "2026-06-17T04:27:33.518Z",
-    "updatedAt": "2026-06-17T04:27:33.518Z"
+    "updatedAt": "2026-06-17T04:27:33.518Z",
+    "companyIntro": "",
+    "companyLogoFile": "",
+    "coverImageFile": ""
+  },
+  {
+    "id": "survey-student-course-feedback-mqi85zqj",
+    "title": "Student course feedback",
+    "description": "Collect student feedback on course content, instruction, and materials.",
+    "companyIntro": "",
+    "companyLogoFile": "",
+    "coverImageFile": "",
+    "category": "civic",
+    "status": "published",
+    "questions": [
+      {
+        "id": "q-qxur9syo",
+        "type": "rating_scale",
+        "title": "Course content was relevant and well organized.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-0pg5rxd2",
+        "type": "rating_scale",
+        "title": "The instructor explained concepts clearly.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-i4ooht57",
+        "type": "rating_scale",
+        "title": "Assignments and assessments were fair.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-hs5ibr1k",
+        "type": "single_choice",
+        "title": "Course difficulty",
+        "description": "",
+        "required": true,
+        "options": [
+          "Too easy",
+          "About right",
+          "Too difficult"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-s2hxbg7p",
+        "type": "multiple_choice",
+        "title": "Which resources helped most? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Lectures",
+          "Readings",
+          "Videos",
+          "Group work",
+          "Practice exercises"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-5can7eyr",
+        "type": "yes_no",
+        "title": "Would you recommend this course to other students?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-3or9ndjw",
+        "type": "long_text",
+        "title": "What should be improved in this course?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      }
+    ],
+    "createdAt": "2026-06-17T15:27:38.539Z",
+    "updatedAt": "2026-06-17T15:27:38.539Z"
   }
 ]
