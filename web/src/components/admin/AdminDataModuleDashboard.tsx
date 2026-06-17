@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import type { AdminModuleSnapshot, AdminTableColumn } from "@/lib/admin-snapshot-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -30,6 +31,8 @@ function SortableTable({
       return factor * String(av ?? "").localeCompare(String(bv ?? ""), undefined, { sensitivity: "base" });
     });
   }, [rows, sortKey, direction]);
+
+  const pagination = useTablePagination(sorted);
 
   const toggle = (key: string) => {
     if (sortKey === key) setDirection((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -70,7 +73,7 @@ function SortableTable({
                 </td>
               </tr>
             ) : (
-              sorted.map((row, index) => (
+              pagination.paginatedRows.map((row, index) => (
                 <tr key={`${title}-${index}`} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
                   {columns.map((column) => (
                     <td
@@ -86,6 +89,18 @@ function SortableTable({
           </tbody>
         </table>
       </div>
+      {sorted.length > 0 ? (
+        <div className="px-5 pb-4">
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            totalPages={pagination.totalPages}
+            totalRows={pagination.totalRows}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
+        </div>
+      ) : null}
     </section>
   );
 }

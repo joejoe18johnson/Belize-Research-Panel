@@ -8,6 +8,7 @@ import {
 import { getPanelistSurveys } from "./panelist-surveys";
 import { loadRedemptionRequests } from "./redemption-requests";
 import { loadRewardBalanceSeed } from "./panelist-reward-balances";
+import { loadRewardSettings } from "./reward-settings-store";
 import { getReservedPoints } from "./reward-redemption";
 import { cleanText } from "./validation";
 
@@ -96,7 +97,8 @@ export async function resolveRewardSummary(
   email: string,
   profile: Pick<PanelistDashboardProfile, "verificationStatus">
 ): Promise<DashboardRewardSummary> {
-  const base = calculateMvpRewardPoints(profile);
+  const settings = await loadRewardSettings();
+  const base = calculateMvpRewardPoints(profile, settings);
   const { completed } = await getPanelistSurveys(email);
   const surveyPoints = completed.reduce((sum, survey) => sum + survey.points, 0);
   const calculatedEarned = base.registrationPoints + base.verificationPoints + surveyPoints;

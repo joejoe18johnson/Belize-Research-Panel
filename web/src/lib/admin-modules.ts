@@ -110,6 +110,15 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "reward-settings",
+    label: "Reward Settings",
+    kind: "page",
+    href: "/admin/campaigns/reward-settings",
+    section: "campaigns",
+    parentSlug: "campaigns",
+    status: "working",
+  },
+  {
     slug: "survey-builder",
     label: "Survey Builder",
     kind: "page",

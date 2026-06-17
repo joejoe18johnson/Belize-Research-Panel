@@ -42,6 +42,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
     "sample-selection",
     "campaigns",
     "create-campaign",
+    "reward-settings",
     "survey-builder",
     "survey-distribution",
     "distribution-engine",
@@ -65,7 +66,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
     "fraud-prevention",
     "survey-distribution",
   ],
-  finance_officer: ["admin-dashboard", "payouts", "financial-revenue"],
+  finance_officer: ["admin-dashboard", "payouts", "financial-revenue", "reward-settings"],
   client_viewer: ["client-reporting"],
 };
 
@@ -79,6 +80,7 @@ const ADMIN_PATH_TO_SLUG: Record<string, string> = {
   "/admin/sample-selection": "sample-selection",
   "/admin/campaigns": "campaigns",
   "/admin/campaigns/create": "create-campaign",
+  "/admin/campaigns/reward-settings": "reward-settings",
   "/admin/survey-distribution": "survey-distribution",
   "/admin/analytics": "advanced-analytics",
 };
@@ -119,7 +121,7 @@ export function pathnameToAdminModuleSlug(pathname: string): string | null {
   if (pathname.startsWith("/admin/surveys")) return "survey-builder";
   if (ADMIN_PATH_TO_SLUG[pathname]) return ADMIN_PATH_TO_SLUG[pathname];
 
-  if (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create") {
+  if (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create" && pathname !== "/admin/campaigns/reward-settings") {
     return "campaigns";
   }
 

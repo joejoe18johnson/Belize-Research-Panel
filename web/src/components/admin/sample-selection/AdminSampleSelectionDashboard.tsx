@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { FilterMultiSelect, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import {
   applySampleFilters,
   calculateSampleSize,
@@ -80,6 +81,8 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
     const rows = tab === "sample" ? generatedSample : filteredPool;
     return sortSampleRows(rows, sortKey, sortDirection);
   }, [tab, generatedSample, filteredPool, sortKey, sortDirection]);
+
+  const tablePagination = useTablePagination(displayRows);
 
   const updateFilter = <K extends keyof SampleFilters>(key: K, value: SampleFilters[K]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -382,7 +385,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                     </td>
                   </tr>
                 ) : (
-                  displayRows.slice(0, 200).map((row) => (
+                  tablePagination.paginatedRows.map((row) => (
                     <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
                       <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                         {row.firstName} {row.lastName}
@@ -400,8 +403,15 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               </tbody>
             </table>
           </div>
-          {displayRows.length > 200 ? (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Showing first 200 rows. Export CSV for the full list.</p>
+          {displayRows.length > 0 ? (
+            <TablePagination
+              page={tablePagination.page}
+              pageSize={tablePagination.pageSize}
+              totalPages={tablePagination.totalPages}
+              totalRows={tablePagination.totalRows}
+              onPageChange={tablePagination.setPage}
+              onPageSizeChange={tablePagination.setPageSize}
+            />
           ) : null}
         </section>
       ) : null}

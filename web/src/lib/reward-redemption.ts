@@ -1,12 +1,19 @@
+import {
+  DEFAULT_REWARD_SETTINGS,
+  redemptionMinimumBz,
+  redemptionRateLabel,
+  type RewardSettings,
+} from "./reward-settings";
 import { cleanText } from "./validation";
 
-/** 500 points = BZ$20 */
-export const POINTS_PER_BZ_DOLLAR = 25;
+/** @deprecated Use loadRewardSettings() — default snapshot for legacy imports. */
+export const POINTS_PER_BZ_DOLLAR = DEFAULT_REWARD_SETTINGS.pointsPerBzDollar;
 
-/** Minimum balance before any redemption option unlocks (BZ$20). */
-export const REDEMPTION_MINIMUM_POINTS = 500;
+/** @deprecated Use loadRewardSettings() — default snapshot for legacy imports. */
+export const REDEMPTION_MINIMUM_POINTS = DEFAULT_REWARD_SETTINGS.redemptionMinimumPoints;
 
-export const REDEMPTION_RATE_LABEL = "500 points = BZ$20";
+/** @deprecated Use loadRewardSettings() — default snapshot for legacy imports. */
+export const REDEMPTION_RATE_LABEL = redemptionRateLabel(DEFAULT_REWARD_SETTINGS);
 
 export type RedemptionOptionId = "mobile_top_up" | "bank_transfer" | "utility_credit";
 
@@ -181,28 +188,34 @@ export interface RedemptionOptionProgress {
   exampleTiers: RedemptionAmountChoice[];
 }
 
-export function bzToPoints(amountBz: number): number {
-  return Math.round(amountBz * POINTS_PER_BZ_DOLLAR);
+export function bzToPoints(amountBz: number, settings: RewardSettings = DEFAULT_REWARD_SETTINGS): number {
+  return Math.round(amountBz * settings.pointsPerBzDollar);
 }
 
-export function pointsToBz(points: number): number {
-  return points / POINTS_PER_BZ_DOLLAR;
+export function pointsToBz(points: number, settings: RewardSettings = DEFAULT_REWARD_SETTINGS): number {
+  return points / settings.pointsPerBzDollar;
 }
 
 export function formatBz(amountBz: number): string {
   return `BZ$${amountBz % 1 === 0 ? amountBz : amountBz.toFixed(2)}`;
 }
 
-export function getMinPointsForOption(option: RedemptionOption): number {
-  return bzToPoints(option.minAmountBz);
+export function getMinPointsForOption(
+  option: RedemptionOption,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
+): number {
+  return bzToPoints(option.minAmountBz, settings);
 }
 
 export function getRedemptionOption(id: string): RedemptionOption | undefined {
   return REDEMPTION_OPTIONS.find((option) => option.id === id);
 }
 
-export function canAccessRedemption(totalPoints: number): boolean {
-  return totalPoints >= REDEMPTION_MINIMUM_POINTS;
+export function canAccessRedemption(
+  totalPoints: number,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
+): boolean {
+  return totalPoints >= settings.redemptionMinimumPoints;
 }
 
 export function getReservedPoints(requests: RedemptionRequest[]): number {
@@ -225,18 +238,19 @@ function getIncrementBz(mode: RedemptionAmountMode): number | null {
 
 export function getRedemptionAmountChoices(
   option: RedemptionOption,
-  availablePoints: number
+  availablePoints: number,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
 ): RedemptionAmountChoice[] {
-  const minPoints = getMinPointsForOption(option);
+  const minPoints = getMinPointsForOption(option, settings);
   if (availablePoints < minPoints) return [];
 
-  const maxAmountBz = pointsToBz(availablePoints);
+  const maxAmountBz = pointsToBz(availablePoints, settings);
   const increment = getIncrementBz(option.amountMode);
 
   if (increment) {
     const choices: RedemptionAmountChoice[] = [];
     for (let amountBz = option.minAmountBz; amountBz <= maxAmountBz + 0.001; amountBz += increment) {
-      const points = bzToPoints(amountBz);
+      const points = bzToPoints(amountBz, settings);
       if (points > availablePoints) break;
       choices.push({
         amountBz,
@@ -250,13 +264,17 @@ export function getRedemptionAmountChoices(
   return [];
 }
 
-export function getExampleTiers(option: RedemptionOption, count = 4): RedemptionAmountChoice[] {
+export function getExampleTiers(
+  option: RedemptionOption,
+  count = 4,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
+): RedemptionAmountChoice[] {
   const increment = getIncrementBz(option.amountMode) ?? 20;
   const tiers: RedemptionAmountChoice[] = [];
 
   for (let index = 0; index < count; index += 1) {
     const amountBz = option.minAmountBz + index * increment;
-    const points = bzToPoints(amountBz);
+    const points = bzToPoints(amountBz, settings);
     tiers.push({
       amountBz,
       points,
@@ -269,9 +287,10 @@ export function getExampleTiers(option: RedemptionOption, count = 4): Redemption
 
 export function buildRedemptionOptionProgress(
   availablePoints: number,
-  option: RedemptionOption
+  option: RedemptionOption,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
 ): RedemptionOptionProgress {
-  const minPoints = getMinPointsForOption(option);
+  const minPoints = getMinPointsForOption(option, settings);
   const pointsNeeded = Math.max(0, minPoints - availablePoints);
   const progressPercent = Math.min(100, Math.round((availablePoints / minPoints) * 100));
 
@@ -281,16 +300,17 @@ export function buildRedemptionOptionProgress(
     pointsNeeded,
     progressPercent,
     minPoints,
-    exampleTiers: getExampleTiers(option),
+    exampleTiers: getExampleTiers(option, 4, settings),
   };
 }
 
 export function getEligibleRedemptionOptions(
   totalPoints: number,
-  requests: RedemptionRequest[]
+  requests: RedemptionRequest[],
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
 ): RedemptionOption[] {
   const available = getAvailablePoints(totalPoints, requests);
-  return REDEMPTION_OPTIONS.filter((option) => available >= getMinPointsForOption(option));
+  return REDEMPTION_OPTIONS.filter((option) => available >= getMinPointsForOption(option, settings));
 }
 
 function parseAmountBz(raw: string): number | null {
@@ -304,16 +324,17 @@ function validateAmountForOption(
   option: RedemptionOption,
   amountBz: number,
   availablePoints: number,
-  errors: Record<string, string>
+  errors: Record<string, string>,
+  settings: RewardSettings = DEFAULT_REWARD_SETTINGS
 ): number | null {
   if (amountBz < option.minAmountBz) {
     errors.amountBz = `Minimum redemption is ${formatBz(option.minAmountBz)}.`;
     return null;
   }
 
-  const points = bzToPoints(amountBz);
+  const points = bzToPoints(amountBz, settings);
   if (points > availablePoints) {
-    errors.amountBz = `You only have ${availablePoints} available points (${formatBz(pointsToBz(availablePoints))}).`;
+    errors.amountBz = `You only have ${availablePoints} available points (${formatBz(pointsToBz(availablePoints, settings))}).`;
     return null;
   }
 
@@ -338,6 +359,7 @@ export function validateRedemptionRequest(input: {
   notes?: string;
   totalPoints: number;
   requests: RedemptionRequest[];
+  settings?: RewardSettings;
 }):
   | {
       ok: true;
@@ -349,10 +371,11 @@ export function validateRedemptionRequest(input: {
       notes: string;
     }
   | { ok: false; errors: Record<string, string> } {
+  const settings = input.settings ?? DEFAULT_REWARD_SETTINGS;
   const errors: Record<string, string> = {};
 
-  if (!canAccessRedemption(getAvailablePoints(input.totalPoints, input.requests))) {
-    errors.form = `You need at least ${REDEMPTION_MINIMUM_POINTS} points (${formatBz(20)}) before redeeming.`;
+  if (!canAccessRedemption(getAvailablePoints(input.totalPoints, input.requests), settings)) {
+    errors.form = `You need at least ${settings.redemptionMinimumPoints} points (${formatBz(redemptionMinimumBz(settings))}) before redeeming.`;
     return { ok: false, errors };
   }
 
@@ -378,7 +401,7 @@ export function validateRedemptionRequest(input: {
     return { ok: false, errors };
   }
 
-  const points = validateAmountForOption(option, amountBz, available, errors);
+  const points = validateAmountForOption(option, amountBz, available, errors, settings);
   if (points === null) {
     return { ok: false, errors };
   }

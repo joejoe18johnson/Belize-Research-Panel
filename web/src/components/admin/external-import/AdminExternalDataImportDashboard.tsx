@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminDataModuleDashboard } from "@/components/admin/AdminDataModuleDashboard";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import type { PanelMatchIndex } from "@/lib/admin-module-snapshots";
 import type { AdminModuleSnapshot } from "@/lib/admin-snapshot-types";
 import { cleanText } from "@/lib/validation";
@@ -68,6 +69,8 @@ export function AdminExternalDataImportDashboard({
   const [results, setResults] = useState<MatchResult[]>([]);
   const [summary, setSummary] = useState<{ total: number; matched: number; unmatched: number } | null>(null);
   const [error, setError] = useState("");
+
+  const resultsPagination = useTablePagination(results);
 
   const emailSet = useMemo(() => new Set(matchIndex.emails), [matchIndex.emails]);
   const phoneSet = useMemo(() => new Set(matchIndex.phones.map((phone) => phone.replace(/\D/g, ""))), [matchIndex.phones]);
@@ -168,7 +171,7 @@ export function AdminExternalDataImportDashboard({
                 </tr>
               </thead>
               <tbody>
-                {results.slice(0, 100).map((result) => (
+                {resultsPagination.paginatedRows.map((result) => (
                   <tr key={result.row} className="border-b border-zinc-50 hover:bg-teal-50/30">
                     <td className="px-3 py-2.5 tabular-nums">{result.row}</td>
                     <td className="px-3 py-2.5">
@@ -181,9 +184,16 @@ export function AdminExternalDataImportDashboard({
                 ))}
               </tbody>
             </table>
-            {results.length > 100 ? (
-              <p className="px-4 py-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Showing first 100 matches.</p>
-            ) : null}
+            <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
+              <TablePagination
+                page={resultsPagination.page}
+                pageSize={resultsPagination.pageSize}
+                totalPages={resultsPagination.totalPages}
+                totalRows={resultsPagination.totalRows}
+                onPageChange={resultsPagination.setPage}
+                onPageSizeChange={resultsPagination.setPageSize}
+              />
+            </div>
           </div>
         ) : null}
       </section>

@@ -7,7 +7,9 @@ import { requireDashboardContext } from "@/lib/dashboard-access";
 import { loadRedemptionRequests } from "@/lib/redemption-requests";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
 import { buildRewardsHistory } from "@/lib/rewards-history";
-import { REDEMPTION_RATE_LABEL, getRedemptionOption } from "@/lib/reward-redemption";
+import { loadRewardSettings } from "@/lib/reward-settings-store";
+import { redemptionRateLabel } from "@/lib/reward-settings";
+import { getRedemptionOption } from "@/lib/reward-redemption";
 
 export const metadata = {
   title: "Redeem points | Belize Research Panel",
@@ -20,9 +22,10 @@ export default async function RedeemPointsPage({
 }) {
   const { option: optionParam } = await searchParams;
   const { account, profile, rewards } = await requireDashboardContext();
-  const [redemptionRequests, { completed }] = await Promise.all([
+  const [redemptionRequests, { completed }, rewardSettings] = await Promise.all([
     loadRedemptionRequests(account.email),
     getPanelistSurveys(account.email),
+    loadRewardSettings(),
   ]);
   const rewardsHistory = buildRewardsHistory({
     rewards,
@@ -40,7 +43,7 @@ export default async function RedeemPointsPage({
     <>
       <DashboardPageHeader
         title="Redeem points"
-        description={`${REDEMPTION_RATE_LABEL}. Submit your details for the reward you want — requests are reviewed before payout.`}
+        description={`${redemptionRateLabel(rewardSettings)}. Submit your details for the reward you want — requests are reviewed before payout.`}
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
         action={
           <Link
@@ -57,6 +60,7 @@ export default async function RedeemPointsPage({
           totalPoints={rewards.totalPoints}
           requests={redemptionRequests}
           profile={profile}
+          rewardSettings={rewardSettings}
           accountOnHold={account.accountStatus === "on_hold"}
           initialOptionId={initialOptionId}
           standalone

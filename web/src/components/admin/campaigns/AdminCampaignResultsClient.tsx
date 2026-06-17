@@ -11,6 +11,7 @@ import {
   StatGrid,
 } from "@/components/admin/campaigns/ResearchCharts";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { CampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
@@ -34,6 +35,7 @@ function statusBadgeClass(status: CampaignResultsSnapshot["campaign"]["status"])
 export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignResultsSnapshot }) {
   const [tab, setTab] = useState<ResultsTab>("fieldwork");
   const { campaign, fieldwork } = snapshot;
+  const rosterPagination = useTablePagination(snapshot.assignments);
 
   const funnelSteps = useMemo(
     () => [
@@ -290,7 +292,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
                     </td>
                   </tr>
                 ) : (
-                  snapshot.assignments.map((row) => (
+                  rosterPagination.paginatedRows.map((row) => (
                     <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20">
                       <td className="px-4 py-2.5">
                         <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.panelistName}</p>
@@ -323,6 +325,16 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
               </tbody>
             </table>
           </div>
+          {snapshot.assignments.length > 0 ? (
+            <TablePagination
+              page={rosterPagination.page}
+              pageSize={rosterPagination.pageSize}
+              totalPages={rosterPagination.totalPages}
+              totalRows={rosterPagination.totalRows}
+              onPageChange={rosterPagination.setPage}
+              onPageSizeChange={rosterPagination.setPageSize}
+            />
+          ) : null}
         </section>
       ) : null}
     </div>

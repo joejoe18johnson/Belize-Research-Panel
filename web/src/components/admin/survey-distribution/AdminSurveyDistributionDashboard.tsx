@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { FilterMultiSelect, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import {
   buildSurveyAssignmentRows,
   buildSurveyDistributionStats,
@@ -99,6 +100,8 @@ export function AdminSurveyDistributionDashboard({
     });
     return sortSurveyAssignments(filtered, sortKey, sortDirection);
   }, [allRows, search, categories, statuses, verificationStatuses, districts, overdueOnly, sortKey, sortDirection]);
+
+  const assignmentsPagination = useTablePagination(filteredRows);
 
   const eligibleCount = useMemo(
     () => countEligibleForTarget(panelists, targetGroup, constituency),
@@ -240,7 +243,7 @@ export function AdminSurveyDistributionDashboard({
                     </td>
                   </tr>
                 ) : (
-                  filteredRows.map((row) => (
+                  assignmentsPagination.paginatedRows.map((row) => (
                     <tr key={row.recordId} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
                       <td className="max-w-[14rem] px-3 py-2.5">
                         <p className="truncate font-medium text-zinc-800 dark:text-zinc-200" title={row.title}>
@@ -275,6 +278,14 @@ export function AdminSurveyDistributionDashboard({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={assignmentsPagination.page}
+            pageSize={assignmentsPagination.pageSize}
+            totalPages={assignmentsPagination.totalPages}
+            totalRows={assignmentsPagination.totalRows}
+            onPageChange={assignmentsPagination.setPage}
+            onPageSizeChange={assignmentsPagination.setPageSize}
+          />
         </section>
       ) : null}
 

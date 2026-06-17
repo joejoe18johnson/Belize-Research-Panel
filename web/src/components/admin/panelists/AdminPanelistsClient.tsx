@@ -156,7 +156,7 @@ export function AdminPanelistsClient({
   );
 
   const allPagination = useTablePagination(filteredRows);
-  const duplicatePagination = useTablePagination(duplicateClusters, 10);
+  const duplicatePagination = useTablePagination(duplicateClusters);
   const flaggedPagination = useTablePagination(flaggedRows);
 
   const cityOptions =

@@ -4,15 +4,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { RedemptionOption, RedemptionRequest } from "@/lib/reward-redemption";
 import {
-  REDEMPTION_MINIMUM_POINTS,
   REDEMPTION_OPTIONS,
-  REDEMPTION_RATE_LABEL,
   buildRedemptionOptionProgress,
   canAccessRedemption,
   formatBz,
   getAvailablePoints,
   pointsToBz,
 } from "@/lib/reward-redemption";
+import type { RewardSettings } from "@/lib/reward-settings";
+import { redemptionMinimumBz, redemptionRateLabel } from "@/lib/reward-settings";
 import {
   BoltIcon,
   BuildingLibraryIcon,
@@ -178,13 +178,17 @@ function RedemptionOptionCard({
 export function RedemptionOptionsCatalog({
   totalPoints,
   requests,
+  rewardSettings,
 }: {
   totalPoints: number;
   requests: RedemptionRequest[];
+  rewardSettings: RewardSettings;
 }) {
   const availablePoints = getAvailablePoints(totalPoints, requests);
-  const unlocked = canAccessRedemption(availablePoints);
-  const progressItems = REDEMPTION_OPTIONS.map((option) => buildRedemptionOptionProgress(availablePoints, option));
+  const unlocked = canAccessRedemption(availablePoints, rewardSettings);
+  const progressItems = REDEMPTION_OPTIONS.map((option) =>
+    buildRedemptionOptionProgress(availablePoints, option, rewardSettings)
+  );
   const [layout, setLayout] = useViewLayout("dashboard-redemption-options");
 
   return (
@@ -193,10 +197,10 @@ export function RedemptionOptionsCatalog({
         <div className="min-w-0 flex-1">
           <SectionHeading as="h3">Redemption options</SectionHeading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-            {REDEMPTION_RATE_LABEL}.{" "}
+            {redemptionRateLabel(rewardSettings)}.{" "}
             {unlocked
               ? formatHeadingCase("Choose a reward below when you have enough available points.")
-              : `Earn ${REDEMPTION_MINIMUM_POINTS} points (${formatBz(20)}) to unlock redemption.`}
+              : `Earn ${rewardSettings.redemptionMinimumPoints} points (${formatBz(redemptionMinimumBz(rewardSettings))}) to unlock redemption.`}
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:items-end">
@@ -208,7 +212,7 @@ export function RedemptionOptionsCatalog({
               <p className="text-lg font-bold text-teal-900 dark:text-teal-100">{availablePoints} pts</p>
             </div>
             <p className="text-sm font-semibold text-teal-700 sm:mt-0 sm:text-xs sm:font-normal">
-              {formatBz(pointsToBz(availablePoints))}
+              {formatBz(pointsToBz(availablePoints, rewardSettings))}
             </p>
           </div>
           </div>

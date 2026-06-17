@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinition[] }) {
+  const pagination = useTablePagination(surveys);
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -45,7 +48,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
               </tr>
             </thead>
             <tbody>
-              {surveys.map((survey) => (
+              {pagination.paginatedRows.map((survey) => (
                 <tr key={survey.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
                   <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{survey.title}</td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(survey.category)}</td>
@@ -76,6 +79,16 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
               ))}
             </tbody>
           </table>
+          <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
+            <TablePagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalPages={pagination.totalPages}
+              totalRows={pagination.totalRows}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+            />
+          </div>
         </div>
       )}
     </div>
