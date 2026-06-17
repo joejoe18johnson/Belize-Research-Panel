@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
-import type { CampaignAssignmentDetail, CampaignSummary } from "@/lib/campaign-targeting";
+import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadgeClass(status: CampaignSummary["status"]): string {
@@ -14,15 +14,7 @@ function statusBadgeClass(status: CampaignSummary["status"]): string {
   return "bg-amber-100 text-amber-900";
 }
 
-export function AdminCampaignsDashboard({
-  summaries,
-  selectedCampaignId,
-  assignmentDetails,
-}: {
-  summaries: CampaignSummary[];
-  selectedCampaignId: string | null;
-  assignmentDetails: CampaignAssignmentDetail[];
-}) {
+export function AdminCampaignsDashboard({ summaries }: { summaries: CampaignSummary[] }) {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -35,8 +27,6 @@ export function AdminCampaignsDashboard({
         row.targetingLabel.toLowerCase().includes(query)
     );
   }, [summaries, search]);
-
-  const selected = summaries.find((row) => row.id === selectedCampaignId) ?? null;
 
   const totals = useMemo(() => {
     return summaries.reduce(
@@ -165,7 +155,7 @@ export function AdminCampaignsDashboard({
                     <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600">{row.targetingLabel}</td>
                     <td className="px-4 py-2.5">
                       <Link
-                        href={`/admin/campaigns?campaign=${encodeURIComponent(row.id)}`}
+                        href={`/admin/campaigns/${encodeURIComponent(row.id)}/results`}
                         className="font-semibold text-teal-700 hover:text-teal-900"
                       >
                         View results
@@ -178,82 +168,6 @@ export function AdminCampaignsDashboard({
           </div>
         )}
       </section>
-
-      {selected ? (
-        <section className="rounded-2xl border border-teal-200 bg-teal-50/30 p-5 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-teal-950">{selected.title}</h2>
-              <p className="mt-1 text-sm text-zinc-600">
-                {selected.targetingLabel} · Due {selected.completeByDate} · {selected.points} points
-              </p>
-            </div>
-            <Link href="/admin/campaigns" className="text-sm font-semibold text-teal-700 hover:text-teal-900">
-              Close detail
-            </Link>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <MetricCard label="Assigned" value={selected.assigned} />
-            <MetricCard label="Pending" value={selected.pending} />
-            <MetricCard label="Opened" value={selected.opened} />
-            <MetricCard label="Completed" value={selected.completed} />
-            <MetricCard label="Overdue" value={selected.overdue} />
-          </div>
-
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 bg-white">
-            <table className="min-w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
-                  <th className="px-4 py-3">Panelist</th>
-                  <th className="px-4 py-3">District</th>
-                  <th className="px-4 py-3">Constituency</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Progress</th>
-                  <th className="px-4 py-3">Due</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assignmentDetails.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
-                      No assignments found for this campaign.
-                    </td>
-                  </tr>
-                ) : (
-                  assignmentDetails.map((row) => (
-                    <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20">
-                      <td className="px-4 py-2.5">
-                        <p className="font-medium text-zinc-800">{row.panelistName}</p>
-                        <p className="text-xs text-zinc-500">{row.panelistEmail}</p>
-                      </td>
-                      <td className="px-4 py-2.5">{row.district || "—"}</td>
-                      <td className="px-4 py-2.5">{row.constituency || "—"}</td>
-                      <td className="px-4 py-2.5">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
-                            row.overdue
-                              ? "bg-red-100 text-red-800"
-                              : row.status === "completed"
-                                ? "bg-teal-700 text-white"
-                                : row.status === "in_progress"
-                                  ? "bg-teal-100 text-teal-900"
-                                  : "bg-zinc-100 text-zinc-700"
-                          }`}
-                        >
-                          {row.overdue ? "overdue" : row.status === "available" ? "pending" : row.status.replace(/_/g, " ")}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums">{row.progressPercent}%</td>
-                      <td className="px-4 py-2.5 tabular-nums text-zinc-600">{row.completeByDate}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

@@ -1,0 +1,31 @@
+[
+  {
+    "assignmentId": "campaign-sample-coastal-tourism-2026",
+    "surveyDefinitionId": "survey-belize-coastal-tourism-2026",
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "answers": {
+      "q-coastal-visit": "Yes",
+      "q-reef-importance": 5,
+      "q-coastal-frequency": "Monthly or more",
+      "q-priorities": [
+        "Cruise ship impacts"
+      ],
+      "q-spending-change": "About the same",
+      "q-interview-notes": "Yes"
+    },
+    "startedAt": "2026-06-17T04:08:07.377Z",
+    "updatedAt": "2026-06-17T04:08:07.377Z",
+    "submittedAt": "2026-06-17T04:08:07.377Z"
+  },
+  {
+    "assignmentId": "campaign-belize-as-a-country-mqhk48xc",
+    "surveyDefinitionId": "survey-belize-as-a-country-mqhk0zzy",
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "answers": {
+      "q-m5fuxb56": "Yes"
+    },
+    "startedAt": "2026-06-17T04:14:46.041Z",
+    "updatedAt": "2026-06-17T04:14:46.041Z",
+    "submittedAt": "2026-06-17T04:14:46.041Z"
+  }
+]

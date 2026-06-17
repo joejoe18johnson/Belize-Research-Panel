@@ -2,12 +2,12 @@ import { promises as fs } from "fs";
 import path from "path";
 import {
   calculateSurveyProgress,
-  type SurveyAnswerValue,
   validateSurveySubmission,
-} from "./survey-definitions";
+  type SurveyAnswerValue,
+} from "./survey-types";
+import { findSurveyDefinitionById } from "./survey-definitions";
 import { loadSurveyRecordsFromFile, saveSurveyRecordsToFile } from "./panelist-surveys-store";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
-import { findSurveyDefinitionById } from "./survey-definitions";
 import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "survey-responses.json");
@@ -185,4 +185,9 @@ export async function submitSurveyResponse(input: {
 export async function loadSurveyResponsesForDefinition(surveyDefinitionId: string): Promise<SurveyResponseRecord[]> {
   const records = await loadSurveyResponsesRaw();
   return records.filter((record) => record.surveyDefinitionId === surveyDefinitionId);
+}
+
+export async function loadSurveyResponsesForCampaign(campaignId: string): Promise<SurveyResponseRecord[]> {
+  const records = await loadSurveyResponsesRaw();
+  return records.filter((record) => record.assignmentId === campaignId);
 }

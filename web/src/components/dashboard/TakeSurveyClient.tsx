@@ -11,7 +11,7 @@ import {
   type SurveyAnswerValue,
   type SurveyDefinition,
   type SurveyQuestion,
-} from "@/lib/survey-definitions";
+} from "@/lib/survey-types";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 

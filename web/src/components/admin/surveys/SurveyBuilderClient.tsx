@@ -12,7 +12,7 @@ import {
   type SurveyDefinition,
   type SurveyQuestion,
   type SurveyQuestionType,
-} from "@/lib/survey-definitions";
+} from "@/lib/survey-types";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -37,8 +37,12 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
     setQuestions((current) => current.map((question) => (question.id === id ? { ...question, ...patch } : question)));
   };
 
-  const addQuestion = (type: SurveyQuestionType = "short_text") => {
-    setQuestions((current) => [...current, createEmptyQuestion(type)]);
+  const insertQuestion = (afterIndex: number, type: SurveyQuestionType = "short_text") => {
+    setQuestions((current) => {
+      const next = [...current];
+      next.splice(afterIndex + 1, 0, createEmptyQuestion(type));
+      return next;
+    });
   };
 
   const duplicateQuestion = (id: string) => {
@@ -169,24 +173,16 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
       </section>
 
       <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
           <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Questions")}</h2>
-          <div className="flex flex-wrap gap-2">
-            {BUILDER_QUESTION_TYPES.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => addQuestion(type)}
-                className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-teal-50"
-              >
-                + {SURVEY_QUESTION_TYPE_LABELS[type]}
-              </button>
-            ))}
-          </div>
+          <p className="mt-1 text-sm text-zinc-500">
+            Use <strong>Add question</strong> below any item to insert the next question in place — no need to scroll back up.
+          </p>
         </div>
 
         {questions.map((question, index) => (
-          <article key={question.id} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+          <div key={question.id} className="space-y-3">
+            <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <p className="text-sm font-semibold text-teal-900">Question {index + 1}</p>
               <div className="flex flex-wrap gap-2">
@@ -321,7 +317,9 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
                 </div>
               </div>
             </div>
-          </article>
+            </article>
+            <AddQuestionBelow onAdd={(type) => insertQuestion(index, type)} />
+          </div>
         ))}
       </section>
 
@@ -348,6 +346,59 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         >
           Back to library
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function AddQuestionBelow({ onAdd }: { onAdd: (type: SurveyQuestionType) => void }) {
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-dashed border-teal-300 bg-teal-50/50 px-5 text-sm font-semibold text-teal-800 transition hover:border-teal-400 hover:bg-teal-50"
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-700 text-base leading-none text-white">
+            +
+          </span>
+          Add question
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-dashed border-teal-200 bg-teal-50/40 p-4">
+      <p className="text-center text-xs font-semibold uppercase tracking-wide text-teal-800">
+        Choose question type
+      </p>
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
+        {BUILDER_QUESTION_TYPES.map((type) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => {
+              onAdd(type);
+              setOpen(false);
+            }}
+            className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold text-teal-900 hover:bg-teal-100"
+          >
+            {SURVEY_QUESTION_TYPE_LABELS[type]}
+          </button>
+        ))}
+      </div>
+      <div className="mt-3 text-center">
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="text-xs font-semibold text-zinc-500 hover:text-zinc-700"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );

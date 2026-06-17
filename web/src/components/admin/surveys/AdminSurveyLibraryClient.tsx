@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
-import type { SurveyDefinition } from "@/lib/survey-definitions";
+import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinition[] }) {
