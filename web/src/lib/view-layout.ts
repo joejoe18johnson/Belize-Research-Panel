@@ -1,13 +1,12 @@
-export type ViewLayout = "cards" | "list" | "horizontal";
+export type ViewLayout = "cards" | "list";
 
 export const VIEW_LAYOUT_OPTIONS: { id: ViewLayout; label: string; shortLabel: string }[] = [
   { id: "cards", label: "Card view", shortLabel: "Cards" },
   { id: "list", label: "List view", shortLabel: "List" },
-  { id: "horizontal", label: "Horizontal layout", shortLabel: "Row" },
 ];
 
 export function isViewLayout(value: string | null | undefined): value is ViewLayout {
-  return value === "cards" || value === "list" || value === "horizontal";
+  return value === "cards" || value === "list";
 }
 
 export function readStoredViewLayout(scope: string): ViewLayout | null {
@@ -39,14 +38,10 @@ export function viewLayoutContainerClass(
   cardsGridClass = "grid gap-4 sm:grid-cols-2"
 ): string {
   if (layout === "list") return "flex flex-col gap-3";
-  if (layout === "horizontal") {
-    return "flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
-  }
   return cardsGridClass;
 }
 
-export function viewLayoutItemClass(layout: ViewLayout, horizontalWidth = "w-[min(85vw,18rem)]"): string {
-  if (layout === "horizontal") return `${horizontalWidth} shrink-0 snap-start`;
+export function viewLayoutItemClass(layout: ViewLayout, _itemWidth?: string): string {
   if (layout === "list") return "w-full";
   return "";
 }

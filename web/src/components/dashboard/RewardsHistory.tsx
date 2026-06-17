@@ -50,20 +50,6 @@ function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
 }
 
 function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layout: ViewLayout }) {
-  if (layout === "horizontal") {
-    return (
-      <div className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-4">
-        <HistoryIcon kind={entry.kind} />
-        <p className="mt-3 line-clamp-2 text-sm font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
-        <p className="mt-1 line-clamp-2 flex-1 text-xs text-zinc-600">{entry.detail}</p>
-        <p className={`mt-3 text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
-          {entry.points >= 0 ? "+" : "−"}
-          {Math.abs(entry.points)} pts
-        </p>
-      </div>
-    );
-  }
-
   if (layout === "cards") {
     return (
       <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
