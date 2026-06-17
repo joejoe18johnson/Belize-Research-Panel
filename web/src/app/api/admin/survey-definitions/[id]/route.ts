@@ -39,6 +39,7 @@ export async function PUT(
     const survey = await updateSurveyDefinition(id, {
       title: body.title !== undefined ? cleanText(String(body.title)) : undefined,
       description: body.description !== undefined ? cleanText(String(body.description)) : undefined,
+      companyIntro: body.companyIntro !== undefined ? cleanText(String(body.companyIntro)) : undefined,
       category:
         body.category !== undefined
           ? ((cleanText(String(body.category)) || "civic") as SurveyCategory)

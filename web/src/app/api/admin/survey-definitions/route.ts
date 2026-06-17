@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     const survey = await createSurveyDefinition({
       title: cleanText(String(body.title ?? "")),
       description: cleanText(String(body.description ?? "")),
+      companyIntro: cleanText(String(body.companyIntro ?? "")),
       category: (cleanText(String(body.category ?? "civic")) || "civic") as SurveyCategory,
       status: body.status === "published" ? "published" : "draft",
       questions: Array.isArray(body.questions) ? body.questions : undefined,

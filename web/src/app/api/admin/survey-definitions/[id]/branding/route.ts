@@ -7,7 +7,7 @@ import {
   removeSurveyBrandingAsset,
   saveSurveyBrandingAsset,
   type SurveyBrandingAssetKind,
-} from "@/lib/survey-branding";
+} from "@/lib/survey-branding-server";
 import { findSurveyDefinitionById, updateSurveyDefinition } from "@/lib/survey-definitions";
 import { cleanText } from "@/lib/validation";
 

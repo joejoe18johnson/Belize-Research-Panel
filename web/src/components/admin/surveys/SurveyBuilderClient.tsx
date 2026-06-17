@@ -2,8 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
+import {
+  SurveyBrandingFields,
+  uploadSurveyBranding,
+  type SurveyBrandingUploadState,
+} from "@/components/admin/surveys/SurveyBrandingFields";
 import { SurveyOptionListEditor } from "@/components/admin/surveys/SurveyOptionListEditor";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BUILDER_QUESTION_TYPES, SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
@@ -26,6 +31,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
 
   const [title, setTitle] = useState(initialSurvey?.title ?? "");
   const [description, setDescription] = useState(initialSurvey?.description ?? "");
+  const [companyIntro, setCompanyIntro] = useState(initialSurvey?.companyIntro ?? "");
   const [category, setCategory] = useState<SurveyCategory>(initialSurvey?.category ?? "civic");
   const [status, setStatus] = useState<SurveyDefinition["status"]>(initialSurvey?.status ?? "draft");
   const [questions, setQuestions] = useState<SurveyQuestion[]>(
@@ -34,6 +40,16 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const brandingUploadRef = useRef<SurveyBrandingUploadState>({
+    logoFile: null,
+    coverFile: null,
+    removeLogo: false,
+    removeCover: false,
+  });
+
+  const handleBrandingChange = useCallback((state: SurveyBrandingUploadState) => {
+    brandingUploadRef.current = state;
+  }, []);
 
   const updateQuestion = (id: string, patch: Partial<SurveyQuestion>) => {
     setQuestions((current) => current.map((question) => (question.id === id ? { ...question, ...patch } : question)));
@@ -87,6 +103,7 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
       const payload = {
         title,
         description,
+        companyIntro,
         category,
         status: nextStatus,
         questions: questions.map(sanitizeQuestionOptions),
@@ -102,6 +119,12 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
       const data = (await res.json()) as { ok?: boolean; message?: string; survey?: SurveyDefinition };
       if (!res.ok || !data.ok || !data.survey) {
         setError(data.message ?? "Could not save survey.");
+        return;
+      }
+
+      const brandingResult = await uploadSurveyBranding(data.survey.id, brandingUploadRef.current);
+      if (!brandingResult.ok) {
+        setError(brandingResult.message ?? "Survey saved, but branding assets could not be uploaded.");
         return;
       }
 
@@ -179,6 +202,17 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
           </div>
         </div>
       </section>
+
+      <SurveyBrandingFields
+        surveyId={initialSurvey?.id}
+        initialSurvey={initialSurvey}
+        title={title}
+        description={description}
+        category={category}
+        companyIntro={companyIntro}
+        onCompanyIntroChange={setCompanyIntro}
+        onBrandingChange={handleBrandingChange}
+      />
 
       <section className="space-y-4">
         <div>
