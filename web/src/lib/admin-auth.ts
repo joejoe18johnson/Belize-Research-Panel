@@ -1,27 +1,22 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+  createAdminSessionExpiry,
+  decodeAdminSessionToken,
+  encodeAdminSessionToken,
+  type AdminSession,
+} from "./admin-session";
+import {
   adminPathAllowedForRole,
   staffDefaultAdminPath,
-  type StaffRole,
 } from "./staff-roles";
 import { verifyStaffUserLogin, type StaffUserRecord } from "./staff-users";
 
-export const ADMIN_SESSION_COOKIE = "brp_admin_session";
-const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
-
-export interface AdminSession {
-  role: StaffRole;
-  email: string;
-  staffId: string;
-  displayName: string;
-  exp: number;
-}
-
-function sessionSecret(): string {
-  return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
-}
+export type { AdminSession } from "./admin-session";
+export { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "./admin-session";
 
 export function adminPassword(): string {
   return process.env.ADMIN_PASSWORD?.trim() || "admin123";
@@ -35,42 +30,15 @@ export function verifyAdminPassword(password: string): boolean {
   return timingSafeEqual(provided, target);
 }
 
-function signPayload(payload: string): string {
-  return createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
-}
-
-function encodeSessionPayload(session: Omit<AdminSession, "exp"> & { exp: number }): string {
-  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  return `${payload}.${signPayload(payload)}`;
-}
-
-export function decodeAdminSessionToken(token: string): AdminSession | null {
-  const [payload, signature] = token.split(".");
-  if (!payload || !signature) return null;
-  const expected = signPayload(payload);
-  const sigBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expected);
-  if (sigBuffer.length !== expectedBuffer.length || !timingSafeEqual(sigBuffer, expectedBuffer)) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8")) as AdminSession;
-    if (!parsed.role || !parsed.exp || parsed.exp < Date.now()) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
 function staffDisplayName(user: StaffUserRecord): string {
   return `${user.first_name} ${user.last_name}`.trim();
 }
 
 export async function setAdminSessionCookie(session: Omit<AdminSession, "exp">): Promise<void> {
   const cookieStore = await cookies();
-  const token = encodeSessionPayload({
+  const token = encodeAdminSessionToken({
     ...session,
-    exp: Date.now() + ADMIN_SESSION_MAX_AGE_SECONDS * 1000,
+    exp: createAdminSessionExpiry(),
   });
   cookieStore.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,

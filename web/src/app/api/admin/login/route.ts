@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  authenticateStaffLogin,
-  setAdminSessionCookie,
-  staffDefaultAdminPath,
-} from "@/lib/admin-auth";
+import { authenticateStaffLogin, setAdminSessionCookie } from "@/lib/admin-auth";
+import { staffDefaultAdminPath } from "@/lib/staff-roles";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { email?: string; password?: string };

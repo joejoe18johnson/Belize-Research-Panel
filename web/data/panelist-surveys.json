@@ -323,5 +323,18 @@
     "completedDate": "2026-05-10",
     "surveyUrl": "https://forms.gle/demo-glen-onboarding",
     "panelistEmail": "glen.avilez@belizepanel.test"
+  },
+  {
+    "id": "campaign-sample-coastal-tourism-2026",
+    "title": "Belize coastal tourism attitudes 2026",
+    "category": "market",
+    "assignedDate": "2026-06-16",
+    "completeByDate": "2026-06-30",
+    "points": 125,
+    "status": "available",
+    "progressPercent": 0,
+    "completedDate": null,
+    "surveyUrl": "https://forms.gle/sample-belize-coastal-tourism-2026",
+    "panelistEmail": "johannesjohnsonj@gmail.com"
   }
 ]

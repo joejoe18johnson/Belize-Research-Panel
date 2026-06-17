@@ -11,8 +11,7 @@ import {
   type AdminModule,
 } from "@/lib/admin-modules";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
-import { STAFF_ROLE_LABELS } from "@/lib/staff-roles";
-import { staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
+import { STAFF_ROLE_LABELS, staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadge(status?: AdminModule["status"]) {

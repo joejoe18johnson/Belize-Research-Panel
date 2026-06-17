@@ -32,10 +32,10 @@ export function HomePageClient() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white">
       <header className="safe-top mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <BrpLogoLink href="/" variant="dark" />
 
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher locale={locale} onChange={handleLocaleChange} />
 
             <div className="hidden items-center gap-3 sm:flex">

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "campaign-sample-coastal-tourism-2026",
+    "title": "Belize coastal tourism attitudes 2026",
+    "description": "Sample campaign for panelist inbox preview. Share your views on tourism development, reef conservation, and visitor spending along Belize's coast.",
+    "category": "market",
+    "status": "active",
+    "surveyUrl": "https://forms.gle/sample-belize-coastal-tourism-2026",
+    "points": 125,
+    "assignedDate": "2026-06-16",
+    "completeByDate": "2026-06-30",
+    "deliveryMethod": "External Survey Link",
+    "targeting": {
+      "mode": "specific_emails",
+      "emails": [
+        "johannesjohnsonj@gmail.com"
+      ]
+    },
+    "createdAt": "2026-06-16T12:00:00.000Z",
+    "launchedAt": "2026-06-16T12:00:00.000Z"
+  }
+]

@@ -34,8 +34,11 @@ export async function getPanelistSurveys(email: string): Promise<{
 
   const surveys = matched.map(toPanelistSurvey);
 
+  const byAssignedNewest = (a: PanelistSurvey, b: PanelistSurvey) =>
+    b.assignedDate.localeCompare(a.assignedDate) || b.id.localeCompare(a.id);
+
   return {
-    inbox: surveys.filter((survey) => survey.status !== "completed"),
-    completed: surveys.filter((survey) => survey.status === "completed"),
+    inbox: surveys.filter((survey) => survey.status !== "completed").sort(byAssignedNewest),
+    completed: surveys.filter((survey) => survey.status === "completed").sort(byAssignedNewest),
   };
 }
