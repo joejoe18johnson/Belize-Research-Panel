@@ -22,8 +22,8 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
           : "Your panelist account is temporarily on hold while we verify a contact detail change. Dashboard access, surveys, and profile editing are paused until an administrator approves the update."}
       </BrandedAlert>
 
-      <div className="space-y-4 rounded-2xl border border-teal-100 bg-white p-6 shadow-sm shadow-teal-950/5">
-        <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("What is pending")}</h2>
+      <div className="space-y-4 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-6 shadow-sm shadow-teal-950/5">
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("What is pending")}</h2>
 
         {fraudReview ? (
           <BrandedAlert tone="info" title="Duplicate review" compact showIcon>
@@ -34,10 +34,10 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
         ) : null}
 
         {pendingEmail ? (
-          <div className="rounded-xl border border-teal-100 bg-teal-50/40 px-4 py-3 text-sm">
-            <p className="font-semibold text-teal-950">{formatHeadingCase("Email change")}</p>
+          <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 px-4 py-3 text-sm">
+            <p className="font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Email change")}</p>
             <p className="mt-1 text-teal-900/80">
-              Requested address: <span className="font-medium text-teal-950">{pendingEmail}</span>
+              Requested address: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingEmail}</span>
             </p>
             <p className="mt-2 text-teal-900/80">
               An administrator must approve this change before your account is reactivated. Your login email stays{" "}
@@ -57,10 +57,10 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
         ) : null}
 
         {pendingPhone ? (
-          <div className="rounded-xl border border-teal-100 bg-teal-50/40 px-4 py-3 text-sm">
-            <p className="font-semibold text-teal-950">{formatHeadingCase("Phone change")}</p>
+          <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 px-4 py-3 text-sm">
+            <p className="font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Phone change")}</p>
             <p className="mt-1 text-teal-900/80">
-              Requested number: <span className="font-medium text-teal-950">{pendingPhone}</span>
+              Requested number: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingPhone}</span>
             </p>
             <p className="mt-2 text-teal-900/80">
               An administrator must approve this change before your account is reactivated. Current number on file
@@ -89,11 +89,11 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/dashboard/profile"
-          className="rounded-xl border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+          className="rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
         >
           Back to profile
         </Link>
-        <LogoutButton className="rounded-xl border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm hover:bg-teal-50" />
+        <LogoutButton className="rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-semibold text-teal-800 dark:text-teal-200 shadow-sm hover:bg-teal-50 dark:hover:bg-teal-900/40" />
       </div>
     </div>
   );

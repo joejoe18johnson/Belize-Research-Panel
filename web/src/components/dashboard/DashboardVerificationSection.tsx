@@ -9,7 +9,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
   return (
     <div className="space-y-6">
       <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0">
-        <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 bg-teal-700 px-5 py-5 text-white sm:px-6">
+        <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 dark:border-teal-900/60 bg-teal-700 px-5 py-5 text-white sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-teal-100">{formatHeadingCase("Verification center")}</p>
@@ -27,7 +27,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
             </span>
           </div>
         </div>
-        <div className="space-y-2 px-5 py-4 text-sm text-zinc-600 sm:px-6">
+        <div className="space-y-2 px-5 py-4 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 sm:px-6">
           <p>
             {formatHeadingCase("Submitted")}: {summary.registrationDate}
           </p>
@@ -46,7 +46,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
       {!summary.isVerified ? (
         <DashboardCard>
           <SectionHeading as="h3">{formatHeadingCase("Need to update something?")}</SectionHeading>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             {formatHeadingCase(
               "Contact details such as phone number can be updated from your profile. Photo ID changes require support from the panel team."
             )}
@@ -60,7 +60,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
             </Link>
             <Link
               href="/dashboard/notifications"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
             >
               {formatHeadingCase("View notifications")}
             </Link>

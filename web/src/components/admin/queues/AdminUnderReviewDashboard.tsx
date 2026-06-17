@@ -109,9 +109,9 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
       ) : null}
 
       {requirementFilter === "phone" ? (
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Pending phone number <em>changes</em> awaiting approval are in{" "}
-          <Link href="/admin/notifications?type=phone" className="font-semibold text-teal-700 hover:text-teal-900">
+          <Link href="/admin/notifications?type=phone" className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100">
             Notifications → Phone changes
           </Link>
           .
@@ -149,19 +149,19 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
 
       <section
         id="under-review-queue"
-        className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+        className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
       >
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Review queue")}</h2>
-            <p className="mt-1 text-sm text-zinc-500">{filtered.length} records</p>
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Review queue")}</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{filtered.length} records</p>
           </div>
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search name, email, status…"
-            className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            className="w-full max-w-xs rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           />
         </div>
 
@@ -182,7 +182,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
           </div>
         ) : (
           <>
-            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
               <AdminDataTable className="min-w-[960px]">
                 <AdminTableHead>
                   <AdminTableTh>Name</AdminTableTh>
@@ -197,8 +197,8 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                 <tbody>
                   {pagination.paginatedRows.map((row) => (
                     <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
-                      <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-800">{row.name}</td>
-                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700">{row.email}</td>
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-800 dark:text-zinc-200">{row.name}</td>
+                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
                       <td className="whitespace-nowrap px-4 py-3">
                         <RequirementStatusGroup
                           email={row.emailRequirement}
@@ -223,19 +223,19 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                         {row.accountStatus === "on_hold" ? (
                           <AdminStatusPill label="On hold" tone="warning" />
                         ) : (
-                          <span className="text-zinc-500">Active</span>
+                          <span className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Active</span>
                         )}
                       </td>
                       <td className="align-top px-4 py-3">
                         <ReviewReasonList reasons={row.reasons} />
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-600">
+                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                         {row.registrationDate || "—"}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3">
                         <Link
                           href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                          className="font-semibold text-teal-700 hover:text-teal-900"
+                          className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                         >
                           Open record
                         </Link>

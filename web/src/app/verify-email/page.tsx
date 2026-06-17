@@ -49,7 +49,7 @@ export default async function VerifyEmailPage({
           <Link href="/login" className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800">
             Log in
           </Link>
-          <Link href="/signup" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+          <Link href="/signup" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
             Create a new account
           </Link>
         </div>

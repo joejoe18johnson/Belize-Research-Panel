@@ -23,12 +23,12 @@ export function RegistrationPhaseNav({
   onNext: () => void;
 }) {
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+    <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       {activePhaseIndex > 0 ? (
         <button
           type="button"
           onClick={onBack}
-          className={`${navButtonClass} border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50`}
+          className={`${navButtonClass} border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950`}
         >
           Back
         </button>
@@ -56,7 +56,7 @@ export function RegistrationPhaseNav({
           type="button"
           onClick={onNext}
           disabled={nextDisabled}
-          className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:hover:bg-zinc-300`}
+          className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 disabled:shadow-none disabled:hover:bg-zinc-300`}
         >
           Next
         </button>

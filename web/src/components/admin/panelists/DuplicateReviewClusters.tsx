@@ -72,20 +72,20 @@ export function DuplicateReviewClusters({
                 <p className="text-xs font-semibold text-amber-800">
                   Duplicate cluster {clusterIndex + 1}
                 </p>
-                <h3 className="mt-1 text-lg font-bold text-zinc-900">
+                <h3 className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
                   {formatAdminLabel(cluster.displayName)}
                 </h3>
-                <p className="mt-1 text-sm text-zinc-600">
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   Born {formatDobDisplay(cluster.dob) || cluster.dob} · {cluster.records.length} matching records
                 </p>
               </div>
-              <span className="rounded-full border border-amber-300 bg-white px-3 py-1 text-xs font-semibold text-amber-900">
+              <span className="rounded-full border border-amber-300 bg-white dark:bg-zinc-900 px-3 py-1 text-xs font-semibold text-amber-900">
                 Compare side by side
               </span>
             </div>
 
             <div className="mt-4 space-y-2">
-              <p className="text-xs font-semibold text-zinc-600">Why these may be duplicates</p>
+              <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Why these may be duplicates</p>
               <ul className="space-y-2">
                 {cluster.relationships.map((link) => (
                   <li
@@ -138,15 +138,15 @@ function DuplicateRecordCard({
   const busy = actions.flaggingEmail === record.email || actions.deletingEmail === record.email;
 
   return (
-    <div className="flex min-w-0 flex-col rounded-xl border border-zinc-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-2 border-b border-zinc-100 px-4 py-3">
+    <div className="flex min-w-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+      <div className="flex items-start justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-teal-700">
             Record {recordIndex + 1} of {clusterSize}
           </p>
-          <p className="mt-0.5 truncate text-sm font-semibold text-zinc-900">{cleanText(record.email)}</p>
+          <p className="mt-0.5 truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{cleanText(record.email)}</p>
           {recordIndex > 0 ? (
-            <p className="mt-1 text-[11px] text-zinc-500">
+            <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               Linked to record 1 via {formatAdminLabel(cluster.relationships[0]?.label ?? "name + DOB")}
             </p>
           ) : null}
@@ -161,24 +161,24 @@ function DuplicateRecordCard({
           return (
             <div
               key={field.key}
-              className={`rounded-lg px-2.5 py-2 ${shared ? "bg-emerald-50/80 ring-1 ring-emerald-100" : "bg-zinc-50"}`}
+              className={`rounded-lg px-2.5 py-2 ${shared ? "bg-emerald-50/80 ring-1 ring-emerald-100" : "bg-zinc-50 dark:bg-zinc-950"}`}
             >
-              <dt className="text-[11px] font-semibold text-zinc-500">
+              <dt className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 {formatAdminLabel(field.label)}
                 {shared ? (
                   <span className="ml-1.5 font-bold text-emerald-700">· Match</span>
                 ) : value !== "—" ? (
-                  <span className="ml-1.5 font-medium text-zinc-400">· Differs</span>
+                  <span className="ml-1.5 font-medium text-zinc-400 dark:text-zinc-500">· Differs</span>
                 ) : null}
               </dt>
-              <dd className="mt-0.5 break-all font-medium text-zinc-800">{value}</dd>
+              <dd className="mt-0.5 break-all font-medium text-zinc-800 dark:text-zinc-200">{value}</dd>
             </div>
           );
         })}
       </dl>
 
-      <div className="border-t border-zinc-100 px-4 py-3">
-        <p className="text-[11px] font-semibold text-zinc-500">Requirements</p>
+      <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
+        <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Requirements</p>
         <div className="mt-1.5">
           {requirements ? (
             <RequirementStatusGroup
@@ -188,7 +188,7 @@ function DuplicateRecordCard({
               iconsOnly
             />
           ) : (
-            <span className="text-xs text-zinc-400">—</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">—</span>
           )}
         </div>
         {isFlagged ? (
@@ -259,7 +259,7 @@ function IconButton({
         ? "text-red-700 hover:bg-red-50"
         : tone === "muted"
           ? "text-zinc-300 cursor-not-allowed"
-          : "text-teal-700 hover:bg-teal-50";
+          : "text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40";
 
   return (
     <button

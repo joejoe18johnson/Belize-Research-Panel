@@ -17,7 +17,7 @@ function statusTone(status: NonNullable<RewardsHistoryEntry["status"]>): string 
     case "fulfilled":
       return "bg-emerald-50 text-emerald-800 border-emerald-200";
     case "approved":
-      return "bg-teal-50 text-teal-800 border-teal-200";
+      return "bg-teal-50 text-teal-800 dark:text-teal-200 border-teal-200";
     case "rejected":
       return "bg-red-50 text-red-800 border-red-200";
     default:
@@ -52,14 +52,14 @@ function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
 function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layout: ViewLayout }) {
   if (layout === "cards") {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 p-4">
         <div className="flex items-start gap-3">
           <HistoryIcon kind={entry.kind} />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
-            <p className="mt-1 text-sm text-zinc-600">{entry.detail}</p>
+            <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(entry.title)}</p>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{entry.detail}</p>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-zinc-500">{entry.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{entry.dateLabel}</p>
               <span className={`text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
                 {entry.points >= 0 ? "+" : "−"}
                 {Math.abs(entry.points)} pts
@@ -77,9 +77,9 @@ function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layou
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
-            <p className="mt-0.5 text-sm text-zinc-600">{entry.detail}</p>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+            <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(entry.title)}</p>
+            <p className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{entry.detail}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               <span>{entry.dateLabel}</span>
               {entry.referenceId ? <span>Ref {entry.referenceId}</span> : null}
               {entry.amountBz ? <span>{formatBz(entry.amountBz)}</span> : null}
@@ -123,10 +123,10 @@ export function RewardsHistory({
 
   return (
     <DashboardCard>
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-100 pb-3">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
         <div>
           <SectionHeading as="h3">{variant === "earnings" ? "Earnings history" : "Rewards history"}</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             {variant === "earnings"
               ? "Points earned from registration, verification, and surveys."
               : "Points earned and withdrawal requests on your account."}
@@ -150,7 +150,7 @@ export function RewardsHistory({
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 filter === item.id
                   ? "bg-teal-700 text-white"
-                  : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                  : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-teal-50 dark:hover:bg-teal-900/40"
               }`}
             >
               {item.label}
@@ -162,13 +162,13 @@ export function RewardsHistory({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-8 text-center">
-          <p className="font-medium text-zinc-800">
+        <div className="mt-6 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-8 text-center">
+          <p className="font-medium text-zinc-800 dark:text-zinc-200">
             {filter === "withdrawals"
               ? formatHeadingCase("No withdrawal requests yet")
               : formatHeadingCase("No rewards activity yet")}
           </p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             {filter === "withdrawals"
               ? "When you redeem points, your withdrawal requests will appear here with live status updates."
               : variant === "earnings"

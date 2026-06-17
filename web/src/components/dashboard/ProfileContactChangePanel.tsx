@@ -98,11 +98,11 @@ export function ProfileContactChangePanel({
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-      <h3 className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+      <h3 className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
         {formatHeadingCase("Email and phone")}
       </h3>
-      <p className="mt-3 text-sm text-zinc-600">
+      <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         Changing your email or phone puts your account on hold until an administrator approves the update.
       </p>
 
@@ -119,7 +119,7 @@ export function ProfileContactChangePanel({
                 Pending phone approval: <span className="font-medium">{account.pendingPhone}</span>.{" "}
               </>
             ) : null}
-            <Link href="/dashboard/account-on-hold" className="font-semibold text-teal-800 underline">
+            <Link href="/dashboard/account-on-hold" className="font-semibold text-teal-800 dark:text-teal-200 underline">
               View hold status
             </Link>
           </BrandedAlert>
@@ -127,9 +127,9 @@ export function ProfileContactChangePanel({
       ) : null}
 
       <div className="mt-5 space-y-6">
-        <div className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-4">
-          <p className="text-sm font-medium text-zinc-800">Current email</p>
-          <p className="mt-1 text-sm text-zinc-600">{account.email}</p>
+        <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
+          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current email</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{account.email}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field label="New email address" error={errors.newEmail ?? errors.emailChange} id="newEmail">
@@ -150,14 +150,14 @@ export function ProfileContactChangePanel({
               >
                 {emailSubmitting ? "Submitting…" : "Request email change (admin approval)"}
               </button>
-              {emailMessage ? <p className="text-sm text-zinc-600">{emailMessage}</p> : null}
+              {emailMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{emailMessage}</p> : null}
             </div>
           ) : null}
         </div>
 
-        <div className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-4">
-          <p className="text-sm font-medium text-zinc-800">Current phone / WhatsApp</p>
-          <p className="mt-1 text-sm text-zinc-600">{contact.phone || "Not provided"}</p>
+        <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
+          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current phone / WhatsApp</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{contact.phone || "Not provided"}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field
@@ -178,11 +178,11 @@ export function ProfileContactChangePanel({
                 type="button"
                 onClick={requestPhoneChange}
                 disabled={phoneSubmitting || !phoneLocalNumber.trim()}
-                className="flex min-h-12 w-full items-center justify-center rounded-xl border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-60 sm:w-auto"
+                className="flex min-h-12 w-full items-center justify-center rounded-xl border border-teal-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 sm:w-auto"
               >
                 {phoneSubmitting ? "Submitting…" : "Request phone change (admin approval)"}
               </button>
-              {phoneMessage ? <p className="text-sm text-zinc-600">{phoneMessage}</p> : null}
+              {phoneMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{phoneMessage}</p> : null}
             </div>
           ) : null}
         </div>

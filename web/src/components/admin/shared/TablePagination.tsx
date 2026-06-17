@@ -56,15 +56,15 @@ export function TablePagination({
   const end = Math.min(page * pageSize, totalRows);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
-      <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-600">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         <label className="flex items-center gap-2">
-          <span className="text-xs font-medium text-zinc-600">Rows per page</span>
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Rows per page</span>
           <select
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value) as PageSizeOption)}
             aria-label="Rows per page"
-            className="min-h-9 min-w-[4.5rem] rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            className="min-h-9 min-w-[4.5rem] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
@@ -80,18 +80,18 @@ export function TablePagination({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40"
+          className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 disabled:opacity-40"
         >
           Previous
         </button>
-        <span className="min-w-[5rem] text-center text-sm tabular-nums text-zinc-600">
+        <span className="min-w-[5rem] text-center text-sm tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Page {page} of {totalPages}
         </span>
         <button
           type="button"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
-          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40"
+          className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 disabled:opacity-40"
         >
           Next
         </button>

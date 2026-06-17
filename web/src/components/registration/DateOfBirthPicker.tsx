@@ -138,7 +138,7 @@ export function DateOfBirthPicker({ value, onChange, onBlur, error, compact = fa
         </Field>
       </div>
 
-      <p className="mt-4 text-sm text-zinc-500">
+      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
         Select your birth month, day, and year. You must be at least 18 years old.
       </p>
 

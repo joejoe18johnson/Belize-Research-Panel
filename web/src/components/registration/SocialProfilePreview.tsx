@@ -76,9 +76,9 @@ export function SocialProfilePreview({
       : null;
 
   return (
-    <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+    <div className="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-teal-100 text-sm font-semibold text-teal-800">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-teal-100 text-sm font-semibold text-teal-800 dark:text-teal-200">
           {proxiedImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -92,8 +92,8 @@ export function SocialProfilePreview({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-zinc-900">{preview.displayName}</p>
-          <p className="truncate text-xs text-zinc-500">
+          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{preview.displayName}</p>
+          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             {platformLabel}
             {preview.handle ? ` · @${preview.handle.replace(/^@/, "")}` : ""}
           </p>
@@ -101,13 +101,13 @@ export function SocialProfilePreview({
             href={preview.profileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-0.5 inline-block truncate text-xs text-teal-700 hover:text-teal-900"
+            className="mt-0.5 inline-block truncate text-xs text-teal-700 hover:text-teal-900 dark:text-teal-100"
           >
             View profile
           </a>
         </div>
         {loading ? (
-          <span className="text-xs text-zinc-500">Loading…</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Loading…</span>
         ) : preview.previewAvailable ? (
           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
             Preview
@@ -117,7 +117,7 @@ export function SocialProfilePreview({
       {preview.message ? (
         <p className="mt-2 text-xs text-amber-800">{preview.message}</p>
       ) : (
-        <p className="mt-2 text-xs text-zinc-600">Does this look like your {platformLabel} account?</p>
+        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Does this look like your {platformLabel} account?</p>
       )}
     </div>
   );

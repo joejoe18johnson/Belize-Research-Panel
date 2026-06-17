@@ -3,7 +3,7 @@
 import { forwardRef, useRef, useState, type InputHTMLAttributes } from "react";
 
 const inputClass =
-  "w-full h-12 rounded-lg border border-zinc-200 bg-white px-4 pr-11 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500";
+  "w-full h-12 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 pr-11 text-sm text-zinc-900 dark:text-zinc-100 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 dark:disabled:bg-zinc-900 dark:bg-zinc-950 disabled:text-zinc-500 dark:text-zinc-400 dark:text-zinc-500";
 const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-500/20";
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -82,7 +82,7 @@ export const PasswordInput = forwardRef<
       <button
         type="button"
         tabIndex={-1}
-        className="absolute inset-y-0 right-0 z-10 flex min-h-12 min-w-12 touch-manipulation items-center justify-center rounded-r-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-600/30"
+        className="absolute inset-y-0 right-0 z-10 flex min-h-12 min-w-12 touch-manipulation items-center justify-center rounded-r-lg text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 transition hover:bg-zinc-100 dark:bg-zinc-800 hover:text-zinc-800 dark:text-zinc-200 active:bg-zinc-100 dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-600/30"
         onClick={toggleVisibility}
         aria-label={visible ? "Hide password" : "Show password"}
         aria-pressed={visible}

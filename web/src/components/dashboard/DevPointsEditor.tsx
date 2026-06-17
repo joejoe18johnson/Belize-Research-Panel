@@ -67,10 +67,10 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-200/80 pb-4">
         <div>
           <p className="text-xs font-semibold tracking-wide text-amber-800">{formatHeadingCase("Dev tool")}</p>
-          <SectionHeading as="h3" className="mt-1 text-base font-semibold text-zinc-900">
+          <SectionHeading as="h3" className="mt-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">
             Adjust test points
           </SectionHeading>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             Override your point balance to preview redemption tiers and forms. Only available in development.
           </p>
         </div>
@@ -82,19 +82,19 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm">
-          <p className="text-zinc-500">{formatHeadingCase("Calculated balance")}</p>
-          <p className="mt-1 text-lg font-bold text-zinc-900">{calculated} pts</p>
-          <p className="text-xs text-zinc-500">{formatBz(pointsToBz(calculated))}</p>
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm">
+          <p className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Calculated balance")}</p>
+          <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{calculated} pts</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatBz(pointsToBz(calculated))}</p>
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm">
-          <p className="text-zinc-500">{formatHeadingCase("Total points to date")}</p>
-          <p className="mt-1 text-lg font-bold text-zinc-900">{rewards.totalPointsToDate} pts</p>
-          <p className="text-xs text-zinc-500">{formatBz(pointsToBz(rewards.totalPointsToDate))}</p>
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm">
+          <p className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Total points to date")}</p>
+          <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate} pts</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatBz(pointsToBz(rewards.totalPointsToDate))}</p>
         </div>
         <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm">
           <p className="text-teal-700">{formatHeadingCase("Displayed balance")}</p>
-          <p className="mt-1 text-lg font-bold text-teal-900">{rewards.totalPoints} pts</p>
+          <p className="mt-1 text-lg font-bold text-teal-900 dark:text-teal-100">{rewards.totalPoints} pts</p>
           <p className="text-xs text-teal-700">{formatBz(pointsToBz(rewards.totalPoints))}</p>
         </div>
       </div>
@@ -122,7 +122,7 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
                 setInput(String(amount));
                 void applyPoints(amount);
               }}
-              className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100 disabled:opacity-60"
+              className="rounded-lg border border-amber-300 bg-white dark:bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100 disabled:opacity-60"
             >
               {amount} pts
             </button>
@@ -143,7 +143,7 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
               type="button"
               onClick={() => void applyPoints(null)}
               disabled={submitting}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-300 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 disabled:opacity-60"
             >
               Reset to calculated
             </button>

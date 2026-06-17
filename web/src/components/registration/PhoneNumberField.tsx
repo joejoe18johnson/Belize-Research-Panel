@@ -28,7 +28,7 @@ export function PhoneNumberField({
   return (
     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start">
       <div className="sm:w-52 sm:shrink-0">
-        <label htmlFor="phoneCountryCode" className="mb-1.5 block text-sm font-medium text-zinc-800 sm:sr-only">
+        <label htmlFor="phoneCountryCode" className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
           Country code
         </label>
         <SelectInput
@@ -46,7 +46,7 @@ export function PhoneNumberField({
         </SelectInput>
       </div>
       <div className="min-w-0 flex-1">
-        <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-zinc-800 sm:sr-only">
+        <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
           Phone number
         </label>
         <TextInput

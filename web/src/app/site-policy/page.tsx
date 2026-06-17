@@ -84,7 +84,7 @@ export default function SitePolicyPage() {
           </a>
           .
         </p>
-        <p className="text-xs text-zinc-500">{formatHeadingCase("Effective date")}: 30 May 2026</p>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Effective date")}: 30 May 2026</p>
       </PolicySection>
     </PolicyPageShell>
   );

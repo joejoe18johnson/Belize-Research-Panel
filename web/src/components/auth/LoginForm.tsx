@@ -165,21 +165,21 @@ export function LoginForm({
         {submitting ? formatSiteCase("Signing in…") : formatSiteCase("Log in")}
       </button>
 
-      <p className="text-center text-sm text-zinc-600">
+      <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         {formatSiteCase("Need an account?")}{" "}
-        <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900">
+        <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
           {formatSiteCase("Create account")}
         </Link>
       </p>
 
       {isDemoAccountsEnabled() ? (
-        <div className="space-y-2 rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3 text-center text-xs text-teal-900/80">
-          <p className="font-semibold text-teal-900">Testing accounts</p>
+        <div className="space-y-2 rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/50 px-4 py-3 text-center text-xs text-teal-900/80">
+          <p className="font-semibold text-teal-900 dark:text-teal-100">Testing accounts</p>
           <p>
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 dark:text-teal-100 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_REGISTRATION_READY_ACCOUNT.email)}
             >
               Log in as registration demo
@@ -190,7 +190,7 @@ export function LoginForm({
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 dark:text-teal-100 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_REGISTERED_ACCOUNT.email)}
             >
               Log in as registered demo
@@ -201,7 +201,7 @@ export function LoginForm({
             <button
               type="button"
               disabled={submitting}
-              className="font-medium text-teal-700 hover:text-teal-950 disabled:opacity-60"
+              className="font-medium text-teal-700 hover:text-teal-950 dark:text-teal-100 disabled:opacity-60"
               onClick={() => loginWithDemo(DEMO_UNVERIFIED_REGISTERED_ACCOUNT.email)}
             >
               Log in as unverified demo

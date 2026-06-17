@@ -187,7 +187,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard>
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
-        <p className={`text-sm text-zinc-600 ${standalone ? "" : "mt-2"}`}>
+        <p className={`text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${standalone ? "" : "mt-2"}`}>
           Your account is on hold until contact verification is complete. You can still view redemption options on
           rewards, but requests are disabled for now.
         </p>
@@ -199,7 +199,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard className="border-dashed border-zinc-300 bg-zinc-50/80">
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
-        <p className={`text-sm leading-relaxed text-zinc-600 ${standalone ? "" : "mt-2"}`}>
+        <p className={`text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${standalone ? "" : "mt-2"}`}>
           Redemption unlocks at <strong>{REDEMPTION_MINIMUM_POINTS} points ({formatBz(20)})</strong>. You currently
           have <strong>{totalPoints} points</strong> ({formatBz(pointsToBz(totalPoints))}). {REDEMPTION_RATE_LABEL} —
           return to rewards to see what you can redeem and how many points each amount needs.
@@ -212,7 +212,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard>
         <SectionHeading as="h3">Redeem points</SectionHeading>
-        <p className="mt-2 text-sm text-zinc-600">
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           You have reached the first redemption milestone, but your available balance is{" "}
           <strong>{availablePoints} points</strong> ({formatBz(pointsToBz(availablePoints))})
           {requests.some((request) => request.status === "pending" || request.status === "approved")
@@ -230,9 +230,9 @@ export function RedemptionRequestForm({
   return (
     <DashboardCard>
       {!standalone ? (
-        <div className="border-b border-zinc-100 pb-4">
+        <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
           <SectionHeading as="h3">Redeem points</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             {REDEMPTION_RATE_LABEL}. Submit your details for the reward you want — requests are reviewed before payout.
           </p>
         </div>
@@ -411,9 +411,9 @@ function OptionSummary({
   availablePoints: number;
 }) {
   return (
-    <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-sm text-teal-900">
+    <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
       <p className="font-semibold">{option.label}</p>
-      <p className="mt-1 text-teal-800">
+      <p className="mt-1 text-teal-800 dark:text-teal-200">
         {formatBz(amountBz)} · {points} points will be reserved from your balance ({availablePoints} pts /{" "}
         {formatBz(pointsToBz(availablePoints))} available).
       </p>

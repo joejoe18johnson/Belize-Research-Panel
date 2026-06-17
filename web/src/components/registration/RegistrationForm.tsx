@@ -365,9 +365,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
   return (
     <form id="registration-form-top" onSubmit={handleSubmit} className="w-full scroll-mt-6 space-y-6" noValidate>
-      <div className="rounded-2xl border border-teal-100 bg-teal-50 px-6 py-5">
-        <p className="text-sm font-medium text-teal-900">Exclusive Belize Research Panel</p>
-        <p className="mt-1 text-sm text-teal-800">
+      <div className="rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-teal-50 px-6 py-5">
+        <p className="text-sm font-medium text-teal-900 dark:text-teal-100">Exclusive Belize Research Panel</p>
+        <p className="mt-1 text-sm text-teal-800 dark:text-teal-200">
           Complete registration to join the panel. Your information is kept confidential and used only for legitimate research.
         </p>
       </div>
@@ -388,7 +388,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
       <div id="citizenship-section">
         <FormSection step={1} title="Citizenship / residency">
-          <p className="text-sm text-zinc-600">{CITIZENSHIP_PANEL_INTRO}</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{CITIZENSHIP_PANEL_INTRO}</p>
           <div className="flex flex-col gap-3">
             {CITIZENSHIP_STATUS.map((status) => (
               <label key={status} className={choiceBoxLabelClass}>
@@ -509,7 +509,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={6} title="Residence details">
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               Select your current district if you live in Belize, or choose Abroad if you live in another country.
             </p>
             <Field label="Where do you currently live?" required error={fieldError("placeOfResidence")} id="placeOfResidence">
@@ -519,8 +519,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </SelectInput>
             </Field>
             {form.placeOfResidence === "Abroad" ? (
-              <div className="space-y-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                <p className="text-sm font-medium text-zinc-800">Living outside Belize</p>
+              <div className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4">
+                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Living outside Belize</p>
                 <Field label="Country of residence" required error={fieldError("countryIfAbroad")} id="countryIfAbroad">
                   <SelectInput id="countryIfAbroad" value={form.countryIfAbroad} onChange={(e) => update("countryIfAbroad", e.target.value)} onBlur={() => touchAndValidate("countryIfAbroad")} error={fieldError("countryIfAbroad")}>
                     <option value="">Select country</option>
@@ -589,7 +589,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
           {form.placeOfResidence !== "Abroad" ? (
             <FormSection step={8} title="Market research interests">
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 Select the product and service topics you are willing to give feedback on. Political and social poll
                 topics are matched separately when you are eligible for those studies.
               </p>
@@ -606,10 +606,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 3 ? (
         <>
           <FormSection step={11} title="Preferred ways to contact you">
-            <p className="text-sm text-zinc-600">Please enter contact details carefully. At least two contact methods are encouraged so we can still reach you if one channel changes, is inactive, or fails during fieldwork.</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Please enter contact details carefully. At least two contact methods are encouraged so we can still reach you if one channel changes, is inactive, or fails during fieldwork.</p>
             <FieldGroup columns={2}>
               <Field label="Email address" hint="This is your verified account email." error={fieldError("email")} id="email">
-                <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50" error={fieldError("email")} />
+                <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50 dark:bg-zinc-950" error={fieldError("email")} />
               </Field>
               <SocialContactField
                 platform="facebook"
@@ -695,7 +695,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
           <FormSection step={13} title="Photo identification">
             <div className="space-y-3">
-              <p className="text-sm font-medium text-zinc-800">Registration mode</p>
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
               <div className="flex flex-wrap gap-4">
                 {(["Self-registration", "Registration by authorised person"] as const).map((mode) => (
                   <label key={mode} className={choiceBoxLabelClass}>
@@ -725,7 +725,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             <Alert variant="info">Photo identification is used only to verify your identity and eligibility. We do not keep or store ID images or copies in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.</Alert>
             {form.registrationMode === "Registration by authorised person" ? (
               <>
-                <p className="text-sm text-zinc-600">Authorised registration mode allows photo upload to be bypassed when an authorised verification or QR process has been used.</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Authorised registration mode allows photo upload to be bypassed when an authorised verification or QR process has been used.</p>
                 <Field label="Authorised verification code" required error={fieldError("authorisedVerificationCode")} id="authorisedVerificationCode">
                   <TextInput id="authorisedVerificationCode" value={form.authorisedVerificationCode} onChange={(e) => update("authorisedVerificationCode", e.target.value)} onBlur={() => touchAndValidate("authorisedVerificationCode")} placeholder="Enter authorised verification / QR code" error={fieldError("authorisedVerificationCode")} />
                 </Field>
@@ -760,27 +760,27 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={15} title="Review full registration before submitting">
-            <div className="space-y-3 rounded-lg border border-zinc-200 md:hidden">
+            <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 md:hidden">
               {reviewRows.map(([label, value]) => (
-                <div key={label} className="border-b border-zinc-100 px-4 py-3 last:border-0">
-                  <p className="text-xs font-medium text-zinc-500">{label}</p>
-                  <p className="mt-1 text-sm text-zinc-900 break-words">{String(value || "Not provided")}</p>
+                <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{label}</p>
+                  <p className="mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-words">{String(value || "Not provided")}</p>
                 </div>
               ))}
             </div>
-            <div className="hidden overflow-x-auto rounded-lg border border-zinc-200 md:block">
+            <div className="hidden overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800 md:block">
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
-                <thead className="bg-zinc-50">
+                <thead className="bg-zinc-50 dark:bg-zinc-950">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-zinc-700">Question / field</th>
-                    <th className="px-4 py-3 text-left font-medium text-zinc-700">Response</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">Question / field</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">Response</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100 bg-white">
+                <tbody className="divide-y divide-zinc-100 bg-white dark:bg-zinc-900">
                   {reviewRows.map(([label, value]) => (
                     <tr key={label}>
-                      <td className="px-4 py-2.5 text-zinc-600">{label}</td>
-                      <td className="px-4 py-2.5 text-zinc-900">{String(value || "Not provided")}</td>
+                      <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{label}</td>
+                      <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{String(value || "Not provided")}</td>
                     </tr>
                   ))}
                 </tbody>

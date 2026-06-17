@@ -135,7 +135,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
         <MetricCard label="Suggested sample" value={requiredSample} hint={`At ${marginError}% MOE · ${confidenceLevel}`} />
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -143,8 +143,8 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             onClick={() => setTab(item.id)}
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
-                ? "border border-b-0 border-teal-200 bg-white text-teal-900"
-                : "text-zinc-600 hover:bg-teal-50/50 hover:text-teal-800"
+                ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
+                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -154,8 +154,8 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
 
       {tab === "filters" ? (
         <div className="space-y-4">
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Panel filters")}</h2>
+          <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+            <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Panel filters")}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <FilterMultiSelect label="Place of residence" options={options.residence} selected={filters.residence} onChange={(v) => updateFilter("residence", v)} />
               <FilterMultiSelect label="District" options={options.districts} selected={filters.districts} onChange={(v) => updateFilter("districts", v)} />
@@ -170,28 +170,28 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Age min</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age min</label>
                 <input
                   type="number"
                   min={18}
                   max={filters.ageMax}
                   value={filters.ageMin}
                   onChange={(e) => updateFilter("ageMin", Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Age max</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age max</label>
                 <input
                   type="number"
                   min={filters.ageMin}
                   max={120}
                   value={filters.ageMax}
                   onChange={(e) => updateFilter("ageMax", Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
                 />
               </div>
-              <label className="flex items-end gap-2 pb-2 text-sm text-zinc-700">
+              <label className="flex items-end gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300">
                 <input
                   type="checkbox"
                   checked={filters.registeredVotersOnly}
@@ -203,11 +203,11 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             </div>
           </section>
           <HorizontalBarChart rows={districtBreakdown} title="Filtered pool by district" maxBars={10} />
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Draw sample")}</h2>
+          <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+            <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Draw sample")}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Sampling method</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sampling method</label>
                 <SiteSelect
                   value={samplingMethod}
                   onChange={(value) => setSamplingMethod(value as SamplingMethod)}
@@ -221,14 +221,14 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 ) : null}
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600">Sample size</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sample size</label>
                 <input
                   type="number"
                   min={1}
                   max={filteredPool.length || 1}
                   value={sampleSize}
                   onChange={(e) => setSampleSize(Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
                 />
               </div>
               <div className="flex items-end gap-2">
@@ -244,7 +244,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                   type="button"
                   disabled={displayRows.length === 0}
                   onClick={downloadCsv}
-                  className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                  className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-50"
                 >
                   Export CSV
                 </button>
@@ -255,24 +255,24 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
       ) : null}
 
       {tab === "calculator" ? (
-        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Sample size calculator")}</h2>
-          <p className="text-sm text-zinc-500">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+          <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Sample size calculator")}</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Uses the same finite population correction as the Streamlit MVP (Cochran formula with p = 0.5).
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Population size (N)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Population size (N)</label>
               <input
                 type="number"
                 min={1}
                 value={populationSize}
                 onChange={(e) => setPopulationSize(Number(e.target.value))}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Margin of error (%)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Margin of error (%)</label>
               <input
                 type="number"
                 min={1}
@@ -280,11 +280,11 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 step={0.5}
                 value={marginError}
                 onChange={(e) => setMarginError(Number(e.target.value))}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Confidence level</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Confidence level</label>
               <SiteSelect
                 value={confidenceLevel}
                 onChange={(value) => setConfidenceLevel(value as "90%" | "95%" | "99%")}
@@ -297,14 +297,14 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Expected response rate (%)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Expected response rate (%)</label>
               <input
                 type="number"
                 min={1}
                 max={100}
                 value={responseRate}
                 onChange={(e) => setResponseRate(Number(e.target.value))}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -318,7 +318,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               setSampleSize(Math.min(requiredSample, filteredPool.length || requiredSample));
               setTab("filters");
             }}
-            className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-teal-50 px-4 text-sm font-semibold text-teal-900 hover:bg-teal-100"
+            className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-teal-50 px-4 text-sm font-semibold text-teal-900 dark:text-teal-100 hover:bg-teal-100"
           >
             Apply {requiredSample} to sample size and return to filters
           </button>
@@ -326,15 +326,15 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
       ) : null}
 
       {tab === "filters" || tab === "sample" ? (
-        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold text-teal-950">
+              <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">
                 {tab === "sample" && generatedSample.length > 0
                   ? formatHeadingCase("Generated sample")
                   : formatHeadingCase("Filtered pool preview")}
               </h2>
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 {tab === "sample" && generatedSample.length === 0
                   ? "Generate a random sample from the Filter pool tab."
                   : `${displayRows.length} rows · click headers to sort`}
@@ -344,15 +344,15 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               type="button"
               disabled={displayRows.length === 0}
               onClick={downloadCsv}
-              className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+              className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-50"
             >
               Export CSV
             </button>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-zinc-100">
+          <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   {(
                     [
                       ["lastName", "Name"],
@@ -364,7 +364,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                     ] as const
                   ).map(([key, label]) => (
                     <th key={key} className="px-3 py-3">
-                      <button type="button" onClick={() => toggleSort(key)} className="font-semibold hover:text-teal-800">
+                      <button type="button" onClick={() => toggleSort(key)} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                         {label}
                         {sortIndicator(key)}
                       </button>
@@ -377,14 +377,14 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               <tbody>
                 {displayRows.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-zinc-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                       No panelists match the current filters.
                     </td>
                   </tr>
                 ) : (
                   displayRows.slice(0, 200).map((row) => (
                     <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
-                      <td className="px-3 py-2.5 font-medium text-zinc-800">
+                      <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                         {row.firstName} {row.lastName}
                       </td>
                       <td className="px-3 py-2.5">{row.district || "—"}</td>
@@ -392,8 +392,8 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                       <td className="px-3 py-2.5">{row.sex}</td>
                       <td className="px-3 py-2.5 tabular-nums">{row.age ?? "—"}</td>
                       <td className="px-3 py-2.5">{row.verificationStatus}</td>
-                      <td className="px-3 py-2.5 text-zinc-600">{row.email}</td>
-                      <td className="px-3 py-2.5 text-zinc-600">{row.phone || "—"}</td>
+                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.email}</td>
+                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone || "—"}</td>
                     </tr>
                   ))
                 )}
@@ -401,7 +401,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             </table>
           </div>
           {displayRows.length > 200 ? (
-            <p className="text-xs text-zinc-500">Showing first 200 rows. Export CSV for the full list.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Showing first 200 rows. Export CSV for the full list.</p>
           ) : null}
         </section>
       ) : null}

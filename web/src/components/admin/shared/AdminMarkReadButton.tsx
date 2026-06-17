@@ -32,7 +32,7 @@ export function AdminMarkReadButton({
       type="button"
       onClick={markRead}
       disabled={busy}
-      className="inline-flex min-h-10 items-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 disabled:opacity-60"
+      className="inline-flex min-h-10 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 disabled:opacity-60"
     >
       {busy ? "Updating…" : label}
     </button>

@@ -54,7 +54,7 @@ export function DashboardSurveysSection({
       ) : null}
 
       <div
-        className={`flex w-full rounded-xl border border-zinc-200 bg-zinc-50 p-1 sm:inline-flex sm:w-auto ${surveysLocked ? "opacity-60" : ""}`}
+        className={`flex w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-1 sm:inline-flex sm:w-auto ${surveysLocked ? "opacity-60" : ""}`}
       >
         <button
           type="button"
@@ -62,13 +62,13 @@ export function DashboardSurveysSection({
           disabled={surveysLocked}
           className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition sm:flex-none sm:px-4 ${
             tab === "inbox"
-              ? "bg-white text-teal-800 shadow-sm"
-              : "text-zinc-600 hover:text-teal-800"
+              ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
+              : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
           } disabled:cursor-not-allowed`}
         >
           {formatHeadingCase("Inbox")}
           {inbox.length > 0 ? (
-            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "inbox" ? "bg-teal-100 text-teal-800" : "bg-zinc-200 text-zinc-600"}`}>
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "inbox" ? "bg-teal-100 text-teal-800 dark:text-teal-200" : "bg-zinc-200 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}`}>
               {inbox.length}
             </span>
           ) : null}
@@ -79,13 +79,13 @@ export function DashboardSurveysSection({
           disabled={surveysLocked}
           className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition sm:flex-none sm:px-4 ${
             tab === "completed"
-              ? "bg-white text-teal-800 shadow-sm"
-              : "text-zinc-600 hover:text-teal-800"
+              ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
+              : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
           } disabled:cursor-not-allowed`}
         >
           {formatHeadingCase("Completed")}
           {completed.length > 0 ? (
-            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "completed" ? "bg-teal-100 text-teal-800" : "bg-zinc-200 text-zinc-600"}`}>
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "completed" ? "bg-teal-100 text-teal-800 dark:text-teal-200" : "bg-zinc-200 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}`}>
               {completed.length}
             </span>
           ) : null}
@@ -95,7 +95,7 @@ export function DashboardSurveysSection({
       {surveys.length > 0 ? (
         <>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               {surveys.length} {tab === "inbox" ? "survey" : "completed survey"}
               {surveys.length === 1 ? "" : "s"}
             </p>

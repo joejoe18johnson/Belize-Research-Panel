@@ -22,10 +22,10 @@ type AnalyticsTab = "overview" | "geography" | "demographics" | "interests";
 
 function MetricCard({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
-    <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium text-zinc-600">{formatAdminLabel(label)}</p>
-      <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-zinc-500">{hint}</p> : null}
+    <div className="rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm">
+      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(label)}</p>
+      <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950 dark:text-teal-100">{value}</p>
+      {hint ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{hint}</p> : null}
     </div>
   );
 }
@@ -62,20 +62,20 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
     <div className="mx-auto max-w-[1400px] space-y-6">
       <div className="border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel intelligence</p>
-        <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">
+        <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">
           {formatHeadingCase("Advanced analytics")}
         </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Live breakdowns from the panel register — filter, sort, and chart coverage across geography,
           demographics, and research interests. Aligned with the Streamlit MVP Advanced Analytics module.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Filters")}</h2>
-            <p className="mt-1 text-sm text-zinc-500">
+            <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Filters")}</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
               Showing <strong>{filtered.length}</strong> of <strong>{slices.length}</strong> panelists
               {activeFilterCount > 0 ? ` · ${activeFilterCount} filter(s) active` : ""}
             </p>
@@ -84,7 +84,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+              className="rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
             >
               Clear all filters
             </button>
@@ -128,7 +128,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
             onChange={(sexes) => setFilters({ ...filters, sexes })}
           />
         </div>
-        <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
+        <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
           <input
             type="checkbox"
             checked={filters.registeredVotersOnly}
@@ -146,7 +146,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
         <MetricCard label="Active" value={snapshot.active} />
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-zinc-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -155,7 +155,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "bg-teal-700 text-white"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-teal-900"
+                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-900 dark:text-teal-100"
             }`}
           >
             {formatHeadingCase(item.label)}

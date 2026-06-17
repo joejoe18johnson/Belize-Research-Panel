@@ -25,7 +25,7 @@ export default async function DashboardPayoutsPage() {
         action={
           <Link
             href="/dashboard/rewards"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
           >
             View rewards
           </Link>

@@ -163,7 +163,7 @@ export function AdminCreateCampaignClient({
             </Link>
             <Link
               href="/admin/campaigns"
-              className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+              className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
             >
               Back to campaigns
             </Link>
@@ -177,7 +177,7 @@ export function AdminCreateCampaignClient({
                 setDescription("");
                 setSurveyUrl("");
               }}
-              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
             >
               Create another campaign
             </button>
@@ -187,37 +187,37 @@ export function AdminCreateCampaignClient({
 
       {!launchedCampaign ? (
       <form
-        className="space-y-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+        className="space-y-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           launchCampaign();
         }}
       >
         <section className="space-y-4">
-          <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Campaign details")}</h2>
+          <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Campaign details")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600">Campaign title</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Campaign title</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="e.g. Q2 Belize consumer sentiment"
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600">Description (optional)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Description (optional)</label>
               <textarea
                 rows={2}
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Category</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Category</label>
               <SiteSelect
                 value={category}
                 onChange={(value) => setCategory(value as SurveyCategory)}
@@ -229,18 +229,18 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Reward points</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Reward points</label>
               <input
                 type="number"
                 min={0}
                 step={25}
                 value={points}
                 onChange={(event) => setPoints(Number(event.target.value))}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600">Survey delivery</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey delivery</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -248,7 +248,7 @@ export function AdminCreateCampaignClient({
                   className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                     deliveryType === "internal"
                       ? "bg-teal-700 text-white"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                      : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-teal-50 dark:hover:bg-teal-900/40"
                   }`}
                 >
                   On-site survey (built in BRP)
@@ -259,7 +259,7 @@ export function AdminCreateCampaignClient({
                   className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                     deliveryType === "external"
                       ? "bg-teal-700 text-white"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                      : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-teal-50 dark:hover:bg-teal-900/40"
                   }`}
                 >
                   External link
@@ -268,7 +268,7 @@ export function AdminCreateCampaignClient({
             </div>
             {deliveryType === "internal" ? (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold text-zinc-600">Published survey</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Published survey</label>
                 <SiteSelect
                   value={surveyDefinitionId}
                   onChange={setSurveyDefinitionId}
@@ -294,39 +294,39 @@ export function AdminCreateCampaignClient({
               </div>
             ) : (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold text-zinc-600">Survey URL</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey URL</label>
                 <input
                   type="url"
                   required
                   value={surveyUrl}
                   onChange={(event) => setSurveyUrl(event.target.value)}
                   placeholder="https://forms.gle/..."
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
                 />
               </div>
             )}
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Assigned date</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Assigned date</label>
               <input
                 type="date"
                 required
                 value={assignedDate}
                 onChange={(event) => setAssignedDate(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Complete by date</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Complete by date</label>
               <input
                 type="date"
                 required
                 value={completeByDate}
                 onChange={(event) => setCompleteByDate(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600">Delivery method</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Delivery method</label>
               <SiteSelect
                 value={deliveryMethod}
                 onChange={setDeliveryMethod}
@@ -337,10 +337,10 @@ export function AdminCreateCampaignClient({
           </div>
         </section>
 
-        <section className="space-y-4 border-t border-zinc-100 pt-6">
-          <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Target audience")}</h2>
+        <section className="space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-6">
+          <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Target audience")}</h2>
           <div>
-            <label className="text-xs font-semibold text-zinc-600">Target group</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Target group</label>
             <SiteSelect
               value={targetMode}
               onChange={(value) => setTargetMode(value as CampaignTargetMode)}
@@ -354,7 +354,7 @@ export function AdminCreateCampaignClient({
 
           {targetMode === "specific_constituency" ? (
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Constituency</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Constituency</label>
               <SiteSelect
                 value={constituency}
                 onChange={setConstituency}
@@ -383,13 +383,13 @@ export function AdminCreateCampaignClient({
 
           {targetMode === "specific_emails" ? (
             <div>
-              <label className="text-xs font-semibold text-zinc-600">Panelist emails</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Panelist emails</label>
               <textarea
                 rows={4}
                 value={emails}
                 onChange={(event) => setEmails(event.target.value)}
                 placeholder="One email per line, or comma-separated"
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
               />
             </div>
           ) : null}
@@ -400,7 +400,7 @@ export function AdminCreateCampaignClient({
           </BrandedAlert>
         </section>
 
-        <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
+        <div className="flex flex-wrap gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
           <button
             type="submit"
             disabled={submitting || eligibleCount === 0 || (deliveryType === "internal" && !surveyDefinitionId)}
@@ -410,7 +410,7 @@ export function AdminCreateCampaignClient({
           </button>
           <Link
             href="/admin/campaigns"
-            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
           >
             Cancel
           </Link>

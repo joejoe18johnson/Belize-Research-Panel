@@ -83,14 +83,14 @@ function PayoutProcessDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4" role="dialog" aria-modal="true">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold text-teal-700">Payout request</p>
-            <h3 className="mt-1 text-xl font-semibold text-zinc-900">{row.shortId}</h3>
-            <p className="mt-1 text-sm text-zinc-500">Submitted {row.formattedDate}</p>
+            <h3 className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</h3>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Submitted {row.formattedDate}</p>
             {readOnly && row.formattedUpdatedDate ? (
-              <p className="mt-0.5 text-sm text-zinc-500">
+              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                 Processed {row.formattedUpdatedDate}
                 {row.processedBy ? ` by ${row.processedBy}` : ""}
               </p>
@@ -99,7 +99,7 @@ function PayoutProcessDialog({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-sm font-semibold text-zinc-500 hover:bg-zinc-100"
+            className="rounded-lg px-2 py-1 text-sm font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800"
           >
             Close
           </button>
@@ -108,13 +108,13 @@ function PayoutProcessDialog({
         <div className="mt-5 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <AdminStatusPill label={payoutStatusLabel(row.status)} tone={payoutStatusTone(row.status)} />
-            <span className="text-sm font-semibold text-zinc-800">{row.optionLabel}</span>
-            <span className="text-sm text-zinc-600">{formatBz(row.amountBz)} · {row.points.toLocaleString()} pts</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{row.optionLabel}</span>
+            <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatBz(row.amountBz)} · {row.points.toLocaleString()} pts</span>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
-            <p className="text-xs font-semibold text-zinc-600">Payment details</p>
-            <p className="mt-1 font-medium text-zinc-900">{row.paymentTitle}</p>
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-3">
+            <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Payment details</p>
+            <p className="mt-1 font-medium text-zinc-900 dark:text-zinc-100">{row.paymentTitle}</p>
             <dl className="mt-2 space-y-1.5">
               {(row.paymentFields.length > 0 ? row.paymentFields : row.paymentLines.map((line) => {
                 const split = line.indexOf(": ");
@@ -122,8 +122,8 @@ function PayoutProcessDialog({
                 return { label: line.slice(0, split), value: line.slice(split + 2) };
               })).map((field) => (
                 <div key={`${row.id}-${field.label}`}>
-                  <dt className="text-xs font-medium text-zinc-500">{field.label}</dt>
-                  <dd className="mt-0.5 text-sm font-semibold text-zinc-900 break-all">{field.value}</dd>
+                  <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{field.label}</dt>
+                  <dd className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all">{field.value}</dd>
                 </div>
               ))}
             </dl>
@@ -175,17 +175,17 @@ function PayoutProcessDialog({
               type="button"
               disabled={Boolean(busyAction)}
               onClick={() => onProcess("reject")}
-              className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
+              className="rounded-xl border border-red-200 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
             >
               {busyAction === "reject" ? "Declining…" : "Decline request"}
             </button>
           ) : null}
           {readOnly ? (
-            <p className="text-sm text-zinc-500">This request is closed. No further action is required.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">This request is closed. No further action is required.</p>
           ) : null}
         </div>
 
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
           When you update this request, the panelist is notified in their dashboard and by email or WhatsApp when contact details are on file.
         </p>
       </div>
@@ -296,19 +296,19 @@ export function AdminPayoutQueueSection({
   return (
     <section
       id={sectionId}
-      className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+      className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
     >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900">{formatHeadingCase(title)}</h2>
-          <p className="mt-1 text-sm text-zinc-500">{description}</p>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(title)}</h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{description}</p>
         </div>
         <input
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={mode === "history" ? "Search ID, email, option, processor…" : "Search ID, option, payment…"}
-          className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+          className="w-full max-w-xs rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
         />
       </div>
 
@@ -329,7 +329,7 @@ export function AdminPayoutQueueSection({
                   className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                     historyStatusFilter === item.id
                       ? "bg-teal-700 text-white"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                      : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-teal-50 dark:hover:bg-teal-900/40"
                   }`}
                 >
                   {item.label}
@@ -349,7 +349,7 @@ export function AdminPayoutQueueSection({
                   className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                     queueStatusFilter === item.id
                       ? "bg-teal-700 text-white"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                      : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-teal-50 dark:hover:bg-teal-900/40"
                   }`}
                 >
                   {item.label}
@@ -374,7 +374,7 @@ export function AdminPayoutQueueSection({
         </div>
       ) : (
         <>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <AdminDataTable className="min-w-[960px]">
               <AdminTableHead>
                 <AdminTableTh>Request ID</AdminTableTh>
@@ -394,34 +394,34 @@ export function AdminPayoutQueueSection({
                   const isNew = row.status === "pending" && unreadSet.has(row.id);
                   return (
                   <tr key={row.id} className={adminNewItemRowClass(isNew, "border-b border-zinc-50 align-top hover:bg-zinc-50/60")}>
-                    <td className="px-4 py-3 font-semibold text-zinc-900">
+                    <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">
                       <span className="inline-flex items-center gap-2">
                         {row.shortId}
                         {isNew ? <AdminNewBadge /> : null}
                       </span>
                     </td>
                     {mode === "history" ? (
-                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700">{row.email}</td>
+                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
                     ) : null}
                     <td className="px-4 py-3">
                       <AdminStatusPill label={payoutStatusLabel(row.status)} tone={payoutStatusTone(row.status)} />
                     </td>
-                    <td className="max-w-[14rem] px-4 py-3 font-medium text-zinc-900">{row.optionLabel}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-zinc-800">{formatBz(row.amountBz)}</td>
-                    <td className="max-w-[14rem] px-4 py-3 text-xs leading-relaxed text-zinc-600">
-                      <p className="font-medium text-zinc-800">{row.paymentTitle}</p>
+                    <td className="max-w-[14rem] px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.optionLabel}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-zinc-800 dark:text-zinc-200">{formatBz(row.amountBz)}</td>
+                    <td className="max-w-[14rem] px-4 py-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                      <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.paymentTitle}</p>
                       {row.paymentLines.map((line) => (
                         <p key={`${row.id}-${line}`} className="mt-0.5">
                           {line}
                         </p>
                       ))}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.formattedDate}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.formattedDate}</td>
                     {mode === "history" ? (
-                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.formattedUpdatedDate}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.formattedUpdatedDate}</td>
                     ) : null}
                     {mode === "history" ? (
-                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{row.processedBy ?? "—"}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.processedBy ?? "—"}</td>
                     ) : null}
                     <td className="px-4 py-3 text-center">
                       <AdminDownloadButton onClick={() => downloadPayoutStatement(row)} />
@@ -436,7 +436,7 @@ export function AdminPayoutQueueSection({
                             void markPayoutRead(row.id);
                           }
                         }}
-                        className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                        className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                       >
                         {row.status === "pending" || row.status === "approved" ? "Process" : "View"}
                       </button>

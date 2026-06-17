@@ -166,7 +166,7 @@ export function AdminDashboardClient({
               <tbody>
                 {recentPanelists.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-zinc-500">
+                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                       No panelists registered yet.
                     </td>
                   </tr>
@@ -176,20 +176,20 @@ export function AdminDashboardClient({
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                          className="font-medium text-zinc-900 hover:text-teal-800"
+                          className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-teal-800 dark:text-teal-200"
                         >
                           {row.name}
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
+                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}>
                           {row.panelistStatus}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <AdminStatusPill label={row.verificationStatus} tone={verificationTone(row.verificationStatus)} />
                       </td>
-                      <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
+                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone}</td>
                     </tr>
                   ))
                 )}
@@ -224,26 +224,26 @@ export function AdminDashboardClient({
               <tbody>
                 {recentPanelists.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500">
+                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                       No users registered yet.
                     </td>
                   </tr>
                 ) : (
                   usersPagination.paginatedRows.map((row) => (
                     <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60">
-                      <td className="px-4 py-3 font-medium text-zinc-900">{row.name}</td>
-                      <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600">{row.email}</td>
+                      <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.name}</td>
+                      <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.email}</td>
                       <td className="px-4 py-3">
-                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
+                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}>
                           {row.panelistStatus}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
+                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone}</td>
                       <td className="px-4 py-3">
                         {row.phoneApproved ? (
                           <span className="font-medium text-emerald-600">Yes</span>
                         ) : (
-                          <span className="text-zinc-400">—</span>
+                          <span className="text-zinc-400 dark:text-zinc-500">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -260,7 +260,7 @@ export function AdminDashboardClient({
                               label="Addr"
                             />
                           ) : null}
-                          {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400">—</span> : null}
+                          {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400 dark:text-zinc-500">—</span> : null}
                         </div>
                       </td>
                     </tr>
@@ -297,17 +297,17 @@ export function AdminDashboardClient({
             <tbody>
               {recentPayouts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                     No payout requests yet.
                   </td>
                 </tr>
               ) : (
                 payoutsPagination.paginatedRows.map((row) => (
                   <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60">
-                    <td className="px-4 py-3 font-semibold text-zinc-900">{row.shortId}</td>
-                    <td className="px-4 py-3 text-zinc-700">{row.paymentTitle}</td>
-                    <td className="px-4 py-3 text-zinc-700">{row.optionLabel}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-zinc-700">{formatBz(row.amountBz)}</td>
+                    <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</td>
+                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.paymentTitle}</td>
+                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.optionLabel}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{formatBz(row.amountBz)}</td>
                     <td className="px-4 py-3">
                       <AdminStatusPill
                         label={formatHeadingCase(

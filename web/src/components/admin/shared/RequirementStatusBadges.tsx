@@ -19,7 +19,7 @@ function statusTextClass(status: RequirementApprovalStatus): string {
   if (status === "approved") return "text-emerald-600";
   if (status === "under_review") return "text-amber-700";
   if (status === "denied") return "text-red-700";
-  return "text-zinc-500";
+  return "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500";
 }
 
 function RequirementGlyph({ kind, size }: { kind: RequirementKind; size: number }) {
@@ -117,14 +117,14 @@ export function RequirementStatusBadge({
       >
         {compact ? (
           <>
-            <span className="font-semibold text-zinc-700">{label}</span>
-            <span className="text-zinc-400"> · </span>
+            <span className="font-semibold text-zinc-700 dark:text-zinc-300">{label}</span>
+            <span className="text-zinc-400 dark:text-zinc-500"> · </span>
             {displayLabel}
           </>
         ) : (
           <>
             {label}
-            <span className="text-zinc-400"> · </span>
+            <span className="text-zinc-400 dark:text-zinc-500"> · </span>
             {displayLabel}
           </>
         )}

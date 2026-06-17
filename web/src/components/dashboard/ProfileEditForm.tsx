@@ -151,37 +151,37 @@ export function ProfileEditForm({
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <div
         id="profile-section-personal"
-        className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 sm:p-6"
+        className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-5 sm:p-6"
       >
         <SectionHeading as="h3">Biographical details</SectionHeading>
-        <p className="mt-1 text-sm text-zinc-600">
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Name, date of birth, sex, and ethnicity cannot be changed online. You may update your education level if it
           changes.
         </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm font-medium text-zinc-800">First name</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.firstName}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">First name</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.firstName}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800">Last name(s)</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.lastName}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Last name(s)</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.lastName}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800">Date of birth</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.dob}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Date of birth</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.dob}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800">Age</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.age}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Age</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.age}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800">Sex</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.sex}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Sex</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.sex}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800">Ethnicity</dt>
-            <dd className="mt-1 text-sm text-zinc-600">{profile.ethnicity}</dd>
+            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Ethnicity</dt>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.ethnicity}</dd>
           </div>
         </dl>
         <div className="mt-5">
@@ -205,9 +205,9 @@ export function ProfileEditForm({
 
       <div
         id="profile-section-citizenship"
-        className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+        className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
       >
-        <SectionHeading as="h3" className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+        <SectionHeading as="h3" className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Citizenship and voter registration
         </SectionHeading>
         <div className="mt-4 space-y-5">
@@ -322,8 +322,8 @@ export function ProfileEditForm({
         </div>
       </div>
 
-      <div className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-        <SectionHeading as="h3" className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+      <div className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+        <SectionHeading as="h3" className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Residence
         </SectionHeading>
         <div className="mt-4 space-y-5">
@@ -421,8 +421,8 @@ export function ProfileEditForm({
       <div id="profile-section-contact" className="scroll-mt-24 space-y-6">
         <ProfileContactChangePanel contact={contact} account={account} />
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-          <SectionHeading as="h3" className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+          <SectionHeading as="h3" className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
             Other contact details
           </SectionHeading>
         <div className="mt-4 space-y-5">
@@ -501,9 +501,9 @@ export function ProfileEditForm({
 
       <div
         id="profile-section-interests"
-        className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+        className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
       >
-        <SectionHeading as="h3" className="border-b border-zinc-100 pb-3 text-base font-semibold text-zinc-900">
+        <SectionHeading as="h3" className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Research interests
         </SectionHeading>
         <div className="mt-4 space-y-5">
@@ -556,7 +556,7 @@ export function ProfileEditForm({
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-60 sm:w-auto"
+          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 disabled:opacity-60 sm:w-auto"
         >
           Cancel
         </button>

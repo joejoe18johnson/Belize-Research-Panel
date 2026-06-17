@@ -40,12 +40,12 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
 
   const content = (
     <>
-      <p className="text-sm leading-relaxed text-zinc-600">
+      <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         {formatHeadingCase(
           "You can delete your account and opt out of the Belize Research Panel at any time. This removes your login, withdraws panel membership, and anonymises personal data we are not required to retain."
         )}
       </p>
-      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-zinc-600">
+      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         <li>{formatHeadingCase("Your account login will be permanently removed")}</li>
         <li>{formatHeadingCase("You will stop receiving research invitations")}</li>
         <li>{formatHeadingCase("Profile and contact details will be anonymised or deleted")}</li>
@@ -53,7 +53,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
       </ul>
 
       <div className="mt-5 space-y-4">
-        <label className="flex items-start gap-3 text-sm text-zinc-700">
+        <label className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
           <input
             type="checkbox"
             checked={confirmOptOut}
@@ -68,7 +68,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
         </label>
 
         <div>
-          <label htmlFor="delete-account-password" className="mb-1.5 block text-sm font-medium text-zinc-800">
+          <label htmlFor="delete-account-password" className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200">
             {formatHeadingCase("Confirm your password")}
           </label>
           <PasswordInput
@@ -99,7 +99,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
 
   return (
     <DashboardCard className="border-red-200">
-      <h3 className="text-base font-semibold text-zinc-900">{formatHeadingCase("Delete account and opt out")}</h3>
+      <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase("Delete account and opt out")}</h3>
       <div className="mt-4">{content}</div>
     </DashboardCard>
   );

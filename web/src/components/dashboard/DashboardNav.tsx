@@ -41,7 +41,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
                 className={`inline-flex min-h-10 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition sm:min-h-11 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm ${
                   active
                     ? "bg-teal-700 text-white shadow-md shadow-teal-900/20"
-                    : "text-teal-900/70 hover:bg-teal-50 hover:text-teal-900"
+                    : "text-teal-900/70 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
@@ -56,7 +56,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
                           : "animate-pulse bg-amber-500 text-white shadow-sm"
                         : active
                           ? "bg-white/20 text-white"
-                          : "bg-teal-100 text-teal-800"
+                          : "bg-teal-100 text-teal-800 dark:text-teal-200"
                     }`}
                   >
                     {badgeKey === "newSurveys"

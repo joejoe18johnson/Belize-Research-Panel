@@ -25,7 +25,7 @@ export function SurveyQuestionField({
         value={typeof value === "string" ? value : ""}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+        className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
       />
     );
   }
@@ -37,7 +37,7 @@ export function SurveyQuestionField({
         value={typeof value === "string" ? value : ""}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+        className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
       />
     );
   }
@@ -60,14 +60,14 @@ export function SurveyQuestionField({
               className={`min-h-10 min-w-10 rounded-full border px-3 text-sm font-semibold transition ${
                 selected === option
                   ? "border-teal-600 bg-teal-700 text-white"
-                  : "border-zinc-200 bg-white text-zinc-700 hover:border-teal-300"
+                  : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-teal-300 dark:hover:border-teal-700"
               }`}
             >
               {option}
             </button>
           ))}
         </div>
-        <div className="flex justify-between text-xs text-zinc-500">
+        <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
           <span>{question.scaleMinLabel}</span>
           <span>{question.scaleMaxLabel}</span>
         </div>
@@ -98,7 +98,7 @@ export function SurveyQuestionField({
         {question.options.map((option) => {
           const checked = selected.includes(option);
           return (
-            <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 px-3 py-2.5 hover:bg-teal-50/40">
+            <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 hover:bg-teal-50/40">
               <input
                 type="checkbox"
                 checked={checked}
@@ -108,7 +108,7 @@ export function SurveyQuestionField({
                 }}
                 className="h-4 w-4 rounded border-zinc-300 text-teal-700"
               />
-              <span className="text-sm text-zinc-800">{option}</span>
+              <span className="text-sm text-zinc-800 dark:text-zinc-200">{option}</span>
             </label>
           );
         })}
@@ -122,7 +122,7 @@ export function SurveyQuestionField({
   return (
     <div className="mt-3 space-y-2">
       {options.map((option) => (
-        <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 px-3 py-2.5 hover:bg-teal-50/40">
+        <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 hover:bg-teal-50/40">
           <input
             type="radio"
             name={question.id}
@@ -131,7 +131,7 @@ export function SurveyQuestionField({
             onChange={() => onChange(option)}
             className="h-4 w-4 border-zinc-300 text-teal-700"
           />
-          <span className="text-sm text-zinc-800">{option}</span>
+          <span className="text-sm text-zinc-800 dark:text-zinc-200">{option}</span>
         </label>
       ))}
     </div>
@@ -147,12 +147,12 @@ export function SurveyQuestionPreviewLabel({
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-zinc-900">
+      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
         {index + 1}. {question.title || "Untitled question"}
         {question.required ? <span className="text-red-600"> *</span> : null}
       </p>
-      {question.description ? <p className="mt-1 text-xs text-zinc-500">{question.description}</p> : null}
-      <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-400">
+      {question.description ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p> : null}
+      <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
         {formatHeadingCase(SURVEY_QUESTION_TYPE_LABELS[question.type])}
       </p>
     </div>

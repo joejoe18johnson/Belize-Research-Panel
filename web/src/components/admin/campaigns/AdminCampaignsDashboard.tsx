@@ -11,8 +11,8 @@ import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadgeClass(status: CampaignSummary["status"]): string {
-  if (status === "active") return "bg-teal-100 text-teal-900";
-  if (status === "closed") return "bg-zinc-100 text-zinc-700";
+  if (status === "active") return "bg-teal-100 text-teal-900 dark:text-teal-100";
+  if (status === "closed") return "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300";
   return "bg-amber-100 text-amber-900";
 }
 
@@ -115,18 +115,18 @@ export function AdminCampaignsDashboard({
         <HorizontalBarChart rows={categoryChart} title="Assignments by category" />
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Campaign register")}</h2>
-            <p className="mt-1 text-sm text-zinc-500">{filtered.length} campaigns</p>
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Campaign register")}</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{filtered.length} campaigns</p>
           </div>
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search campaigns…"
-            className="w-full max-w-xs rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            className="w-full max-w-xs rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           />
         </div>
 
@@ -141,10 +141,10 @@ export function AdminCampaignsDashboard({
             </BrandedAlert>
           </div>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   <th className="px-4 py-3">Campaign</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Assigned</th>
@@ -166,11 +166,11 @@ export function AdminCampaignsDashboard({
                     className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
                   >
                     <td className="px-4 py-2.5">
-                      <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900">
+                      <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">
                         {row.title}
                         {isNew ? <AdminNewBadge label="Completed" /> : null}
                       </p>
-                      <p className="text-xs text-zinc-500">{formatAdminLabel(row.category)}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(row.category)}</p>
                     </td>
                     <td className="px-4 py-2.5">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(row.status)}`}>
@@ -183,11 +183,11 @@ export function AdminCampaignsDashboard({
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.completed}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.overdue}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.responseRate}%</td>
-                    <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600">{row.targetingLabel}</td>
+                    <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.targetingLabel}</td>
                     <td className="px-4 py-2.5">
                       <Link
                         href={`/admin/campaigns/${encodeURIComponent(row.id)}/results`}
-                        className="font-semibold text-teal-700 hover:text-teal-900"
+                        className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                       >
                         View results
                       </Link>

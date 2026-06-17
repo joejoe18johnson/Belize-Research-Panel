@@ -105,7 +105,7 @@ export function LanguageSwitcher({
         <div
           role="listbox"
           aria-label={copy.languageLabel}
-          className="absolute right-0 z-20 mt-2 min-w-[11rem] overflow-hidden rounded-2xl border border-zinc-200 bg-white py-1 text-zinc-900 shadow-xl"
+          className="absolute right-0 z-20 mt-2 min-w-[11rem] overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 text-zinc-900 dark:text-zinc-100 shadow-xl"
         >
           {options.map((option) => {
             const selected = locale === option.id;
@@ -116,11 +116,11 @@ export function LanguageSwitcher({
                 role="option"
                 aria-selected={selected}
                 onClick={() => selectLocale(option.id)}
-                className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-teal-50 ${
-                  selected ? "bg-teal-50/80 font-semibold text-teal-900" : "text-zinc-700"
+                className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-teal-50 dark:hover:bg-teal-900/40 ${
+                  selected ? "bg-teal-50/80 font-semibold text-teal-900 dark:text-teal-100" : "text-zinc-700 dark:text-zinc-300"
                 }`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200">
                   <FlagIcon
                     locale={option.id}
                     className="h-5 w-5"
