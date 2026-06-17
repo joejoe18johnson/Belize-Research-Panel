@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "crypto";
+import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
 import { PANELIST_COLUMNS } from "./constants";
@@ -198,9 +199,9 @@ export function duplicateCheck(
 
   const emailNorm = cleanText(data.email).toLowerCase();
   const phoneNorm = normalizePhoneForComparison(getFullPhoneNumber(data));
-  const firstNorm = cleanText(data.firstName).toLowerCase();
-  const lastNorm = cleanText(data.lastName).toLowerCase();
-  const dobNorm = cleanText(data.dob);
+  const firstNorm = cleanText(data.firstName).toLowerCase().replace(/\s+/g, " ").trim();
+  const lastNorm = cleanText(data.lastName).toLowerCase().replace(/\s+/g, " ").trim();
+  const dobNorm = normalizeDobForComparison(cleanText(data.dob));
   const idTypeNorm = cleanText(data.photoIdType).toLowerCase();
   const idLast4Norm = cleanText(photoIdLast4);
 
@@ -211,9 +212,9 @@ export function duplicateCheck(
       firstNorm &&
       lastNorm &&
       dobNorm &&
-      cleanText(row.first_name).toLowerCase() === firstNorm &&
-      cleanText(row.last_name).toLowerCase() === lastNorm &&
-      cleanText(row.dob) === dobNorm
+      cleanText(row.first_name).toLowerCase().replace(/\s+/g, " ").trim() === firstNorm &&
+      cleanText(row.last_name).toLowerCase().replace(/\s+/g, " ").trim() === lastNorm &&
+      normalizeDobForComparison(cleanText(row.dob)) === dobNorm
     ) {
       hardDuplicate = true;
     }

@@ -237,12 +237,15 @@ export function assessPanelistRequirements(
 export function buildPanelistReviewReasons(
   panelist: PanelistRow,
   context: RequirementContext = {},
-  options: { accountOnHold?: boolean } = {}
+  options: { accountOnHold?: boolean; duplicateNameDobMatch?: boolean } = {}
 ): string[] {
   const requirements = assessPanelistRequirements(panelist, context);
   const reasons: string[] = [];
   const status = cleanText(panelist.verification_status);
 
+  if (options.duplicateNameDobMatch) {
+    reasons.push("Same name and date of birth as another panelist");
+  }
   if (status === "Possible Duplicate") reasons.push("Flagged as possible duplicate");
   if (status === "Needs Follow-up") reasons.push("Needs administrator follow-up");
   if (status === "Rejected") reasons.push("Registration rejected");
@@ -268,11 +271,12 @@ export function buildPanelistReviewReasons(
 export function panelistRequiresAdminReview(
   panelist: PanelistRow,
   context: RequirementContext = {},
-  options: { accountOnHold?: boolean } = {}
+  options: { accountOnHold?: boolean; duplicateNameDobMatch?: boolean } = {}
 ): boolean {
   const requirements = assessPanelistRequirements(panelist, context);
   const status = cleanText(panelist.verification_status);
 
+  if (options.duplicateNameDobMatch) return true;
   if (options.accountOnHold) return true;
   if (!requirements.allApproved) return true;
   if (status === "Possible Duplicate" || status === "Needs Follow-up" || status === "Pending") return true;

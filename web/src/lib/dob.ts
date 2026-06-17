@@ -71,3 +71,28 @@ export function parseBirthDate(dob: string): Date | null {
   if (composeDob(parts.year, parts.month, parts.day) !== dob) return null;
   return new Date(parseInt(parts.year, 10), parseInt(parts.month, 10) - 1, parseInt(parts.day, 10));
 }
+
+/** Canonical YYYY-MM-DD for duplicate matching across stored formats. */
+export function normalizeDobForComparison(dob: string): string {
+  const trimmed = dob.trim();
+  if (!trimmed) return "";
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const parts = parseDobParts(trimmed);
+    return composeDob(parts.year, parts.month, parts.day) || trimmed;
+  }
+
+  const slashMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (slashMatch) {
+    const [, day, month, year] = slashMatch;
+    return composeDob(year, month, day);
+  }
+
+  const parsed = Date.parse(trimmed);
+  if (!Number.isNaN(parsed)) {
+    const date = new Date(parsed);
+    return composeDob(String(date.getFullYear()), String(date.getMonth() + 1), String(date.getDate()));
+  }
+
+  return trimmed;
+}
