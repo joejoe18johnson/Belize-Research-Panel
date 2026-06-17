@@ -63,11 +63,20 @@ export function normalizeSurveyQuestion(input: Partial<SurveyQuestion>): SurveyQ
   };
 }
 
+function normalizeSurveyDefinition(definition: SurveyDefinition): SurveyDefinition {
+  return {
+    ...definition,
+    companyIntro: cleanText(definition.companyIntro),
+    companyLogoFile: cleanText(definition.companyLogoFile),
+    coverImageFile: cleanText(definition.coverImageFile),
+  };
+}
+
 export async function loadSurveyDefinitions(): Promise<SurveyDefinition[]> {
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as SurveyDefinition[];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map(normalizeSurveyDefinition) : [];
   } catch {
     return [];
   }
@@ -93,6 +102,7 @@ export async function listPublishedSurveyDefinitions(): Promise<SurveyDefinition
 export async function createSurveyDefinition(input: {
   title: string;
   description?: string;
+  companyIntro?: string;
   category: SurveyCategory;
   status?: SurveyDefinitionStatus;
   questions?: Partial<SurveyQuestion>[];
@@ -111,6 +121,9 @@ export async function createSurveyDefinition(input: {
     id,
     title,
     description: cleanText(input.description),
+    companyIntro: cleanText(input.companyIntro),
+    companyLogoFile: "",
+    coverImageFile: "",
     category: input.category,
     status: input.status ?? "draft",
     questions: (input.questions ?? [createEmptyQuestion()]).map(normalizeSurveyQuestion),
@@ -128,6 +141,9 @@ export async function updateSurveyDefinition(
   input: {
     title?: string;
     description?: string;
+    companyIntro?: string;
+    companyLogoFile?: string;
+    coverImageFile?: string;
     category?: SurveyCategory;
     status?: SurveyDefinitionStatus;
     questions?: Partial<SurveyQuestion>[];
@@ -145,6 +161,11 @@ export async function updateSurveyDefinition(
     ...current,
     title,
     description: input.description !== undefined ? cleanText(input.description) : current.description,
+    companyIntro: input.companyIntro !== undefined ? cleanText(input.companyIntro) : current.companyIntro ?? "",
+    companyLogoFile:
+      input.companyLogoFile !== undefined ? cleanText(input.companyLogoFile) : current.companyLogoFile ?? "",
+    coverImageFile:
+      input.coverImageFile !== undefined ? cleanText(input.coverImageFile) : current.coverImageFile ?? "",
     category: input.category ?? current.category,
     status: input.status ?? current.status,
     questions:

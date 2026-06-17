@@ -30,6 +30,9 @@ export interface SurveyDefinition {
   id: string;
   title: string;
   description: string;
+  companyIntro: string;
+  companyLogoFile: string;
+  coverImageFile: string;
   category: SurveyCategory;
   status: SurveyDefinitionStatus;
   questions: SurveyQuestion[];
