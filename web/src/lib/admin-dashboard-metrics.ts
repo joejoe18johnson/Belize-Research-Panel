@@ -60,7 +60,7 @@ export interface UnderReviewRow {
   panelistStatus: string;
   holdReason: AccountHoldReason;
   accountStatus: string;
-  reason: string;
+  reasons: string[];
   registrationDate: string;
   emailRequirement: RequirementApprovalStatus;
   phoneRequirement: RequirementApprovalStatus;
@@ -256,7 +256,7 @@ export function buildUnderReviewRows(
       panelistStatus: cleanText(row.status) || "Active",
       holdReason: (account?.hold_reason ?? "") as AccountHoldReason,
       accountStatus: accountOnHold ? "on_hold" : "active",
-      reason: reasons.join("; "),
+      reasons,
       registrationDate: cleanText(row.registration_date),
       emailRequirement: requirements.email,
       phoneRequirement: requirements.phone,
@@ -279,7 +279,7 @@ export function buildUnderReviewRows(
         panelistStatus: "—",
         holdReason: (account.hold_reason ?? "") as AccountHoldReason,
         accountStatus: "on_hold",
-        reason: "Account on hold",
+        reasons: ["Account on hold"],
         registrationDate: "",
         emailRequirement: "missing",
         phoneRequirement: "missing",
@@ -300,7 +300,7 @@ export function buildUnderReviewRows(
       panelistStatus: cleanText(panelist.status) || "—",
       holdReason: (account.hold_reason ?? "") as AccountHoldReason,
       accountStatus: "on_hold",
-      reason: reasons.join("; "),
+      reasons,
       registrationDate: cleanText(panelist.registration_date),
       emailRequirement: requirements.email,
       phoneRequirement: requirements.phone,

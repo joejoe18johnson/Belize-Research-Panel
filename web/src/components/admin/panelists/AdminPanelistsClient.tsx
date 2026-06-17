@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { PANELIST_STATUS, VERIFICATION_STATUS } from "@/lib/admin-constants";
 import {
   applyAdminPanelistFilters,
+  countPanelistsByField,
   getDuplicateReviewRows,
   panelistDisplayLabel,
   type AdminPanelistPublicRow,
@@ -132,6 +133,23 @@ export function AdminPanelistsClient({
   );
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
+
+  const verificationCounts = useMemo(
+    () => countPanelistsByField(rows, "verification_status", filterOptions.verification),
+    [rows, filterOptions.verification]
+  );
+  const districtCounts = useMemo(
+    () => countPanelistsByField(rows, "district", filterOptions.district),
+    [rows, filterOptions.district]
+  );
+  const constituencyCounts = useMemo(
+    () => countPanelistsByField(rows, "constituency", filterOptions.constituency),
+    [rows, filterOptions.constituency]
+  );
+  const voterCounts = useMemo(
+    () => countPanelistsByField(rows, "voter_status", filterOptions.voterStatus),
+    [rows, filterOptions.voterStatus]
+  );
 
   const allPagination = useTablePagination(filteredRows);
   const duplicatePagination = useTablePagination(duplicateRows);
@@ -371,7 +389,7 @@ export function AdminPanelistsClient({
     : "";
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6">
+    <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
       <div className="border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Panel register</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
@@ -388,24 +406,28 @@ export function AdminPanelistsClient({
             options={filterOptions.verification}
             selected={verificationFilter}
             onChange={setVerificationFilter}
+            counts={verificationCounts}
           />
           <FilterMultiSelect
             label="District"
             options={filterOptions.district}
             selected={districtFilter}
             onChange={setDistrictFilter}
+            counts={districtCounts}
           />
           <FilterMultiSelect
             label="Constituency"
             options={filterOptions.constituency}
             selected={constituencyFilter}
             onChange={setConstituencyFilter}
+            counts={constituencyCounts}
           />
           <FilterMultiSelect
             label="Voter status"
             options={filterOptions.voterStatus}
             selected={voterFilter}
             onChange={setVoterFilter}
+            counts={voterCounts}
           />
         </div>
         <p className="mt-4 text-sm text-zinc-600">
@@ -431,7 +453,7 @@ export function AdminPanelistsClient({
       </div>
 
       {tab === "duplicates" ? (
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Duplicate review")}</h2>
             {duplicateRows.length > 0 ? (
@@ -466,7 +488,7 @@ export function AdminPanelistsClient({
                   </BrandedAlert>
                 </div>
               ) : null}
-              <div className="mt-4 overflow-x-auto">
+              <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
                 <DataTable
                   rows={duplicatePagination.paginatedRows}
                   columns={DUPLICATE_REVIEW_COLUMNS}
@@ -493,7 +515,7 @@ export function AdminPanelistsClient({
           )}
         </section>
       ) : (
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("All panelists")}</h2>
@@ -514,7 +536,7 @@ export function AdminPanelistsClient({
               </BrandedAlert>
             </div>
           ) : null}
-          <div className="mt-4 overflow-x-auto">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
             <DataTable
               rows={allPagination.paginatedRows}
               columns={TABLE_COLUMNS}

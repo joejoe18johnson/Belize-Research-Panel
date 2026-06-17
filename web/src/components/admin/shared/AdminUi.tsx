@@ -9,11 +9,13 @@ export function FilterMultiSelect({
   options,
   selected,
   onChange,
+  counts,
 }: {
   label: string;
   options: string[];
   selected: string[];
   onChange: (values: string[]) => void;
+  counts?: Record<string, number>;
 }) {
   return (
     <div>
@@ -37,7 +39,10 @@ export function FilterMultiSelect({
                   }
                   className={`${siteCheckboxClass} shrink-0`}
                 />
-                <span className="truncate">{option}</span>
+                <span className="min-w-0 flex-1 truncate">{option}</span>
+                {counts && counts[option] !== undefined ? (
+                  <span className="shrink-0 tabular-nums text-xs font-medium text-zinc-400">({counts[option]})</span>
+                ) : null}
               </label>
             );
           })
@@ -242,6 +247,23 @@ export function AdminDownloadButton({
       </svg>
       {label}
     </button>
+  );
+}
+
+export function ReviewReasonList({ reasons }: { reasons: string[] }) {
+  if (reasons.length === 0) {
+    return <span className="text-zinc-400">—</span>;
+  }
+
+  return (
+    <ul className="min-w-[11rem] space-y-1.5">
+      {reasons.map((reason) => (
+        <li key={reason} className="flex items-start gap-2 text-xs leading-snug text-zinc-600">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-300" aria-hidden="true" />
+          <span>{reason}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 

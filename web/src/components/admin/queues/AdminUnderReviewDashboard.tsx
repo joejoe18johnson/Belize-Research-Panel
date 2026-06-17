@@ -11,6 +11,7 @@ import {
   AdminTableTh,
   MetricCard,
   PageIntro,
+  ReviewReasonList,
 } from "@/components/admin/shared/AdminUi";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
@@ -41,7 +42,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
         row.name.toLowerCase().includes(query) ||
         row.email.toLowerCase().includes(query) ||
         row.verificationStatus.toLowerCase().includes(query) ||
-        row.reason.toLowerCase().includes(query)
+        row.reasons.some((reason) => reason.toLowerCase().includes(query))
     );
   }, [requirementFiltered, search]);
 
@@ -57,7 +58,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
   const onHold = rows.filter((row) => row.accountStatus === "on_hold").length;
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6">
+    <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
       <PageIntro
         eyebrow="Panel review"
         title="Under review"
@@ -94,7 +95,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
         <MetricCard label="Accounts on hold" value={onHold} />
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Review queue")}</h2>
@@ -170,7 +171,9 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                           <span className="text-zinc-500">Active</span>
                         )}
                       </td>
-                      <td className="max-w-[14rem] px-4 py-3 text-zinc-600">{row.reason}</td>
+                      <td className="align-top px-4 py-3">
+                        <ReviewReasonList reasons={row.reasons} />
+                      </td>
                       <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-600">
                         {row.registrationDate || "—"}
                       </td>

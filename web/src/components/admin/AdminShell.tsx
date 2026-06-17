@@ -130,7 +130,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               governance studies.
             </p>
           </header>
-          <main className="px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main className="overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </div>
       </div>
     </div>
