@@ -23,7 +23,12 @@ export const metadata = {
   title: "Panelists | Admin | Belize Research Panel",
 };
 
-export default async function AdminPanelistsPage() {
+export default async function AdminPanelistsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ email?: string; verification?: string }>;
+}) {
+  const params = await searchParams;
   const [rows, accounts, photoUploadUsernames] = await Promise.all([
     loadPanelists(),
     loadAccounts(),
@@ -63,6 +68,8 @@ export default async function AdminPanelistsPage() {
     <AdminPanelistsClient
       rows={rows}
       requirementByEmail={requirementByEmail}
+      initialEmail={params.email}
+      initialVerification={params.verification}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),
         district: getUniqueFilterValues(rows, "district"),

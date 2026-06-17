@@ -11,6 +11,7 @@ import {
   IconMetricCard,
   PageIntro,
 } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { PayoutQueueRow } from "@/lib/admin-dashboard-metrics";
 import { buildPayoutStatementText, payoutStatusLabel } from "@/lib/admin-payout-display";
@@ -69,6 +70,8 @@ export function AdminPayoutsDashboard({ rows }: { rows: PayoutQueueRow[] }) {
     .filter((row) => row.status === "pending" || row.status === "approved")
     .reduce((sum, row) => sum + row.amountBz, 0);
 
+  const pagination = useTablePagination(filtered, 2);
+
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageIntro
@@ -118,21 +121,22 @@ export function AdminPayoutsDashboard({ rows }: { rows: PayoutQueueRow[] }) {
             </BrandedAlert>
           </div>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
-            <AdminDataTable>
-              <AdminTableHead>
-                <AdminTableTh>Request ID</AdminTableTh>
-                <AdminTableTh>Status</AdminTableTh>
-                <AdminTableTh>Redemption option</AdminTableTh>
-                <AdminTableTh align="right">Amount</AdminTableTh>
-                <AdminTableTh>Panelist</AdminTableTh>
-                <AdminTableTh>Payment details</AdminTableTh>
-                <AdminTableTh>Date</AdminTableTh>
-                <AdminTableTh align="center">Invoice / statement</AdminTableTh>
-                <AdminTableTh align="center">Action</AdminTableTh>
-              </AdminTableHead>
-              <tbody>
-                {filtered.map((row) => (
+          <>
+            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+              <AdminDataTable className="min-w-[1100px]">
+                <AdminTableHead>
+                  <AdminTableTh>Request ID</AdminTableTh>
+                  <AdminTableTh>Status</AdminTableTh>
+                  <AdminTableTh>Redemption option</AdminTableTh>
+                  <AdminTableTh align="right">Amount</AdminTableTh>
+                  <AdminTableTh>Panelist</AdminTableTh>
+                  <AdminTableTh>Payment details</AdminTableTh>
+                  <AdminTableTh>Date</AdminTableTh>
+                  <AdminTableTh align="center">Invoice / statement</AdminTableTh>
+                  <AdminTableTh align="center">Action</AdminTableTh>
+                </AdminTableHead>
+                <tbody>
+                  {pagination.paginatedRows.map((row) => (
                   <tr key={row.id} className="border-b border-zinc-50 align-top hover:bg-zinc-50/60">
                     <td className="px-4 py-3 font-semibold text-zinc-900">{row.shortId}</td>
                     <td className="px-4 py-3">
@@ -173,6 +177,15 @@ export function AdminPayoutsDashboard({ rows }: { rows: PayoutQueueRow[] }) {
               </tbody>
             </AdminDataTable>
           </div>
+            <TablePagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalPages={pagination.totalPages}
+              totalRows={pagination.totalRows}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+            />
+          </>
         )}
       </section>
     </div>

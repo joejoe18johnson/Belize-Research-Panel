@@ -4,7 +4,15 @@ import { isPanelistVerified } from "./verification-status";
 import { cleanText, validEmail } from "./validation";
 
 export type RequirementKey = "email" | "phone" | "photo_id";
-export type RequirementApprovalStatus = "approved" | "under_review" | "missing";
+export type RequirementApprovalStatus = "approved" | "under_review" | "missing" | "denied";
+
+export type AdminRequirementDecision = "" | "true" | "false";
+
+export const ADMIN_REQUIREMENT_FIELDS = {
+  email: "admin_email_approved",
+  phone: "admin_phone_approved",
+  photoId: "admin_photo_id_approved",
+} as const;
 
 export interface RequirementItem {
   key: RequirementKey;
@@ -39,74 +47,35 @@ function photoIdOnFile(panelist: PanelistRow, context: RequirementContext): bool
   return Boolean(photoIdType || authorisedRegistration || context.hasPhotoUpload);
 }
 
-function assessEmail(panelist: PanelistRow, context: RequirementContext): RequirementItem {
-  const email = cleanText(panelist.email).toLowerCase();
-  const onFile = Boolean(email && validEmail(email));
-  const accountVerified = context.emailVerified !== false;
-
-  let status: RequirementApprovalStatus = "missing";
-  if (!onFile) {
-    status = "missing";
-  } else if (isPanelistVerified(panelist.verification_status) && accountVerified) {
-    status = "approved";
-  } else {
-    status = "under_review";
-  }
-
-  return {
-    key: "email",
-    label: "Email",
-    status,
-    detail: onFile ? email : "Not provided",
-  };
+function readAdminDecision(panelist: PanelistRow, field: string): AdminRequirementDecision {
+  const value = cleanText(panelist[field]).toLowerCase();
+  if (value === "true") return "true";
+  if (value === "false") return "false";
+  return "";
 }
 
-function assessPhone(panelist: PanelistRow, context: RequirementContext): RequirementItem {
-  const phone = cleanText(panelist.phone_whatsapp);
-  const onFile = phoneDigits(phone).length === 10;
-  const pendingChange = Boolean(context.pendingPhone);
-
-  let status: RequirementApprovalStatus = "missing";
-  if (!onFile) {
-    status = "missing";
-  } else if (isPanelistVerified(panelist.verification_status) && !pendingChange) {
-    status = "approved";
-  } else {
-    status = "under_review";
-  }
-
-  return {
-    key: "phone",
-    label: "Phone",
-    status,
-    detail: onFile ? phone : "Not provided",
-  };
+function resolveRequirementStatus(
+  onFile: boolean,
+  adminDecision: AdminRequirementDecision,
+  legacyApproved: boolean
+): RequirementApprovalStatus {
+  if (adminDecision === "true") return onFile ? "approved" : "missing";
+  if (adminDecision === "false") return onFile ? "denied" : "missing";
+  if (!onFile) return "missing";
+  if (legacyApproved) return "approved";
+  return "under_review";
 }
 
-function assessPhotoId(panelist: PanelistRow, context: RequirementContext): RequirementItem {
-  const onFile = photoIdOnFile(panelist, context);
-  const photoIdType = cleanText(panelist.photo_id_type);
+function legacyEmailApproved(panelist: PanelistRow, context: RequirementContext): boolean {
+  return isPanelistVerified(panelist.verification_status) && context.emailVerified !== false;
+}
 
-  let status: RequirementApprovalStatus = "missing";
-  if (!onFile) {
-    status = "missing";
-  } else if (isPanelistVerified(panelist.verification_status)) {
-    status = "approved";
-  } else {
-    status = "under_review";
-  }
+function legacyPhoneApproved(panelist: PanelistRow, context: RequirementContext): boolean {
+  return isPanelistVerified(panelist.verification_status) && !context.pendingPhone;
+}
 
-  let detail = "Not provided";
-  if (onFile) {
-    detail = photoIdType || "Submitted — review in progress";
-  }
-
-  return {
-    key: "photo_id",
-    label: "Photo ID",
-    status,
-    detail,
-  };
+function legacyPhotoIdApproved(panelist: PanelistRow): boolean {
+  return isPanelistVerified(panelist.verification_status);
 }
 
 export function requirementContextFromAccount(account: AccountRecord | undefined): RequirementContext {

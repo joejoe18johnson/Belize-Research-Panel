@@ -15,8 +15,8 @@ export default async function AdminDashboardPage() {
   const hub = await loadAdminDataHub();
   const photoUploadUsernames = await loadPanelistPhotoUploadUsernames();
   const metrics = buildAdminDashboardMetrics(hub);
-  const recentPanelists = buildRecentPanelistRows(hub, photoUploadUsernames, 5);
-  const recentPayouts = buildPayoutQueueRows(hub).slice(0, 5);
+  const recentPanelists = buildRecentPanelistRows(hub, photoUploadUsernames);
+  const recentPayouts = buildPayoutQueueRows(hub);
 
   if (metrics.total === 0 && hub.accounts.length === 0) {
     return (
