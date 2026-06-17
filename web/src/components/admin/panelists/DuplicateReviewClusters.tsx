@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { DuplicateReviewCluster } from "@/lib/admin-panelists";
-import type { AdminPanelistPublicRow } from "@/lib/admin-panelists";
+import { isFlaggedPanelist, type AdminPanelistPublicRow } from "@/lib/admin-panelists";
 import { formatDobDisplay } from "@/lib/dob";
 import { formatAdminLabel } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
@@ -134,7 +134,7 @@ function DuplicateRecordCard({
   actions: RowActions;
   requirements?: { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus };
 }) {
-  const alreadyFlagged = cleanText(record.verification_status) === "Possible Duplicate";
+  const isFlagged = isFlaggedPanelist(record);
   const busy = actions.flaggingEmail === record.email || actions.deletingEmail === record.email;
 
   return (
@@ -151,7 +151,7 @@ function DuplicateRecordCard({
             </p>
           ) : null}
         </div>
-        <RecordActionButtons email={record.email} actions={actions} flagged={alreadyFlagged} />
+        <RecordActionButtons email={record.email} actions={actions} flagged={isFlagged} />
       </div>
 
       <dl className="flex-1 space-y-2 px-4 py-3 text-sm">
@@ -191,8 +191,8 @@ function DuplicateRecordCard({
             <span className="text-xs text-zinc-400">—</span>
           )}
         </div>
-        {alreadyFlagged ? (
-          <p className="mt-2 text-xs font-semibold text-amber-800">Already flagged as Possible Duplicate</p>
+        {isFlagged ? (
+          <p className="mt-2 text-xs font-semibold text-amber-800">Flagged as Possible Duplicate</p>
         ) : (
           <button
             type="button"

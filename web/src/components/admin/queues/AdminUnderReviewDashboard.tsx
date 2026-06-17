@@ -16,8 +16,10 @@ import {
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { isFlaggedPanelist } from "@/lib/admin-panelists";
 import type { UnderReviewRow } from "@/lib/admin-dashboard-metrics";
 import {
+  ADMIN_DASHBOARD_LINKS,
   filterUnderReviewRowsByQueue,
   filterUnderReviewRowsByRequirement,
   parseUnderReviewQueueFilter,
@@ -63,7 +65,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
       row.phoneRequirement !== "approved" ||
       row.photoIdRequirement !== "approved"
   ).length;
-  const flagged = rows.filter((row) => row.verificationStatus === "Possible Duplicate").length;
+  const flagged = rows.filter((row) => isFlaggedPanelist({ verification_status: row.verificationStatus })).length;
   const onHold = rows.filter((row) => row.accountStatus === "on_hold").length;
 
   const queueHref = (queue: string | null) => {
@@ -84,7 +86,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
             ? `Showing ${UNDER_REVIEW_QUEUE_LABELS[queueFilter].toLowerCase()}.`
             : requirementFilter
               ? `Showing panelists with ${UNDER_REVIEW_FILTER_LABELS[requirementFilter].toLowerCase()} needing review.`
-              : "Panelists with incomplete email, phone, or photo ID requirements, plus flagged, pending, or on-hold accounts."
+              : "Panelists with incomplete email, phone, or photo ID requirements, plus possible-duplicate flags, pending verification, or on-hold accounts."
         }
       />
 
@@ -133,8 +135,9 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
         <MetricCard
           label="Flagged"
           value={flagged}
-          href={queueHref("flagged")}
-          active={queueFilter === "flagged"}
+          hint="Possible duplicate"
+          href={ADMIN_DASHBOARD_LINKS.panelistsFlagged}
+          active={false}
         />
         <MetricCard
           label="Accounts on hold"
