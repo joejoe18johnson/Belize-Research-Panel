@@ -60,23 +60,6 @@ export function HomePageClient() {
             </div>
           </div>
         </div>
-
-        <div className="mt-4 sm:hidden">
-          <div className="grid grid-cols-2 gap-2">
-            <Link
-              href="/login"
-              className="flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
-            >
-              {t(copy.logIn)}
-            </Link>
-            <Link
-              href="/register"
-              className="flex min-h-11 items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-teal-900 hover:bg-teal-50"
-            >
-              {t(copy.register)}
-            </Link>
-          </div>
-        </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16">
