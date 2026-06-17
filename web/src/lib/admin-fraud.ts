@@ -22,6 +22,7 @@ export interface SuspiciousEmailRow extends FraudDuplicateRow {
   signalSummary: string;
   signals: SuspiciousEmailAssessment["signals"];
   flagged: boolean;
+  registrationDate: string;
 }
 
 export interface FraudPreventionDetail {
@@ -99,6 +100,7 @@ function buildSuspiciousEmailRows(rows: PanelistRow[]): SuspiciousEmailRow[] {
       signalSummary: assessment.signals.map((signal) => signal.label).join(" · "),
       signals: assessment.signals,
       flagged: isFlaggedPanelist(row),
+      registrationDate: cleanText(row.registration_date),
     });
   }
 
