@@ -10,6 +10,7 @@ import {
   getAdminModulesBySection,
   type AdminModule,
 } from "@/lib/admin-modules";
+import { AdminFooter } from "@/components/admin/AdminFooter";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
 import type { AdminNavBadges } from "@/lib/admin-nav-badges";
 import { STAFF_ROLE_LABELS, staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
@@ -62,9 +63,9 @@ export function AdminShell({
   const accessibleSlugs = new Set(accessibleModules.map((module) => module.slug));
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)]">
-      <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
-        <aside className="safe-top z-40 flex shrink-0 flex-col border-b border-teal-100 bg-teal-950 text-white lg:h-screen lg:w-72 lg:border-b-0 lg:border-r">
+    <div className="flex min-h-0 flex-1 flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)]">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        <aside className="safe-top z-40 flex shrink-0 flex-col border-b border-teal-100 bg-teal-950 text-white lg:h-full lg:w-72 lg:border-b-0 lg:border-r">
           <div className="h-1 shrink-0 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400 lg:hidden" aria-hidden />
           <div className="shrink-0 border-b border-white/10 px-4 py-4">
             <BrpLogoLink href="/admin/dashboard" variant="dark" className="block" />
@@ -145,7 +146,7 @@ export function AdminShell({
           </div>
         </aside>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:overflow-y-auto">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:overflow-hidden">
           <header className="shrink-0 border-b border-teal-100 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6">
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">
               Belize Research Panel
@@ -155,7 +156,10 @@ export function AdminShell({
               governance studies.
             </p>
           </header>
-          <main className="min-h-0 flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
+            {children}
+          </main>
+          <AdminFooter />
         </div>
       </div>
     </div>
