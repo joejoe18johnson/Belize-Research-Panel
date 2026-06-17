@@ -52,14 +52,44 @@ export function FilterMultiSelect({
   );
 }
 
-export function MetricCard({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
-  return (
-    <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm">
+export function MetricCard({
+  label,
+  value,
+  hint,
+  href,
+  active = false,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+  href?: string;
+  active?: boolean;
+}) {
+  const className = `block rounded-2xl border bg-white p-4 shadow-sm transition ${
+    active
+      ? "border-teal-600 ring-2 ring-teal-200"
+      : href
+        ? "border-teal-100 hover:border-teal-300 hover:shadow-md"
+        : "border-teal-100"
+  }`;
+
+  const content = (
+    <>
       <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
       <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950">{value}</p>
       {hint ? <p className="mt-1 text-xs text-zinc-500">{hint}</p> : null}
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className={className} aria-current={active ? "true" : undefined}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
 }
 
 const ICON_METRIC_TONES = {

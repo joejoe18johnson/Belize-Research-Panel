@@ -18,15 +18,19 @@ import { TablePagination, useTablePagination } from "@/components/admin/shared/T
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { UnderReviewRow } from "@/lib/admin-dashboard-metrics";
 import {
+  filterUnderReviewRowsByQueue,
   filterUnderReviewRowsByRequirement,
+  parseUnderReviewQueueFilter,
   parseUnderReviewRequirementFilter,
   UNDER_REVIEW_FILTER_LABELS,
+  UNDER_REVIEW_QUEUE_LABELS,
 } from "@/lib/admin-dashboard-links";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) {
   const searchParams = useSearchParams();
   const requirementFilter = parseUnderReviewRequirementFilter(searchParams.get("requirement") ?? undefined);
+  const queueFilter = parseUnderReviewQueueFilter(searchParams.get("queue") ?? undefined);
   const [search, setSearch] = useState("");
 
   const requirementFiltered = useMemo(
@@ -34,17 +38,22 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
     [rows, requirementFilter]
   );
 
+  const queueFiltered = useMemo(
+    () => filterUnderReviewRowsByQueue(requirementFiltered, queueFilter),
+    [requirementFiltered, queueFilter]
+  );
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return requirementFiltered;
-    return requirementFiltered.filter(
+    if (!query) return queueFiltered;
+    return queueFiltered.filter(
       (row) =>
         row.name.toLowerCase().includes(query) ||
         row.email.toLowerCase().includes(query) ||
         row.verificationStatus.toLowerCase().includes(query) ||
         row.reasons.some((reason) => reason.toLowerCase().includes(query))
     );
-  }, [requirementFiltered, search]);
+  }, [queueFiltered, search]);
 
   const pagination = useTablePagination(filtered);
 
@@ -57,17 +66,36 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
   const flagged = rows.filter((row) => row.verificationStatus === "Possible Duplicate").length;
   const onHold = rows.filter((row) => row.accountStatus === "on_hold").length;
 
+  const queueHref = (queue: string | null) => {
+    const params = new URLSearchParams();
+    if (requirementFilter) params.set("requirement", requirementFilter);
+    if (queue) params.set("queue", queue);
+    const query = params.toString();
+    return `/admin/under-review${query ? `?${query}` : ""}#under-review-queue`;
+  };
+
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
       <PageIntro
         eyebrow="Panel review"
         title="Under review"
         description={
-          requirementFilter
-            ? `Showing panelists with ${UNDER_REVIEW_FILTER_LABELS[requirementFilter].toLowerCase()} needing review.`
-            : "Panelists with incomplete email, phone, or photo ID requirements, plus flagged, pending, or on-hold accounts."
+          queueFilter
+            ? `Showing ${UNDER_REVIEW_QUEUE_LABELS[queueFilter].toLowerCase()}.`
+            : requirementFilter
+              ? `Showing panelists with ${UNDER_REVIEW_FILTER_LABELS[requirementFilter].toLowerCase()} needing review.`
+              : "Panelists with incomplete email, phone, or photo ID requirements, plus flagged, pending, or on-hold accounts."
         }
       />
+
+      {queueFilter ? (
+        <BrandedAlert tone="info" compact showIcon>
+          Filtered by {UNDER_REVIEW_QUEUE_LABELS[queueFilter]}.{" "}
+          <Link href={queueHref(null)} className="font-semibold underline">
+            Show all in queue
+          </Link>
+        </BrandedAlert>
+      ) : null}
 
       {requirementFilter ? (
         <BrandedAlert tone="info" compact showIcon>
@@ -89,13 +117,37 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Total in queue" value={requirementFiltered.length} />
-        <MetricCard label="Requirements incomplete" value={incompleteRequirements} hint="Email, phone, or ID" />
-        <MetricCard label="Flagged" value={flagged} />
-        <MetricCard label="Accounts on hold" value={onHold} />
+        <MetricCard
+          label="Total in queue"
+          value={rows.length}
+          href="/admin/under-review#under-review-queue"
+          active={!queueFilter && !requirementFilter}
+        />
+        <MetricCard
+          label="Requirements incomplete"
+          value={incompleteRequirements}
+          hint="Email, phone, or ID"
+          href={queueHref("incomplete")}
+          active={queueFilter === "incomplete"}
+        />
+        <MetricCard
+          label="Flagged"
+          value={flagged}
+          href={queueHref("flagged")}
+          active={queueFilter === "flagged"}
+        />
+        <MetricCard
+          label="Accounts on hold"
+          value={onHold}
+          href={queueHref("on_hold")}
+          active={queueFilter === "on_hold"}
+        />
       </div>
 
-      <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section
+        id="under-review-queue"
+        className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
+      >
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Review queue")}</h2>
@@ -120,7 +172,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
           <div className="mt-4">
             <BrandedAlert tone="info" title="No matches" showIcon>
               No records match this filter.{" "}
-              <Link href="/admin/under-review" className="font-semibold underline">
+              <Link href="/admin/under-review#under-review-queue" className="font-semibold underline">
                 Clear filter
               </Link>
             </BrandedAlert>

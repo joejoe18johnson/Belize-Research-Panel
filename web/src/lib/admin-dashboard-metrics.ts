@@ -366,7 +366,31 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
     }
   }
 
-  return rows.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
+  return rows
+    .sort((a, b) => {
+      const aTime = parseNotificationSortTime(a.requestedAt);
+      const bTime = parseNotificationSortTime(b.requestedAt);
+      if (bTime !== aTime) return bTime - aTime;
+      return a.name.localeCompare(b.name);
+    })
+    .map((row) => ({
+      ...row,
+      requestedAt: formatNotificationRequestedAt(row.requestedAt === "—" ? "" : row.requestedAt),
+    }));
+}
+
+function formatNotificationRequestedAt(value: string): string {
+  if (!value) return "—";
+  const ms = Date.parse(value);
+  if (!Number.isNaN(ms)) return formatAdminPayoutDate(value);
+  return value;
+}
+
+function parseNotificationSortTime(requestedAt: string): number {
+  const value = cleanText(requestedAt);
+  if (!value || value === "—") return 0;
+  const ms = Date.parse(value);
+  return Number.isNaN(ms) ? 0 : ms;
 }
 
 export function buildPayoutQueueRows(hub: AdminDataHub): PayoutQueueRow[] {
