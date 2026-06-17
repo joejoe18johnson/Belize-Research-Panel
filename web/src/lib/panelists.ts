@@ -112,6 +112,38 @@ export async function updatePanelistPhone(accountEmail: string, phone: string): 
   return true;
 }
 
+export async function updatePanelistAdminFields(
+  accountEmail: string,
+  updates: {
+    verification_status?: string;
+    status?: string;
+    email?: string;
+    phone_whatsapp?: string;
+    district?: string;
+    city_town_village?: string;
+    constituency?: string;
+    notes?: string;
+  }
+): Promise<boolean> {
+  const normalized = cleanText(accountEmail).toLowerCase();
+  if (!normalized) return false;
+
+  const rows = await loadPanelists();
+  const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === normalized);
+  if (index < 0) return false;
+
+  rows[index] = {
+    ...rows[index],
+    ...Object.fromEntries(
+      Object.entries(updates)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => [key, cleanText(String(value))])
+    ),
+  };
+  await savePanelists(rows);
+  return true;
+}
+
 export async function savePanelists(rows: PanelistRow[]): Promise<void> {
   await fs.mkdir(DATA_DIR, { recursive: true });
   const headers = [...PANELIST_COLUMNS];

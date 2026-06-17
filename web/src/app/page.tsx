@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { AdminEntryButton } from "@/components/admin/AdminEntryButton";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { HomeDemoAccess } from "@/components/home/HomeDemoAccess";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export default function HomePage() {
@@ -9,6 +9,7 @@ export default function HomePage() {
       <header className="safe-top mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6">
         <BrpLogoLink href="/" variant="dark" />
         <div className="hidden w-full gap-2 sm:flex sm:w-auto sm:gap-3">
+          <AdminEntryButton variant="header" />
           <Link
             href="/login"
             className="flex min-h-11 flex-1 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10 sm:flex-none"
@@ -50,6 +51,7 @@ export default function HomePage() {
             >
               {formatHeadingCase("Panelist login")}
             </Link>
+            <AdminEntryButton variant="inline" />
           </div>
         </div>
 
@@ -65,8 +67,6 @@ export default function HomePage() {
             </div>
           ))}
         </section>
-
-        <HomeDemoAccess />
       </main>
     </div>
   );

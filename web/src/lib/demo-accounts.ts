@@ -59,26 +59,10 @@ export const DEMO_UNVERIFIED_REGISTERED_ACCOUNT: DemoAccountInfo = {
   dob: "1995-08-22",
 };
 
-/** Full-access verified panelist — primary admin / QA demo for dashboard testing */
-export const DEMO_ADMIN_ACCOUNT: DemoAccountInfo = {
-  id: "44444444-4444-4444-4444-444444444444",
-  email: "glen.avilez@belizepanel.test",
-  firstName: "Glen",
-  lastName: "Avilez",
-  emailVerified: true,
-  panelistRegistered: true,
-  verificationToken: "",
-  passwordSalt: "demo-salt-glen01",
-  passwordHash: "69ad7ef6365972e1e0faea06dfd68af986aec29b44aa9c95502ccd2ea25c840d",
-  citizenshipStatus: "Citizen of Belize",
-  dob: "1982-04-10",
-};
-
 export const DEMO_ACCOUNTS = [
   DEMO_REGISTRATION_READY_ACCOUNT,
   DEMO_REGISTERED_ACCOUNT,
   DEMO_UNVERIFIED_REGISTERED_ACCOUNT,
-  DEMO_ADMIN_ACCOUNT,
 ] as const;
 
 export function isDemoAccountsEnabled(): boolean {
