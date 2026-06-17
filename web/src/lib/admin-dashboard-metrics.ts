@@ -1,6 +1,6 @@
 import type { AccountHoldReason, AccountRecord } from "./auth-types";
 import type { AdminDataHub } from "./admin-data-hub";
-import { duplicateNameDobKey } from "./admin-panelists";
+import { buildDuplicateNameDobKeyCounts, duplicateNameDobKey, isDuplicateNameDobMatch } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import type { RedemptionRequest } from "./reward-redemption";
 import type { StoredRedemptionOptionId } from "./reward-redemption";
@@ -241,6 +241,7 @@ export function buildUnderReviewRows(
   );
 
   const rows = new Map<string, UnderReviewRow>();
+  const duplicateKeyCounts = buildDuplicateNameDobKeyCounts(hub.panelists);
 
   for (const row of hub.panelists) {
     const email = cleanText(row.email).toLowerCase();
@@ -249,11 +250,12 @@ export function buildUnderReviewRows(
     const account = accountsByEmail.get(email);
     const context = requirementContextForPanelist(row, accountsByEmail, photoUploadUsernames);
     const accountOnHold = cleanText(account?.account_status) === "on_hold";
+    const duplicateNameDobMatch = isDuplicateNameDobMatch(row, duplicateKeyCounts);
 
-    if (!panelistRequiresAdminReview(row, context, { accountOnHold })) continue;
+    if (!panelistRequiresAdminReview(row, context, { accountOnHold, duplicateNameDobMatch })) continue;
 
     const requirements = assessPanelistRequirements(row, context);
-    const reasons = buildPanelistReviewReasons(row, context, { accountOnHold });
+    const reasons = buildPanelistReviewReasons(row, context, { accountOnHold, duplicateNameDobMatch });
 
     rows.set(email, {
       email,
@@ -297,7 +299,10 @@ export function buildUnderReviewRows(
 
     const context = requirementContextForPanelist(panelist, accountsByEmail, photoUploadUsernames);
     const requirements = assessPanelistRequirements(panelist, context);
-    const reasons = buildPanelistReviewReasons(panelist, context, { accountOnHold: true });
+    const reasons = buildPanelistReviewReasons(panelist, context, {
+      accountOnHold: true,
+      duplicateNameDobMatch: isDuplicateNameDobMatch(panelist, duplicateKeyCounts),
+    });
 
     rows.set(email, {
       email,

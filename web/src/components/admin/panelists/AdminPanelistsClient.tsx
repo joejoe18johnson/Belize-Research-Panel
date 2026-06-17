@@ -8,6 +8,7 @@ import {
   applyAdminPanelistFilters,
   countPanelistsByField,
   getDuplicateReviewRows,
+  groupDuplicateReviewClusters,
   panelistDisplayLabel,
   type AdminPanelistPublicRow,
 } from "@/lib/admin-panelists";
@@ -22,6 +23,7 @@ import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteC
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert, BrandedModal } from "@/components/shared/BrandedFeedback";
+import { DuplicateReviewClusters } from "./DuplicateReviewClusters";
 import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import {
@@ -29,22 +31,6 @@ import {
   requirementOnFile,
   verificationStatusFromRequirementApprovals,
 } from "@/lib/panelist-requirements";
-
-const DUPLICATE_REVIEW_COLUMNS = [
-  "first_name",
-  "last_name",
-  "dob",
-  "age",
-  "username",
-  "email",
-  "phone_whatsapp",
-  "district",
-  "city_town_village",
-  "constituency",
-  "verification_status",
-  "status",
-  "notes",
-] as const;
 
 const TABLE_COLUMNS = [
   "registration_date",
@@ -136,6 +122,7 @@ export function AdminPanelistsClient({
   );
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
+  const duplicateClusters = useMemo(() => groupDuplicateReviewClusters(rows), [rows]);
 
   const verificationCounts = useMemo(
     () => countPanelistsByField(rows, "verification_status", filterOptions.verification),
@@ -155,7 +142,7 @@ export function AdminPanelistsClient({
   );
 
   const allPagination = useTablePagination(filteredRows);
-  const duplicatePagination = useTablePagination(duplicateRows);
+  const duplicatePagination = useTablePagination(duplicateClusters, 10);
 
   const cityOptions =
     editState?.district && editState.district in CITY_TOWN_VILLAGE
@@ -380,7 +367,7 @@ export function AdminPanelistsClient({
 
   const TABS = [
     { id: "all" as const, label: "All panelists", count: filteredRows.length },
-    { id: "duplicates" as const, label: "Duplicate review", count: duplicateRows.length },
+    { id: "duplicates" as const, label: "Duplicate Review", count: duplicateClusters.length },
   ];
 
   const rowActionTone =
@@ -462,8 +449,13 @@ export function AdminPanelistsClient({
       {tab === "duplicates" ? (
         <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Duplicate review")}</h2>
-            {duplicateRows.length > 0 ? (
+            <div>
+              <h2 className="text-lg font-semibold text-teal-950">{formatHeadingCase("Duplicate Review")}</h2>
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600">
+                Records that share the same name and exact date of birth are flagged for review.
+              </p>
+            </div>
+            {duplicateClusters.length > 0 ? (
               <button
                 type="button"
                 disabled={markingDuplicates}
@@ -481,11 +473,12 @@ export function AdminPanelistsClient({
               </BrandedAlert>
             </div>
           ) : null}
-          {duplicateRows.length > 0 ? (
+          {duplicateClusters.length > 0 ? (
             <>
               <div className="mt-2">
                 <BrandedAlert tone="warning" compact showIcon>
-                  {duplicateRows.length} records share the same name and date of birth.
+                  {duplicateClusters.length} duplicate {duplicateClusters.length === 1 ? "cluster" : "clusters"} ·{" "}
+                  {duplicateRows.length} records grouped for side-by-side comparison.
                 </BrandedAlert>
               </div>
               {rowActionMessage ? (
@@ -495,28 +488,28 @@ export function AdminPanelistsClient({
                   </BrandedAlert>
                 </div>
               ) : null}
-              <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
-                <DataTable
-                  rows={duplicatePagination.paginatedRows}
-                  columns={DUPLICATE_REVIEW_COLUMNS}
-                  highlightDuplicates
+              <div className="mt-4">
+                <DuplicateReviewClusters
+                  clusters={duplicatePagination.paginatedRows}
                   actions={rowActions}
                   requirementByEmail={requirementByEmail}
                 />
               </div>
-              <TablePagination
-                page={duplicatePagination.page}
-                pageSize={duplicatePagination.pageSize}
-                totalPages={duplicatePagination.totalPages}
-                totalRows={duplicatePagination.totalRows}
-                onPageChange={duplicatePagination.setPage}
-                onPageSizeChange={duplicatePagination.setPageSize}
-              />
+              {duplicatePagination.totalPages > 1 ? (
+                <TablePagination
+                  page={duplicatePagination.page}
+                  pageSize={duplicatePagination.pageSize}
+                  totalPages={duplicatePagination.totalPages}
+                  totalRows={duplicatePagination.totalRows}
+                  onPageChange={duplicatePagination.setPage}
+                  onPageSizeChange={duplicatePagination.setPageSize}
+                />
+              ) : null}
             </>
           ) : (
             <div className="mt-3">
               <BrandedAlert tone="success" compact showIcon>
-                No duplicate name + DOB records currently detected.
+                No records share the same name and exact date of birth.
               </BrandedAlert>
             </div>
           )}
@@ -909,7 +902,16 @@ function DataTable({
                 ) : null}
                 {columns.map((column) => (
                   <td key={column} className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-zinc-700">
-                    {row[column] ?? ""}
+                    {column === "verification_status" && flagged ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span>{row[column] ?? ""}</span>
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+                          Name + DOB
+                        </span>
+                      </span>
+                    ) : (
+                      row[column] ?? ""
+                    )}
                   </td>
                 ))}
                 <td className="whitespace-nowrap px-3 py-2">

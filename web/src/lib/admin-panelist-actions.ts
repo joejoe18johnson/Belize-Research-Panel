@@ -1,4 +1,4 @@
-import { duplicateNameDobKey } from "./admin-panelists";
+import { buildDuplicateNameDobKeyCounts, isDuplicateNameDobMatch } from "./admin-panelists";
 import { putAccountOnHoldForFraudReview, releaseAccountFromFraudReview } from "./accounts";
 import { loadPanelists, savePanelists, updatePanelistAdminFields } from "./panelists";
 import { cleanText } from "./validation";
@@ -7,18 +7,12 @@ import { deletePanelistRelatedData } from "./admin-panelist-delete";
 /** MVP Admin / Fraud Prevention: mark all name+DOB duplicate clusters as Possible Duplicate. */
 export async function markNameDobDuplicatesAsPossibleDuplicate(): Promise<number> {
   const rows = await loadPanelists();
-  const keyCounts = new Map<string, number>();
-  for (const row of rows) {
-    const key = duplicateNameDobKey(row);
-    if (!key.replace(/\|/g, "").trim()) continue;
-    keyCounts.set(key, (keyCounts.get(key) ?? 0) + 1);
-  }
+  const keyCounts = buildDuplicateNameDobKeyCounts(rows);
 
   let updated = 0;
   const emailsToHold: string[] = [];
   const next = rows.map((row) => {
-    const key = duplicateNameDobKey(row);
-    if ((keyCounts.get(key) ?? 0) <= 1) return row;
+    if (!isDuplicateNameDobMatch(row, keyCounts)) return row;
     if (cleanText(row.verification_status) === "Possible Duplicate") return row;
     updated += 1;
     const email = cleanText(row.email).toLowerCase();
