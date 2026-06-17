@@ -20,6 +20,7 @@ import {
 } from "@/lib/admin-sample-selection";
 import type { PanelistRow } from "@/lib/panelists";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { siteCheckboxClass } from "@/lib/site-controls";
 
 type Tab = "filters" | "calculator" | "sample";
 type SortKey = keyof Pick<
@@ -194,7 +195,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                   type="checkbox"
                   checked={filters.registeredVotersOnly}
                   onChange={(e) => updateFilter("registeredVotersOnly", e.target.checked)}
-                  className="rounded border-zinc-300 text-teal-700"
+                  className={siteCheckboxClass}
                 />
                 Registered voters only
               </label>

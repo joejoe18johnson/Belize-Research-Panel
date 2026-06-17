@@ -13,7 +13,7 @@ export async function POST() {
     updated,
     message:
       updated > 0
-        ? `${updated} record(s) marked as Possible Duplicate.`
+        ? `${updated} record(s) marked as Possible Duplicate. Matching login accounts are now on hold until the review is cleared.`
         : "No new name + DOB duplicates to mark.",
   });
 }

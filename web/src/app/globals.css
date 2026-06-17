@@ -53,7 +53,8 @@ select.appearance-none {
   background-image: none;
 }
 
-/* Round teal checkboxes */
+/* Round teal checkboxes — site-wide brand control */
+input[type="checkbox"],
 input.site-checkbox {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -70,20 +71,24 @@ input.site-checkbox {
   transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+input[type="checkbox"]:hover,
 input.site-checkbox:hover {
   border-color: #0f766e;
 }
 
+input[type="checkbox"]:focus-visible,
 input.site-checkbox:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgb(13 148 136 / 0.2);
 }
 
+input[type="checkbox"]:checked,
 input.site-checkbox:checked {
   background-color: #0f766e;
   border-color: #0f766e;
 }
 
+input[type="checkbox"]:checked::after,
 input.site-checkbox:checked::after {
   content: "";
   width: 0.3rem;
@@ -91,6 +96,17 @@ input.site-checkbox:checked::after {
   border: solid #ffffff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) translate(-1px, -1px);
+}
+
+input[type="checkbox"]:disabled,
+input.site-checkbox:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+input[type="checkbox"]:disabled:hover,
+input.site-checkbox:disabled:hover {
+  border-color: #e4e4e7;
 }
 
 /* Round teal radio buttons */

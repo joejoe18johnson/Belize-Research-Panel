@@ -1,5 +1,10 @@
 import { type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { siteCheckboxClass, siteRadioClass } from "@/lib/site-controls";
+import type { FeedbackTone } from "@/lib/site-alerts";
 import { formatHeadingCase } from "@/lib/sentence-case";
+
+export { siteCheckboxClass, siteRadioClass };
 
 const inputClass =
   "w-full h-12 rounded-lg border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500";
@@ -7,8 +12,6 @@ export const choiceBoxClass =
   "w-full h-12 appearance-none rounded-lg border border-zinc-200 bg-white bg-none px-4 pr-10 text-sm text-zinc-900 transition hover:bg-zinc-50 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-zinc-50 disabled:text-zinc-500";
 export const choiceBoxLabelClass =
   "flex h-12 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 px-4 text-sm text-zinc-900 transition hover:bg-zinc-50";
-export const siteCheckboxClass = "site-checkbox";
-export const siteRadioClass = "site-radio";
 const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-500/20";
 const labelClass = "mb-1.5 block text-sm font-medium text-zinc-800";
 const errorClass = "mt-1.5 text-sm text-red-600";
@@ -208,19 +211,13 @@ export function Alert({
   variant,
   children,
 }: {
-  variant: "info" | "success" | "warning" | "error";
+  variant: FeedbackTone;
   children: ReactNode;
 }) {
-  const styles = {
-    info: "border-sky-200 bg-sky-50 text-sky-900",
-    success: "border-emerald-200 bg-emerald-50 text-emerald-900",
-    warning: "border-amber-200 bg-amber-50 text-amber-900",
-    error: "border-red-200 bg-red-50 text-red-900",
-  };
   return (
-    <div className={`rounded-lg border px-4 py-3 text-sm ${styles[variant]}`} role="status">
+    <BrandedAlert tone={variant} showIcon>
       {children}
-    </div>
+    </BrandedAlert>
   );
 }
 

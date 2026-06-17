@@ -18,6 +18,7 @@ import {
 import type { PanelistRow } from "@/lib/panelists";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { siteCheckboxClass } from "@/lib/site-controls";
 
 type Tab = "overview" | "assignments" | "planner";
 
@@ -187,7 +188,7 @@ export function AdminSurveyDistributionDashboard({
                 type="checkbox"
                 checked={overdueOnly}
                 onChange={(e) => setOverdueOnly(e.target.checked)}
-                className="rounded border-zinc-300 text-teal-700"
+                className={siteCheckboxClass}
               />
               Overdue only
             </label>

@@ -176,10 +176,10 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           {submitting ? "Updating…" : "Mark name + DOB duplicates as Possible Duplicate"}
         </button>
         <Link
-          href="/admin/dashboard"
+          href="/admin/panelists"
           className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50"
         >
-          Open admin dashboard
+          Open panelists register
         </Link>
       </div>
       {message ? <p className="text-sm text-teal-900">{message}</p> : null}

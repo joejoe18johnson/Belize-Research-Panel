@@ -36,10 +36,6 @@ async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
   await fs.writeFile(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), "utf-8");
 }
 
-function accountStatus(record: AccountRecord): AccountStatus {
-  return record.account_status === "on_hold" ? "on_hold" : "active";
-}
-
 function hasPendingEmailChange(record: AccountRecord): boolean {
   return Boolean(cleanText(record.pending_email));
 }
@@ -48,7 +44,7 @@ function hasPendingPhoneChange(record: AccountRecord): boolean {
   return Boolean(cleanText(record.pending_phone_whatsapp));
 }
 
-function computeHoldReason(record: AccountRecord): AccountHoldReason {
+function computeContactHoldReason(record: AccountRecord): AccountHoldReason {
   const emailPending = hasPendingEmailChange(record);
   const phonePending = hasPendingPhoneChange(record);
   if (emailPending && phonePending) return "email_and_phone";
@@ -57,13 +53,33 @@ function computeHoldReason(record: AccountRecord): AccountHoldReason {
   return "";
 }
 
+function computeHoldReason(record: AccountRecord): AccountHoldReason {
+  const contactReason = computeContactHoldReason(record);
+  if (contactReason) return contactReason;
+  if (record.account_status === "on_hold" && record.hold_reason === "fraud_review") {
+    return "fraud_review";
+  }
+  return "";
+}
+
+function accountStatus(record: AccountRecord): AccountStatus {
+  return computeHoldReason(record) ? "on_hold" : "active";
+}
+
 function applyHoldSync(record: AccountRecord): AccountRecord {
-  const holdReason = computeHoldReason(record);
-  if (holdReason) {
+  const contactReason = computeContactHoldReason(record);
+  if (contactReason) {
     return {
       ...record,
       account_status: "on_hold",
-      hold_reason: holdReason,
+      hold_reason: contactReason,
+    };
+  }
+  if (record.hold_reason === "fraud_review") {
+    return {
+      ...record,
+      account_status: "on_hold",
+      hold_reason: "fraud_review",
     };
   }
   return {
@@ -316,6 +332,41 @@ export async function getPendingPhoneForApproval(accountEmail: string): Promise<
   const account = await findAccountByEmail(accountEmail);
   if (!account || !hasPendingPhoneChange(account)) return null;
   return cleanText(account.pending_phone_whatsapp);
+}
+
+export async function putAccountOnHoldForFraudReview(email: string): Promise<boolean> {
+  const normalized = cleanText(email).toLowerCase();
+  if (!normalized) return false;
+
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((account) => cleanText(account.email).toLowerCase() === normalized);
+  if (index < 0) return false;
+
+  accounts[index] = applyHoldSync({
+    ...accounts[index],
+    account_status: "on_hold",
+    hold_reason: "fraud_review",
+  });
+  await saveAccountsRaw(accounts);
+  return true;
+}
+
+export async function releaseAccountFromFraudReview(email: string): Promise<boolean> {
+  const normalized = cleanText(email).toLowerCase();
+  if (!normalized) return false;
+
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((account) => cleanText(account.email).toLowerCase() === normalized);
+  if (index < 0) return false;
+  if (accounts[index].hold_reason !== "fraud_review") return false;
+
+  accounts[index] = applyHoldSync({
+    ...accounts[index],
+    account_status: "active",
+    hold_reason: "",
+  });
+  await saveAccountsRaw(accounts);
+  return true;
 }
 
 export async function markAccountPanelistRegistered(accountId: string): Promise<void> {

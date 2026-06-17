@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
@@ -152,20 +153,14 @@ export function DashboardAlert({
   title,
   children,
 }: {
-  tone?: "success" | "info";
+  tone?: "success" | "info" | "warning";
   title: string;
   children: ReactNode;
 }) {
-  const toneClass =
-    tone === "info"
-      ? "border-teal-200 bg-teal-50 text-teal-900"
-      : "border-emerald-200 bg-emerald-50 text-emerald-900";
-
   return (
-    <div className={`rounded-xl border px-4 py-3.5 text-sm ${toneClass}`} role="status">
-      <p className="font-semibold">{formatHeadingCase(title)}</p>
-      <div className="mt-1 leading-relaxed opacity-90">{children}</div>
-    </div>
+    <BrandedAlert tone={tone === "success" ? "success" : tone === "warning" ? "warning" : "info"} title={title}>
+      {children}
+    </BrandedAlert>
   );
 }
 
@@ -178,9 +173,9 @@ export function StatusBadge({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+      ? "border-teal-300 bg-teal-50 text-teal-800"
       : tone === "warning"
-        ? "border-amber-200 bg-amber-50 text-amber-800"
+        ? "border-teal-300/70 bg-teal-50 text-teal-800"
         : tone === "info"
           ? "border-teal-200 bg-teal-50 text-teal-800"
           : "border-zinc-200 bg-zinc-50 text-zinc-700";
@@ -207,16 +202,18 @@ export function StatCard({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-emerald-200 bg-emerald-50/90 shadow-sm shadow-emerald-950/[0.03]"
+      const toneClass =
+    tone === "success"
+      ? "border-teal-200 bg-teal-50/90 shadow-sm shadow-teal-950/[0.04]"
       : tone === "warning"
-        ? "border-amber-200 bg-amber-50/90 shadow-sm shadow-amber-950/[0.03]"
+        ? "border-teal-200 bg-teal-50/80 shadow-sm shadow-teal-950/[0.04]"
         : "border-teal-100 bg-white shadow-sm shadow-teal-950/[0.03]";
 
   const iconToneClass =
     tone === "success"
-      ? "bg-emerald-100 text-emerald-700"
+      ? "bg-teal-100 text-teal-700"
       : tone === "warning"
-        ? "bg-amber-100 text-amber-700"
+        ? "bg-teal-100 text-teal-700 ring-2 ring-amber-200/70"
         : "bg-teal-50 text-teal-700";
 
   return (

@@ -19,6 +19,9 @@ function holdMessage(holdReason: AccountHoldReason): string {
   if (holdReason === "email_and_phone") {
     return "Wait for administrator approval of your email and phone changes to unlock surveys.";
   }
+  if (holdReason === "fraud_review") {
+    return "Your account is on hold while an administrator reviews a possible duplicate flag.";
+  }
   return "Complete account verification to unlock surveys.";
 }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { DashboardCard } from "@/components/dashboard/DashboardShell";
+import { siteCheckboxClass } from "@/lib/site-controls";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
@@ -57,7 +58,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
             type="checkbox"
             checked={confirmOptOut}
             onChange={(event) => setConfirmOptOut(event.target.checked)}
-            className="site-checkbox mt-0.5"
+            className={`${siteCheckboxClass} mt-0.5 shrink-0`}
           />
           <span>
             {formatHeadingCase(

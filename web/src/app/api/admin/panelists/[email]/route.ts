@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deletePanelistByEmail } from "@/lib/admin-panelist-actions";
+import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/lib/admin-panelist-actions";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { updatePanelistAdminFields } from "@/lib/panelists";
 import { cleanText, validEmail } from "@/lib/validation";
@@ -52,6 +52,10 @@ export async function PATCH(
 
   if (!updated) {
     return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+  }
+
+  if (body.verification_status !== undefined) {
+    await syncAccountHoldForVerificationStatus(accountEmail, body.verification_status);
   }
 
   return NextResponse.json({ ok: true, message: "Record updated successfully." });
