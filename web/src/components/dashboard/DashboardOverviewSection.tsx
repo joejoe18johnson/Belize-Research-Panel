@@ -24,6 +24,7 @@ import {
 } from "./DashboardShell";
 import { UserAvatar } from "./UserAvatar";
 import { isAccountApproved, VerifiedCheckBadge, VerifiedStatusPill } from "./VerifiedCheckBadge";
+import { dashboardHeroCardClass } from "@/lib/brand";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function verificationTone(status: string): "default" | "success" | "warning" {
@@ -104,7 +105,7 @@ export function DashboardOverviewSection({
         </DashboardAlert>
       ) : null}
 
-      <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 p-0 text-white">
+      <DashboardCard className={`${dashboardHeroCardClass} p-0`}>
         <div className="relative overflow-hidden rounded-t-2xl p-5 sm:p-8">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
           <div className="relative flex flex-col gap-4">

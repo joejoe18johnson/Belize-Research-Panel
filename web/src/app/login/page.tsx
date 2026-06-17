@@ -11,9 +11,9 @@ export const metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; email?: string }>;
 }) {
-  const { next: nextPath } = await searchParams;
+  const { next: nextPath, email: initialEmail } = await searchParams;
   const account = await getSessionAccount();
   const destination = nextPath ?? "/dashboard";
 
@@ -27,7 +27,7 @@ export default async function LoginPage({
       subtitle="Sign in with the email and password you used when creating your account."
     >
       {account ? <SignedInBanner account={account} nextPath={destination} /> : null}
-      <LoginForm nextPath={destination} />
+      <LoginForm nextPath={destination} initialEmail={initialEmail ?? ""} />
     </AuthPageShell>
   );
 }
