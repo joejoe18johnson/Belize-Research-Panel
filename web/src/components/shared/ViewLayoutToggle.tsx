@@ -54,11 +54,13 @@ export function ViewLayoutToggle({
   onChange,
   className = "",
   compactOnMobile = true,
+  variant = "light",
 }: {
   value: ViewLayout;
   onChange: (layout: ViewLayout) => void;
   className?: string;
   compactOnMobile?: boolean;
+  variant?: "light" | "dark";
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -68,16 +70,24 @@ export function ViewLayoutToggle({
 
   if (!mounted) return null;
 
+  const labelClass = variant === "dark" ? "text-teal-100" : "text-zinc-500";
+  const shellClass =
+    variant === "dark" ? "border-white/20 bg-white/10" : "border-zinc-200 bg-zinc-50";
+  const activeClass =
+    variant === "dark" ? "bg-white text-teal-900 shadow-sm" : "bg-white text-teal-800 shadow-sm";
+  const idleClass =
+    variant === "dark" ? "text-teal-100 hover:text-white" : "text-zinc-600 hover:text-teal-800";
+
   return (
     <div
       className={`flex items-center gap-2 ${className}`.trim()}
       role="group"
       aria-label="Choose layout"
     >
-      <span className={`text-xs font-medium text-zinc-500 ${compactOnMobile ? "hidden sm:inline" : ""}`}>
+      <span className={`text-xs font-medium ${labelClass} ${compactOnMobile ? "hidden sm:inline" : ""}`}>
         Layout
       </span>
-      <div className="inline-flex rounded-xl border border-zinc-200 bg-zinc-50 p-1">
+      <div className={`inline-flex rounded-xl border p-1 ${shellClass}`}>
         {VIEW_LAYOUT_OPTIONS.map((option) => (
           <button
             key={option.id}
@@ -87,9 +97,7 @@ export function ViewLayoutToggle({
             aria-label={option.label}
             title={option.label}
             className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition sm:px-3 ${
-              value === option.id
-                ? "bg-white text-teal-800 shadow-sm"
-                : "text-zinc-600 hover:text-teal-800"
+              value === option.id ? activeClass : idleClass
             }`}
           >
             <LayoutIcon layout={option.id} />

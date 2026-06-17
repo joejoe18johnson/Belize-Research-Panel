@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import type { RewardsHistoryEntry } from "@/lib/rewards-history";
 import { withdrawalStatusLabel } from "@/lib/rewards-history";
 import { formatBz } from "@/lib/reward-redemption";
+import type { ViewLayout } from "@/lib/view-layout";
+import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
+import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 
@@ -46,8 +49,76 @@ function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
   );
 }
 
+function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layout: ViewLayout }) {
+  if (layout === "horizontal") {
+    return (
+      <div className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-4">
+        <HistoryIcon kind={entry.kind} />
+        <p className="mt-3 line-clamp-2 text-sm font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
+        <p className="mt-1 line-clamp-2 flex-1 text-xs text-zinc-600">{entry.detail}</p>
+        <p className={`mt-3 text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
+          {entry.points >= 0 ? "+" : "−"}
+          {Math.abs(entry.points)} pts
+        </p>
+      </div>
+    );
+  }
+
+  if (layout === "cards") {
+    return (
+      <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+        <div className="flex items-start gap-3">
+          <HistoryIcon kind={entry.kind} />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
+            <p className="mt-1 text-sm text-zinc-600">{entry.detail}</p>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-zinc-500">{entry.dateLabel}</p>
+              <span className={`text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
+                {entry.points >= 0 ? "+" : "−"}
+                {Math.abs(entry.points)} pts
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-3 py-1">
+      <HistoryIcon kind={entry.kind} />
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
+            <p className="mt-0.5 text-sm text-zinc-600">{entry.detail}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+              <span>{entry.dateLabel}</span>
+              {entry.referenceId ? <span>Ref {entry.referenceId}</span> : null}
+              {entry.amountBz ? <span>{formatBz(entry.amountBz)}</span> : null}
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <span className={`text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
+              {entry.points >= 0 ? "+" : "−"}
+              {Math.abs(entry.points)} pts
+            </span>
+            {entry.status ? (
+              <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(entry.status)}`}>
+                {formatHeadingCase(withdrawalStatusLabel(entry.status))}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) {
   const [filter, setFilter] = useState<HistoryFilter>("all");
+  const [layout, setLayout] = useViewLayout("dashboard-rewards-history");
 
   const earnedCount = entries.filter((entry) => entry.kind === "earned").length;
   const withdrawalCount = entries.filter((entry) => entry.kind === "withdrawal").length;
@@ -67,7 +138,9 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
             Points earned and withdrawal requests on your account.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col items-stretch gap-3 sm:items-end">
+          <ViewLayoutToggle value={layout} onChange={setLayout} />
+          <div className="flex flex-wrap gap-2">
           {(
             [
               { id: "all" as const, label: `All (${entries.length})` },
@@ -88,6 +161,7 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
               {item.label}
             </button>
           ))}
+          </div>
         </div>
       </div>
 
@@ -105,37 +179,16 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
           </p>
         </div>
       ) : (
-        <ul className="mt-4 divide-y divide-zinc-100">
+        <div className={`mt-4 ${viewLayoutContainerClass(layout, layout === "list" ? "divide-y divide-zinc-100" : "grid gap-4 sm:grid-cols-2")}`}>
           {filtered.map((entry) => (
-            <li key={entry.id} className="flex gap-3 py-4 first:pt-2">
-              <HistoryIcon kind={entry.kind} />
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-zinc-900">{formatHeadingCase(entry.title)}</p>
-                    <p className="mt-0.5 text-sm text-zinc-600">{entry.detail}</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-                      <span>{entry.dateLabel}</span>
-                      {entry.referenceId ? <span>Ref {entry.referenceId}</span> : null}
-                      {entry.amountBz ? <span>{formatBz(entry.amountBz)}</span> : null}
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
-                    <span className={`text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
-                      {entry.points >= 0 ? "+" : "−"}
-                      {Math.abs(entry.points)} pts
-                    </span>
-                    {entry.status ? (
-                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(entry.status)}`}>
-                        {formatHeadingCase(withdrawalStatusLabel(entry.status))}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </li>
+            <div
+              key={entry.id}
+              className={`${viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")} ${layout === "list" ? "py-4 first:pt-2" : ""}`}
+            >
+              <HistoryEntryCard entry={entry} layout={layout} />
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </DashboardCard>
   );

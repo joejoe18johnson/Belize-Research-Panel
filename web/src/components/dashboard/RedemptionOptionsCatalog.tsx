@@ -219,6 +219,7 @@ export function RedemptionOptionsCatalog({
               {formatBz(pointsToBz(availablePoints))}
             </p>
           </div>
+          </div>
         </div>
       </div>
 

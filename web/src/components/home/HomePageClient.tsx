@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
+import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
 import {
   HOME_COPY,
   readStoredHomeLocale,
   storeHomeLocale,
   type HomeLocale,
 } from "@/lib/home-locale";
+import type { ViewLayout } from "@/lib/view-layout";
+import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
 import { formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -18,8 +21,93 @@ function displayCopy(text: string, locale: HomeLocale): string {
 
 const REWARD_ICONS = ["💵", "📱", "🎁", "✨"] as const;
 
+function HomeFeatureCard({
+  title,
+  body,
+  layout,
+}: {
+  title: string;
+  body: string;
+  layout: ViewLayout;
+}) {
+  if (layout === "list") {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <h2 className="text-base font-semibold">{title}</h2>
+        <p className="mt-1 text-sm leading-relaxed text-teal-100">{body}</p>
+      </div>
+    );
+  }
+
+  if (layout === "horizontal") {
+    return (
+      <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        <p className="mt-2 line-clamp-4 flex-1 text-xs leading-relaxed text-teal-100">{body}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-teal-100">{body}</p>
+    </div>
+  );
+}
+
+function HomeRewardPerkCard({
+  title,
+  body,
+  icon,
+  layout,
+}: {
+  title: string;
+  body: string;
+  icon: string;
+  layout: ViewLayout;
+}) {
+  if (layout === "list") {
+    return (
+      <div className="flex items-start gap-3 rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm">
+        <p className="text-2xl" aria-hidden>
+          {icon}
+        </p>
+        <div>
+          <h3 className="text-sm font-bold text-white">{title}</h3>
+          <p className="mt-1 text-xs leading-relaxed text-teal-100">{body}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "horizontal") {
+    return (
+      <div className="flex h-full flex-col rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm">
+        <p className="text-2xl" aria-hidden>
+          {icon}
+        </p>
+        <h3 className="mt-2 text-sm font-bold text-white">{title}</h3>
+        <p className="mt-1 line-clamp-4 flex-1 text-xs leading-relaxed text-teal-100">{body}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm">
+      <p className="text-2xl" aria-hidden>
+        {icon}
+      </p>
+      <h3 className="mt-2 text-sm font-bold text-white">{title}</h3>
+      <p className="mt-1 text-xs leading-relaxed text-teal-100">{body}</p>
+    </div>
+  );
+}
+
 export function HomePageClient() {
   const [locale, setLocale] = useState<HomeLocale>("en");
+  const [perkLayout, setPerkLayout] = useViewLayout("home-reward-perks");
+  const [featureLayout, setFeatureLayout] = useViewLayout("home-features");
 
   useEffect(() => {
     const stored = readStoredHomeLocale();
@@ -99,30 +187,37 @@ export function HomePageClient() {
                 {t(copy.rewardsCta)}
               </Link>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:max-w-xl lg:shrink-0">
-              {copy.rewardPerks.map((perk, index) => (
-                <div
-                  key={perk.title}
-                  className="rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm"
-                >
-                  <p className="text-2xl" aria-hidden>
-                    {REWARD_ICONS[index] ?? "✨"}
-                  </p>
-                  <h3 className="mt-2 text-sm font-bold text-white">{t(perk.title)}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-teal-100">{t(perk.body)}</p>
-                </div>
-              ))}
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <ViewLayoutToggle value={perkLayout} onChange={setPerkLayout} variant="dark" />
+              </div>
+              <div className={viewLayoutContainerClass(perkLayout, "grid gap-3 sm:grid-cols-2 lg:max-w-xl lg:shrink-0")}>
+                {copy.rewardPerks.map((perk, index) => (
+                  <div key={perk.title} className={viewLayoutItemClass(perkLayout, "w-[min(72vw,14rem)]")}>
+                    <HomeRewardPerkCard
+                      title={t(perk.title)}
+                      body={t(perk.body)}
+                      icon={REWARD_ICONS[index] ?? "✨"}
+                      layout={perkLayout}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="mt-14 grid gap-4 sm:mt-20 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {copy.features.map((feature) => (
-            <div key={feature.title} className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
-              <h2 className="text-lg font-semibold">{t(feature.title)}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-teal-100">{t(feature.body)}</p>
-            </div>
-          ))}
+        <section className="mt-14 sm:mt-20">
+          <div className="mb-4 flex justify-end">
+            <ViewLayoutToggle value={featureLayout} onChange={setFeatureLayout} variant="dark" />
+          </div>
+          <div className={viewLayoutContainerClass(featureLayout, "grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4")}>
+            {copy.features.map((feature) => (
+              <div key={feature.title} className={viewLayoutItemClass(featureLayout, "w-[min(72vw,14rem)]")}>
+                <HomeFeatureCard title={t(feature.title)} body={t(feature.body)} layout={featureLayout} />
+              </div>
+            ))}
+          </div>
         </section>
       </main>
     </div>
