@@ -186,16 +186,7 @@ function AgeEligibilityBanner({
   }
 
   if (eligible) {
-    return (
-      <div
-        className={`${boxClass} border-emerald-200 bg-emerald-50 text-emerald-900`}
-        role="status"
-        aria-live="polite"
-      >
-        <p className="font-medium text-emerald-800">Age requirement met</p>
-        <p className="mt-1 text-emerald-800/90">You are 18 or over and can continue.</p>
-      </div>
-    );
+    return null;
   }
 
   return (

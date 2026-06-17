@@ -16,7 +16,7 @@ import { PasswordStrengthBar } from "@/components/registration/PasswordStrengthB
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { PasswordMatchStatus } from "@/components/auth/PasswordMatchStatus";
 import type { SignupFormData } from "@/lib/auth-types";
-import { ELIGIBLE_CITIZENSHIP_STATUSES, COMMONWEALTH_COUNTRIES } from "@/lib/constants";
+import { CITIZENSHIP_STATUS, COMMONWEALTH_COUNTRIES } from "@/lib/constants";
 import { isValidDobString } from "@/lib/dob";
 import {
   isSignupEligible,
@@ -139,13 +139,14 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
             Citizenship / residency status <span className="text-red-600">*</span>
           </p>
           <p className="mb-3 text-sm text-zinc-600">
-            Registration is open to citizens of Belize and Commonwealth citizens currently living in Belize.
+            The panel is open to citizens of Belize, Commonwealth citizens living in Belize, and other residents of
+            Belize who qualify under our eligibility rules. Foreign nationals living outside Belize cannot register.
           </p>
           <p className="mb-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
             You will be required to provide proof of your citizenship or residency during panelist registration.
           </p>
           <div className="flex flex-col gap-3">
-            {ELIGIBLE_CITIZENSHIP_STATUSES.map((status) => (
+            {CITIZENSHIP_STATUS.map((status) => (
               <label key={status} className={choiceBoxLabelClass}>
                 <input
                   type="radio"

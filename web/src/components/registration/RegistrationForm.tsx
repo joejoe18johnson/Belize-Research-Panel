@@ -22,18 +22,16 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import {
-  ELIGIBLE_CITIZENSHIP_STATUSES,
+  CITIZENSHIP_STATUS,
   CITY_TOWN_VILLAGE,
-  CIVIC_INTERESTS,
-  COMMONWEALTH_RESIDENCE_PROOF_TYPES,
   COMMONWEALTH_COUNTRIES,
+  COMMONWEALTH_RESIDENCE_PROOF_TYPES,
   COUNTRIES,
   EDUCATION_LEVELS,
   ETHNICITY_OPTIONS,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
-  POLITICAL_INTERESTS,
   SEX_OPTIONS,
   US_DIASPORA_REGIONS,
   VOTING_STATUS,
@@ -41,6 +39,7 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
+  needsVoterRegistrationQuestion,
 } from "@/lib/constants";
 import {
   initialRegistrationForm,
@@ -168,7 +167,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     activePhaseIndex === 0 && Boolean(form.citizenshipStatus) && !eligibleCitizenship;
   const needsCommonwealthCountry =
     form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";
-  const needsVoterQuestion = eligibleCitizenship;
+  const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
   const progressInput = { form, registeredVoter };
   const isLastPhase = activePhaseIndex === REGISTRATION_PHASES.length - 1;
@@ -202,9 +201,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Country if abroad", form.countryIfAbroad],
       ["Constituency registered to vote", form.constituency],
       ["Registered CTV area", form.registeredCtvArea],
-      ["Political interests", form.politicalInterests.join(", ")],
       ["Market research interests", form.marketInterests.join(", ")],
-      ["Civic interests", form.civicInterests.join(", ")],
       ["Account email", account.email],
       ["Phone / WhatsApp", getFullPhoneNumber(form)],
       ["Facebook", form.facebook],
@@ -231,10 +228,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   };
 
   const scrollToRegistrationTop = useCallback(() => {
-    const anchor = document.getElementById("registration-form-top");
+    const anchor = document.getElementById("registration-phase-content");
     if (anchor) {
       const y = anchor.getBoundingClientRect().top + window.scrollY - 24;
       window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+      anchor.focus({ preventScroll: true });
       return;
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -379,7 +377,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         registeredVoter={registeredVoter}
       />
 
-      <div id="registration-phase-content" className="space-y-6">
+      <div id="registration-phase-content" className="space-y-6" key={activePhaseIndex} tabIndex={-1}>
       {showPhaseValidationAlert ? (
         <Alert variant="error">
           Please fix the highlighted fields in this section before continuing.
@@ -390,10 +388,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       <div id="citizenship-section">
         <FormSection step={1} title="Citizenship / residency">
           <p className="text-sm text-zinc-600">
-            Registration is open to citizens of Belize and Commonwealth citizens currently living in Belize.
+            The panel is open to citizens of Belize, Commonwealth citizens living in Belize, and other residents of
+            Belize who qualify under our eligibility rules. Foreign nationals living outside Belize cannot register.
           </p>
           <div className="flex flex-col gap-3">
-            {ELIGIBLE_CITIZENSHIP_STATUSES.map((status) => (
+            {CITIZENSHIP_STATUS.map((status) => (
               <label key={status} className={choiceBoxLabelClass}>
                 <input
                   type="radio"
@@ -406,6 +405,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </label>
             ))}
           </div>
+          {citizenshipIneligible ? (
+            <Alert variant="error">
+              You are not eligible to register under this citizenship / residency status. Choose a qualifying option
+              or return home.
+            </Alert>
+          ) : null}
           {fieldError("citizenshipStatus") ? (
             <p className="mt-3 text-sm text-red-600" role="alert">
               {fieldError("citizenshipStatus")}
@@ -468,6 +473,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 1 ? (
         <>
           <FormSection step={4} title="Name">
+            <Alert variant="info">
+              Enter your first name and last name(s) exactly as they appear on your government-issued photo ID. If you
+              have more than one last name, include all of them.
+            </Alert>
             <FieldGroup columns={2}>
               <Field label="First name" required error={fieldError("firstName")} id="firstName">
                 <TextInput id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} onBlur={() => { touch("firstName"); validateField("firstName"); }} error={fieldError("firstName")} />
@@ -580,29 +589,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 2 ? (
         <>
-          {registeredVoter ? (
-            <FormSection step={8} title="Political / election poll interests">
-              <Field label="Select all that apply" required error={fieldError("politicalInterests")}>
-                <MultiSelect options={POLITICAL_INTERESTS} values={form.politicalInterests} onChange={(values) => { update("politicalInterests", values); touch("politicalInterests"); validateField("politicalInterests"); }} error={fieldError("politicalInterests")} />
-              </Field>
-            </FormSection>
-          ) : null}
-
           {form.placeOfResidence !== "Abroad" ? (
-            <FormSection step={9} title="Market research interests">
+            <FormSection step={8} title="Market research interests">
+              <p className="text-sm text-zinc-600">
+                Select the product and service topics you are willing to give feedback on. Political and social poll
+                topics are matched separately when you are eligible for those studies.
+              </p>
               <Field label="Select all that apply" required error={fieldError("marketInterests")}>
                 <MultiSelect options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests"); }} error={fieldError("marketInterests")} />
               </Field>
             </FormSection>
           ) : (
-            <Alert variant="info">Persons living abroad are eligible for political/election polls and diaspora-focused research where applicable.</Alert>
+            <Alert variant="info">Persons living abroad are eligible for political/election polls and diaspora-focused research where applicable. Market research interests are collected for residents in Belize.</Alert>
           )}
-
-          <FormSection step={10} title="Civic / public / social issues">
-            <Field label="Select all that apply" required error={fieldError("civicInterests")}>
-              <MultiSelect options={CIVIC_INTERESTS} values={form.civicInterests} onChange={(values) => { update("civicInterests", values); touch("civicInterests"); validateField("civicInterests"); }} error={fieldError("civicInterests")} />
-            </Field>
-          </FormSection>
         </>
       ) : null}
 

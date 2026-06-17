@@ -60,7 +60,8 @@ export function CitizenshipEligibilityBanner({
         <p className="font-medium text-red-800">Citizenship requirement not met</p>
         <p className="mt-1 font-medium text-red-900">{citizenshipStatus}</p>
         <p className="mt-1 text-red-800">
-          Only citizens of Belize and Commonwealth citizens living in Belize may join the panel.
+          Only citizens of Belize, Commonwealth citizens living in Belize, and other qualifying residents of Belize may
+          join the panel. Foreign nationals living outside Belize cannot register.
         </p>
         <Link
           href="/"

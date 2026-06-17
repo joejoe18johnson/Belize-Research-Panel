@@ -289,8 +289,11 @@ export function validateCitizenship(citizenshipStatus: string): string | null {
   if (!cleanText(citizenshipStatus)) {
     return "Please select your citizenship / residency status.";
   }
+  if (citizenshipStatus === "Foreign national not living in Belize") {
+    return "You are not eligible to register. The panel is limited to people who live in Belize under an eligible citizenship or residency category.";
+  }
   if (!isEligibleCitizenship(citizenshipStatus)) {
-    return "You are not eligible to register. Only citizens of Belize and Commonwealth citizens living in Belize may join the panel.";
+    return "You are not eligible to register under this citizenship / residency status.";
   }
   return null;
 }
@@ -366,7 +369,13 @@ export function validateRegistrationForm(
   }
 
   if (isEligibleCitizenship(data.citizenshipStatus)) {
-    if (!data.votingStatus) errors.votingStatus = "Please indicate your voter registration status.";
+    if (
+      (data.citizenshipStatus === "Citizen of Belize" ||
+        data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") &&
+      !data.votingStatus
+    ) {
+      errors.votingStatus = "Please indicate your voter registration status.";
+    }
   }
 
   if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
@@ -379,6 +388,10 @@ export function validateRegistrationForm(
 
   if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" && data.placeOfResidence === "Abroad") {
     errors.placeOfResidence = "Commonwealth citizens must be living in Belize to be eligible under this registration category.";
+  }
+
+  if (data.citizenshipStatus === "Other resident of Belize" && data.placeOfResidence === "Abroad") {
+    errors.placeOfResidence = "Other residents of Belize must currently live in Belize to be eligible.";
   }
 
   if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
@@ -421,14 +434,8 @@ export function validateRegistrationForm(
   if (registeredVoter && hasRegisteredCtvQuestion(data.constituency) && !cleanText(data.registeredCtvArea)) {
     errors.registeredCtvArea = "Village / town / city area of voter registration is required for registered voters.";
   }
-  if (registeredVoter && data.politicalInterests.length === 0) {
-    errors.politicalInterests = "Please select at least one political / election poll interest.";
-  }
   if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
     errors.marketInterests = "Please select at least one market research interest.";
-  }
-  if (data.civicInterests.length === 0) {
-    errors.civicInterests = "Please select at least one civic / public / social issue.";
   }
 
   if (contactCount < 2 && !cleanText(data.streetAddress)) {

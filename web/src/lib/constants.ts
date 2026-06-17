@@ -7,7 +7,10 @@ export const CITIZENSHIP_STATUS = raw.CITIZENSHIP_STATUS as string[];
 export const ELIGIBLE_CITIZENSHIP_STATUSES = [
   "Citizen of Belize",
   "Citizen of a Commonwealth country living in Belize",
+  "Other resident of Belize",
 ] as const;
+
+export const INELIGIBLE_CITIZENSHIP_STATUSES = ["Foreign national not living in Belize"] as const;
 
 export type EligibleCitizenshipStatus = (typeof ELIGIBLE_CITIZENSHIP_STATUSES)[number];
 export const VOTING_STATUS = raw.VOTING_STATUS as string[];
@@ -15,7 +18,18 @@ export const BELIZE_DISTRICTS = raw.BELIZE_DISTRICTS as string[];
 export const PLACE_OPTIONS = raw.PLACE_OPTIONS as string[];
 export const CONSTITUENCIES = raw.CONSTITUENCIES as string[];
 export const CITY_TOWN_VILLAGE = raw.CITY_TOWN_VILLAGE as Record<string, string[]>;
-export const COUNTRIES = raw.COUNTRIES as string[];
+
+export function sortDropdownOptions(options: string[]): string[] {
+  const cleaned = options.map((o) => o.trim()).filter(Boolean);
+  const unique = [...new Set(cleaned)].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  const prefer = unique.filter((x) => x === "Prefer not to say");
+  const other = unique.filter((x) => x === "Other");
+  const regular = unique.filter((x) => x !== "Other" && x !== "Prefer not to say");
+  return [...regular, ...other, ...prefer];
+}
+
+export const COUNTRIES = sortDropdownOptions(raw.COUNTRIES as string[]);
+export const COMMONWEALTH_COUNTRIES = sortDropdownOptions(raw.COMMONWEALTH_COUNTRIES as string[]);
 export const OTHER_CONTACT_PLATFORM_OPTIONS = raw.OTHER_CONTACT_PLATFORM_OPTIONS as string[];
 export const SEX_OPTIONS = raw.SEX_OPTIONS as string[];
 export const EDUCATION_LEVELS = raw.EDUCATION_LEVELS as string[];
@@ -32,7 +46,6 @@ export const PHOTO_ID_TYPES = raw.PHOTO_ID_TYPES.filter((t) => {
   );
 }) as string[];
 export const COMMONWEALTH_RESIDENCE_PROOF_TYPES = raw.COMMONWEALTH_RESIDENCE_PROOF_TYPES as string[];
-export const COMMONWEALTH_COUNTRIES = raw.COMMONWEALTH_COUNTRIES as string[];
 export const US_DIASPORA_REGIONS = raw.US_DIASPORA_REGIONS as string[];
 export const CONSTITUENCY_CTV = raw.CONSTITUENCY_CTV as Record<string, string[]>;
 
@@ -79,15 +92,6 @@ export const PANELIST_COLUMNS = [
   "notes",
 ] as const;
 
-export function sortDropdownOptions(options: string[]): string[] {
-  const cleaned = options.map((o) => o.trim()).filter(Boolean);
-  const unique = [...new Set(cleaned)].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-  const prefer = unique.filter((x) => x === "Prefer not to say");
-  const other = unique.filter((x) => x === "Other");
-  const regular = unique.filter((x) => x !== "Other" && x !== "Prefer not to say");
-  return [...regular, ...other, ...prefer];
-}
-
 export function getConstituencyOptions(): string[] {
   return [...CONSTITUENCIES].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 }
@@ -106,12 +110,22 @@ export function hasRegisteredCtvQuestion(constituency: string): boolean {
   return values.filter((v) => !["Other", "Prefer not to say"].includes(v)).length > 0;
 }
 
+export function needsVoterRegistrationQuestion(citizenshipStatus: string): boolean {
+  return (
+    citizenshipStatus === "Citizen of Belize" ||
+    citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
+  );
+}
+
 export function getResidenceOptions(citizenshipStatus: string): string[] {
   if (citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
     return BELIZE_DISTRICTS;
   }
   if (citizenshipStatus === "Citizen of Belize") {
     return PLACE_OPTIONS;
+  }
+  if (citizenshipStatus === "Other resident of Belize") {
+    return BELIZE_DISTRICTS;
   }
   return BELIZE_DISTRICTS;
 }
