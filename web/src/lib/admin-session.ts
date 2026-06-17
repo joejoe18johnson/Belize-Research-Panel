@@ -1,4 +1,3 @@
-import { createHmac, timingSafeEqual } from "crypto";
 import type { StaffRole } from "./staff-roles";
 
 export const ADMIN_SESSION_COOKIE = "brp_admin_session";
@@ -16,26 +15,73 @@ function sessionSecret(): string {
   return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
 }
 
-function signPayload(payload: string): string {
-  return createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
+function bytesToBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-export function encodeAdminSessionToken(session: AdminSession): string {
-  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  return `${payload}.${signPayload(payload)}`;
+function base64UrlToBytes(value: string): Uint8Array {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }
 
-export function decodeAdminSessionToken(token: string): AdminSession | null {
+function stringToBase64Url(value: string): string {
+  return bytesToBase64Url(new TextEncoder().encode(value));
+}
+
+function base64UrlToString(value: string): string {
+  return new TextDecoder().decode(base64UrlToBytes(value));
+}
+
+function timingSafeEqualStrings(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+let hmacKeyPromise: Promise<CryptoKey> | null = null;
+
+function getHmacKey(): Promise<CryptoKey> {
+  if (!hmacKeyPromise) {
+    hmacKeyPromise = crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(sessionSecret()),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+  }
+  return hmacKeyPromise;
+}
+
+async function signPayload(payload: string): Promise<string> {
+  const key = await getHmacKey();
+  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+  return bytesToBase64Url(new Uint8Array(signature));
+}
+
+export async function encodeAdminSessionToken(session: AdminSession): Promise<string> {
+  const payload = stringToBase64Url(JSON.stringify(session));
+  return `${payload}.${await signPayload(payload)}`;
+}
+
+export async function decodeAdminSessionToken(token: string): Promise<AdminSession | null> {
   const [payload, signature] = token.split(".");
   if (!payload || !signature) return null;
-  const expected = signPayload(payload);
-  const sigBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expected);
-  if (sigBuffer.length !== expectedBuffer.length || !timingSafeEqual(sigBuffer, expectedBuffer)) {
-    return null;
-  }
+
+  const expected = await signPayload(payload);
+  if (!timingSafeEqualStrings(signature, expected)) return null;
+
   try {
-    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8")) as AdminSession;
+    const parsed = JSON.parse(base64UrlToString(payload)) as AdminSession;
     if (!parsed.role || !parsed.exp || parsed.exp < Date.now()) return null;
     return parsed;
   } catch {

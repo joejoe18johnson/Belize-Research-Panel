@@ -36,7 +36,7 @@ function staffDisplayName(user: StaffUserRecord): string {
 
 export async function setAdminSessionCookie(session: Omit<AdminSession, "exp">): Promise<void> {
   const cookieStore = await cookies();
-  const token = encodeAdminSessionToken({
+  const token = await encodeAdminSessionToken({
     ...session,
     exp: createAdminSessionExpiry(),
   });
@@ -58,7 +58,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
   if (!token) return null;
-  return decodeAdminSessionToken(token);
+  return await decodeAdminSessionToken(token);
 }
 
 export async function isAdminSessionActive(): Promise<boolean> {
