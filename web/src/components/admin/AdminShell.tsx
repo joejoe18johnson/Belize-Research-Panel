@@ -6,10 +6,10 @@ import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import {
   ADMIN_NAV_SECTIONS,
-  ADMIN_MODULES,
   getAdminModulesBySection,
   type AdminModule,
 } from "@/lib/admin-modules";
+import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadge(status?: AdminModule["status"]) {
@@ -32,7 +32,13 @@ function moduleHref(module: AdminModule): string {
 }
 
 function isModuleActive(pathname: string, module: AdminModule): boolean {
-  if (module.href) return pathname === module.href || pathname.startsWith(`${module.href}/`);
+  if (module.href) {
+    if (pathname === module.href) return true;
+    if (module.href === "/admin/campaigns") {
+      return pathname === "/admin/campaigns" || (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create");
+    }
+    return pathname.startsWith(`${module.href}/`);
+  }
   return pathname === `/admin/modules/${module.slug}`;
 }
 
@@ -73,13 +79,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                               href={href}
                               target={external ? "_blank" : undefined}
                               rel={external ? "noopener noreferrer" : undefined}
-                              className={`flex items-start gap-2 rounded-xl px-3 py-2.5 text-sm transition ${
+                              className={`flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-sm transition ${
                                 active
                                   ? "bg-teal-700 text-white shadow-sm"
                                   : "text-teal-50/90 hover:bg-white/10 hover:text-white"
                               }`}
                               aria-current={active ? "page" : undefined}
                             >
+                              <AdminNavIcon module={module} />
                               <span className="min-w-0 flex-1 leading-snug">{module.label}</span>
                               {module.status ? (
                                 <span

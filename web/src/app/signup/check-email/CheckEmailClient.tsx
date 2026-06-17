@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 
 export default function CheckEmailClient() {
   const searchParams = useSearchParams();
@@ -24,15 +25,12 @@ export default function CheckEmailClient() {
         <p>After verification, you can complete your panelist registration profile.</p>
 
         {verifyUrl ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <p className="font-medium text-amber-900">Development verification link</p>
-            <p className="mt-1 text-amber-800">
-              Email delivery is not configured yet. Use this link to verify your account:
-            </p>
+          <BrandedAlert tone="warning" title="Development verification link" showIcon>
+            Email delivery is not configured yet. Use this link to verify your account:{" "}
             <Link href={verifyUrl} className="mt-2 inline-block break-all font-medium text-teal-700 hover:text-teal-900">
               {verifyUrl}
             </Link>
-          </div>
+          </BrandedAlert>
         ) : null}
 
         <div className="flex flex-col gap-3 pt-2">

@@ -13,3 +13,8 @@ export async function loadSurveyRecordsFromFile(): Promise<PanelistSurveyRecord[
     return [];
   }
 }
+
+export async function saveSurveyRecordsToFile(records: PanelistSurveyRecord[]): Promise<void> {
+  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2), "utf-8");
+}

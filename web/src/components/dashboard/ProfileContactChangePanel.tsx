@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { PhoneNumberField } from "@/components/registration/PhoneNumberField";
 import { Field, TextInput } from "@/components/registration/form-ui";
 import type { SessionAccount } from "@/lib/auth-types";
@@ -106,20 +107,22 @@ export function ProfileContactChangePanel({
       </p>
 
       {onHold ? (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p className="font-semibold">{formatHeadingCase("Account on hold")}</p>
-          <p className="mt-1">
+        <div className="mt-4">
+          <BrandedAlert tone="warning" title="Account on hold" compact showIcon>
             {account.pendingEmail ? (
-              <>Pending email approval: <span className="font-medium">{account.pendingEmail}</span>. </>
+              <>
+                Pending email approval: <span className="font-medium">{account.pendingEmail}</span>.{" "}
+              </>
             ) : null}
             {account.pendingPhone ? (
-              <>Pending phone approval: <span className="font-medium">{account.pendingPhone}</span>. </>
+              <>
+                Pending phone approval: <span className="font-medium">{account.pendingPhone}</span>.{" "}
+              </>
             ) : null}
-            {" "}
             <Link href="/dashboard/account-on-hold" className="font-semibold text-teal-800 underline">
               View hold status
             </Link>
-          </p>
+          </BrandedAlert>
         </div>
       ) : null}
 

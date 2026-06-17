@@ -4,6 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import type { DashboardNotification } from "@/lib/panelist-dashboard";
+import {
+  brandedNotificationBadgeClass,
+  brandedNotificationPriorityClass,
+  brandedNotificationUnreadClass,
+} from "@/lib/site-alerts";
 import { BellIcon, ClipboardIcon, GiftIcon, ShieldCheckIcon } from "./DashboardIcons";
 import { DashboardCard, DashboardInfoNote } from "./DashboardShell";
 
@@ -111,7 +116,7 @@ export function DashboardNotificationsClient({
         {notifications.map((notification) => (
           <DashboardCard
             key={notification.id}
-            className={notification.unread ? "border-teal-200 bg-teal-50/40" : ""}
+            className={notification.unread ? brandedNotificationUnreadClass : ""}
           >
             <div className="flex gap-4">
               <span
@@ -125,12 +130,12 @@ export function DashboardNotificationsClient({
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
                       {notification.unread ? (
-                        <span className="rounded-full bg-teal-700 px-2.5 py-0.5 text-[10px] font-semibold text-white">
+                        <span className={brandedNotificationBadgeClass}>
                           {formatHeadingCase("New")}
                         </span>
                       ) : null}
                       {notification.priority === "high" && notification.unread ? (
-                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800">
+                        <span className={brandedNotificationPriorityClass}>
                           {formatHeadingCase("Important")}
                         </span>
                       ) : null}

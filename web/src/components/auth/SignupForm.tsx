@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { DateOfBirthPicker } from "@/components/registration/DateOfBirthPicker";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import {
   choiceBoxLabelClass,
   Field,
@@ -231,10 +232,9 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-        <p className="font-medium">Eligibility confirmed</p>
-        <p className="mt-1">{form.citizenshipStatus}</p>
-        <p className="mt-2 text-emerald-800">
+      <BrandedAlert tone="success" title="Eligibility confirmed" showIcon>
+        <p>{form.citizenshipStatus}</p>
+        <p className="mt-2">
           Proof of citizenship or residency will be required when you complete panelist registration.
         </p>
         <button
@@ -244,7 +244,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         >
           Change eligibility answers
         </button>
-      </div>
+      </BrandedAlert>
 
       <FieldGroup columns={2}>
         <Field label="First name" required error={errors.firstName} id="firstName">

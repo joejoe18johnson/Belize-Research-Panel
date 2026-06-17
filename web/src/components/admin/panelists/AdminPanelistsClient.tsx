@@ -497,116 +497,102 @@ function PanelistEditModal({
   deleting: boolean;
 }) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/50 p-4 sm:items-center"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-zinc-200 bg-white shadow-xl">
-        <div className="sticky top-0 flex items-center justify-between border-b border-zinc-100 bg-white px-5 py-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Edit panelist</p>
-            <h2 className="mt-0.5 text-lg font-semibold text-teal-950">{label}</h2>
-          </div>
+    <BrandedModal
+      open
+      onClose={onClose}
+      title={label}
+      eyebrow="Edit panelist"
+      footer={
+        <>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={onSave}
+            className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+          <button
+            type="button"
+            disabled={deleting}
+            onClick={onDelete}
+            className="inline-flex min-h-11 items-center rounded-xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-800 hover:bg-red-100 disabled:opacity-60"
+          >
+            {deleting ? "Deleting…" : "Delete record"}
+          </button>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
-            aria-label="Close"
+            className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50"
           >
-            <CloseIcon />
+            Cancel
           </button>
+        </>
+      }
+    >
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FieldSelect
+            label="Verification status"
+            value={editState.verification_status}
+            options={VERIFICATION_STATUS}
+            onChange={(value) => onChange({ ...editState, verification_status: value })}
+          />
+          <FieldSelect
+            label="Panelist status"
+            value={editState.status}
+            options={PANELIST_STATUS}
+            onChange={(value) => onChange({ ...editState, status: value })}
+          />
+          <FieldInput label="Email" value={editState.email} onChange={(value) => onChange({ ...editState, email: value })} />
+          <FieldInput
+            label="Phone / WhatsApp"
+            value={editState.phone_whatsapp}
+            onChange={(value) => onChange({ ...editState, phone_whatsapp: value })}
+          />
+          <FieldSelect
+            label="District"
+            value={editState.district}
+            options={["", ...BELIZE_DISTRICTS]}
+            onChange={(value) => onChange({ ...editState, district: value, city_town_village: "" })}
+          />
+          <FieldSelect
+            label="City / town / village"
+            value={editState.city_town_village}
+            options={cityOptions}
+            onChange={(value) => onChange({ ...editState, city_town_village: value })}
+          />
+          <FieldSelect
+            label="Constituency"
+            value={editState.constituency}
+            options={["", ...getConstituencyOptions()]}
+            onChange={(value) => onChange({ ...editState, constituency: value })}
+          />
         </div>
-
-        <div className="space-y-6 p-5">
-          <div className="grid gap-4 md:grid-cols-2">
-            <FieldSelect
-              label="Verification status"
-              value={editState.verification_status}
-              options={VERIFICATION_STATUS}
-              onChange={(value) => onChange({ ...editState, verification_status: value })}
-            />
-            <FieldSelect
-              label="Panelist status"
-              value={editState.status}
-              options={PANELIST_STATUS}
-              onChange={(value) => onChange({ ...editState, status: value })}
-            />
-            <FieldInput label="Email" value={editState.email} onChange={(value) => onChange({ ...editState, email: value })} />
-            <FieldInput
-              label="Phone / WhatsApp"
-              value={editState.phone_whatsapp}
-              onChange={(value) => onChange({ ...editState, phone_whatsapp: value })}
-            />
-            <FieldSelect
-              label="District"
-              value={editState.district}
-              options={["", ...BELIZE_DISTRICTS]}
-              onChange={(value) => onChange({ ...editState, district: value, city_town_village: "" })}
-            />
-            <FieldSelect
-              label="City / town / village"
-              value={editState.city_town_village}
-              options={cityOptions}
-              onChange={(value) => onChange({ ...editState, city_town_village: value })}
-            />
-            <FieldSelect
-              label="Constituency"
-              value={editState.constituency}
-              options={["", ...getConstituencyOptions()]}
-              onChange={(value) => onChange({ ...editState, constituency: value })}
-            />
-          </div>
-          <div>
-            <label htmlFor="admin-notes" className="block text-sm font-medium text-zinc-800">
-              Admin notes
-            </label>
-            <textarea
-              id="admin-notes"
-              rows={4}
-              value={editState.notes}
-              onChange={(e) => onChange({ ...editState, notes: e.target.value })}
-              className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-            />
-          </div>
-          {error ? (
-            <p className="text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          ) : null}
-          {message ? (
-            <p className="text-sm text-emerald-700" role="status">
-              {message}
-            </p>
-          ) : null}
-          <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
-            <button
-              type="button"
-              disabled={saving}
-              onClick={onSave}
-              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
-            >
-              {saving ? "Saving…" : "Save changes"}
-            </button>
-            <button
-              type="button"
-              disabled={deleting}
-              onClick={onDelete}
-              className="inline-flex min-h-11 items-center rounded-xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-800 hover:bg-red-100 disabled:opacity-60"
-            >
-              {deleting ? "Deleting…" : "Delete record"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
-            >
-              Cancel
-            </button>
-          </div>
+        <div>
+          <label htmlFor="admin-notes" className="block text-sm font-medium text-zinc-800">
+            Admin notes
+          </label>
+          <textarea
+            id="admin-notes"
+            rows={4}
+            value={editState.notes}
+            onChange={(e) => onChange({ ...editState, notes: e.target.value })}
+            className="mt-2 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+          />
         </div>
+        {error ? (
+          <BrandedAlert tone="error" compact showIcon>
+            {error}
+          </BrandedAlert>
+        ) : null}
+        {message ? (
+          <BrandedAlert tone="success" compact showIcon>
+            {message}
+          </BrandedAlert>
+        ) : null}
       </div>
-    </div>
+    </BrandedModal>
   );
 }
 
@@ -762,15 +748,6 @@ function TrashIcon() {
       <path d="M19 6l-1 14H6L5 6" />
       <path d="M10 11v6M14 11v6" />
       <path d="M9 6V4h6v2" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }

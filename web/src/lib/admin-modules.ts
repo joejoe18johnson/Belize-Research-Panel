@@ -5,7 +5,7 @@ export type AdminModuleKind = "page" | "module";
 
 export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
-export type AdminNavSectionId = "panelists" | "research" | "operations" | "platform";
+export type AdminNavSectionId = "panelists" | "campaigns" | "research" | "operations" | "platform";
 
 export interface AdminNavSection {
   id: AdminNavSectionId;
@@ -25,6 +25,7 @@ export interface AdminModule {
 
 export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   { id: "panelists", label: "Panelists" },
+  { id: "campaigns", label: "Campaigns" },
   { id: "research", label: "Research" },
   { id: "operations", label: "Operations" },
   { id: "platform", label: "Platform" },
@@ -51,6 +52,30 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "under-review",
+    label: "Under Review",
+    kind: "page",
+    href: "/admin/under-review",
+    section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "notifications",
+    label: "Notifications",
+    kind: "page",
+    href: "/admin/notifications",
+    section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "payouts",
+    label: "Payouts",
+    kind: "page",
+    href: "/admin/payouts",
+    section: "panelists",
+    status: "working",
+  },
+  {
     slug: "fraud-prevention",
     label: "Fraud Prevention",
     kind: "page",
@@ -64,6 +89,22 @@ export const ADMIN_MODULES: AdminModule[] = [
     kind: "page",
     href: "/admin/sample-selection",
     section: "panelists",
+    status: "working",
+  },
+  {
+    slug: "campaigns",
+    label: "Campaigns",
+    kind: "page",
+    href: "/admin/campaigns",
+    section: "campaigns",
+    status: "working",
+  },
+  {
+    slug: "create-campaign",
+    label: "Create Campaign",
+    kind: "page",
+    href: "/admin/campaigns/create",
+    section: "campaigns",
     status: "working",
   },
   {

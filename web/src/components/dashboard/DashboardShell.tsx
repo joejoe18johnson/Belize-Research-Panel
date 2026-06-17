@@ -202,8 +202,6 @@ export function StatCard({
 }) {
   const toneClass =
     tone === "success"
-      const toneClass =
-    tone === "success"
       ? "border-teal-200 bg-teal-50/90 shadow-sm shadow-teal-950/[0.04]"
       : tone === "warning"
         ? "border-teal-200 bg-teal-50/80 shadow-sm shadow-teal-950/[0.04]"
