@@ -5,11 +5,14 @@ import {
   isValidElement,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
   type SelectHTMLAttributes,
 } from "react";
+import { createPortal } from "react-dom";
 import { siteSelectTriggerClass, siteSelectTriggerCompactClass } from "@/lib/site-controls";
 
 export type SiteSelectOption = {
@@ -74,6 +77,55 @@ export function mapStringOptions(values: readonly string[], emptyLabel = "—"):
   }));
 }
 
+export type SiteSelectMenuPlacement = "auto" | "top" | "bottom";
+
+function usePortalMenuPosition(
+  open: boolean,
+  rootRef: React.RefObject<HTMLDivElement | null>,
+  menuRef: React.RefObject<HTMLUListElement | null>,
+  placement: SiteSelectMenuPlacement
+) {
+  const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
+
+  useLayoutEffect(() => {
+    if (!open) return;
+
+    const update = () => {
+      const trigger = rootRef.current;
+      if (!trigger) return;
+
+      const rect = trigger.getBoundingClientRect();
+      const menuHeight = menuRef.current?.offsetHeight ?? Math.min(240, 42 * 4);
+      const gap = 4;
+      const spaceBelow = window.innerHeight - rect.bottom - gap;
+      const spaceAbove = rect.top - gap;
+      const openUp =
+        placement === "top" ||
+        (placement === "auto" && spaceBelow < menuHeight && spaceAbove >= spaceBelow);
+
+      setStyle({
+        position: "fixed",
+        left: rect.left,
+        width: rect.width,
+        minWidth: rect.width,
+        zIndex: 9999,
+        top: openUp ? Math.max(gap, rect.top - menuHeight - gap) : rect.bottom + gap,
+        visibility: "visible",
+      });
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open, placement, rootRef, menuRef]);
+
+  return style;
+}
+
 export function SiteSelect({
   value,
   onChange,
@@ -85,6 +137,7 @@ export function SiteSelect({
   "aria-label": ariaLabel,
   compact = false,
   error = false,
+  menuPlacement = "auto",
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -96,10 +149,13 @@ export function SiteSelect({
   "aria-label"?: string;
   compact?: boolean;
   error?: boolean;
+  menuPlacement?: SiteSelectMenuPlacement;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const listboxId = useId();
+  const menuStyle = usePortalMenuPosition(open, rootRef, menuRef, menuPlacement);
   const selected = options.find((option) => option.value === value);
   const display = selected?.label ?? placeholder;
   const isPlaceholder = !selected;
@@ -108,9 +164,11 @@ export function SiteSelect({
     if (!open) return;
 
     const onPointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target) || menuRef.current?.contains(target)) {
+        return;
       }
+      setOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -145,39 +203,44 @@ export function SiteSelect({
         <ChevronIcon open={open} />
       </button>
 
-      {open ? (
-        <ul
-          id={listboxId}
-          role="listbox"
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10"
-        >
-          {options.map((option) => {
-            const active = option.value === value;
-            return (
-              <li key={`${option.value}::${option.label}`} role="presentation">
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={active}
-                  disabled={option.disabled}
-                  onClick={() => {
-                    onChange(option.value);
-                    setOpen(false);
-                  }}
-                  className={`flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition ${
-                    active
-                      ? "bg-teal-700 text-white"
-                      : "text-zinc-800 hover:bg-teal-50 hover:text-teal-900"
-                  } disabled:cursor-not-allowed disabled:opacity-50`}
-                >
-                  {active ? <CheckIcon /> : <span className="w-4 shrink-0" aria-hidden />}
-                  <span className="truncate">{option.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
+      {open
+        ? createPortal(
+            <ul
+              ref={menuRef}
+              id={listboxId}
+              role="listbox"
+              style={menuStyle}
+              className="max-h-60 overflow-auto rounded-xl border border-teal-100 bg-white py-1 shadow-lg shadow-teal-950/10"
+            >
+              {options.map((option) => {
+                const active = option.value === value;
+                return (
+                  <li key={`${option.value}::${option.label}`} role="presentation">
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      disabled={option.disabled}
+                      onClick={() => {
+                        onChange(option.value);
+                        setOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition ${
+                        active
+                          ? "bg-teal-700 text-white"
+                          : "text-zinc-800 hover:bg-teal-50 hover:text-teal-900"
+                      } disabled:cursor-not-allowed disabled:opacity-50`}
+                    >
+                      {active ? <CheckIcon /> : <span className="w-4 shrink-0" aria-hidden />}
+                      <span className="truncate">{option.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
