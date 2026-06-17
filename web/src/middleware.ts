@@ -5,7 +5,7 @@ import { adminPathAllowedForRole, staffDefaultAdminPath } from "@/lib/staff-role
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login"]);
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith("/admin")) {
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get("brp_admin_session")?.value;
-  const session = token ? decodeAdminSessionToken(token) : null;
+  const session = token ? await decodeAdminSessionToken(token) : null;
 
   if (!session) {
     const loginUrl = new URL("/admin/login", request.url);

@@ -18,5 +18,22 @@
     },
     "createdAt": "2026-06-16T12:00:00.000Z",
     "launchedAt": "2026-06-16T12:00:00.000Z"
+  },
+  {
+    "id": "campaign-johannes-test-campaign-mqhj5jx3",
+    "title": "Johannes Test Campaign",
+    "description": "Johannes Test Campaign",
+    "category": "political",
+    "status": "active",
+    "surveyUrl": "https://forms.g.com",
+    "points": 100,
+    "assignedDate": "2026-06-17",
+    "completeByDate": "2026-07-01",
+    "deliveryMethod": "External Survey Link",
+    "targeting": {
+      "mode": "all_verified"
+    },
+    "createdAt": "2026-06-17T03:47:27.639Z",
+    "launchedAt": "2026-06-17T03:47:27.639Z"
   }
 ]
