@@ -1,30 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { NotificationQueueRow } from "@/lib/admin-dashboard-metrics";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
+function matchesNotificationType(row: NotificationQueueRow, typeFilter: string | null): boolean {
+  if (!typeFilter) return true;
+  const normalized = typeFilter.trim().toLowerCase();
+  if (normalized === "phone") return row.type === "Phone change";
+  if (normalized === "email") return row.type === "Email change";
+  if (normalized === "verification") return row.type === "Email verification";
+  return row.type.toLowerCase().includes(normalized);
+}
+
 export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueRow[] }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const typeFilter = searchParams.get("type");
   const [search, setSearch] = useState("");
   const [approvingKey, setApprovingKey] = useState("");
   const [message, setMessage] = useState("");
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return rows;
-    return rows.filter(
-      (row) =>
+    return rows.filter((row) => {
+      if (!matchesNotificationType(row, typeFilter)) return false;
+      if (!query) return true;
+      return (
         row.name.toLowerCase().includes(query) ||
         row.email.toLowerCase().includes(query) ||
         row.type.toLowerCase().includes(query) ||
         row.detail.toLowerCase().includes(query)
-    );
-  }, [rows, search]);
+      );
+    });
+  }, [rows, search, typeFilter]);
+
+  const pagination = useTablePagination(filtered, 2);
 
   const emailChanges = rows.filter((row) => row.type === "Email change").length;
   const phoneChanges = rows.filter((row) => row.type === "Phone change").length;
@@ -72,6 +88,15 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
         description="Contact change approvals and signup email verification backlog requiring administrator attention."
       />
 
+      {typeFilter ? (
+        <BrandedAlert tone="info" compact showIcon>
+          Showing {typeFilter === "phone" ? "phone change" : typeFilter} notifications.{" "}
+          <Link href="/admin/notifications" className="font-semibold underline">
+            Show all notifications
+          </Link>
+        </BrandedAlert>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total pending" value={rows.length} />
         <MetricCard label="Email changes" value={emailChanges} />
@@ -107,20 +132,21 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
             </BrandedAlert>
           </div>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
-            <table className="min-w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Detail</th>
-                  <th className="px-4 py-3">Requested</th>
-                  <th className="px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((row) => {
+          <>
+            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
+              <table className="min-w-[900px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                    <th className="px-4 py-3">Type</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Detail</th>
+                    <th className="px-4 py-3">Requested</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pagination.paginatedRows.map((row) => {
                   const actionKey = `${row.type}:${row.email}`;
                   const canApprove = row.type === "Email change" || row.type === "Phone change";
                   return (
@@ -153,9 +179,18 @@ export function AdminNotificationsDashboard({ rows }: { rows: NotificationQueueR
                     </tr>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
+            <TablePagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalPages={pagination.totalPages}
+              totalRows={pagination.totalRows}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+            />
+          </>
         )}
       </section>
     </div>

@@ -17,7 +17,9 @@ import type {
   PayoutQueueRow,
   RecentPanelistRow,
 } from "@/lib/admin-dashboard-metrics";
+import { ADMIN_DASHBOARD_LINKS } from "@/lib/admin-dashboard-links";
 import { formatBz } from "@/lib/reward-redemption";
+import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function DashboardIcon({ children }: { children: ReactNode }) {
@@ -44,6 +46,10 @@ export function AdminDashboardClient({
   recentPanelists: RecentPanelistRow[];
   recentPayouts: PayoutQueueRow[];
 }) {
+  const panelistsPagination = useTablePagination(recentPanelists, 2);
+  const usersPagination = useTablePagination(recentPanelists, 2);
+  const payoutsPagination = useTablePagination(recentPayouts, 2);
+
   return (
     <div className="mx-auto max-w-[1400px] space-y-8">
       <PageIntro
@@ -54,7 +60,7 @@ export function AdminDashboardClient({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard
-          href="/admin/panelists"
+          href={ADMIN_DASHBOARD_LINKS.panelists}
           label="Panelists"
           value={metrics.total}
           tone="blue"
@@ -65,7 +71,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/panelists"
+          href={ADMIN_DASHBOARD_LINKS.verified}
           label="Verified"
           value={metrics.verified}
           tone="green"
@@ -76,7 +82,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/under-review"
+          href={ADMIN_DASHBOARD_LINKS.underReview}
           label="Under review"
           value={metrics.underReviewTotal}
           tone="amber"
@@ -87,7 +93,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/payouts"
+          href={ADMIN_DASHBOARD_LINKS.payouts}
           label="Payout requests"
           value={metrics.totalRedemptionRequests}
           tone="rose"
@@ -101,7 +107,7 @@ export function AdminDashboardClient({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard
-          href="/admin/under-review"
+          href={ADMIN_DASHBOARD_LINKS.underReview}
           label="Under review"
           value={metrics.underReviewTotal}
           tone="amber"
@@ -112,7 +118,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/notifications"
+          href={ADMIN_DASHBOARD_LINKS.phoneReview}
           label="Phone numbers to review"
           value={metrics.phoneNumbersToReview}
           tone="blue"
@@ -123,7 +129,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/under-review"
+          href={ADMIN_DASHBOARD_LINKS.addressReview}
           label="Address documents to review"
           value={metrics.addressDocumentsToReview}
           tone="green"
@@ -135,7 +141,7 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href="/admin/under-review"
+          href={ADMIN_DASHBOARD_LINKS.identityReview}
           label="Identity documents to review"
           value={metrics.idDocumentsToReview}
           tone="violet"
@@ -148,148 +154,190 @@ export function AdminDashboardClient({
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <AdminSectionPanel title="Recent panelists" viewAllHref="/admin/panelists">
-          <AdminDataTable>
-            <AdminTableHead>
-              <AdminTableTh>Name</AdminTableTh>
-              <AdminTableTh>Status</AdminTableTh>
-              <AdminTableTh>Verification</AdminTableTh>
-              <AdminTableTh>Phone</AdminTableTh>
-            </AdminTableHead>
-            <tbody>
-              {recentPanelists.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-zinc-500">
-                    No panelists registered yet.
-                  </td>
-                </tr>
-              ) : (
-                recentPanelists.map((row) => (
-                  <tr key={row.email} className="border-b border-zinc-50 hover:bg-zinc-50/60">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                        className="font-medium text-zinc-900 hover:text-teal-800"
-                      >
-                        {row.name}
-                      </Link>
+        <AdminSectionPanel title="Recent panelists" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
+          <div className="overflow-x-auto">
+            <AdminDataTable className="min-w-[640px]">
+              <AdminTableHead>
+                <AdminTableTh>Name</AdminTableTh>
+                <AdminTableTh>Status</AdminTableTh>
+                <AdminTableTh>Verification</AdminTableTh>
+                <AdminTableTh>Phone</AdminTableTh>
+              </AdminTableHead>
+              <tbody>
+                {recentPanelists.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-zinc-500">
+                      No panelists registered yet.
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
-                        {row.panelistStatus}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <AdminStatusPill label={row.verificationStatus} tone={verificationTone(row.verificationStatus)} />
-                    </td>
-                    <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </AdminDataTable>
+                ) : (
+                  panelistsPagination.paginatedRows.map((row) => (
+                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                          className="font-medium text-zinc-900 hover:text-teal-800"
+                        >
+                          {row.name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
+                          {row.panelistStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <AdminStatusPill label={row.verificationStatus} tone={verificationTone(row.verificationStatus)} />
+                      </td>
+                      <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </AdminDataTable>
+          </div>
+          {recentPanelists.length > 0 ? (
+            <div className="px-4 pb-4">
+              <TablePagination
+                page={panelistsPagination.page}
+                pageSize={panelistsPagination.pageSize}
+                totalPages={panelistsPagination.totalPages}
+                totalRows={panelistsPagination.totalRows}
+                onPageChange={panelistsPagination.setPage}
+                onPageSizeChange={panelistsPagination.setPageSize}
+              />
+            </div>
+          ) : null}
         </AdminSectionPanel>
 
-        <AdminSectionPanel title="Recent users" viewAllHref="/admin/panelists">
-          <AdminDataTable>
-            <AdminTableHead>
-              <AdminTableTh>Name</AdminTableTh>
-              <AdminTableTh>Email</AdminTableTh>
-              <AdminTableTh>Status</AdminTableTh>
-              <AdminTableTh>Phone</AdminTableTh>
-              <AdminTableTh>Phone approved</AdminTableTh>
-              <AdminTableTh>Docs</AdminTableTh>
-            </AdminTableHead>
-            <tbody>
-              {recentPanelists.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500">
-                    No users registered yet.
-                  </td>
-                </tr>
-              ) : (
-                recentPanelists.map((row) => (
-                  <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60">
-                    <td className="px-4 py-3 font-medium text-zinc-900">{row.name}</td>
-                    <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600">{row.email}</td>
-                    <td className="px-4 py-3">
-                      <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
-                        {row.panelistStatus}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
-                    <td className="px-4 py-3">
-                      {row.phoneApproved ? (
-                        <span className="font-medium text-emerald-600">Yes</span>
-                      ) : (
-                        <span className="text-zinc-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {row.hasIdDoc ? (
-                          <AdminDocPill
-                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                            label="ID"
-                          />
-                        ) : null}
-                        {row.hasAddressDoc ? (
-                          <AdminDocPill
-                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                            label="Addr"
-                          />
-                        ) : null}
-                        {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400">—</span> : null}
-                      </div>
+        <AdminSectionPanel title="Recent users" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
+          <div className="overflow-x-auto">
+            <AdminDataTable className="min-w-[720px]">
+              <AdminTableHead>
+                <AdminTableTh>Name</AdminTableTh>
+                <AdminTableTh>Email</AdminTableTh>
+                <AdminTableTh>Status</AdminTableTh>
+                <AdminTableTh>Phone</AdminTableTh>
+                <AdminTableTh>Phone approved</AdminTableTh>
+                <AdminTableTh>Docs</AdminTableTh>
+              </AdminTableHead>
+              <tbody>
+                {recentPanelists.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500">
+                      No users registered yet.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </AdminDataTable>
+                ) : (
+                  usersPagination.paginatedRows.map((row) => (
+                    <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                      <td className="px-4 py-3 font-medium text-zinc-900">{row.name}</td>
+                      <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600">{row.email}</td>
+                      <td className="px-4 py-3">
+                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600"}>
+                          {row.panelistStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-zinc-600">{row.phone}</td>
+                      <td className="px-4 py-3">
+                        {row.phoneApproved ? (
+                          <span className="font-medium text-emerald-600">Yes</span>
+                        ) : (
+                          <span className="text-zinc-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {row.hasIdDoc ? (
+                            <AdminDocPill
+                              href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                              label="ID"
+                            />
+                          ) : null}
+                          {row.hasAddressDoc ? (
+                            <AdminDocPill
+                              href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                              label="Addr"
+                            />
+                          ) : null}
+                          {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400">—</span> : null}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </AdminDataTable>
+          </div>
+          {recentPanelists.length > 0 ? (
+            <div className="px-4 pb-4">
+              <TablePagination
+                page={usersPagination.page}
+                pageSize={usersPagination.pageSize}
+                totalPages={usersPagination.totalPages}
+                totalRows={usersPagination.totalRows}
+                onPageChange={usersPagination.setPage}
+                onPageSizeChange={usersPagination.setPageSize}
+              />
+            </div>
+          ) : null}
         </AdminSectionPanel>
       </div>
 
-      <AdminSectionPanel title="Recent payouts" viewAllHref="/admin/payouts">
-        <AdminDataTable>
-          <AdminTableHead>
-            <AdminTableTh>Request ID</AdminTableTh>
-            <AdminTableTh>Panelist</AdminTableTh>
-            <AdminTableTh>Option</AdminTableTh>
-            <AdminTableTh align="right">Amount</AdminTableTh>
-            <AdminTableTh>Status</AdminTableTh>
-          </AdminTableHead>
-          <tbody>
-            {recentPayouts.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500">
-                  No payout requests yet.
-                </td>
-              </tr>
-            ) : (
-              recentPayouts.slice(0, 5).map((row) => (
-                <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60">
-                  <td className="px-4 py-3 font-semibold text-zinc-900">{row.shortId}</td>
-                  <td className="px-4 py-3 text-zinc-700">{row.name}</td>
-                  <td className="px-4 py-3 text-zinc-700">{row.optionLabel}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-zinc-700">{formatBz(row.amountBz)}</td>
-                  <td className="px-4 py-3">
-                    <AdminStatusPill
-                      label={formatHeadingCase(row.status === "fulfilled" ? "Completed" : row.status)}
-                      tone={
-                        row.status === "fulfilled"
-                          ? "success"
-                          : row.status === "approved"
-                            ? "info"
-                            : "warning"
-                      }
-                    />
+      <AdminSectionPanel title="Recent payouts" viewAllHref={ADMIN_DASHBOARD_LINKS.payouts}>
+        <div className="overflow-x-auto">
+          <AdminDataTable className="min-w-[640px]">
+            <AdminTableHead>
+              <AdminTableTh>Request ID</AdminTableTh>
+              <AdminTableTh>Panelist</AdminTableTh>
+              <AdminTableTh>Option</AdminTableTh>
+              <AdminTableTh align="right">Amount</AdminTableTh>
+              <AdminTableTh>Status</AdminTableTh>
+            </AdminTableHead>
+            <tbody>
+              {recentPayouts.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500">
+                    No payout requests yet.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </AdminDataTable>
+              ) : (
+                payoutsPagination.paginatedRows.map((row) => (
+                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                    <td className="px-4 py-3 font-semibold text-zinc-900">{row.shortId}</td>
+                    <td className="px-4 py-3 text-zinc-700">{row.name}</td>
+                    <td className="px-4 py-3 text-zinc-700">{row.optionLabel}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-zinc-700">{formatBz(row.amountBz)}</td>
+                    <td className="px-4 py-3">
+                      <AdminStatusPill
+                        label={formatHeadingCase(row.status === "fulfilled" ? "Completed" : row.status)}
+                        tone={
+                          row.status === "fulfilled"
+                            ? "success"
+                            : row.status === "approved"
+                              ? "info"
+                              : "warning"
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </AdminDataTable>
+        </div>
+        {recentPayouts.length > 0 ? (
+          <div className="px-4 pb-4">
+            <TablePagination
+              page={payoutsPagination.page}
+              pageSize={payoutsPagination.pageSize}
+              totalPages={payoutsPagination.totalPages}
+              totalRows={payoutsPagination.totalRows}
+              onPageChange={payoutsPagination.setPage}
+              onPageSizeChange={payoutsPagination.setPageSize}
+            />
+          </div>
+        ) : null}
       </AdminSectionPanel>
     </div>
   );

@@ -1,11 +1,11 @@
 import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
 
-type RequirementLetter = "E" | "P" | "I";
+type RequirementKind = "email" | "phone" | "id";
 
-const REQUIREMENT_LETTERS: Record<string, RequirementLetter> = {
-  Email: "E",
-  Phone: "P",
-  ID: "I",
+const REQUIREMENT_KINDS: Record<string, RequirementKind> = {
+  Email: "email",
+  Phone: "phone",
+  ID: "id",
 };
 
 function requirementDisplayLabel(status: RequirementApprovalStatus): string {
@@ -20,62 +20,70 @@ function statusTextClass(status: RequirementApprovalStatus): string {
   return "text-zinc-500";
 }
 
+function RequirementGlyph({ kind, size }: { kind: RequirementKind; size: number }) {
+  const stroke = {
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    fill: "none",
+  };
+
+  if (kind === "email") {
+    return (
+      <svg viewBox="0 0 16 16" width={size} height={size} aria-hidden="true">
+        <path {...stroke} d="M2.5 4.5h11v7h-11v-7Z" />
+        <path {...stroke} d="M2.5 5.5 8 9l5.5-3.5" />
+      </svg>
+    );
+  }
+
+  if (kind === "phone") {
+    return (
+      <svg viewBox="0 0 16 16" width={size} height={size} aria-hidden="true">
+        <path
+          {...stroke}
+          d="M6.5 2h3a1 1 0 0 1 1 1v1.5M6.5 2v1.5h3M6.5 2H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V4.5h-.5"
+        />
+        <path {...stroke} d="M7.25 12.25h1.5" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 16 16" width={size} height={size} aria-hidden="true">
+      <path {...stroke} d="M4.5 3.5h7a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 11V5a1.5 1.5 0 0 1 1.5-1.5Z" />
+      <circle cx="8" cy="6.25" r="1.35" fill="currentColor" stroke="none" />
+      <path {...stroke} d="M5.75 10.25c.55-.9 1.45-1.35 2.25-1.35s1.7.45 2.25 1.35" />
+    </svg>
+  );
+}
+
 function StatusCircleIcon({
-  letter,
+  kind,
   status,
   size = "sm",
 }: {
-  letter: RequirementLetter;
+  kind: RequirementKind;
   status: RequirementApprovalStatus;
   size?: "sm" | "md";
 }) {
   const sizeClass = size === "sm" ? "h-4 w-4" : "h-[18px] w-[18px]";
   const iconSize = size === "sm" ? 10 : 11;
-  const letterClass = size === "sm" ? "text-[9px]" : "text-[10px]";
 
-  if (status === "approved") {
-    return (
-      <span
-        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white ${sizeClass}`}
-        aria-hidden="true"
-      >
-        <svg viewBox="0 0 16 16" width={iconSize} height={iconSize} fill="none">
-          <path
-            d="M3.5 8.2 6.4 11 12.5 4.8"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-    );
-  }
-
-  if (status === "missing") {
-    return (
-      <span
-        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-zinc-400 text-white ${sizeClass}`}
-        aria-hidden="true"
-      >
-        <svg viewBox="0 0 16 16" width={iconSize} height={iconSize} fill="none">
-          <path
-            d="M5 5l6 6M11 5l-6 6"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-        </svg>
-      </span>
-    );
-  }
+  const toneClass =
+    status === "approved"
+      ? "bg-emerald-500 text-white"
+      : status === "under_review"
+        ? "bg-amber-500 text-white"
+        : "bg-zinc-400 text-white";
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-amber-500 font-bold text-white ${sizeClass} ${letterClass}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full ${toneClass} ${sizeClass}`}
       aria-hidden="true"
     >
-      {letter}
+      <RequirementGlyph kind={kind} size={iconSize} />
     </span>
   );
 }
@@ -89,7 +97,7 @@ export function RequirementStatusBadge({
   status: RequirementApprovalStatus;
   compact?: boolean;
 }) {
-  const letter = REQUIREMENT_LETTERS[label] ?? "E";
+  const kind = REQUIREMENT_KINDS[label] ?? "email";
   const displayLabel = requirementDisplayLabel(status);
 
   return (
@@ -97,22 +105,18 @@ export function RequirementStatusBadge({
       className={`inline-flex items-center ${compact ? "gap-1.5" : "gap-2"}`}
       title={`${label}: ${displayLabel}`}
     >
-      <StatusCircleIcon letter={letter} status={status} size={compact ? "sm" : "md"} />
+      <StatusCircleIcon kind={kind} status={status} size={compact ? "sm" : "md"} />
       <span
         className={`font-medium ${statusTextClass(status)} ${
           compact ? "text-[11px] leading-tight" : "text-xs"
         }`}
       >
         {compact ? (
-          status === "under_review" ? (
-            displayLabel
-          ) : (
-            <>
-              <span className="font-semibold text-zinc-600">{letter}</span>
-              <span className="text-zinc-400"> · </span>
-              {displayLabel}
-            </>
-          )
+          <>
+            <span className="font-semibold text-zinc-700">{label}</span>
+            <span className="text-zinc-400"> · </span>
+            {displayLabel}
+          </>
         ) : (
           <>
             {label}
@@ -140,9 +144,9 @@ export function RequirementStatusGroup({
 }) {
   if (iconsOnly) {
     const items = [
-      { label: "Email", letter: "E" as const, status: email },
-      { label: "Phone", letter: "P" as const, status: phone },
-      { label: "ID", letter: "I" as const, status: photoId },
+      { label: "Email", kind: "email" as const, status: email },
+      { label: "Phone", kind: "phone" as const, status: phone },
+      { label: "ID", kind: "id" as const, status: photoId },
     ];
 
     return (
@@ -153,7 +157,7 @@ export function RequirementStatusGroup({
             title={`${item.label}: ${requirementDisplayLabel(item.status)}`}
             className="inline-flex"
           >
-            <StatusCircleIcon letter={item.letter} status={item.status} size="sm" />
+            <StatusCircleIcon kind={item.kind} status={item.status} size="sm" />
             <span className="sr-only">
               {item.label}: {requirementDisplayLabel(item.status)}
             </span>

@@ -22,3 +22,28 @@ export function parseUnderReviewRequirementFilter(
   if (normalized === "address" || normalized === "addr" || normalized === "residence") return "address";
   return null;
 }
+
+export function filterUnderReviewRowsByRequirement<
+  T extends {
+    emailRequirement: string;
+    phoneRequirement: string;
+    photoIdRequirement: string;
+    hasAddressDocument: boolean;
+  },
+>(rows: T[], requirement: UnderReviewRequirementFilter | null): T[] {
+  if (!requirement) return rows;
+
+  return rows.filter((row) => {
+    if (requirement === "email") return row.emailRequirement !== "approved";
+    if (requirement === "phone") return row.phoneRequirement !== "approved";
+    if (requirement === "id") return row.photoIdRequirement !== "approved";
+    return row.hasAddressDocument && row.photoIdRequirement !== "approved";
+  });
+}
+
+export const UNDER_REVIEW_FILTER_LABELS: Record<UnderReviewRequirementFilter, string> = {
+  email: "Email verification",
+  phone: "Phone numbers",
+  id: "Identity documents",
+  address: "Address documents",
+};

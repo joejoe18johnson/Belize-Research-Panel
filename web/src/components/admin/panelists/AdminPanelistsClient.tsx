@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PANELIST_STATUS, VERIFICATION_STATUS } from "@/lib/admin-constants";
 import {
@@ -72,6 +72,8 @@ export function AdminPanelistsClient({
   rows,
   requirementByEmail,
   filterOptions,
+  initialVerification,
+  initialEmail,
 }: {
   rows: PanelistRow[];
   requirementByEmail: Record<
@@ -84,6 +86,8 @@ export function AdminPanelistsClient({
     constituency: string[];
     voterStatus: string[];
   };
+  initialVerification?: string;
+  initialEmail?: string;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"all" | "duplicates">("all");
@@ -116,8 +120,8 @@ export function AdminPanelistsClient({
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
 
-  const allPagination = useTablePagination(filteredRows, 30);
-  const duplicatePagination = useTablePagination(duplicateRows, 30);
+  const allPagination = useTablePagination(filteredRows, 2);
+  const duplicatePagination = useTablePagination(duplicateRows, 2);
 
   const cityOptions =
     editState?.district && editState.district in CITY_TOWN_VILLAGE
@@ -144,6 +148,19 @@ export function AdminPanelistsClient({
       notes: row.notes ?? "",
     });
   };
+
+  useEffect(() => {
+    if (initialVerification) {
+      setVerificationFilter([initialVerification]);
+    }
+  }, [initialVerification]);
+
+  useEffect(() => {
+    if (!initialEmail) return;
+    const match = rows.find((row) => cleanText(row.email).toLowerCase() === initialEmail.toLowerCase());
+    if (match) openEdit(match.email);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deep-link opens the matching record once
+  }, [initialEmail]);
 
   const closeEdit = () => {
     setEditingEmail(null);
@@ -723,7 +740,7 @@ function DataTable({
   >;
 }) {
   return (
-    <table className="min-w-full text-left text-xs sm:text-sm">
+    <table className="min-w-[1100px] text-left text-xs sm:text-sm">
       <thead>
         <tr className="border-b border-zinc-200 bg-zinc-50 text-[11px] uppercase tracking-wide text-zinc-500">
           {actions ? (
@@ -734,7 +751,7 @@ function DataTable({
               {column.replace(/_/g, " ")}
             </th>
           ))}
-          <th className="whitespace-nowrap px-3 py-2 font-semibold">Email · phone · ID</th>
+          <th className="whitespace-nowrap px-3 py-2 font-semibold">Email · Phone · ID</th>
         </tr>
       </thead>
       <tbody>
@@ -764,13 +781,13 @@ function DataTable({
                     {row[column] ?? ""}
                   </td>
                 ))}
-                <td className="min-w-[10rem] px-3 py-2">
+                <td className="whitespace-nowrap px-3 py-2">
                   {requirements ? (
                     <RequirementStatusGroup
                       email={requirements.email}
                       phone={requirements.phone}
                       photoId={requirements.photoId}
-                      compact
+                      iconsOnly
                     />
                   ) : (
                     "—"
