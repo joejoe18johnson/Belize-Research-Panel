@@ -1,6 +1,8 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { AdminModule } from "@/lib/admin-modules";
 import type { AdminModuleContent } from "@/lib/admin-module-content";
+import { getMvpAlignment, portalStatusLabel } from "@/lib/admin-alignment";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function statusTone(label: string): string {
@@ -8,7 +10,7 @@ function statusTone(label: string): string {
   if (lower.includes("live") || lower.includes("working")) {
     return "border-emerald-200 bg-emerald-50 text-emerald-900";
   }
-  if (lower.includes("partial") || lower.includes("mvp")) {
+  if (lower.includes("partial") || lower.includes("streamlit")) {
     return "border-amber-200 bg-amber-50 text-amber-950";
   }
   return "border-zinc-200 bg-zinc-50 text-zinc-800";
@@ -35,10 +37,14 @@ function SectionBlock({ section }: { section: AdminModuleContent["sections"][num
 export function AdminModulePage({
   module,
   content,
+  livePanel,
 }: {
   module: AdminModule;
   content: AdminModuleContent;
+  livePanel?: ReactNode;
 }) {
+  const alignment = getMvpAlignment(module.slug);
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="border-l-4 border-teal-600 pl-4">
@@ -46,10 +52,34 @@ export function AdminModulePage({
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{content.summary}</p>
       </div>
 
+      {alignment ? (
+        <div className="rounded-2xl border border-teal-100 bg-teal-50/60 px-5 py-4 text-sm text-teal-950">
+          <p className="font-semibold">
+            MVP alignment: {alignment.mvpOriginalStatus} → {portalStatusLabel(alignment.portalStatus)}
+          </p>
+          <p className="mt-2 leading-relaxed opacity-90">{alignment.rationale}</p>
+        </div>
+      ) : null}
+
       <div className={`rounded-2xl border px-5 py-4 text-sm ${statusTone(content.statusLabel)}`}>
         <p className="font-semibold">{content.statusLabel}</p>
         <p className="mt-2 leading-relaxed opacity-90">{content.statusDetail}</p>
       </div>
+
+      {module.externalHref ? (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={module.externalHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            {formatHeadingCase(`Open ${module.label.toLowerCase()}`)}
+          </Link>
+        </div>
+      ) : null}
+
+      {livePanel}
 
       {content.liveInPortal?.length ? (
         <section className="rounded-2xl border border-teal-100 bg-teal-50/50 p-5 sm:p-6">
@@ -61,7 +91,7 @@ export function AdminModulePage({
               <li key={item.label} className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm">
                 <p className="font-semibold text-teal-900">
                   {item.href ? (
-                    <Link href={item.href} className="hover:underline" target={item.href.startsWith("/") ? undefined : "_blank"}>
+                    <Link href={item.href} className="hover:underline">
                       {item.label}
                     </Link>
                   ) : (
@@ -116,14 +146,16 @@ export function AdminModulePage({
         </section>
       ) : null}
 
-      <div className="flex flex-wrap gap-3 pt-2">
-        <Link
-          href="/admin/dashboard"
-          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white hover:bg-teal-800"
-        >
-          {formatHeadingCase("Open admin dashboard")}
-        </Link>
-      </div>
+      {!module.externalHref ? (
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Link
+            href="/admin/dashboard"
+            className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            {formatHeadingCase("Open admin dashboard")}
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

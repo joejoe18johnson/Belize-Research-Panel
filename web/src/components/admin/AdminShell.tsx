@@ -10,7 +10,15 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 function statusBadge(status?: AdminModule["status"]) {
   if (status === "working") return "bg-emerald-100 text-emerald-800";
   if (status === "partial") return "bg-amber-100 text-amber-900";
+  if (status === "streamlit") return "bg-violet-100 text-violet-900";
   return "bg-zinc-100 text-zinc-600";
+}
+
+function statusLabel(status?: AdminModule["status"]) {
+  if (status === "working") return "Live";
+  if (status === "partial") return "Partial";
+  if (status === "streamlit") return "Streamlit";
+  return "Planned";
 }
 
 function moduleHref(module: AdminModule): string {
@@ -42,7 +50,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               {ADMIN_MODULES.map((module) => {
                 const active = isModuleActive(pathname, module);
                 const href = moduleHref(module);
-                const external = module.kind === "external";
+                const external = Boolean(module.externalHref);
 
                 return (
                   <li key={module.slug}>
@@ -62,7 +70,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         <span
                           className={`mt-0.5 hidden shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide xl:inline ${statusBadge(module.status)}`}
                         >
-                          {module.status === "working" ? "Live" : module.status === "partial" ? "Partial" : "Planned"}
+                          {statusLabel(module.status)}
                         </span>
                       ) : null}
                     </Link>

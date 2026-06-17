@@ -21,13 +21,113 @@ export interface AdminModuleContent {
   plannedNext?: string[];
 }
 
+export interface AdminModuleContent {
+  summary: string;
+  statusLabel: string;
+  statusDetail: string;
+  sections: AdminModuleSection[];
+  liveInPortal?: AdminModuleLiveItem[];
+  adminActions?: string[];
+  dataSources?: string[];
+  plannedNext?: string[];
+}
+
 export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
+  "panelist-registration": {
+    summary:
+      "Eligible Belize residents complete multi-step registration with citizenship, residency, voter, demographic, interest, and contact validation. Records persist to panelists.csv.",
+    statusLabel: "Live — Working MVP",
+    statusDetail:
+      "The Next.js registration at /register implements and extends the Streamlit MVP: phased form, duplicate blocking, photo ID handling, and consent capture.",
+    liveInPortal: [
+      { label: "Registration flow", href: "/register", detail: "Self-registration and authorised-person modes with eligibility gates at each phase." },
+      { label: "Registration API", detail: "POST /api/register validates fields, blocks hard duplicates, and writes panelists.csv." },
+      { label: "Username check", detail: "GET /api/check-username ensures unique usernames before submit." },
+    ],
+    sections: [
+      {
+        title: "Eligibility gates (aligned with MVP)",
+        bullets: [
+          "Age 18+ required",
+          "Citizenship / residency status with ineligible categories rejected",
+          "Voter registration question for citizens and Commonwealth residents in Belize",
+          "District, constituency, and CTV logic for registered voters",
+          "Political interests for registered voters; market and civic interests by residence",
+        ],
+      },
+      {
+        title: "Duplicate blocking at registration",
+        bullets: [
+          "Duplicate email",
+          "Duplicate phone / WhatsApp",
+          "Same first name + last name + date of birth",
+          "Same photo ID type + last four digits",
+        ],
+      },
+      {
+        title: "Portal improvements over Streamlit MVP",
+        bullets: [
+          "Email-verified account required before panelist registration",
+          "Scroll-to-phase navigation and mobile-first layout",
+          "Market-only interests phase per client feedback (political/civic collected at registration when applicable)",
+        ],
+      },
+    ],
+    adminActions: [
+      "Review new registrations in Admin Dashboard (filter by Pending verification)",
+      "Export filtered CSV for QA against registration fields",
+    ],
+    dataSources: ["data/panelists.csv", "data/accounts.json", "data/uploads/"],
+    plannedNext: ["Authorised-person verification code workflow in admin console"],
+  },
+
+  "panelist-login": {
+    summary:
+      "Panelists sign in with email and password, access the dashboard, and manage profile, surveys, rewards, and verification.",
+    statusLabel: "Live — exceeds MVP",
+    statusDetail:
+      "Streamlit MVP showed a read-only profile on username login. The portal uses email auth, a full dashboard, editable profile (with admin approval for email/phone), and modular sections.",
+    liveInPortal: [
+      { label: "Panelist login", href: "/login", detail: "Email/password with session cookie and email-verification gate." },
+      { label: "Dashboard overview", href: "/dashboard", detail: "Welcome, stats, survey preview, quick links." },
+      { label: "Profile", href: "/dashboard/profile", detail: "View/update profile; email and phone changes require admin approval." },
+      { label: "Verification Center", href: "/dashboard/verification", detail: "Phone, photo ID, and residence verification status." },
+    ],
+    sections: [
+      {
+        title: "Dashboard sections",
+        bullets: [
+          "Overview — stats and active survey preview",
+          "Surveys — inbox and completed studies with points",
+          "Profile — registration summary and contact change requests",
+          "Notifications — verification and survey updates",
+          "Rewards — points balance and redemption",
+          "Verification Center — itemised verification checklist",
+        ],
+      },
+      {
+        title: "Account states",
+        bullets: [
+          "Unverified registered — dashboard access, surveys may be locked",
+          "Verified — full survey and redemption eligibility",
+          "On hold — email or phone change pending admin approval",
+        ],
+      },
+    ],
+    adminActions: [
+      "Approve email/phone changes via admin API routes",
+      "Edit verification and panelist status in Admin Dashboard",
+    ],
+    dataSources: ["data/accounts.json", "data/panelists.csv"],
+    plannedNext: ["Staff impersonation / support view for panelist accounts"],
+  },
+
   "rewards-loyalty": {
     summary:
       "Tracks panelist incentive points, redemption eligibility, and payout requests. The panelist-facing rewards flow is live in the Next.js portal; admin fulfillment and reporting will expand here.",
-    statusLabel: "Partially live",
+    statusLabel: "Partial — panelist live, admin manual",
     statusDetail:
-      "Point balances, earning rules, redemption catalog, and request submission are implemented for panelists. Admin review queues and automated payout processing are not yet built in this console.",
+      "Streamlit MVP listed this as a concept with rules overview only. The portal implements points, redemption, and requests; admin payout queue remains file-based.",
     liveInPortal: [
       {
         label: "Panelist rewards dashboard",
@@ -97,9 +197,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "survey-distribution": {
     summary:
       "Creates survey assignments, targets eligible panelists, and tracks invitations, reminders, and completion rewards.",
-    statusLabel: "Panelist inbox live · admin distribution pending",
+    statusLabel: "Partial — inbox live, distribution planned",
     statusDetail:
-      "Panelists receive assigned surveys in their dashboard inbox. Full admin assignment builder, multi-channel sending, and automated reminders from the Streamlit MVP are not yet ported.",
+      "Panelists receive assigned surveys in the dashboard inbox. Full admin assignment builder, multi-channel sending, and automated reminders from the Streamlit MVP are not yet ported.",
     liveInPortal: [
       {
         label: "Panelist survey inbox",
@@ -155,9 +255,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "advanced-analytics": {
     summary:
       "Panel health, geographic coverage, political and market profiling, and operational metrics for research planning and client reporting.",
-    statusLabel: "MVP analytics in Streamlit · admin views planned",
+    statusLabel: "Partial — live summaries below",
     statusDetail:
-      "The Streamlit MVP includes district/constituency summaries, registered voter breakdowns, and interest profiling. This admin console will surface the same metrics from live panel data.",
+      "Core district, constituency, and interest counts from the MVP Advanced Analytics module are computed live from panelists.csv on this page. Turnout modelling and operational metrics remain planned.",
     sections: [
       {
         title: "Panel health metrics",
@@ -228,9 +328,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "fraud-prevention": {
     summary:
       "Duplicate detection, verification quality control, and admin actions to protect panel integrity before sampling and rewards.",
-    statusLabel: "Core checks live",
+    statusLabel: "Live — Working MVP",
     statusDetail:
-      "Registration hard-blocks duplicate email, phone, name+DOB, and ID fragment matches. Admin Dashboard provides duplicate review and status editing. Automated trust scoring is planned.",
+      "Matches Streamlit Fraud Prevention: duplicate email/phone/name+DOB metrics, verification summary, bulk mark action, and Admin Dashboard review table.",
     liveInPortal: [
       {
         label: "Registration duplicate blocking",
@@ -1015,9 +1115,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "sample-selection": {
     summary:
       "Filter the panel, calculate required sample sizes, and generate random samples for survey fieldwork.",
-    statusLabel: "MVP engine in Streamlit · port planned",
+    statusLabel: "Streamlit MVP — use appfiles/app.py",
     statusDetail:
-      "Full sampling method selection, geographic/demographic filters, sample size calculator, and CSV export exist in appfiles/app.py. Will be ported to use live panelists.csv data.",
+      "Full sampling methods, filters, sample size calculator, and CSV export run in the Streamlit app today. Admin Dashboard filter + CSV export is the interim Next.js workflow until this engine is ported.",
     sections: [
       {
         title: "Sampling methods",
@@ -1081,9 +1181,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "distribution-engine": {
     summary:
       "Prepare outreach batches and invitation exports from survey assignments and sample batches.",
-    statusLabel: "MVP workflow in Streamlit · admin UI pending",
+    statusLabel: "Streamlit MVP — use appfiles/app.py",
     statusDetail:
-      "Links survey assignments to sample batch members, selects distribution mode, and exports contact files with message templates. Uses survey_assignments.csv and sample_batch_members.csv in the Streamlit app.",
+      "Outreach batch export with distribution modes and invitation messages is implemented in the Streamlit MVP (survey_assignments.csv, sample_batch_members.csv, distribution_log.csv). Port to Next.js admin is planned.",
     sections: [
       {
         title: "Distribution modes",
