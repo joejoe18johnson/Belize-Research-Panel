@@ -235,7 +235,9 @@ export async function registerPanelist(
     data.citizenshipStatus === "Citizen of Belize" ||
     data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
       ? data.votingStatus
-      : "Not registered to vote in Belize";
+      : data.citizenshipStatus === "Other resident of Belize"
+        ? "No"
+        : "Not registered to vote in Belize";
 
   const cityFinal =
     data.cityTownVillage === "Other" ? data.cityTownVillageOther : data.cityTownVillage;
@@ -341,7 +343,9 @@ export async function updatePanelistProfile(
     data.citizenshipStatus === "Citizen of Belize" ||
     data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
       ? data.votingStatus
-      : "Not registered to vote in Belize";
+      : data.citizenshipStatus === "Other resident of Belize"
+        ? "No"
+        : "Not registered to vote in Belize";
 
   const cityFinal =
     data.placeOfResidence === "Abroad"

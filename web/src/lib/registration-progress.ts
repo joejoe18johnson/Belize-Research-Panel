@@ -62,7 +62,7 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "constituency",
     "registeredCtvArea",
   ],
-  ["politicalInterests", "marketInterests", "civicInterests"],
+  ["marketInterests"],
   [
     "email",
     "phoneCountryCode",
@@ -143,9 +143,6 @@ function collectPhaseErrors(
     }
   }
   if (phaseIndex === 2) {
-    if (!isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
-      delete allErrors.politicalInterests;
-    }
     if (form.placeOfResidence === "Abroad") {
       delete allErrors.marketInterests;
     }
