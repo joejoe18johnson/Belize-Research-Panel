@@ -108,6 +108,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "survey-builder",
+    label: "Survey Builder",
+    kind: "page",
+    href: "/admin/surveys",
+    section: "campaigns",
+    status: "working",
+  },
+  {
     slug: "survey-distribution",
     label: "Survey Distribution",
     kind: "page",

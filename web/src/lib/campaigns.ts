@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { CreateCampaignInput, CampaignRecord } from "./campaign-targeting";
 import { resolveCampaignAudience } from "./campaign-targeting";
+import { findSurveyDefinitionById } from "./survey-definitions";
 import { loadSurveyRecordsFromFile, saveSurveyRecordsToFile } from "./panelist-surveys-store";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
@@ -38,8 +39,23 @@ export async function createAndLaunchCampaign(
 ): Promise<{ campaign: CampaignRecord; assignedCount: number; skippedCount: number }> {
   const title = cleanText(input.title);
   if (!title) throw new Error("Campaign title is required.");
-  if (!input.surveyUrl.trim()) throw new Error("Survey URL is required.");
   if (!input.assignedDate || !input.completeByDate) throw new Error("Assigned and due dates are required.");
+
+  const deliveryType = input.deliveryType === "internal" ? "internal" : "external";
+  let surveyDefinitionId = cleanText(input.surveyDefinitionId ?? "");
+  let surveyUrl = cleanText(input.surveyUrl ?? "");
+
+  if (deliveryType === "internal") {
+    if (!surveyDefinitionId) throw new Error("Select an on-site survey to launch.");
+    const definition = await findSurveyDefinitionById(surveyDefinitionId);
+    if (!definition) throw new Error("Selected survey was not found.");
+    if (definition.status !== "published") throw new Error("Only published surveys can be launched.");
+    surveyUrl = "";
+  } else if (!surveyUrl) {
+    throw new Error("Survey URL is required for external surveys.");
+  } else {
+    surveyDefinitionId = "";
+  }
 
   const audience = resolveCampaignAudience(panelists, input.targeting);
   if (audience.length === 0) throw new Error("No panelists match the selected targeting.");
@@ -59,11 +75,13 @@ export async function createAndLaunchCampaign(
     description: cleanText(input.description),
     category: input.category,
     status: "active",
-    surveyUrl: cleanText(input.surveyUrl),
+    surveyUrl,
+    surveyDefinitionId: surveyDefinitionId || undefined,
+    deliveryType,
     points: Math.max(0, input.points),
     assignedDate: input.assignedDate,
     completeByDate: input.completeByDate,
-    deliveryMethod: cleanText(input.deliveryMethod) || "External Survey Link",
+    deliveryMethod: cleanText(input.deliveryMethod) || (deliveryType === "internal" ? "On-site survey" : "External Survey Link"),
     targeting: input.targeting,
     createdAt: now,
     launchedAt: now,
@@ -96,7 +114,9 @@ export async function createAndLaunchCampaign(
       status: "available",
       progressPercent: 0,
       completedDate: null,
-      surveyUrl: campaign.surveyUrl,
+      surveyUrl: deliveryType === "external" ? surveyUrl : null,
+      surveyDefinitionId: deliveryType === "internal" ? surveyDefinitionId : null,
+      deliveryType,
       panelistEmail: email,
     });
     existingKeys.add(key);

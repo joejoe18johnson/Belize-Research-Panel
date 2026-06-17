@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { PanelistSurvey, SurveyCategory } from "@/lib/panelist-surveys-types";
 import { isSurveyOverdue } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -108,7 +109,14 @@ export function SurveyCard({ survey, locked = false }: { survey: PanelistSurvey;
         <SurveyProgressBar percent={survey.progressPercent} completed={completed} />
 
         {!completed ? (
-          survey.surveyUrl && !locked ? (
+          survey.surveyDefinitionId && !locked ? (
+            <Link
+              href={`/dashboard/surveys/${encodeURIComponent(survey.id)}`}
+              className="flex w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800"
+            >
+              {formatHeadingCase(survey.status === "in_progress" ? "Continue survey" : "Start survey")}
+            </Link>
+          ) : survey.surveyUrl && !locked ? (
             <a
               href={survey.surveyUrl}
               target="_blank"

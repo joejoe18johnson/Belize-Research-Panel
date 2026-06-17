@@ -1,4 +1,5 @@
 import { AdminCreateCampaignClient } from "@/components/admin/campaigns/AdminCreateCampaignClient";
+import { listPublishedSurveyDefinitions } from "@/lib/survey-definitions";
 import { loadPanelists } from "@/lib/panelists";
 
 export const metadata = {
@@ -6,6 +7,6 @@ export const metadata = {
 };
 
 export default async function AdminCreateCampaignPage() {
-  const panelists = await loadPanelists();
-  return <AdminCreateCampaignClient panelists={panelists} />;
+  const [panelists, publishedSurveys] = await Promise.all([loadPanelists(), listPublishedSurveyDefinitions()]);
+  return <AdminCreateCampaignClient panelists={panelists} publishedSurveys={publishedSurveys} />;
 }

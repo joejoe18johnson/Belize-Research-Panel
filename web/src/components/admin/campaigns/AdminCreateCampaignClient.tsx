@@ -15,6 +15,7 @@ import { DELIVERY_METHODS } from "@/lib/admin-survey-distribution";
 import { BELIZE_DISTRICTS, getConstituencyOptions } from "@/lib/constants";
 import type { PanelistRow } from "@/lib/panelists";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
+import type { SurveyDefinition } from "@/lib/survey-definitions";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 const CATEGORIES: SurveyCategory[] = ["political", "market", "civic"];
@@ -25,11 +26,19 @@ function defaultDueDate(daysFromNow: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-export function AdminCreateCampaignClient({ panelists }: { panelists: PanelistRow[] }) {
+export function AdminCreateCampaignClient({
+  panelists,
+  publishedSurveys,
+}: {
+  panelists: PanelistRow[];
+  publishedSurveys: SurveyDefinition[];
+}) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<SurveyCategory>("civic");
+  const [deliveryType, setDeliveryType] = useState<"internal" | "external">("internal");
+  const [surveyDefinitionId, setSurveyDefinitionId] = useState(publishedSurveys[0]?.id ?? "");
   const [surveyUrl, setSurveyUrl] = useState("");
   const [points, setPoints] = useState(100);
   const [assignedDate, setAssignedDate] = useState(new Date().toISOString().slice(0, 10));
@@ -75,7 +84,9 @@ export function AdminCreateCampaignClient({ panelists }: { panelists: PanelistRo
           title,
           description,
           category,
-          surveyUrl,
+          deliveryType,
+          surveyDefinitionId: deliveryType === "internal" ? surveyDefinitionId : undefined,
+          surveyUrl: deliveryType === "external" ? surveyUrl : undefined,
           points,
           assignedDate,
           completeByDate,
@@ -183,16 +194,71 @@ export function AdminCreateCampaignClient({ panelists }: { panelists: PanelistRo
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey URL</label>
-              <input
-                type="url"
-                required
-                value={surveyUrl}
-                onChange={(event) => setSurveyUrl(event.target.value)}
-                placeholder="https://forms.gle/..."
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
-              />
+              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey delivery</label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("internal")}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                    deliveryType === "internal"
+                      ? "bg-teal-700 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                  }`}
+                >
+                  On-site survey (built in BRP)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("external")}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                    deliveryType === "external"
+                      ? "bg-teal-700 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-teal-50"
+                  }`}
+                >
+                  External link
+                </button>
+              </div>
             </div>
+            {deliveryType === "internal" ? (
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Published survey</label>
+                <select
+                  required
+                  value={surveyDefinitionId}
+                  onChange={(event) => setSurveyDefinitionId(event.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
+                >
+                  <option value="">Select a published survey</option>
+                  {publishedSurveys.map((survey) => (
+                    <option key={survey.id} value={survey.id}>
+                      {survey.title} ({survey.questions.length} questions)
+                    </option>
+                  ))}
+                </select>
+                {publishedSurveys.length === 0 ? (
+                  <p className="mt-2 text-sm text-amber-700">
+                    No published surveys yet.{" "}
+                    <Link href="/admin/surveys/create" className="font-semibold underline">
+                      Create one first
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey URL</label>
+                <input
+                  type="url"
+                  required
+                  value={surveyUrl}
+                  onChange={(event) => setSurveyUrl(event.target.value)}
+                  placeholder="https://forms.gle/..."
+                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                />
+              </div>
+            )}
             <div>
               <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Assigned date</label>
               <input
@@ -300,7 +366,7 @@ export function AdminCreateCampaignClient({ panelists }: { panelists: PanelistRo
         <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
           <button
             type="submit"
-            disabled={submitting || eligibleCount === 0}
+            disabled={submitting || eligibleCount === 0 || (deliveryType === "internal" && !surveyDefinitionId)}
             className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
           >
             {submitting ? "Launching…" : `Launch to ${eligibleCount} panelist${eligibleCount === 1 ? "" : "s"}`}
