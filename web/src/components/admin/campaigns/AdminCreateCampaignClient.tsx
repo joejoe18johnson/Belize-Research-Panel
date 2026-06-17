@@ -16,8 +16,11 @@ import { DELIVERY_METHODS } from "@/lib/admin-survey-distribution";
 import { BELIZE_DISTRICTS, getConstituencyOptions } from "@/lib/constants";
 import type { PanelistRow } from "@/lib/panelists";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
+import type { CampaignAssignmentLink } from "@/lib/campaign-survey-links";
+import type { CampaignRecord } from "@/lib/campaign-targeting";
 import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { CampaignLaunchLinks } from "./CampaignLaunchLinks";
 
 const CATEGORIES: SurveyCategory[] = ["political", "market", "civic"];
 
@@ -53,6 +56,8 @@ export function AdminCreateCampaignClient({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [launchedCampaign, setLaunchedCampaign] = useState<CampaignRecord | null>(null);
+  const [launchedSurveyLinks, setLaunchedSurveyLinks] = useState<CampaignAssignmentLink[]>([]);
 
   const targeting = useMemo<CampaignTargeting>(
     () => ({
@@ -99,14 +104,24 @@ export function AdminCreateCampaignClient({
           emails,
         }),
       });
-      const data = (await res.json()) as { ok?: boolean; message?: string; campaign?: { id: string } };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        message?: string;
+        campaign?: CampaignRecord;
+        surveyLinks?: CampaignAssignmentLink[];
+      };
       if (!res.ok || !data.ok) {
         setError(data.message ?? "Could not launch campaign.");
         return;
       }
       setSuccess(data.message ?? "Campaign launched.");
-      router.push(data.campaign?.id ? `/admin/campaigns?campaign=${encodeURIComponent(data.campaign.id)}` : "/admin/campaigns");
-      router.refresh();
+      if (data.campaign && data.surveyLinks?.length) {
+        setLaunchedCampaign(data.campaign);
+        setLaunchedSurveyLinks(data.surveyLinks);
+      } else {
+        router.push(data.campaign?.id ? `/admin/campaigns?campaign=${encodeURIComponent(data.campaign.id)}` : "/admin/campaigns");
+        router.refresh();
+      }
     } catch {
       setError("Network error while launching campaign.");
     } finally {
@@ -133,12 +148,44 @@ export function AdminCreateCampaignClient({
           {error}
         </BrandedAlert>
       ) : null}
-      {success ? (
-        <BrandedAlert tone="success" showIcon>
-          {success}
-        </BrandedAlert>
+      {success && launchedCampaign && launchedSurveyLinks.length > 0 ? (
+        <>
+          <BrandedAlert tone="success" showIcon>
+            {success}
+          </BrandedAlert>
+          <CampaignLaunchLinks campaign={launchedCampaign} surveyLinks={launchedSurveyLinks} />
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/admin/campaigns/${encodeURIComponent(launchedCampaign.id)}/results`}
+              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+            >
+              View campaign results
+            </Link>
+            <Link
+              href="/admin/campaigns"
+              className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+            >
+              Back to campaigns
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setLaunchedCampaign(null);
+                setLaunchedSurveyLinks([]);
+                setSuccess("");
+                setTitle("");
+                setDescription("");
+                setSurveyUrl("");
+              }}
+              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+            >
+              Create another campaign
+            </button>
+          </div>
+        </>
       ) : null}
 
+      {!launchedCampaign ? (
       <form
         className="space-y-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6"
         onSubmit={(event) => {
@@ -369,6 +416,7 @@ export function AdminCreateCampaignClient({
           </Link>
         </div>
       </form>
+      ) : null}
     </div>
   );
 }

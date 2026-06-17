@@ -2,7 +2,8 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { createAndLaunchCampaign } from "@/lib/campaigns";
-import type { CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
+import type { CampaignRecord, CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
+import { buildCampaignAssignmentLinks } from "@/lib/campaign-survey-links";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { loadPanelists } from "@/lib/panelists";
 import { cleanText } from "@/lib/validation";
@@ -53,6 +54,8 @@ export async function POST(request: Request) {
 
     const panelists = await loadPanelists();
     const result = await createAndLaunchCampaign(input, panelists);
+    const origin = new URL(request.url).origin;
+    const surveyLinks = buildCampaignAssignmentLinks(origin, result.campaign, result.assignedPanelists);
 
     revalidatePath("/admin/campaigns");
     revalidatePath("/admin/campaigns/create");
@@ -63,6 +66,7 @@ export async function POST(request: Request) {
       campaign: result.campaign,
       assignedCount: result.assignedCount,
       skippedCount: result.skippedCount,
+      surveyLinks,
       message: `Campaign launched to ${result.assignedCount} panelist(s).`,
     });
   } catch (error) {
