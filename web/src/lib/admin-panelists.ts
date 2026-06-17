@@ -20,6 +20,16 @@ export type AdminPanelistPublicRow = PanelistRow & {
   duplicate_name_dob_flag?: boolean;
 };
 
+export const FLAGGED_VERIFICATION_STATUS = "Possible Duplicate" as const;
+
+export function isFlaggedPanelist(row: Pick<PanelistRow, "verification_status">): boolean {
+  return cleanText(row.verification_status) === FLAGGED_VERIFICATION_STATUS;
+}
+
+export function getFlaggedPanelists(rows: PanelistRow[]): PanelistRow[] {
+  return rows.filter(isFlaggedPanelist);
+}
+
 const SENSITIVE_COLUMNS = ["password_salt", "password_hash"] as const;
 
 function normalizeNamePart(value: string): string {
@@ -69,7 +79,7 @@ export function getAdminPanelOverview(rows: PanelistRow[]): AdminPanelOverview {
     total: rows.length,
     verified: rows.filter((row) => cleanText(row.verification_status) === "Verified").length,
     pending: rows.filter((row) => cleanText(row.verification_status) === "Pending").length,
-    duplicateWarnings: Math.max(duplicateByNameDob, markedPossibleDuplicate),
+    duplicateWarnings: markedPossibleDuplicate,
   };
 }
 

@@ -244,9 +244,9 @@ export function buildPanelistReviewReasons(
   const status = cleanText(panelist.verification_status);
 
   if (options.duplicateNameDobMatch) {
-    reasons.push("Same name and date of birth as another panelist");
+    reasons.push("Same name and date of birth as another panelist (review in Duplicate Review)");
   }
-  if (status === "Possible Duplicate") reasons.push("Flagged as possible duplicate");
+  if (status === FLAGGED_VERIFICATION_STATUS) reasons.push("Flagged as possible duplicate");
   if (status === "Needs Follow-up") reasons.push("Needs administrator follow-up");
   if (status === "Rejected") reasons.push("Registration rejected");
   if (status === "Pending") reasons.push("Verification pending");
@@ -276,7 +276,6 @@ export function panelistRequiresAdminReview(
   const requirements = assessPanelistRequirements(panelist, context);
   const status = cleanText(panelist.verification_status);
 
-  if (options.duplicateNameDobMatch) return true;
   if (options.accountOnHold) return true;
   if (!requirements.allApproved) return true;
   if (status === "Possible Duplicate" || status === "Needs Follow-up" || status === "Pending") return true;

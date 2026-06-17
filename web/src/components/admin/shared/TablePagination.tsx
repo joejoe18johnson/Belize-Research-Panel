@@ -65,6 +65,8 @@ export function TablePagination({
             value={String(pageSize)}
             onChange={(value) => onPageSizeChange(Number(value) as PageSizeOption)}
             compact
+            menuPlacement="top"
+            aria-label="Rows per page"
             options={PAGE_SIZE_OPTIONS.map((size) => ({
               value: String(size),
               label: String(size),

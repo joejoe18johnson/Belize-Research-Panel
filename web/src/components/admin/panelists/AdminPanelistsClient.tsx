@@ -495,7 +495,7 @@ export function AdminPanelistsClient({
                   requirementByEmail={requirementByEmail}
                 />
               </div>
-              {duplicatePagination.totalPages > 1 ? (
+              {duplicatePagination.totalRows > 0 ? (
                 <TablePagination
                   page={duplicatePagination.page}
                   pageSize={duplicatePagination.pageSize}

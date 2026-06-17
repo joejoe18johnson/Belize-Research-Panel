@@ -1,6 +1,6 @@
 import type { AccountHoldReason, AccountRecord } from "./auth-types";
 import type { AdminDataHub } from "./admin-data-hub";
-import { buildDuplicateNameDobKeyCounts, duplicateNameDobKey, isDuplicateNameDobMatch } from "./admin-panelists";
+import { buildDuplicateNameDobKeyCounts, duplicateNameDobKey, isDuplicateNameDobMatch, isFlaggedPanelist } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import type { RedemptionRequest } from "./reward-redemption";
 import type { StoredRedemptionOptionId } from "./reward-redemption";
@@ -121,7 +121,7 @@ function countDuplicateNameDob(rows: PanelistRow[]): number {
 export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMetrics {
   const { panelists, accounts, redemptionRequests } = hub;
 
-  const flagged = panelists.filter((row) => cleanText(row.verification_status) === "Possible Duplicate").length;
+  const flagged = panelists.filter(isFlaggedPanelist).length;
   const duplicateByNameDob = countDuplicateNameDob(panelists);
 
   const onHoldAccounts = accounts.filter((account) => cleanText(account.account_status) === "on_hold");
@@ -176,7 +176,7 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
     flagged,
     needsFollowUp,
     rejected,
-    duplicateWarnings: Math.max(duplicateByNameDob, flagged),
+    duplicateWarnings: flagged,
     onHold: onHoldAccounts.length,
     fraudReviewHold,
     contactChangeHold,
