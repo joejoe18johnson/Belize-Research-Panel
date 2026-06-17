@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteFooterGate } from "@/components/SiteFooterGate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,10 +31,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="flex min-h-full flex-col font-sans">
         <NetlifyDeployBanner />
-        <div className="flex flex-1 flex-col">{children}</div>
-        <SiteFooter />
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        <SiteFooterGate>
+          <SiteFooter />
+        </SiteFooterGate>
       </body>
     </html>
   );
