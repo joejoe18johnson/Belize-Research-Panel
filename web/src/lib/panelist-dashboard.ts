@@ -46,8 +46,31 @@ export interface DashboardNotification {
   title: string;
   body: string;
   dateLabel: string;
+  sortAt: string;
   priority: "normal" | "high";
   unread: boolean;
+}
+
+function parseNotificationSortAt(value: string, fallback = "1970-01-01T00:00:00.000Z"): string {
+  const trimmed = cleanText(value);
+  if (!trimmed) return fallback;
+  if (trimmed === "Just now") return new Date().toISOString();
+  if (trimmed === "Coming soon") return fallback;
+  const ms = Date.parse(trimmed);
+  if (!Number.isNaN(ms)) return new Date(ms).toISOString();
+  return fallback;
+}
+
+function formatNotificationDateLabel(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  const day = date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const time = date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
+  return `${day} at ${time}`;
+}
+
+function sortNotificationsNewestFirst(notifications: DashboardNotification[]): DashboardNotification[] {
+  return [...notifications].sort((a, b) => b.sortAt.localeCompare(a.sortAt));
 }
 
 export interface DashboardRewardSummary {
@@ -152,10 +175,8 @@ export function buildRedemptionNotifications(
       const id = redemptionNotificationId(request.id);
       const shortId = payoutShortId(request.id);
       const amount = formatBz(request.amountBz ?? request.points / 25);
-      const date = new Date(request.updatedAt);
-      const dateLabel = Number.isNaN(date.getTime())
-        ? request.updatedAt
-        : date.toLocaleDateString("en-BZ", { dateStyle: "medium" });
+      const sortAt = request.updatedAt;
+      const dateLabel = formatNotificationDateLabel(sortAt);
 
       if (request.status === "approved") {
         return {
@@ -163,6 +184,7 @@ export function buildRedemptionNotifications(
           title: "Payout processing",
           body: `Your ${request.optionLabel} redemption (${amount}) is being processed. Reference ${shortId}.`,
           dateLabel,
+          sortAt,
           priority: "normal" as const,
           unread: isUnread(id, true),
         };
@@ -174,6 +196,7 @@ export function buildRedemptionNotifications(
           title: "Payout completed",
           body: `Your ${request.optionLabel} redemption of ${amount} has been completed. Reference ${shortId}.`,
           dateLabel,
+          sortAt,
           priority: "high" as const,
           unread: isUnread(id, true),
         };
@@ -185,6 +208,7 @@ export function buildRedemptionNotifications(
           title: "Payout request declined",
           body: `Your ${request.optionLabel} redemption request (${shortId}) was not approved. Points remain in your balance.`,
           dateLabel,
+          sortAt,
           priority: "high" as const,
           unread: isUnread(id, true),
         };
@@ -192,8 +216,7 @@ export function buildRedemptionNotifications(
 
       return null;
     })
-    .filter((notification): notification is DashboardNotification => notification !== null)
-    .sort((a, b) => b.dateLabel.localeCompare(a.dateLabel));
+    .filter((notification): notification is DashboardNotification => notification !== null);
 }
 
 export function buildDashboardNotifications(
@@ -220,10 +243,13 @@ export function buildDashboardNotifications(
       title: "Registration submitted",
       body: "Thank you for joining the Belize Research Panel. Your profile is now on file while our team completes verification.",
       dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
       priority: "high",
       unread: isUnread("welcome", true),
     });
   }
+
+  const registrationSortAt = parseNotificationSortAt(profile.registrationDate);
 
   notifications.push({
     id: "verification",
@@ -232,6 +258,7 @@ export function buildDashboardNotifications(
       ? "Your panelist account has been verified. You are eligible for matched survey invitations."
       : `Your registration is under review. Current status: ${profile.verificationStatus}. We will contact you when verification is complete.`,
     dateLabel: profile.registrationDate,
+    sortAt: registrationSortAt,
     priority: verified ? "normal" : "high",
     unread: isUnread("verification", !verified),
   });
@@ -241,6 +268,7 @@ export function buildDashboardNotifications(
     title: "Survey invitations",
     body: "Matched survey invitations will appear here when studies are available for your profile and interests.",
     dateLabel: "Coming soon",
+    sortAt: parseNotificationSortAt("Coming soon"),
     priority: "normal",
     unread: isUnread("surveys", false),
   });
@@ -252,6 +280,7 @@ export function buildDashboardNotifications(
       ? "Points for registration, verification, and completed surveys are tracked on your Rewards page. Redeem when you reach 500 points (BZ$20)."
       : "Registration points are tracked below. Verification and survey rewards apply once your account is verified.",
     dateLabel: profile.registrationDate,
+    sortAt: registrationSortAt,
     priority: "normal",
     unread: isUnread("rewards", false),
   });
@@ -259,7 +288,7 @@ export function buildDashboardNotifications(
   const redemptionNotifications = buildRedemptionNotifications(options.redemptionRequests ?? [], readState);
   notifications.push(...redemptionNotifications);
 
-  return notifications;
+  return sortNotificationsNewestFirst(notifications);
 }
 
 export function countUnreadNotifications(notifications: DashboardNotification[]): number {

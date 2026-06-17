@@ -3,12 +3,58 @@ export const ADMIN_DASHBOARD_LINKS = {
   panelists: "/admin/panelists",
   verified: "/admin/panelists?verification=Verified",
   underReview: "/admin/under-review",
+  underReviewIncomplete: "/admin/under-review?queue=incomplete",
+  underReviewFlagged: "/admin/under-review?queue=flagged",
+  underReviewOnHold: "/admin/under-review?queue=on_hold",
   payouts: "/admin/payouts",
   phoneReview: "/admin/under-review?requirement=phone",
   addressReview: "/admin/under-review?requirement=address",
   identityReview: "/admin/under-review?requirement=id",
   phoneChanges: "/admin/notifications?type=phone",
 } as const;
+
+export type UnderReviewQueueFilter = "incomplete" | "flagged" | "on_hold";
+
+export function parseUnderReviewQueueFilter(value: string | undefined): UnderReviewQueueFilter | null {
+  const normalized = (value ?? "").trim().toLowerCase();
+  if (normalized === "incomplete" || normalized === "requirements") return "incomplete";
+  if (normalized === "flagged" || normalized === "duplicate") return "flagged";
+  if (normalized === "on_hold" || normalized === "hold" || normalized === "onhold") return "on_hold";
+  return null;
+}
+
+export function filterUnderReviewRowsByQueue<
+  T extends {
+    emailRequirement: string;
+    phoneRequirement: string;
+    photoIdRequirement: string;
+    verificationStatus: string;
+    accountStatus: string;
+  },
+>(rows: T[], queue: UnderReviewQueueFilter | null): T[] {
+  if (!queue) return rows;
+
+  if (queue === "incomplete") {
+    return rows.filter(
+      (row) =>
+        row.emailRequirement !== "approved" ||
+        row.phoneRequirement !== "approved" ||
+        row.photoIdRequirement !== "approved"
+    );
+  }
+
+  if (queue === "flagged") {
+    return rows.filter((row) => row.verificationStatus === "Possible Duplicate");
+  }
+
+  return rows.filter((row) => row.accountStatus === "on_hold");
+}
+
+export const UNDER_REVIEW_QUEUE_LABELS: Record<UnderReviewQueueFilter, string> = {
+  incomplete: "Requirements incomplete",
+  flagged: "Flagged panelists",
+  on_hold: "Accounts on hold",
+};
 
 export type UnderReviewRequirementFilter = "email" | "phone" | "id" | "address";
 
