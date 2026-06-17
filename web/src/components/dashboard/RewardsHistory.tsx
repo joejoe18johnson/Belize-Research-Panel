@@ -102,8 +102,14 @@ function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layou
   );
 }
 
-export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) {
-  const [filter, setFilter] = useState<HistoryFilter>("all");
+export function RewardsHistory({
+  entries,
+  variant = "all",
+}: {
+  entries: RewardsHistoryEntry[];
+  variant?: "all" | "earnings";
+}) {
+  const [filter, setFilter] = useState<HistoryFilter>(variant === "earnings" ? "earned" : "all");
   const [layout, setLayout] = useViewLayout("dashboard-rewards-history");
 
   const earnedCount = entries.filter((entry) => entry.kind === "earned").length;
@@ -119,13 +125,16 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
     <DashboardCard>
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-100 pb-3">
         <div>
-          <SectionHeading as="h3">Rewards history</SectionHeading>
+          <SectionHeading as="h3">{variant === "earnings" ? "Earnings history" : "Rewards history"}</SectionHeading>
           <p className="mt-1 text-sm text-zinc-500">
-            Points earned and withdrawal requests on your account.
+            {variant === "earnings"
+              ? "Points earned from registration, verification, and surveys."
+              : "Points earned and withdrawal requests on your account."}
           </p>
         </div>
         <div className="flex flex-col items-stretch gap-3 sm:items-end">
           <ViewLayoutToggle value={layout} onChange={setLayout} />
+          {variant === "all" ? (
           <div className="flex flex-wrap gap-2">
           {(
             [
@@ -148,6 +157,7 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
             </button>
           ))}
           </div>
+          ) : null}
         </div>
       </div>
 
@@ -161,7 +171,9 @@ export function RewardsHistory({ entries }: { entries: RewardsHistoryEntry[] }) 
           <p className="mt-1 text-sm text-zinc-500">
             {filter === "withdrawals"
               ? "When you redeem points, your withdrawal requests will appear here with live status updates."
-              : "Complete registration, verification, and surveys to earn points."}
+              : variant === "earnings"
+                ? "Complete registration, verification, and surveys to earn points."
+                : "Complete registration, verification, and surveys to earn points."}
           </p>
         </div>
       ) : (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DashboardRewardsSection } from "@/components/dashboard/DashboardRewardsSection";
 import { DashboardPageHeader } from "@/components/dashboard/DashboardShell";
 import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
@@ -31,8 +32,16 @@ export default async function DashboardRewardsPage() {
     <>
       <DashboardPageHeader
         title="Rewards"
-        description="Track your points (500 pts = BZ$20), redeem rewards, and review your earnings and withdrawal history."
+        description="Track your points (500 pts = BZ$20), redeem rewards, and review your earnings history."
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
+        action={
+          <Link
+            href="/dashboard/payouts"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+          >
+            View payouts
+          </Link>
+        }
       />
       <DashboardRewardsSection
         rewards={rewards}

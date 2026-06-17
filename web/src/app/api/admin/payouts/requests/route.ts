@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/notifications");
     revalidatePath("/dashboard/rewards");
+    revalidatePath("/dashboard/payouts");
 
     return NextResponse.json({ ok: true, request: updated });
   } catch (error) {
