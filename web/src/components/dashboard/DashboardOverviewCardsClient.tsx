@@ -97,22 +97,18 @@ export function DashboardOverviewStats({
 
 export function DashboardOverviewQuickLinks() {
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-4 lg:grid lg:grid-cols-3 lg:gap-4 lg:overflow-visible lg:pb-0 xl:grid-cols-6">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
       {QUICK_LINKS.map((link) => {
         const Icon = link.icon;
         return (
-          <div
+          <QuickLinkCard
             key={link.href}
-            className="w-[10.75rem] shrink-0 snap-start sm:w-[11.5rem] lg:w-auto lg:shrink"
-          >
-            <QuickLinkCard
-              href={link.href}
-              label={link.label}
-              description={link.description}
-              icon={<Icon className="h-5 w-5" />}
-              layout="cards"
-            />
-          </div>
+            href={link.href}
+            label={link.label}
+            description={link.description}
+            icon={<Icon className="h-5 w-5" />}
+            variant="stacked"
+          />
         );
       })}
     </div>

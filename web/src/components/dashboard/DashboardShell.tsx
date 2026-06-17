@@ -306,18 +306,21 @@ export function QuickLinkCard({
   description,
   icon,
   layout = "cards",
+  variant = "horizontal",
 }: {
   href: string;
   label: string;
   description: string;
   icon: ReactNode;
   layout?: ViewLayout;
+  /** Stacked icon above text — better for overview quick-link grids. */
+  variant?: "horizontal" | "stacked";
 }) {
   if (layout === "list") {
     return (
       <Link
         href={href}
-        className="group flex items-center gap-3 rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition hover:border-teal-300 hover:bg-teal-50/50"
+        className="group flex h-full items-center gap-3 rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition hover:border-teal-300 hover:bg-teal-50/50"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
           {icon}
@@ -330,12 +333,29 @@ export function QuickLinkCard({
     );
   }
 
+  if (variant === "stacked") {
+    return (
+      <Link
+        href={href}
+        className="group flex h-full flex-col rounded-2xl border border-teal-100 bg-white p-4 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10 sm:p-5"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800">
+          {icon}
+        </span>
+        <div className="mt-3 min-w-0 flex-1">
+          <p className="text-sm font-semibold text-teal-800 group-hover:text-teal-950">{formatHeadingCase(label)}</p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600">{formatHeadingCase(description)}</p>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10"
+      className="group flex h-full rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex min-w-0 items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800">
           {icon}
         </span>
