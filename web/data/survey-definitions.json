@@ -512,5 +512,143 @@
     ],
     "createdAt": "2026-06-17T15:50:34.303Z",
     "updatedAt": "2026-06-17T15:51:29.419Z"
+  },
+  {
+    "id": "survey-student-course-feedback-mqibw5fr",
+    "title": "Student course feedback",
+    "description": "Collect student feedback on course content, instruction, and materials.",
+    "companyIntro": "",
+    "companyLogoFile": "",
+    "coverImageFile": "",
+    "category": "civic",
+    "status": "draft",
+    "questions": [
+      {
+        "id": "q-sps3qn10",
+        "type": "rating_scale",
+        "title": "Course content was relevant and well organized.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-ugqcck5a",
+        "type": "single_choice",
+        "title": "",
+        "description": "",
+        "required": false,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-zn9uc58f",
+        "type": "rating_scale",
+        "title": "The instructor explained concepts clearly.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-9ykp8dmr",
+        "type": "rating_scale",
+        "title": "Assignments and assessments were fair.",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-yisrhv19",
+        "type": "single_choice",
+        "title": "Course difficulty",
+        "description": "",
+        "required": true,
+        "options": [
+          "Too easy",
+          "About right",
+          "Too difficult"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-458f2qfe",
+        "type": "multiple_choice",
+        "title": "Which resources helped most? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Lectures",
+          "Readings",
+          "Videos",
+          "Group work",
+          "Practice exercises"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-iu3wanlu",
+        "type": "yes_no",
+        "title": "Would you recommend this course to other students?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "id": "q-rt2rkpj4",
+        "type": "long_text",
+        "title": "What should be improved in this course?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Option 1",
+          "Option 2"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      }
+    ],
+    "createdAt": "2026-06-17T17:11:57.831Z",
+    "updatedAt": "2026-06-17T17:11:57.831Z"
   }
 ]
