@@ -1,8 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
-import { createAndLaunchCampaign, type CampaignTargeting, type CreateCampaignInput } from "@/lib/campaigns";
-import type { CampaignTargeting as CampaignTargetingType } from "@/lib/campaign-targeting";
+import { createAndLaunchCampaign } from "@/lib/campaigns";
+import type { CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { loadPanelists } from "@/lib/panelists";
 import { cleanText } from "@/lib/validation";
