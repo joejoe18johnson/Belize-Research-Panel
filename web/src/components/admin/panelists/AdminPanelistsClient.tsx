@@ -15,8 +15,10 @@ import type { PanelistRow } from "@/lib/panelists";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
 import { FilterMultiSelect } from "@/components/admin/shared/AdminUi";
+import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert, BrandedConfirmDialog, BrandedModal } from "@/components/shared/BrandedFeedback";
+import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
 
 const DUPLICATE_REVIEW_COLUMNS = [
   "first_name",
@@ -68,9 +70,14 @@ type RowActions = {
 
 export function AdminPanelistsClient({
   rows,
+  requirementByEmail,
   filterOptions,
 }: {
   rows: PanelistRow[];
+  requirementByEmail: Record<
+    string,
+    { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
+  >;
   filterOptions: {
     verification: string[];
     district: string[];
@@ -378,6 +385,7 @@ export function AdminPanelistsClient({
                   columns={DUPLICATE_REVIEW_COLUMNS}
                   highlightDuplicates
                   actions={rowActions}
+                  requirementByEmail={requirementByEmail}
                 />
               </div>
               <TablePagination
@@ -425,6 +433,7 @@ export function AdminPanelistsClient({
               columns={TABLE_COLUMNS}
               highlightDuplicates
               actions={rowActions}
+              requirementByEmail={requirementByEmail}
             />
           </div>
           <TablePagination
@@ -448,6 +457,14 @@ export function AdminPanelistsClient({
           saving={saving}
           error={error}
           message={message}
+          requirements={
+            requirementByEmail[cleanText(editingEmail).toLowerCase()] ?? {
+              email: "missing",
+              phone: "missing",
+              photoId: "missing",
+            }
+          }
+          photoIdType={cleanText(rows.find((row) => row.email === editingEmail)?.photo_id_type)}
           onChange={setEditState}
           onClose={closeEdit}
           onSave={saveRecord}
@@ -478,6 +495,8 @@ function PanelistEditModal({
   saving,
   error,
   message,
+  requirements,
+  photoIdType,
   onChange,
   onClose,
   onSave,
@@ -490,6 +509,12 @@ function PanelistEditModal({
   saving: boolean;
   error: string;
   message: string;
+  requirements: {
+    email: RequirementApprovalStatus;
+    phone: RequirementApprovalStatus;
+    photoId: RequirementApprovalStatus;
+  };
+  photoIdType: string;
   onChange: (state: EditState) => void;
   onClose: () => void;
   onSave: () => void;
@@ -531,6 +556,24 @@ function PanelistEditModal({
       }
     >
       <div className="space-y-6">
+        <div className="rounded-xl border border-teal-100 bg-teal-50/40 p-4">
+          <p className="text-sm font-semibold text-teal-950">{formatHeadingCase("Required checks")}</p>
+          <p className="mt-1 text-xs text-teal-900/80">
+            Panelists stay under review until email, phone, and photo ID are on file and verification is approved.
+          </p>
+          <div className="mt-3">
+            <RequirementStatusGroup
+              email={requirements.email}
+              phone={requirements.phone}
+              photoId={requirements.photoId}
+            />
+          </div>
+          {photoIdType ? (
+            <p className="mt-2 text-xs text-zinc-600">
+              ID type on file: <span className="font-medium text-zinc-800">{photoIdType}</span>
+            </p>
+          ) : null}
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <FieldSelect
             label="Verification status"
@@ -668,11 +711,16 @@ function DataTable({
   columns,
   highlightDuplicates = false,
   actions,
+  requirementByEmail,
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
   highlightDuplicates?: boolean;
   actions?: RowActions;
+  requirementByEmail: Record<
+    string,
+    { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
+  >;
 }) {
   return (
     <table className="min-w-full text-left text-xs sm:text-sm">
@@ -686,12 +734,13 @@ function DataTable({
               {column.replace(/_/g, " ")}
             </th>
           ))}
+          <th className="whitespace-nowrap px-3 py-2 font-semibold">Email · phone · ID</th>
         </tr>
       </thead>
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length + (actions ? 1 : 0)} className="px-4 py-8 text-center text-zinc-500">
+            <td colSpan={columns.length + (actions ? 2 : 1)} className="px-4 py-8 text-center text-zinc-500">
               No records on this page.
             </td>
           </tr>
@@ -699,6 +748,7 @@ function DataTable({
           rows.map((row, index) => {
             const flagged = highlightDuplicates && "duplicate_name_dob_flag" in row && row.duplicate_name_dob_flag;
             const alreadyFlagged = cleanText(row.verification_status) === "Possible Duplicate";
+            const requirements = requirementByEmail[cleanText(row.email).toLowerCase()];
             return (
               <tr
                 key={`${row.email}-${index}`}
@@ -714,6 +764,18 @@ function DataTable({
                     {row[column] ?? ""}
                   </td>
                 ))}
+                <td className="min-w-[10rem] px-3 py-2">
+                  {requirements ? (
+                    <RequirementStatusGroup
+                      email={requirements.email}
+                      phone={requirements.phone}
+                      photoId={requirements.photoId}
+                      compact
+                    />
+                  ) : (
+                    "—"
+                  )}
+                </td>
               </tr>
             );
           })

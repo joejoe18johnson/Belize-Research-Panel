@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/lib/admin-panelist-actions";
 import { isAdminSessionActive } from "@/lib/admin-auth";
-import { updatePanelistAdminFields } from "@/lib/panelists";
+import { findAccountByEmail } from "@/lib/accounts";
+import { canApprovePanelistVerification } from "@/lib/panelist-requirements";
+import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
+import { findPanelistByEmail, updatePanelistAdminFields } from "@/lib/panelists";
 import { cleanText, validEmail } from "@/lib/validation";
 
 export async function PATCH(
@@ -37,6 +40,31 @@ export async function PATCH(
   }
   if (errors.length > 0) {
     return NextResponse.json({ ok: false, message: errors.join(" ") }, { status: 400 });
+  }
+
+  if (cleanText(body.verification_status) === "Verified") {
+    const panelist = await findPanelistByEmail(accountEmail);
+    if (!panelist) {
+      return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+    }
+
+    const merged = {
+      ...panelist,
+      ...(body.email ? { email: cleanText(body.email).toLowerCase() } : {}),
+      ...(body.phone_whatsapp !== undefined ? { phone_whatsapp: body.phone_whatsapp } : {}),
+    };
+
+    const lookupEmail = cleanText(merged.email).toLowerCase();
+    const account = lookupEmail ? await findAccountByEmail(lookupEmail) : null;
+    const photoUploadUsernames = await loadPanelistPhotoUploadUsernames();
+    const accountsByEmail = account
+      ? new Map([[lookupEmail, account]])
+      : new Map<string, NonNullable<Awaited<ReturnType<typeof findAccountByEmail>>>>();
+    const context = requirementContextForPanelist(merged, accountsByEmail, photoUploadUsernames);
+    const approval = canApprovePanelistVerification(merged, context);
+    if (!approval.ok) {
+      return NextResponse.json({ ok: false, message: approval.message }, { status: 400 });
+    }
   }
 
   const updated = await updatePanelistAdminFields(accountEmail, {
