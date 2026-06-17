@@ -1,14 +1,27 @@
 import { NextResponse } from "next/server";
-import { setAdminSessionCookie, verifyAdminPassword } from "@/lib/admin-auth";
+import {
+  authenticateStaffLogin,
+  setAdminSessionCookie,
+  staffDefaultAdminPath,
+} from "@/lib/admin-auth";
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { password?: string };
+  const body = (await request.json()) as { email?: string; password?: string };
+  const email = body.email?.trim() ?? "";
   const password = body.password?.trim() ?? "";
 
-  if (!password || !verifyAdminPassword(password)) {
-    return NextResponse.json({ ok: false, message: "Invalid admin password." }, { status: 401 });
+  const session = await authenticateStaffLogin(email || undefined, password);
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, message: "Invalid email or password." },
+      { status: 401 }
+    );
   }
 
-  await setAdminSessionCookie();
-  return NextResponse.json({ ok: true });
+  await setAdminSessionCookie(session);
+  return NextResponse.json({
+    ok: true,
+    role: session.role,
+    redirectTo: staffDefaultAdminPath(session.role),
+  });
 }
