@@ -3,6 +3,7 @@
 import type { SurveyAnswerValue, SurveyQuestion, SurveyQuestionType } from "@/lib/survey-types";
 import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 
 export function SurveyQuestionField({
   question,
@@ -76,19 +77,17 @@ export function SurveyQuestionField({
 
   if (question.type === "dropdown") {
     return (
-      <select
+      <SiteSelect
         value={typeof value === "string" ? value : ""}
+        onChange={(next) => onChange(next)}
+        placeholder="Select an option"
         disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm"
-      >
-        <option value="">Select an option</option>
-        {question.options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        options={[
+          { value: "", label: "Select an option" },
+          ...mapStringOptions(question.options),
+        ]}
+        className="mt-2"
+      />
     );
   }
 

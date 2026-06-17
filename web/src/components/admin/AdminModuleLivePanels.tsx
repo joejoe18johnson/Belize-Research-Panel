@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FraudPreventionStats } from "@/lib/admin-panel-stats";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) {
   const router = useRouter();
@@ -48,7 +48,7 @@ export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) 
         <ul className="mt-2 space-y-1 text-sm text-zinc-700">
           {stats.verificationSummary.map((row) => (
             <li key={row.status} className="flex justify-between gap-4">
-              <span>{row.status}</span>
+              <span>{formatAdminLabel(row.status)}</span>
               <span className="font-semibold">{row.count}</span>
             </li>
           ))}

@@ -71,6 +71,25 @@
   ],
   "johannesjohnsonj@gmail.com": [
     {
+      "id": "fcd5a4ae-47c3-4553-9eae-c0b4a1d6a645",
+      "email": "johannesjohnsonj@gmail.com",
+      "optionId": "bank_transfer",
+      "optionLabel": "Bank/ Cash payout",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 bank/ cash payout",
+      "status": "approved",
+      "details": {
+        "bankName": "belize_bank",
+        "accountNumber": "2110002939",
+        "accountHolderName": "Johannes Johnson"
+      },
+      "notes": "Please Deposit into savings",
+      "submittedAt": "2026-06-17T16:00:03.934Z",
+      "updatedAt": "2026-06-17T16:01:04.910Z",
+      "processedBy": "super.admin@belizepanel.test"
+    },
+    {
       "id": "2226b8b5-74cd-4f42-a1fb-b4eac8bb4f3c",
       "email": "johannesjohnsonj@gmail.com",
       "optionId": "bank_transfer",

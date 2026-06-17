@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { FilterMultiSelect, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import {
   CAMPAIGN_TARGET_OPTIONS,
   countCampaignAudience,
@@ -149,7 +150,7 @@ export function AdminCreateCampaignClient({
           <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Campaign details")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Campaign title</label>
+              <label className="text-xs font-semibold text-zinc-600">Campaign title</label>
               <input
                 type="text"
                 required
@@ -160,7 +161,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Description (optional)</label>
+              <label className="text-xs font-semibold text-zinc-600">Description (optional)</label>
               <textarea
                 rows={2}
                 value={description}
@@ -169,21 +170,19 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Category</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Category</label>
+              <SiteSelect
                 value={category}
-                onChange={(event) => setCategory(event.target.value as SurveyCategory)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-              >
-                {CATEGORIES.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setCategory(value as SurveyCategory)}
+                options={CATEGORIES.map((item) => ({
+                  value: item,
+                  label: formatHeadingCase(item),
+                }))}
+                className="mt-1.5"
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Reward points</label>
+              <label className="text-xs font-semibold text-zinc-600">Reward points</label>
               <input
                 type="number"
                 min={0}
@@ -194,7 +193,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey delivery</label>
+              <label className="text-xs font-semibold text-zinc-600">Survey delivery</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -222,20 +221,20 @@ export function AdminCreateCampaignClient({
             </div>
             {deliveryType === "internal" ? (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Published survey</label>
-                <select
-                  required
+                <label className="text-xs font-semibold text-zinc-600">Published survey</label>
+                <SiteSelect
                   value={surveyDefinitionId}
-                  onChange={(event) => setSurveyDefinitionId(event.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-                >
-                  <option value="">Select a published survey</option>
-                  {publishedSurveys.map((survey) => (
-                    <option key={survey.id} value={survey.id}>
-                      {survey.title} ({survey.questions.length} questions)
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSurveyDefinitionId}
+                  placeholder="Select a published survey"
+                  options={[
+                    { value: "", label: "Select a published survey" },
+                    ...publishedSurveys.map((survey) => ({
+                      value: survey.id,
+                      label: `${survey.title} (${survey.questions.length} questions)`,
+                    })),
+                  ]}
+                  className="mt-1.5"
+                />
                 {publishedSurveys.length === 0 ? (
                   <p className="mt-2 text-sm text-amber-700">
                     No published surveys yet.{" "}
@@ -248,7 +247,7 @@ export function AdminCreateCampaignClient({
               </div>
             ) : (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey URL</label>
+                <label className="text-xs font-semibold text-zinc-600">Survey URL</label>
                 <input
                   type="url"
                   required
@@ -260,7 +259,7 @@ export function AdminCreateCampaignClient({
               </div>
             )}
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Assigned date</label>
+              <label className="text-xs font-semibold text-zinc-600">Assigned date</label>
               <input
                 type="date"
                 required
@@ -270,7 +269,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Complete by date</label>
+              <label className="text-xs font-semibold text-zinc-600">Complete by date</label>
               <input
                 type="date"
                 required
@@ -280,18 +279,13 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Delivery method</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Delivery method</label>
+              <SiteSelect
                 value={deliveryMethod}
-                onChange={(event) => setDeliveryMethod(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-              >
-                {DELIVERY_METHODS.map((method) => (
-                  <option key={method} value={method}>
-                    {method}
-                  </option>
-                ))}
-              </select>
+                onChange={setDeliveryMethod}
+                options={mapStringOptions(DELIVERY_METHODS)}
+                className="mt-1.5"
+              />
             </div>
           </div>
         </section>
@@ -299,35 +293,31 @@ export function AdminCreateCampaignClient({
         <section className="space-y-4 border-t border-zinc-100 pt-6">
           <h2 className="text-base font-semibold text-teal-950">{formatHeadingCase("Target audience")}</h2>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Target group</label>
-            <select
+            <label className="text-xs font-semibold text-zinc-600">Target group</label>
+            <SiteSelect
               value={targetMode}
-              onChange={(event) => setTargetMode(event.target.value as CampaignTargetMode)}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-            >
-              {CAMPAIGN_TARGET_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setTargetMode(value as CampaignTargetMode)}
+              options={CAMPAIGN_TARGET_OPTIONS.map((option) => ({
+                value: option.id,
+                label: option.label,
+              }))}
+              className="mt-1.5"
+            />
           </div>
 
           {targetMode === "specific_constituency" ? (
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Constituency</label>
-              <select
+              <label className="text-xs font-semibold text-zinc-600">Constituency</label>
+              <SiteSelect
                 value={constituency}
-                onChange={(event) => setConstituency(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm"
-              >
-                <option value="">Select constituency</option>
-                {constituencyOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                onChange={setConstituency}
+                placeholder="Select constituency"
+                options={[
+                  { value: "", label: "Select constituency" },
+                  ...mapStringOptions(constituencyOptions.filter(Boolean)),
+                ]}
+                className="mt-1.5"
+              />
             </div>
           ) : null}
 
@@ -346,7 +336,7 @@ export function AdminCreateCampaignClient({
 
           {targetMode === "specific_emails" ? (
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Panelist emails</label>
+              <label className="text-xs font-semibold text-zinc-600">Panelist emails</label>
               <textarea
                 rows={4}
                 value={emails}

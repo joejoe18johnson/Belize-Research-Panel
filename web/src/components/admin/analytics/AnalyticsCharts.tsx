@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { AnalyticsCountRow } from "@/lib/admin-analytics";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 const AGE_GROUP_ORDER = ["18–24", "25–34", "35–44", "45–54", "55–64", "65+", "Unknown"];
 
@@ -39,7 +39,7 @@ export function HorizontalBarChart({
             <li key={row.label}>
               <div className="mb-1 flex items-center justify-between gap-2 text-xs">
                 <span className="min-w-0 truncate font-medium text-zinc-800" title={row.label}>
-                  {row.label}
+                  {formatAdminLabel(row.label)}
                 </span>
                 <span className="shrink-0 tabular-nums text-zinc-600">
                   {row.count} <span className="text-zinc-400">({row.percent}%)</span>
@@ -106,7 +106,7 @@ export function DonutBreakdown({
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: colors[index % colors.length] }}
                 />
-                <span className="truncate">{row.label}</span>
+                <span className="truncate">{formatAdminLabel(row.label)}</span>
               </span>
               <span className="shrink-0 tabular-nums text-zinc-600">{row.percent}%</span>
             </li>
@@ -174,10 +174,10 @@ export function SortableAnalyticsTable({
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+            <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
               <th className="px-4 py-3">
                 <button type="button" onClick={() => toggleSort("label")} className="font-semibold hover:text-teal-800">
-                  {labelHeader}
+                  {formatAdminLabel(labelHeader)}
                   {sortIndicator("label")}
                 </button>
               </th>
@@ -206,7 +206,7 @@ export function SortableAnalyticsTable({
               sorted.map((row) => (
                 <tr key={row.label} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
                   <td className="max-w-[16rem] truncate px-4 py-2.5 font-medium text-zinc-800" title={row.label}>
-                    {row.label}
+                    {formatAdminLabel(row.label)}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-zinc-700">{row.count}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600">{row.percent}%</td>

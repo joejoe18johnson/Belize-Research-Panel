@@ -1,5 +1,6 @@
 import { type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { SiteSelectField } from "@/components/shared/SiteSelect";
 import { siteCheckboxClass, siteRadioClass } from "@/lib/site-controls";
 import type { FeedbackTone } from "@/lib/site-alerts";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -86,30 +87,24 @@ export function SelectInput({
   error,
   className = "",
   children,
+  value,
+  onChange,
   ...props
-}: SelectHTMLAttributes<HTMLSelectElement> & { error?: string }) {
+}: SelectHTMLAttributes<HTMLSelectElement> & {
+  error?: string;
+  value: string;
+  onChange: (event: { target: { value: string } }) => void;
+}) {
   return (
-    <div className="relative">
-      <select
-        className={`${choiceBoxClass} ${error ? errorInputClass : ""} ${className}`}
-        aria-invalid={error ? "true" : undefined}
-        {...props}
-      >
-        {children}
-      </select>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
-      >
-        <path
-          fillRule="evenodd"
-          d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
+    <SiteSelectField
+      {...props}
+      value={value}
+      onChange={(next) => onChange({ target: { value: next } })}
+      className={className}
+      error={error}
+    >
+      {children}
+    </SiteSelectField>
   );
 }
 

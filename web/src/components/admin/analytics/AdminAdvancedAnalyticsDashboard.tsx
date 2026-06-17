@@ -15,7 +15,7 @@ import {
   type AnalyticsFilters,
   type AnalyticsPanelistSlice,
 } from "@/lib/admin-analytics";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 import { siteCheckboxClass } from "@/lib/site-controls";
 
 type AnalyticsTab = "overview" | "geography" | "demographics" | "interests";
@@ -23,7 +23,7 @@ type AnalyticsTab = "overview" | "geography" | "demographics" | "interests";
 function MetricCard({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
     <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+      <p className="text-xs font-medium text-zinc-600">{formatAdminLabel(label)}</p>
       <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950">{value}</p>
       {hint ? <p className="mt-1 text-xs text-zinc-500">{hint}</p> : null}
     </div>
@@ -61,7 +61,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
       <div className="border-l-4 border-teal-600 pl-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Panel intelligence</p>
+        <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel intelligence</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 sm:text-3xl">
           {formatHeadingCase("Advanced analytics")}
         </h1>

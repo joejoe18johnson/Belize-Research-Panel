@@ -68,5 +68,27 @@
     "startedAt": "2026-06-17T15:32:10.467Z",
     "updatedAt": "2026-06-17T15:32:10.467Z",
     "submittedAt": "2026-06-17T15:32:10.467Z"
+  },
+  {
+    "assignmentId": "campaign-vocational-training-mqi959ur",
+    "surveyDefinitionId": "survey-vo-tech-training-program-interest-mqi8zha7",
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "answers": {
+      "q-ar5zb5f0": "Yes",
+      "q-g5bv0fep": "Online live session",
+      "q-5zw9li8i": [
+        "Digital skills"
+      ],
+      "q-sl0y2l8o": 4,
+      "q-0ybwk9bb": "Half day",
+      "q-dkqpb9xx": 4,
+      "q-voocslg5": "1–3 months",
+      "q-sxuo5wmo": "Under BZ$50",
+      "q-j6yo89gr": "Yes",
+      "q-j4w7jcqi": "yes, I would love the opportunity to be a welder"
+    },
+    "startedAt": "2026-06-17T15:58:54.539Z",
+    "updatedAt": "2026-06-17T15:58:54.539Z",
+    "submittedAt": "2026-06-17T15:58:54.539Z"
   }
 ]

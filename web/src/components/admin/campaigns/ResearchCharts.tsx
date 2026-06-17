@@ -2,7 +2,7 @@
 
 import type { AnalyticsCountRow } from "@/lib/admin-analytics";
 import type { CompletionByDay, RatingHistogramBin } from "@/lib/campaign-results-analytics";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 export function CompletionTimelineChart({
   rows,
@@ -67,7 +67,7 @@ export function RatingHistogramChart({
 
   return (
     <div className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-4">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{formatHeadingCase(title)}</h4>
+      <h4 className="text-xs font-semibold text-zinc-600">{formatHeadingCase(title)}</h4>
       <div className="mt-4 flex h-36 items-end gap-2">
         {bins.map((bin) => {
           const height = maxCount > 0 ? Math.max(6, (bin.count / maxCount) * 100) : 6;
@@ -113,7 +113,7 @@ export function FunnelChart({
             <li key={step.label}>
               <div className="mb-1 flex items-center justify-between gap-2 text-xs">
                 <span className="font-medium text-zinc-800">
-                  {index + 1}. {step.label}
+                  {index + 1}. {formatAdminLabel(step.label)}
                 </span>
                 <span className="tabular-nums text-zinc-600">
                   {step.count} <span className="text-zinc-400">({step.percent}%)</span>
@@ -144,12 +144,12 @@ export function FrequencyTable({
   return (
     <div className="overflow-x-auto rounded-xl border border-zinc-100">
       <div className="border-b border-zinc-100 bg-zinc-50/80 px-4 py-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{formatHeadingCase(title)}</p>
+        <p className="text-xs font-semibold text-zinc-600">{formatHeadingCase(title)}</p>
         {denominatorLabel ? <p className="text-[11px] text-zinc-500">{denominatorLabel}</p> : null}
       </div>
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 text-xs uppercase tracking-wide text-zinc-500">
+          <tr className="border-b border-zinc-100 text-xs font-semibold text-zinc-600">
             <th className="px-4 py-2">Response</th>
             <th className="px-4 py-2 text-right">n</th>
             <th className="px-4 py-2 text-right">%</th>
@@ -165,7 +165,7 @@ export function FrequencyTable({
           ) : (
             rows.map((row) => (
               <tr key={row.label} className="border-b border-zinc-50 last:border-0">
-                <td className="px-4 py-2 font-medium text-zinc-800">{row.label}</td>
+                <td className="px-4 py-2 font-medium text-zinc-800">{formatAdminLabel(row.label)}</td>
                 <td className="px-4 py-2 text-right tabular-nums">{row.count}</td>
                 <td className="px-4 py-2 text-right tabular-nums text-zinc-600">{row.percent}%</td>
               </tr>
@@ -195,7 +195,7 @@ export function StatGrid({
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => (
         <div key={stat.label} className="rounded-xl border border-zinc-100 bg-white px-4 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">{stat.label}</p>
+          <p className="text-[11px] font-semibold text-zinc-600">{formatAdminLabel(stat.label)}</p>
           <p className="mt-1 text-xl font-bold tabular-nums text-teal-950">{stat.value}</p>
           {stat.hint ? <p className="mt-0.5 text-xs text-zinc-500">{stat.hint}</p> : null}
         </div>

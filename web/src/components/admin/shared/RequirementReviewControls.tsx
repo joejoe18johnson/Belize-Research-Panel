@@ -69,7 +69,7 @@ function RequirementOnFileDetail({
   if (itemKey === "email") {
     return (
       <div className="mt-2 rounded-lg border border-zinc-100 bg-zinc-50 px-2.5 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">On file</p>
+        <p className="text-[10px] font-semibold text-zinc-600">On file</p>
         <p className="mt-0.5 break-all text-sm font-medium text-zinc-800">{detail.email}</p>
         <Link
           href={`mailto:${detail.email}`}
@@ -84,7 +84,7 @@ function RequirementOnFileDetail({
   if (itemKey === "phone") {
     return (
       <div className="mt-2 rounded-lg border border-zinc-100 bg-zinc-50 px-2.5 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">On file</p>
+        <p className="text-[10px] font-semibold text-zinc-600">On file</p>
         <p className="mt-0.5 text-sm font-medium tabular-nums text-zinc-800">{detail.phone}</p>
         <a
           href={`tel:${detail.phone.replace(/\D/g, "")}`}
@@ -100,7 +100,7 @@ function RequirementOnFileDetail({
     <div className="mt-2 space-y-2">
       {detail.photoIdType ? (
         <div className="rounded-lg border border-zinc-100 bg-zinc-50 px-2.5 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">ID type</p>
+          <p className="text-[10px] font-semibold text-zinc-600">ID type</p>
           <p className="mt-0.5 text-sm font-medium text-zinc-800">{detail.photoIdType}</p>
         </div>
       ) : null}

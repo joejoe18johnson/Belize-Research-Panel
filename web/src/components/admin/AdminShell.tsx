@@ -68,7 +68,7 @@ export function AdminShell({
           <div className="h-1 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400 lg:hidden" aria-hidden />
           <div className="border-b border-white/10 px-4 py-4">
             <BrpLogoLink href="/admin/dashboard" variant="dark" className="block" />
-            <p className="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-teal-200/90">
+            <p className="mt-2 text-xs font-medium tracking-[0.14em] text-teal-200/90">
               {formatHeadingCase("Admin console")}
             </p>
             <p className="mt-2 rounded-lg bg-white/10 px-2.5 py-2 text-xs text-teal-50">
@@ -86,8 +86,8 @@ export function AdminShell({
 
                 return (
                   <div key={section.id}>
-                    <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-teal-300/80">
-                      {section.label}
+                    <p className="px-3 pb-1.5 text-[10px] font-bold tracking-[0.16em] text-teal-300/80">
+                      {formatHeadingCase(section.label)}
                     </p>
                     <ul className="space-y-0.5">
                       {modules.map((module) => {
@@ -144,7 +144,7 @@ export function AdminShell({
 
         <div className="min-w-0 flex-1">
           <header className="border-b border-teal-100 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">
+            <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">
               Belize Research Panel
             </p>
             <p className="mt-1 text-sm text-zinc-600">

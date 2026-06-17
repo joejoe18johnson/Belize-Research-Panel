@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminDataModuleDashboard } from "@/components/admin/AdminDataModuleDashboard";
+import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import type { DistributionExportRow } from "@/lib/admin-module-snapshots";
 import type { AdminModuleSnapshot } from "@/lib/admin-snapshot-types";
 
@@ -93,33 +94,26 @@ export function AdminDistributionEngineDashboard({
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Distribution mode</label>
-            <select
+            <label className="text-xs font-semibold text-zinc-600">Distribution mode</label>
+            <SiteSelect
               value={mode}
-              onChange={(e) => setMode(e.target.value as (typeof MODES)[number])}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-            >
-              {MODES.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setMode(value as (typeof MODES)[number])}
+              options={mapStringOptions(MODES)}
+              className="mt-1.5"
+            />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Survey assignment</label>
-            <select
+            <label className="text-xs font-semibold text-zinc-600">Survey assignment</label>
+            <SiteSelect
               value={surveyFilter}
-              onChange={(e) => setSurveyFilter(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-            >
-              <option value="">All active assignments</option>
-              {surveyOptions.map((title) => (
-                <option key={title} value={title}>
-                  {title}
-                </option>
-              ))}
-            </select>
+              onChange={setSurveyFilter}
+              placeholder="All active assignments"
+              options={[
+                { value: "", label: "All active assignments" },
+                ...mapStringOptions(surveyOptions),
+              ]}
+              className="mt-1.5"
+            />
           </div>
           <div className="flex items-end">
             <button

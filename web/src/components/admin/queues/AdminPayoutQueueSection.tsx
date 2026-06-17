@@ -86,7 +86,7 @@ function PayoutProcessDialog({
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Payout request</p>
+            <p className="text-xs font-semibold text-teal-700">Payout request</p>
             <h3 className="mt-1 text-xl font-semibold text-zinc-900">{row.shortId}</h3>
             <p className="mt-1 text-sm text-zinc-500">Submitted {row.formattedDate}</p>
             {readOnly && row.formattedUpdatedDate ? (
@@ -113,7 +113,7 @@ function PayoutProcessDialog({
           </div>
 
           <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Payment details</p>
+            <p className="text-xs font-semibold text-zinc-600">Payment details</p>
             <p className="mt-1 font-medium text-zinc-900">{row.paymentTitle}</p>
             <dl className="mt-2 space-y-1.5">
               {(row.paymentFields.length > 0 ? row.paymentFields : row.paymentLines.map((line) => {
@@ -131,7 +131,7 @@ function PayoutProcessDialog({
 
           {row.panelistNotes ? (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Panelist notes</p>
+              <p className="text-xs font-semibold text-amber-800">Panelist notes</p>
               <p className="mt-1 text-sm text-amber-950">{row.panelistNotes}</p>
             </div>
           ) : null}
@@ -157,7 +157,7 @@ function PayoutProcessDialog({
               onClick={() => onProcess("start")}
               className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
             >
-              {busyAction === "start" ? "Starting…" : "Start processing"}
+              {busyAction === "start" ? "Completing request…" : "Complete Request"}
             </button>
           ) : null}
           {canComplete ? (

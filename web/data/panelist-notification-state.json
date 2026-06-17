@@ -22,31 +22,39 @@
     },
     "survey-invitation:campaign-johannes-test-campaign-mqhj5jx3": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-digital-banking": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-crime-neighbourhood": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-education-funding": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-belize-election-2026": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-cost-of-living": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
     },
     "survey-invitation:survey-public-transport": {
       "read": true,
-      "updatedAt": "2026-06-17T15:47:09.148Z"
+      "updatedAt": "2026-06-17T15:56:11.819Z"
+    },
+    "survey-invitation:campaign-vocational-training-mqi959ur": {
+      "read": true,
+      "updatedAt": "2026-06-17T15:56:11.819Z"
+    },
+    "redemption-fcd5a4ae-47c3-4553-9eae-c0b4a1d6a645": {
+      "read": false,
+      "updatedAt": "2026-06-17T16:01:04.922Z"
     }
   }
 }

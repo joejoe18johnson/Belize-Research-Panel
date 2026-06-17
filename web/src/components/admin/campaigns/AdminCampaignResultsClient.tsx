@@ -14,7 +14,7 @@ import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { CampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 type ResultsTab = "fieldwork" | "sample" | "questions" | "roster";
 
@@ -71,11 +71,11 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusBadgeClass(campaign.status)}`}>
-          {campaign.status}
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(campaign.status)}`}>
+          {formatAdminLabel(campaign.status)}
         </span>
-        <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold capitalize text-zinc-700">
-          {campaign.category}
+        <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-700">
+          {formatAdminLabel(campaign.category)}
         </span>
         <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800">
           {snapshot.isInternal ? "On-site survey" : "External link"}
@@ -197,7 +197,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
               <section key={question.questionId} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Q{index + 1}</p>
+                    <p className="text-xs font-semibold text-teal-700">Q{index + 1}</p>
                     <h3 className="mt-1 text-base font-semibold text-teal-950">{question.title}</h3>
                     <p className="mt-1 text-sm text-zinc-500">
                       {SURVEY_QUESTION_TYPE_LABELS[question.type]}
@@ -230,7 +230,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
 
                 {question.type === "short_text" || question.type === "long_text" ? (
                   <div className="mt-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Verbatim responses</p>
+                    <p className="text-xs font-semibold text-zinc-600">Verbatim responses</p>
                     {question.textSamples.length === 0 ? (
                       <p className="mt-2 text-sm text-zinc-500">No text responses yet.</p>
                     ) : (
@@ -273,7 +273,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
           <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs uppercase tracking-wide text-zinc-500">
+                <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600">
                   <th className="px-4 py-3">Panelist</th>
                   <th className="px-4 py-3">District</th>
                   <th className="px-4 py-3">Constituency</th>
@@ -300,7 +300,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
                       <td className="px-4 py-2.5">{row.constituency || "—"}</td>
                       <td className="px-4 py-2.5">
                         <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                             row.overdue
                               ? "bg-red-100 text-red-800"
                               : row.status === "completed"
@@ -310,7 +310,9 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
                                   : "bg-zinc-100 text-zinc-700"
                           }`}
                         >
-                          {row.overdue ? "overdue" : row.status === "available" ? "pending" : row.status.replace(/_/g, " ")}
+                          {formatAdminLabel(
+                            row.overdue ? "overdue" : row.status === "available" ? "pending" : row.status.replace(/_/g, " "),
+                          )}
                         </span>
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">{row.progressPercent}%</td>

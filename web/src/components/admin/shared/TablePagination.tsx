@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { SiteSelect } from "@/components/shared/SiteSelect";
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 30, 40] as const;
 export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
@@ -59,18 +60,16 @@ export function TablePagination({
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
       <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-600">
         <label className="flex items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-zinc-500">Rows per page</span>
-          <select
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value) as PageSizeOption)}
-            className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm"
-          >
-            {PAGE_SIZE_OPTIONS.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          <span className="text-xs font-medium text-zinc-600">Rows per page</span>
+          <SiteSelect
+            value={String(pageSize)}
+            onChange={(value) => onPageSizeChange(Number(value) as PageSizeOption)}
+            compact
+            options={PAGE_SIZE_OPTIONS.map((size) => ({
+              value: String(size),
+              label: String(size),
+            }))}
+          />
         </label>
         <span>{totalRows === 0 ? "No rows" : `${start}–${end} of ${totalRows}`}</span>
       </div>

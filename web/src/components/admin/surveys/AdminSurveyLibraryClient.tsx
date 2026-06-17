@@ -4,7 +4,7 @@ import Link from "next/link";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SurveyDefinition } from "@/lib/survey-types";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinition[] }) {
   return (
@@ -35,7 +35,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] uppercase tracking-wide text-zinc-500">
+              <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600">
                 <th className="px-4 py-3 font-semibold">Title</th>
                 <th className="px-4 py-3 font-semibold">Category</th>
                 <th className="px-4 py-3 font-semibold">Questions</th>
@@ -48,7 +48,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
               {surveys.map((survey) => (
                 <tr key={survey.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
                   <td className="px-4 py-3 font-medium text-zinc-900">{survey.title}</td>
-                  <td className="px-4 py-3 capitalize text-zinc-600">{survey.category}</td>
+                  <td className="px-4 py-3 text-zinc-600">{formatAdminLabel(survey.category)}</td>
                   <td className="px-4 py-3 text-zinc-600">{survey.questions.length}</td>
                   <td className="px-4 py-3">
                     <span
