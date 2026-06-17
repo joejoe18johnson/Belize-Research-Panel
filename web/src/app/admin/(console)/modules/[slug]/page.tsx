@@ -1,22 +1,19 @@
 import { notFound } from "next/navigation";
-import { AdminModulePlaceholder } from "@/components/admin/AdminModulePlaceholder";
-import { getAdminModule } from "@/lib/admin-modules";
+import { AdminModulePage } from "@/components/admin/AdminModulePage";
+import { getAdminModuleWithContent } from "@/lib/admin-modules";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const module = getAdminModule(slug);
+  const entry = getAdminModuleWithContent(slug);
   return {
-    title: module ? `${module.label} | Admin` : "Admin module",
+    title: entry ? `${entry.module.label} | Admin` : "Admin module",
   };
 }
 
-export default async function AdminModulePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function AdminModuleRoutePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const module = getAdminModule(slug);
+  const entry = getAdminModuleWithContent(slug);
+  if (!entry) notFound();
 
-  if (!module || module.kind !== "placeholder") {
-    notFound();
-  }
-
-  return <AdminModulePlaceholder module={module} />;
+  return <AdminModulePage module={entry.module} content={entry.content} />;
 }
