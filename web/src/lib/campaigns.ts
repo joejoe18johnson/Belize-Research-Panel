@@ -36,7 +36,12 @@ async function saveCampaignRecords(campaigns: CampaignRecord[]): Promise<void> {
 export async function createAndLaunchCampaign(
   input: CreateCampaignInput,
   panelists: PanelistRow[]
-): Promise<{ campaign: CampaignRecord; assignedCount: number; skippedCount: number }> {
+): Promise<{
+  campaign: CampaignRecord;
+  assignedCount: number;
+  skippedCount: number;
+  assignedPanelists: PanelistRow[];
+}> {
   const title = cleanText(input.title);
   if (!title) throw new Error("Campaign title is required.");
   if (!input.assignedDate || !input.completeByDate) throw new Error("Assigned and due dates are required.");
@@ -93,6 +98,7 @@ export async function createAndLaunchCampaign(
 
   let assignedCount = 0;
   let skippedCount = 0;
+  const assignedPanelists: PanelistRow[] = [];
   const nextAssignments = [...assignments];
 
   for (const panelist of audience) {
@@ -120,6 +126,7 @@ export async function createAndLaunchCampaign(
       panelistEmail: email,
     });
     existingKeys.add(key);
+    assignedPanelists.push(panelist);
     assignedCount += 1;
   }
 
@@ -131,7 +138,7 @@ export async function createAndLaunchCampaign(
   await saveCampaignRecords(campaigns);
   await saveSurveyRecordsToFile(nextAssignments);
 
-  return { campaign, assignedCount, skippedCount };
+  return { campaign, assignedCount, skippedCount, assignedPanelists };
 }
 
 export type {
