@@ -22,7 +22,7 @@ export type AdminPanelistPublicRow = PanelistRow & {
 
 export const FLAGGED_VERIFICATION_STATUS = "Possible Duplicate" as const;
 
-export function isFlaggedPanelist(row: Pick<PanelistRow, "verification_status">): boolean {
+export function isFlaggedPanelist(row: PanelistRow | AdminPanelistPublicRow): boolean {
   return cleanText(row.verification_status) === FLAGGED_VERIFICATION_STATUS;
 }
 
