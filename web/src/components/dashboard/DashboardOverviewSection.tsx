@@ -7,35 +7,20 @@ import type {
 } from "@/lib/panelist-dashboard";
 import type { PanelistSurvey } from "@/lib/panelist-surveys-types";
 import { isSurveyOverdue } from "@/lib/panelist-surveys-types";
+import { ChevronRightIcon, ClipboardIcon } from "./DashboardIcons";
 import {
-  BellIcon,
-  ChevronRightIcon,
-  ClipboardIcon,
-  ShieldCheckIcon,
-  StarIcon,
-  UserCircleIcon,
-} from "./DashboardIcons";
+  DashboardOverviewQuickLinks,
+  DashboardOverviewStats,
+} from "./DashboardOverviewCardsClient";
 import {
   DashboardAlert,
   DashboardCard,
-  QuickLinkCard,
   SectionHeading,
-  StatCard,
 } from "./DashboardShell";
-import { DASHBOARD_QUICK_SECTIONS } from "./dashboard-sections";
 import { UserAvatar } from "./UserAvatar";
 import { isAccountApproved, VerifiedCheckBadge, VerifiedStatusPill } from "./VerifiedCheckBadge";
 import { dashboardHeroCardClass } from "@/lib/brand";
 import { formatHeadingCase } from "@/lib/sentence-case";
-
-function verificationTone(status: string): "default" | "success" | "warning" {
-  const normalized = status.toLowerCase();
-  if (normalized === "verified") return "success";
-  if (normalized.includes("pending") || normalized.includes("duplicate")) return "warning";
-  return "default";
-}
-
-const QUICK_LINKS = DASHBOARD_QUICK_SECTIONS;
 
 function SurveyPreviewRow({ survey }: { survey: PanelistSurvey }) {
   const overdue = isSurveyOverdue(survey);
@@ -146,35 +131,14 @@ export function DashboardOverviewSection({
         </div>
       </DashboardCard>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <StatCard
-          label="Verification status"
-          value={profile.verificationStatus}
-          hint="Admin review of your registration"
-          tone={verificationTone(profile.verificationStatus)}
-          icon={<ShieldCheckIcon className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Panel status"
-          value={profile.panelistStatus}
-          hint="Participation eligibility"
-          icon={<UserCircleIcon className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Reward points"
-          value={String(rewards.totalPoints)}
-          hint={`${rewards.totalPointsToDate} earned to date · ${rewards.totalPoints} available`}
-          tone={rewards.verified ? "success" : "default"}
-          icon={<StarIcon className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Unread notifications"
-          value={String(unreadCount)}
-          hint={unreadCount === 1 ? "Update waiting for you" : "Updates waiting for you"}
-          tone={unreadCount > 0 ? "warning" : "default"}
-          icon={<BellIcon className="h-5 w-5" />}
-        />
-      </div>
+      <DashboardOverviewStats
+        verificationStatus={profile.verificationStatus}
+        panelistStatus={profile.panelistStatus}
+        totalPoints={rewards.totalPoints}
+        totalPointsToDate={rewards.totalPointsToDate}
+        rewardsVerified={rewards.verified}
+        unreadCount={unreadCount}
+      />
 
       {inboxSurveys.length > 0 ? (
         <DashboardCard>
@@ -203,20 +167,7 @@ export function DashboardOverviewSection({
         </DashboardCard>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {QUICK_LINKS.map((link) => {
-          const Icon = link.icon;
-          return (
-            <QuickLinkCard
-              key={link.href}
-              href={link.href}
-              label={link.label}
-              description={link.description}
-              icon={<Icon className="h-5 w-5" />}
-            />
-          );
-        })}
-      </div>
+      <DashboardOverviewQuickLinks />
     </div>
   );
 }
