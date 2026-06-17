@@ -11,6 +11,9 @@ import {
 } from "@/lib/site-alerts";
 import { BellIcon, ClipboardIcon, GiftIcon, ShieldCheckIcon } from "./DashboardIcons";
 import { DashboardCard, DashboardInfoNote } from "./DashboardShell";
+import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
+import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
+import type { ViewLayout } from "@/lib/view-layout";
 
 function notificationIcon(id: string) {
   if (id === "verification" || id === "welcome") {
@@ -33,6 +36,114 @@ function notificationIconTone(id: string, unread: boolean): string {
   return "bg-teal-100 text-teal-700";
 }
 
+function NotificationCard({
+  notification,
+  layout,
+  updatingId,
+  onToggle,
+}: {
+  notification: DashboardNotification;
+  layout: ViewLayout;
+  updatingId: string | null;
+  onToggle: (notification: DashboardNotification) => void;
+}) {
+  const action = (
+    <button
+      type="button"
+      onClick={() => onToggle(notification)}
+      disabled={updatingId === notification.id}
+      className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 disabled:opacity-60"
+    >
+      {updatingId === notification.id
+        ? formatHeadingCase("Saving…")
+        : notification.unread
+          ? formatHeadingCase("Mark as read")
+          : formatHeadingCase("Mark as unread")}
+    </button>
+  );
+
+  if (layout === "list") {
+    return (
+      <DashboardCard className={`p-4 ${notification.unread ? brandedNotificationUnreadClass : ""}`}>
+        <div className="flex items-start gap-3">
+          <span
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${notificationIconTone(notification.id, notification.unread)}`}
+          >
+            {notificationIcon(notification.id)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
+              {notification.unread ? <span className={brandedNotificationBadgeClass}>{formatHeadingCase("New")}</span> : null}
+            </div>
+            <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{formatHeadingCase(notification.body)}</p>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-zinc-500">{notification.dateLabel}</p>
+              {action}
+            </div>
+          </div>
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  if (layout === "horizontal") {
+    return (
+      <DashboardCard className={`flex h-full flex-col p-4 ${notification.unread ? brandedNotificationUnreadClass : ""}`}>
+        <span
+          className={`flex h-9 w-9 items-center justify-center rounded-lg ${notificationIconTone(notification.id, notification.unread)}`}
+        >
+          {notificationIcon(notification.id)}
+        </span>
+        <h3 className="mt-3 line-clamp-2 text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
+        <p className="mt-2 line-clamp-3 flex-1 text-xs leading-relaxed text-zinc-600">
+          {formatHeadingCase(notification.body)}
+        </p>
+        <p className="mt-3 text-xs text-zinc-500">{notification.dateLabel}</p>
+        <div className="mt-2">{action}</div>
+      </DashboardCard>
+    );
+  }
+
+  return (
+    <DashboardCard className={notification.unread ? brandedNotificationUnreadClass : ""}>
+      <div className="flex gap-4">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${notificationIconTone(notification.id, notification.unread)}`}
+        >
+          {notificationIcon(notification.id)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
+                {notification.unread ? (
+                  <span className={brandedNotificationBadgeClass}>
+                    {formatHeadingCase("New")}
+                  </span>
+                ) : null}
+                {notification.priority === "high" && notification.unread ? (
+                  <span className={brandedNotificationPriorityClass}>
+                    {formatHeadingCase("Important")}
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                {formatHeadingCase(notification.body)}
+              </p>
+            </div>
+            <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 sm:w-auto sm:flex-col sm:items-end">
+              <p className="text-xs text-zinc-500">{notification.dateLabel}</p>
+              {action}
+            </div>
+          </div>
+        </div>
+      </div>
+    </DashboardCard>
+  );
+}
+
 export function DashboardNotificationsClient({
   initialNotifications,
 }: {
@@ -42,6 +153,7 @@ export function DashboardNotificationsClient({
   const [notifications, setNotifications] = useState(initialNotifications);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
+  const [layout, setLayout] = useViewLayout("dashboard-notifications");
 
   const unreadCount = notifications.filter((notification) => notification.unread).length;
 
@@ -112,57 +224,20 @@ export function DashboardNotificationsClient({
         ) : null}
       </div>
 
-      <div className="space-y-3">
+      <div className="flex justify-end">
+        <ViewLayoutToggle value={layout} onChange={setLayout} />
+      </div>
+
+      <div className={viewLayoutContainerClass(layout, "space-y-3")}>
         {notifications.map((notification) => (
-          <DashboardCard
-            key={notification.id}
-            className={notification.unread ? brandedNotificationUnreadClass : ""}
-          >
-            <div className="flex gap-4">
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${notificationIconTone(notification.id, notification.unread)}`}
-              >
-                {notificationIcon(notification.id)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-semibold text-zinc-900">{formatHeadingCase(notification.title)}</h3>
-                      {notification.unread ? (
-                        <span className={brandedNotificationBadgeClass}>
-                          {formatHeadingCase("New")}
-                        </span>
-                      ) : null}
-                      {notification.priority === "high" && notification.unread ? (
-                        <span className={brandedNotificationPriorityClass}>
-                          {formatHeadingCase("Important")}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-                      {formatHeadingCase(notification.body)}
-                    </p>
-                  </div>
-                  <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 sm:w-auto sm:flex-col sm:items-end">
-                    <p className="text-xs text-zinc-500">{notification.dateLabel}</p>
-                    <button
-                      type="button"
-                      onClick={() => toggleNotification(notification)}
-                      disabled={updatingId === notification.id}
-                      className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 disabled:opacity-60"
-                    >
-                      {updatingId === notification.id
-                        ? formatHeadingCase("Saving…")
-                        : notification.unread
-                          ? formatHeadingCase("Mark as read")
-                          : formatHeadingCase("Mark as unread")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DashboardCard>
+          <div key={notification.id} className={viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")}>
+            <NotificationCard
+              notification={notification}
+              layout={layout}
+              updatingId={updatingId}
+              onToggle={toggleNotification}
+            />
+          </div>
         ))}
       </div>
 

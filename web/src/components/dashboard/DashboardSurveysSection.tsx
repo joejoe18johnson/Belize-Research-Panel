@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { AccountHoldReason } from "@/lib/auth-types";
 import type { PanelistSurvey } from "@/lib/panelist-surveys-types";
+import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
+import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
 import { DashboardAlert, DashboardInfoNote } from "./DashboardShell";
 import { SurveyCard } from "./SurveyCard";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -37,6 +39,7 @@ export function DashboardSurveysSection({
   holdReason?: AccountHoldReason;
 }) {
   const [tab, setTab] = useState<SurveyTab>("inbox");
+  const [layout, setLayout] = useViewLayout("dashboard-surveys");
   const surveys = tab === "inbox" ? inbox : completed;
 
   return (
@@ -90,11 +93,22 @@ export function DashboardSurveysSection({
       </div>
 
       {surveys.length > 0 ? (
-        <div className={`grid gap-6 sm:grid-cols-2 ${surveysLocked ? "pointer-events-none" : ""}`}>
-          {surveys.map((survey) => (
-            <SurveyCard key={survey.id} survey={survey} locked={surveysLocked} />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-zinc-600">
+              {surveys.length} {tab === "inbox" ? "survey" : "completed survey"}
+              {surveys.length === 1 ? "" : "s"}
+            </p>
+            <ViewLayoutToggle value={layout} onChange={setLayout} />
+          </div>
+          <div className={`${viewLayoutContainerClass(layout, "grid gap-6 sm:grid-cols-2")} ${surveysLocked ? "pointer-events-none" : ""}`}>
+            {surveys.map((survey) => (
+              <div key={survey.id} className={viewLayoutItemClass(layout, "w-[min(88vw,17rem)]")}>
+                <SurveyCard survey={survey} locked={surveysLocked} layout={layout} />
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <DashboardInfoNote>
           {formatHeadingCase(
