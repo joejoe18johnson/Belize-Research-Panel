@@ -334,8 +334,10 @@
     "status": "available",
     "progressPercent": 0,
     "completedDate": null,
-    "surveyUrl": "https://forms.gle/sample-belize-coastal-tourism-2026",
-    "panelistEmail": "johannesjohnsonj@gmail.com"
+    "surveyUrl": null,
+    "panelistEmail": "johannesjohnsonj@gmail.com",
+    "surveyDefinitionId": "survey-belize-coastal-tourism-2026",
+    "deliveryType": "internal"
   },
   {
     "id": "campaign-johannes-test-campaign-mqhj5jx3",
