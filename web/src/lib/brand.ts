@@ -10,19 +10,20 @@ export const BRAND = {
   },
 } as const;
 
-export const dashboardShellClass = "min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)]";
+export const dashboardShellClass =
+  "min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_12rem,#09090b_100%)]";
 
 export const dashboardHeaderClass =
-  "safe-top sticky top-0 z-20 border-b border-teal-100 bg-white/95 shadow-sm shadow-teal-950/5 backdrop-blur-sm";
+  "safe-top sticky top-0 z-20 border-b border-teal-100 bg-white/95 shadow-sm shadow-teal-950/5 backdrop-blur-sm dark:border-teal-900/50 dark:bg-zinc-900/95 dark:shadow-black/20";
 
 export const dashboardCardClass =
-  "rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm shadow-teal-950/[0.03] sm:p-6";
+  "rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm shadow-teal-950/[0.03] sm:p-6 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/20";
 
 export const dashboardHeroCardClass =
-  "overflow-hidden rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 p-0 text-white shadow-md shadow-teal-950/20";
+  "overflow-hidden rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 p-0 text-white shadow-md shadow-teal-950/20 dark:border-teal-800";
 
 export const dashboardPrimaryButtonClass =
-  "inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800";
+  "inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500";
 
 export const dashboardSecondaryButtonClass =
-  "inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 transition hover:border-teal-300 hover:bg-teal-50";
+  "inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 transition hover:border-teal-300 hover:bg-teal-50 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950";
