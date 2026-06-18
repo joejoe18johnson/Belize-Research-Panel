@@ -5,7 +5,7 @@ import { requireDashboardContext } from "@/lib/dashboard-access";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
 
 export const metadata = {
-  title: "Overview | Belize Research Panel",
+  title: "Home | Belize Research Panel",
 };
 
 export default async function DashboardOverviewPage({
@@ -25,7 +25,7 @@ export default async function DashboardOverviewPage({
   return (
     <>
       <DashboardPageHeader
-        title="Overview"
+        title="Home"
         description="Your panel status at a glance."
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />

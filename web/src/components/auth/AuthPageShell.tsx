@@ -20,8 +20,7 @@ export function AuthPageShell({
       <header className="safe-top shrink-0 border-b border-teal-100 bg-white/95 shadow-sm shadow-teal-950/5 backdrop-blur-sm dark:border-teal-900/50 dark:bg-zinc-900/95 dark:shadow-black/20">
         <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`mx-auto flex ${AUTH_CONTENT_MAX} items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4`}>
-          <BrpLogoLink href="/" variant="light" className="dark:hidden" />
-          <BrpLogoLink href="/" variant="dark" className="hidden dark:block" />
+          <BrpLogoLink href="/" variant="light" />
           <ThemeToggle compact />
         </div>
       </header>
