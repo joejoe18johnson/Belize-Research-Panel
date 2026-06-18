@@ -21,7 +21,7 @@ import { UserAvatar } from "./UserAvatar";
 import { isAccountApproved, VerifiedCheckBadge, VerifiedStatusPill } from "./VerifiedCheckBadge";
 import { dashboardHeroCardClass } from "@/lib/brand";
 import { formatHeadingCase } from "@/lib/sentence-case";
-import { countUnreadSurveyInvitations } from "@/lib/survey-notifications";
+import { getUnreadSurveyInvitationIds } from "@/lib/survey-notifications";
 
 function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; isNew?: boolean }) {
   const overdue = isSurveyOverdue(survey);
@@ -80,7 +80,8 @@ export function DashboardOverviewSection({
   welcome?: boolean;
 }) {
   const unreadCount = notifications.filter((notification) => notification.unread).length;
-  const newSurveyCount = countUnreadSurveyInvitations(notifications);
+  const newSurveyIds = getUnreadSurveyInvitationIds(notifications);
+  const newSurveyCount = newSurveyIds.size;
   const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "Panelist";
   const approved = isAccountApproved(profile.verificationStatus, accountStatus);
 
@@ -183,7 +184,7 @@ export function DashboardOverviewSection({
           </div>
           <div className="space-y-2">
             {inboxSurveys.slice(0, 3).map((survey) => (
-              <SurveyPreviewRow key={survey.id} survey={survey} isNew={survey.status === "available"} />
+              <SurveyPreviewRow key={survey.id} survey={survey} isNew={newSurveyIds.has(survey.id)} />
             ))}
           </div>
         </DashboardCard>

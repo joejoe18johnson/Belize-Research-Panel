@@ -66,6 +66,22 @@ export function countUnreadSurveyInvitations(notifications: DashboardNotificatio
   ).length;
 }
 
+export function getUnreadSurveyInvitationIds(notifications: DashboardNotification[]): Set<string> {
+  const ids = new Set<string>();
+  for (const notification of notifications) {
+    if (!notification.unread || !isSurveyInvitationNotificationId(notification.id)) continue;
+    ids.add(notification.id.slice(SURVEY_INVITATION_NOTIFICATION_PREFIX.length));
+  }
+  return ids;
+}
+
+export function isUnreadSurveyInvitation(
+  surveyId: string,
+  notifications: DashboardNotification[]
+): boolean {
+  return getUnreadSurveyInvitationIds(notifications).has(cleanText(surveyId));
+}
+
 export function surveyInvitationNotificationIds(inboxSurveys: PanelistSurvey[]): string[] {
   return inboxSurveys
     .filter((survey) => survey.status !== "completed")

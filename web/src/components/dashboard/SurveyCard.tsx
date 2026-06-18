@@ -131,14 +131,28 @@ function SurveyAction({
   );
 }
 
+function SurveyNewBadge({ compact = false }: { compact?: boolean }) {
+  return (
+    <span
+      className={`shrink-0 rounded-full bg-amber-500 font-bold uppercase tracking-wide text-white ${
+        compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-0.5 text-[11px]"
+      }`}
+    >
+      New
+    </span>
+  );
+}
+
 export function SurveyCard({
   survey,
   locked = false,
   layout = "cards",
+  isNew = false,
 }: {
   survey: PanelistSurvey;
   locked?: boolean;
   layout?: ViewLayout;
+  isNew?: boolean;
 }) {
   const style = CATEGORY_STYLES[survey.category];
   const completed = survey.status === "completed";
@@ -155,7 +169,10 @@ export function SurveyCard({
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
                   {style.icon} {formatHeadingCase(style.label)}
                 </p>
-                <h3 className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:text-base">{survey.title}</h3>
+                <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:text-base">{survey.title}</h3>
+                  {isNew ? <SurveyNewBadge compact /> : null}
+                </div>
               </div>
               <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
                 +{survey.points} pts
@@ -201,7 +218,10 @@ export function SurveyCard({
 
       <div className="space-y-4 p-5">
         <div>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{survey.title}</h3>
+          <div className="flex flex-wrap items-start gap-2">
+            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{survey.title}</h3>
+            {isNew ? <SurveyNewBadge /> : null}
+          </div>
           <dl className="mt-3 grid gap-2 text-sm">
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
               <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Survey date")}</dt>
