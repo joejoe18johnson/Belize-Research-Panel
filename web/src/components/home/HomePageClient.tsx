@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
@@ -13,8 +12,6 @@ import {
   storeHomeLocale,
   type HomeLocale,
 } from "@/lib/home-locale";
-import type { ViewLayout } from "@/lib/view-layout";
-import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
 import { formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -26,35 +23,21 @@ const REWARD_ICONS = ["💵", "📱", "🎁", "✨"] as const;
 function HomeFeatureCard({
   title,
   body,
-  layout,
   onDarkHero,
 }: {
   title: string;
   body: string;
-  layout: ViewLayout;
   onDarkHero: boolean;
 }) {
   const cardClass = onDarkHero
-    ? layout === "list"
-      ? "rounded-2xl border border-white/10 bg-white/5 p-4"
-      : "rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6"
-    : layout === "list"
-      ? "rounded-2xl border border-teal-200 bg-white p-4 shadow-sm dark:border-teal-800 dark:bg-zinc-900"
-      : "rounded-2xl border border-teal-200 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-zinc-900 sm:p-6";
+    ? "rounded-2xl border border-white/10 bg-white/5 p-4"
+    : "rounded-2xl border border-teal-200 bg-white p-4 shadow-sm dark:border-teal-800 dark:bg-zinc-900";
   const titleClass = onDarkHero
-    ? layout === "list"
-      ? "text-base font-semibold"
-      : "text-lg font-semibold"
-    : layout === "list"
-      ? "text-base font-semibold text-zinc-900 dark:text-zinc-100"
-      : "text-lg font-semibold text-zinc-900 dark:text-zinc-100";
+    ? "text-base font-semibold"
+    : "text-base font-semibold text-zinc-900 dark:text-zinc-100";
   const bodyClass = onDarkHero
-    ? layout === "list"
-      ? "mt-1 text-sm leading-relaxed text-teal-100"
-      : "mt-2 text-sm leading-relaxed text-teal-100"
-    : layout === "list"
-      ? "mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400"
-      : "mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400";
+    ? "mt-1 text-sm leading-relaxed text-teal-100"
+    : "mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400";
 
   return (
     <div className={cardClass}>
@@ -68,56 +51,36 @@ function HomeRewardPerkCard({
   title,
   body,
   icon,
-  layout,
   onDarkHero,
 }: {
   title: string;
   body: string;
   icon: string;
-  layout: ViewLayout;
   onDarkHero: boolean;
 }) {
   const cardClass = onDarkHero
-    ? layout === "list"
-      ? "flex items-start gap-3 rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm"
-      : "rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm"
-    : layout === "list"
-      ? "flex items-start gap-3 rounded-2xl border border-teal-200 bg-teal-50/80 p-4 dark:border-teal-800 dark:bg-teal-950/40"
-      : "rounded-2xl border border-teal-200 bg-teal-50/80 p-4 dark:border-teal-800 dark:bg-teal-950/40";
+    ? "flex items-start gap-3 rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-sm"
+    : "flex items-start gap-3 rounded-2xl border border-teal-200 bg-teal-50/80 p-4 dark:border-teal-800 dark:bg-teal-950/40";
   const titleClass = onDarkHero ? "text-sm font-bold text-white" : "text-sm font-bold text-teal-950 dark:text-teal-100";
   const bodyClass = onDarkHero
     ? "mt-1 text-xs leading-relaxed text-teal-100"
     : "mt-1 text-xs leading-relaxed text-teal-800 dark:text-teal-200";
-
-  if (layout === "list") {
-    return (
-      <div className={cardClass}>
-        <p className="text-2xl" aria-hidden>
-          {icon}
-        </p>
-        <div>
-          <h3 className={titleClass}>{title}</h3>
-          <p className={bodyClass}>{body}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={cardClass}>
       <p className="text-2xl" aria-hidden>
         {icon}
       </p>
-      <h3 className={`mt-2 ${titleClass}`}>{title}</h3>
-      <p className={bodyClass}>{body}</p>
+      <div>
+        <h3 className={titleClass}>{title}</h3>
+        <p className={bodyClass}>{body}</p>
+      </div>
     </div>
   );
 }
 
 export function HomePageClient() {
   const [locale, setLocale] = useState<HomeLocale>("en");
-  const [perkLayout, setPerkLayout] = useViewLayout("home-reward-perks");
-  const [featureLayout, setFeatureLayout] = useViewLayout("home-features");
   const { resolved } = useTheme();
   const onDarkHero = resolved === "dark";
 
@@ -272,49 +235,29 @@ export function HomePageClient() {
                 {t(copy.rewardsCta)}
               </Link>
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-end">
-                <ViewLayoutToggle
-                  value={perkLayout}
-                  onChange={setPerkLayout}
-                  variant={onDarkHero ? "dark" : "light"}
+            <div className="flex w-full flex-col gap-3 lg:max-w-xl lg:shrink-0">
+              {copy.rewardPerks.map((perk, index) => (
+                <HomeRewardPerkCard
+                  key={perk.title}
+                  title={t(perk.title)}
+                  body={t(perk.body)}
+                  icon={REWARD_ICONS[index] ?? "✨"}
+                  onDarkHero={onDarkHero}
                 />
-              </div>
-              <div className={viewLayoutContainerClass(perkLayout, "grid gap-3 sm:grid-cols-2 lg:max-w-xl lg:shrink-0")}>
-                {copy.rewardPerks.map((perk, index) => (
-                  <div key={perk.title} className={viewLayoutItemClass(perkLayout, "w-[min(72vw,14rem)]")}>
-                    <HomeRewardPerkCard
-                      title={t(perk.title)}
-                      body={t(perk.body)}
-                      icon={REWARD_ICONS[index] ?? "✨"}
-                      layout={perkLayout}
-                      onDarkHero={onDarkHero}
-                    />
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         <section className="mt-14 sm:mt-20">
-          <div className="mb-4 flex justify-end">
-            <ViewLayoutToggle
-              value={featureLayout}
-              onChange={setFeatureLayout}
-              variant={onDarkHero ? "dark" : "light"}
-            />
-          </div>
-          <div className={viewLayoutContainerClass(featureLayout, "grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4")}>
+          <div className="flex flex-col gap-3">
             {copy.features.map((feature) => (
-              <div key={feature.title} className={viewLayoutItemClass(featureLayout, "w-[min(72vw,14rem)]")}>
-                <HomeFeatureCard
-                  title={t(feature.title)}
-                  body={t(feature.body)}
-                  layout={featureLayout}
-                  onDarkHero={onDarkHero}
-                />
-              </div>
+              <HomeFeatureCard
+                key={feature.title}
+                title={t(feature.title)}
+                body={t(feature.body)}
+                onDarkHero={onDarkHero}
+              />
             ))}
           </div>
         </section>
