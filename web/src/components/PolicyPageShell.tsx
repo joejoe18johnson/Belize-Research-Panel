@@ -18,8 +18,7 @@ export function PolicyPageShell({
     <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-800 dark:bg-zinc-950">
       <header className="safe-top shrink-0 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-900">
         <div className={`${appContentClass} flex items-center justify-between gap-4 px-4 py-4 sm:px-6`}>
-          <BrpLogoLink href="/" variant="light" className="dark:hidden" />
-          <BrpLogoLink href="/" variant="dark" className="hidden dark:block" />
+          <BrpLogoLink href="/" variant="light" />
           <div className="flex items-center gap-2">
             <ThemeToggle compact />
             <Link

@@ -108,11 +108,7 @@ export function HomePageClient() {
     >
       <header className="safe-top mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-between gap-3">
-          {onDarkHero ? (
-            <BrpLogoLink href="/" variant="dark" />
-          ) : (
-            <BrpLogoLink href="/" variant="light" />
-          )}
+          <BrpLogoLink href="/" variant="light" />
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />

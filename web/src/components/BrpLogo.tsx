@@ -34,7 +34,7 @@ export function BrpLogoText({
       className={`inline-flex items-baseline gap-0.5 whitespace-nowrap text-sm font-bold tracking-tight sm:text-base ${className}`.trim()}
       aria-label="Belize Research Panel"
     >
-      <span className={isDark ? "text-teal-200" : "text-teal-700"}>Belize</span>
+      <span className={isDark ? "text-teal-200" : "text-teal-700 dark:text-teal-300"}>Belize</span>
       <span className={isDark ? "text-white" : "text-teal-950 dark:text-teal-100"}>Research Panel</span>
     </span>
   );
@@ -55,6 +55,35 @@ export function BrpLogo({
 }) {
   if (USE_TEXT_LOGO) {
     return <BrpLogoText variant={variant} className={className} />;
+  }
+
+  if (variant === "light") {
+    const lightDimensions = LOGO_DIMENSIONS.light;
+    const darkDimensions = LOGO_DIMENSIONS.dark;
+    const imageClass = `h-8 w-auto max-w-[min(100vw-8rem,11rem)] bg-transparent sm:h-10 sm:max-w-none ${className}`.trim();
+
+    return (
+      <>
+        <Image
+          src={src ?? LOGO_LIGHT_BG_SRC}
+          alt="Belize Research Panel"
+          width={lightDimensions.width}
+          height={lightDimensions.height}
+          priority={priority}
+          sizes="(max-width: 640px) 9rem, 11rem"
+          className={`${imageClass} dark:hidden`}
+        />
+        <Image
+          src={LOGO_DARK_BG_SRC}
+          alt=""
+          aria-hidden
+          width={darkDimensions.width}
+          height={darkDimensions.height}
+          sizes="(max-width: 640px) 9rem, 11rem"
+          className={`${imageClass} hidden dark:inline-block`}
+        />
+      </>
+    );
   }
 
   const resolvedSrc = src ?? logoSrc(variant);
@@ -92,13 +121,15 @@ export function BrpLogoLink({
   priority?: boolean;
 }) {
   return (
-    <Link href={href} className={`inline-flex shrink-0 items-center ${className}`.trim()}>
-      <BrpLogo
-        variant={variant}
-        src={src}
-        priority={USE_TEXT_LOGO ? false : priority}
-        className={logoClassName}
-      />
+    <Link href={href} className={`shrink-0 ${className}`.trim()}>
+      <span className="inline-flex items-center">
+        <BrpLogo
+          variant={variant}
+          src={src}
+          priority={USE_TEXT_LOGO ? false : priority}
+          className={logoClassName}
+        />
+      </span>
     </Link>
   );
 }

@@ -22,9 +22,9 @@ export interface DashboardSectionMeta {
 
 export const DASHBOARD_OVERVIEW_SECTION: DashboardSectionMeta = {
   href: "/dashboard",
-  label: "Overview",
+  label: "Home",
   description: "Dashboard summary and quick links",
-  shortLabel: "Overview",
+  shortLabel: "Home",
   icon: HomeIcon,
   exact: true,
 };
