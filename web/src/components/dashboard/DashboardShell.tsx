@@ -37,20 +37,8 @@ export function DashboardShell({
       <header className={dashboardHeaderClass}>
         <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`${CONTENT_CLASS} flex min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-4 sm:py-4`}>
-          <BrpLogoLink
-            href="/dashboard"
-            variant="light"
-            className="min-w-0 dark:hidden"
-            logoClassName="sm:text-base"
-          />
-          <BrpLogoLink
-            href="/dashboard"
-            variant="dark"
-            className="hidden min-w-0 dark:block"
-            logoClassName="sm:text-base"
-          />
+          <BrpLogoLink href="/dashboard" variant="light" className="min-w-0" logoClassName="sm:text-base" />
           <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
-            <ThemeToggle compact />
             <PointsBalanceLink availablePoints={badges.availablePoints} />
             <NotificationBellLink unreadCount={badges.unreadNotifications} />
             <Link
@@ -67,6 +55,7 @@ export function DashboardShell({
               </div>
             </Link>
             <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-2.5 text-xs font-semibold text-teal-900 dark:text-teal-100 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:min-h-11 sm:px-4 sm:text-sm" />
+            <ThemeToggle compact />
           </div>
         </div>
         <DashboardNav badges={badges} />
