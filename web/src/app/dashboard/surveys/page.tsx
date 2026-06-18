@@ -4,6 +4,11 @@ import { SurveyInvitationsSeenEffect } from "@/components/dashboard/SurveyInvita
 import { dashboardSectionByHref } from "@/components/dashboard/dashboard-sections";
 import { requireRegisteredPanelistSession } from "@/lib/dashboard-access";
 import { getPanelistSurveys } from "@/lib/panelist-surveys";
+import { loadNotificationReadState } from "@/lib/notification-state";
+import {
+  buildSurveyInvitationNotifications,
+  getUnreadSurveyInvitationIds,
+} from "@/lib/survey-notifications";
 
 export const metadata = {
   title: "Surveys | Belize Research Panel",
@@ -12,6 +17,9 @@ export const metadata = {
 export default async function DashboardSurveysPage() {
   const account = await requireRegisteredPanelistSession();
   const { inbox, completed } = await getPanelistSurveys(account.email);
+  const readState = await loadNotificationReadState(account.email);
+  const invitationNotifications = buildSurveyInvitationNotifications(inbox, readState);
+  const newSurveyIds = getUnreadSurveyInvitationIds(invitationNotifications);
   const surveysLocked = account.accountStatus === "on_hold";
 
   const section = dashboardSectionByHref("/dashboard/surveys");
@@ -32,6 +40,7 @@ export default async function DashboardSurveysPage() {
       <DashboardSurveysSection
         inbox={inbox}
         completed={completed}
+        newSurveyIds={newSurveyIds}
         surveysLocked={surveysLocked}
         holdReason={account.holdReason}
       />

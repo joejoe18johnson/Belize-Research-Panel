@@ -30,11 +30,13 @@ function holdMessage(holdReason: AccountHoldReason): string {
 export function DashboardSurveysSection({
   inbox,
   completed,
+  newSurveyIds = new Set<string>(),
   surveysLocked = false,
   holdReason = "",
 }: {
   inbox: PanelistSurvey[];
   completed: PanelistSurvey[];
+  newSurveyIds?: Set<string>;
   surveysLocked?: boolean;
   holdReason?: AccountHoldReason;
 }) {
@@ -104,7 +106,12 @@ export function DashboardSurveysSection({
           <div className={`${viewLayoutContainerClass(layout, "grid gap-6 sm:grid-cols-2")} ${surveysLocked ? "pointer-events-none" : ""}`}>
             {surveys.map((survey) => (
               <div key={survey.id} className={viewLayoutItemClass(layout, "w-[min(88vw,17rem)]")}>
-                <SurveyCard survey={survey} locked={surveysLocked} layout={layout} />
+                <SurveyCard
+                  survey={survey}
+                  locked={surveysLocked}
+                  layout={layout}
+                  isNew={tab === "inbox" && newSurveyIds.has(survey.id)}
+                />
               </div>
             ))}
           </div>
