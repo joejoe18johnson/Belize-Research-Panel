@@ -108,8 +108,9 @@ export function buildCampaignResultsCsv(input: {
   responses: SurveyResponseRecord[];
   panelistMap: Map<string, PanelistRow>;
   generatedAt?: string;
+  clientSafe?: boolean;
 }): string {
-  const { snapshot, surveyDefinition, responses, panelistMap } = input;
+  const { snapshot, surveyDefinition, responses, panelistMap, clientSafe = false } = input;
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const { campaign, fieldwork } = snapshot;
 
@@ -246,22 +247,24 @@ export function buildCampaignResultsCsv(input: {
     }
   });
 
-  sections.push(
-    csvSection(
-      "PANELIST_ROSTER",
-      ["panelist_name", "panelist_email", "district", "constituency", "status", "progress_percent", "complete_by", "overdue"],
-      snapshot.assignments.map((row) => [
-        row.panelistName,
-        row.panelistEmail,
-        row.district,
-        row.constituency,
-        row.status,
-        row.progressPercent,
-        row.completeByDate,
-        row.overdue ? "yes" : "no",
-      ])
-    )
-  );
+  if (!clientSafe) {
+    sections.push(
+      csvSection(
+        "PANELIST_ROSTER",
+        ["panelist_name", "panelist_email", "district", "constituency", "status", "progress_percent", "complete_by", "overdue"],
+        snapshot.assignments.map((row) => [
+          row.panelistName,
+          row.panelistEmail,
+          row.district,
+          row.constituency,
+          row.status,
+          row.progressPercent,
+          row.completeByDate,
+          row.overdue ? "yes" : "no",
+        ])
+      )
+    );
+  }
 
   const microdata = buildMicrodataRows(snapshot, surveyDefinition, responses, panelistMap);
   if (microdata.headers.length > 0) {

@@ -12,6 +12,7 @@
     "assignedDate": "2026-06-16",
     "completeByDate": "2026-06-30",
     "deliveryMethod": "On-site survey",
+    "clientId": "client-belize-tourism-board",
     "targeting": {
       "mode": "specific_emails",
       "emails": [
