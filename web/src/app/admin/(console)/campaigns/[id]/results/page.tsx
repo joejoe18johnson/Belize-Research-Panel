@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { AdminCampaignResultsClient } from "@/components/admin/campaigns/AdminCampaignResultsClient";
+import { AdminCampaignResultsSeenEffect } from "@/components/admin/campaigns/AdminCampaignResultsSeenEffect";
 import { buildCampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { loadCampaignRecords } from "@/lib/campaigns";
 import { targetingLabel } from "@/lib/campaign-targeting";
 import { panelistByEmailMap } from "@/lib/admin-data-hub";
-import { markAdminCampaignsRead } from "@/lib/admin-read-state";
 import { loadPanelists } from "@/lib/panelists";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 import { findSurveyDefinitionById } from "@/lib/survey-definitions";
@@ -43,9 +42,10 @@ export default async function AdminCampaignResultsPage({
     surveyDefinition,
   });
 
-  await markAdminCampaignsRead([id]);
-  revalidatePath("/admin", "layout");
-  revalidatePath("/admin/campaigns");
-
-  return <AdminCampaignResultsClient snapshot={snapshot} />;
+  return (
+    <>
+      <AdminCampaignResultsSeenEffect campaignId={id} />
+      <AdminCampaignResultsClient snapshot={snapshot} />
+    </>
+  );
 }
