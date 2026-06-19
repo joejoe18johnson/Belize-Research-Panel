@@ -5,7 +5,13 @@ export type AdminModuleKind = "page" | "module";
 
 export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
-export type AdminNavSectionId = "panelists" | "campaigns" | "rewards" | "research" | "operations" | "platform";
+export type AdminNavSectionId =
+  | "panelists"
+  | "campaigns"
+  | "rewards"
+  | "research"
+  | "operations"
+  | "platform";
 
 export interface AdminNavSection {
   id: AdminNavSectionId;
@@ -115,6 +121,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     label: "Survey Builder",
     kind: "page",
     href: "/admin/surveys",
+    section: "campaigns",
+    status: "working",
+  },
+  {
+    slug: "survey-templates",
+    label: "My Templates",
+    kind: "page",
+    href: "/admin/templates",
     section: "campaigns",
     status: "working",
   },

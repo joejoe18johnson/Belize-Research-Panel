@@ -45,6 +45,9 @@ function isModuleActive(pathname: string, module: AdminModule): boolean {
     if (module.href === "/admin/payouts") {
       return pathname === "/admin/payouts" || pathname.startsWith("/admin/payouts/");
     }
+    if (module.href === "/admin/templates") {
+      return pathname === "/admin/templates" || pathname.startsWith("/admin/templates/");
+    }
     return pathname.startsWith(`${module.href}/`);
   }
   return pathname === `/admin/modules/${module.slug}`;

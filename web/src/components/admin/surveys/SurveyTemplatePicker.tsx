@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
 import { SiteSelect } from "@/components/shared/SiteSelect";
+import type { SurveyCustomTemplate } from "@/lib/survey-custom-template-types";
 import {
   SURVEY_TEMPLATE_TOPICS,
   getSurveyTemplatesByTopic,
@@ -12,10 +14,14 @@ import {
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function SurveyTemplatePicker({
+  customTemplates,
   onSelectTemplate,
+  onSelectCustomTemplate,
   onStartFromScratch,
 }: {
+  customTemplates: SurveyCustomTemplate[];
   onSelectTemplate: (template: SurveyTemplate) => void;
+  onSelectCustomTemplate: (template: SurveyCustomTemplate) => void;
   onStartFromScratch: () => void;
 }) {
   const [activeTopicId, setActiveTopicId] = useState<SurveyTemplateTopicId>("audience_evaluation");
@@ -66,6 +72,53 @@ export function SurveyTemplatePicker({
           </aside>
 
           <div className="min-w-0 flex-1 p-4 sm:p-6">
+            <section className="mb-6 rounded-xl border border-teal-100 bg-teal-50/40 p-4 dark:border-teal-900/50 dark:bg-teal-950/30 sm:p-5">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold text-teal-950 dark:text-teal-100">
+                  {formatHeadingCase("My custom templates")}
+                </h2>
+                <Link
+                  href="/admin/templates"
+                  className="text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-300"
+                >
+                  Manage templates →
+                </Link>
+              </div>
+              {customTemplates.length === 0 ? (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  No custom templates yet.{" "}
+                  <Link href="/admin/templates/create" className="font-semibold text-teal-700 underline dark:text-teal-300">
+                    Create one
+                  </Link>{" "}
+                  to reuse your standard questions.
+                </p>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {customTemplates.map((template) => (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => onSelectCustomTemplate(template)}
+                      className="group rounded-xl border border-teal-200 bg-white p-4 text-left transition hover:border-teal-400 hover:shadow-sm dark:border-teal-800 dark:bg-zinc-900"
+                    >
+                      <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">{template.title}</p>
+                      <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        {template.questions.length} {template.questions.length === 1 ? "question" : "questions"}
+                      </p>
+                      {template.description ? (
+                        <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                          {template.description}
+                        </p>
+                      ) : null}
+                      <p className="mt-3 text-xs font-semibold text-teal-700 opacity-0 transition group-hover:opacity-100 dark:text-teal-300">
+                        Use template →
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
+
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                 {SURVEY_TEMPLATE_TOPICS.find((topic) => topic.id === activeTopicId)?.label ?? "Templates"}

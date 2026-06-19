@@ -18,12 +18,14 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
           title="On-site surveys"
           description="Create and manage questionnaires hosted on the Belize Research Panel — no Qualtrics, QuestionPro, or external API keys required."
         />
-        <Link
-          href="/admin/surveys/create"
-          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
-        >
-          Create survey
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/surveys/create"
+            className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            Create survey
+          </Link>
+        </div>
       </div>
 
       {surveys.length === 0 ? (

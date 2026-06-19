@@ -44,6 +44,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
     "create-campaign",
     "reward-settings",
     "survey-builder",
+    "survey-templates",
     "survey-distribution",
     "distribution-engine",
     "fieldwork-management",
@@ -54,6 +55,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
     "admin-dashboard",
     "advanced-analytics",
     "survey-builder",
+    "survey-templates",
     "survey-distribution",
     "distribution-engine",
     "client-reporting",
@@ -118,6 +120,7 @@ export function staffDefaultAdminPath(role: StaffRole): string {
 
 export function pathnameToAdminModuleSlug(pathname: string): string | null {
   if (pathname === "/admin" || pathname === "/admin/") return "admin-dashboard";
+  if (pathname.startsWith("/admin/templates")) return "survey-templates";
   if (pathname.startsWith("/admin/surveys")) return "survey-builder";
   if (ADMIN_PATH_TO_SLUG[pathname]) return ADMIN_PATH_TO_SLUG[pathname];
 
