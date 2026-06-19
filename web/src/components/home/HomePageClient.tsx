@@ -116,6 +116,16 @@ export function HomePageClient() {
 
             <div className="hidden items-center gap-3 sm:flex">
               <Link
+                href="/client/login"
+                className={
+                  onDarkHero
+                    ? "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
+                    : "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100"
+                }
+              >
+                {t(copy.clientPortal)}
+              </Link>
+              <Link
                 href="/login"
                 className={
                   onDarkHero

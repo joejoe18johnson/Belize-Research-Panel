@@ -5,6 +5,7 @@ export const HOME_LOCALE_STORAGE_KEY = "brp_home_locale";
 export const HOME_COPY = {
   en: {
     logIn: "Log in",
+    clientPortal: "Client portal",
     register: "Register",
     eyebrow: "Exclusive research panel · earn rewards",
     headline: "Share your opinion. Get rewarded.",
@@ -59,6 +60,7 @@ export const HOME_COPY = {
   },
   es: {
     logIn: "Iniciar sesión",
+    clientPortal: "Portal de clientes",
     register: "Registrarse",
     eyebrow: "Panel de investigación exclusivo · gane recompensas",
     headline: "Comparta su opinión. Reciba recompensas.",
