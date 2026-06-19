@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
+import { findClientUserById } from "@/lib/client-users";
 import { createAndLaunchCampaign } from "@/lib/campaigns";
 import type { CampaignRecord, CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
 import { buildCampaignAssignmentLinks } from "@/lib/campaign-survey-links";
@@ -38,6 +39,14 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
+    const clientId = cleanText(String(body.clientId ?? ""));
+    if (clientId) {
+      const client = await findClientUserById(clientId);
+      if (!client || client.status !== "active") {
+        return NextResponse.json({ ok: false, message: "Selected client account was not found." }, { status: 400 });
+      }
+    }
+
     const input: CreateCampaignInput = {
       title: cleanText(String(body.title ?? "")),
       description: cleanText(String(body.description ?? "")),
@@ -50,7 +59,7 @@ export async function POST(request: Request) {
       completeByDate: cleanText(String(body.completeByDate ?? "")),
       deliveryMethod: cleanText(String(body.deliveryMethod ?? "External Survey Link")),
       targeting: parseTargeting(body),
-      clientId: cleanText(String(body.clientId ?? "")),
+      clientId,
     };
 
     const panelists = await loadPanelists();

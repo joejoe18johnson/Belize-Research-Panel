@@ -33,6 +33,26 @@ async function saveCampaignRecords(campaigns: CampaignRecord[]): Promise<void> {
   await fs.writeFile(DATA_FILE, JSON.stringify(campaigns, null, 2), "utf-8");
 }
 
+export async function updateCampaignClientId(
+  campaignId: string,
+  clientId: string | undefined
+): Promise<CampaignRecord | null> {
+  const normalizedId = cleanText(campaignId);
+  if (!normalizedId) return null;
+
+  const campaigns = await loadCampaignRecords();
+  const index = campaigns.findIndex((campaign) => campaign.id === normalizedId);
+  if (index === -1) return null;
+
+  const nextClientId = cleanText(clientId ?? "") || undefined;
+  campaigns[index] = {
+    ...campaigns[index],
+    clientId: nextClientId,
+  };
+  await saveCampaignRecords(campaigns);
+  return campaigns[index];
+}
+
 export async function createAndLaunchCampaign(
   input: CreateCampaignInput,
   panelists: PanelistRow[]

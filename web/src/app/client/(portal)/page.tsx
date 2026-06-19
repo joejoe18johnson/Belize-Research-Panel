@@ -2,6 +2,8 @@ import { ClientCampaignsDashboard } from "@/components/client/ClientCampaignsDas
 import { requireClientSession } from "@/lib/client-auth";
 import { loadClientCampaignSummaries } from "@/lib/client-access";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "My campaigns | Client portal",
 };
