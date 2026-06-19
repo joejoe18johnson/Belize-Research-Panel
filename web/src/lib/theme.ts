@@ -38,3 +38,6 @@ export function storeThemePreference(preference: ThemePreference): void {
     /* ignore */
   }
 }
+
+/** Inline script for root layout `<head>` — avoids React 19 script-in-component warnings. */
+export const THEME_INIT_SCRIPT = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var t=localStorage.getItem(k);var d=document.documentElement;var dark=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);d.classList.toggle("dark",dark);d.style.colorScheme=dark?"dark":"light"}catch(e){}})();`;

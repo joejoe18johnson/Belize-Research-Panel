@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
       const targetIds = body.markAll ? unreadCompletedCampaignIds(summaries, readState) : ids;
       const updated = await markAdminCampaignsRead(targetIds);
       revalidateAdminShell();
+      revalidatePath("/admin/campaigns");
       return NextResponse.json({
         ok: true,
         unreadCampaigns: unreadCompletedCampaignIds(summaries, updated).length,

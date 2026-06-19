@@ -3,8 +3,8 @@ import { Geist } from "next/font/google";
 import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
+import { ThemeInitScript } from "@/components/theme/ThemeInitScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { ThemeScript } from "@/components/theme/ThemeScript";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
-        <ThemeScript />
+        <ThemeInitScript />
         <ThemeProvider>
           <NetlifyDeployBanner />
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
