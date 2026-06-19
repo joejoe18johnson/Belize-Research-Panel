@@ -88,6 +88,7 @@ export async function createAndLaunchCampaign(
     completeByDate: input.completeByDate,
     deliveryMethod: cleanText(input.deliveryMethod) || (deliveryType === "internal" ? "On-site survey" : "External Survey Link"),
     targeting: input.targeting,
+    clientId: cleanText(input.clientId ?? "") || undefined,
     createdAt: now,
     launchedAt: now,
   };

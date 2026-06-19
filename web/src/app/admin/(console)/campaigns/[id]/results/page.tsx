@@ -45,7 +45,10 @@ export default async function AdminCampaignResultsPage({
   return (
     <>
       <AdminCampaignResultsSeenEffect campaignId={id} />
-      <AdminCampaignResultsClient snapshot={snapshot} />
+      <AdminCampaignResultsClient
+        snapshot={snapshot}
+        exportBasePath={`/api/admin/campaigns/${encodeURIComponent(id)}/export`}
+      />
     </>
   );
 }

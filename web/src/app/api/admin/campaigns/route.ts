@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       completeByDate: cleanText(String(body.completeByDate ?? "")),
       deliveryMethod: cleanText(String(body.deliveryMethod ?? "External Survey Link")),
       targeting: parseTargeting(body),
+      clientId: cleanText(String(body.clientId ?? "")),
     };
 
     const panelists = await loadPanelists();

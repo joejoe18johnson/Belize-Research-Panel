@@ -1,0 +1,12 @@
+[
+  {
+    "id": "client-belize-tourism-board",
+    "organization_name": "Belize Tourism Board",
+    "contact_name": "Maria Castillo",
+    "email": "client.tourism@belizepanel.test",
+    "password_salt": "belize-tourism-client",
+    "password_hash": "0855ae5558ecad516f0a4be996e168d1a0a5cb5193f4cc8fe8ec7d2c38b478d1",
+    "status": "active",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+]

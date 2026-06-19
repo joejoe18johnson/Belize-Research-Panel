@@ -35,6 +35,7 @@ export interface CampaignRecord {
   completeByDate: string;
   deliveryMethod: string;
   targeting: CampaignTargeting;
+  clientId?: string;
   createdAt: string;
   launchedAt: string;
 }
@@ -85,6 +86,7 @@ export interface CreateCampaignInput {
   completeByDate: string;
   deliveryMethod: string;
   targeting: CampaignTargeting;
+  clientId?: string;
 }
 
 export const CAMPAIGN_TARGET_OPTIONS: { id: CampaignTargetMode; label: string }[] = [

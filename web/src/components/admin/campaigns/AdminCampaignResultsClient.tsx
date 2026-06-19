@@ -19,7 +19,7 @@ import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 type ResultsTab = "fieldwork" | "sample" | "questions" | "roster";
 
-const TABS: { id: ResultsTab; label: string }[] = [
+const ALL_TABS: { id: ResultsTab; label: string }[] = [
   { id: "fieldwork", label: "Fieldwork" },
   { id: "sample", label: "Sample profile" },
   { id: "questions", label: "Question analysis" },
@@ -32,10 +32,24 @@ function statusBadgeClass(status: CampaignResultsSnapshot["campaign"]["status"])
   return "bg-amber-100 text-amber-900";
 }
 
-export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignResultsSnapshot }) {
+export function AdminCampaignResultsClient({
+  snapshot,
+  audience = "admin",
+  exportBasePath,
+  backHref = "/admin/campaigns",
+  backLabel = "Back to campaigns",
+}: {
+  snapshot: CampaignResultsSnapshot;
+  audience?: "admin" | "client";
+  exportBasePath?: string;
+  backHref?: string;
+  backLabel?: string;
+}) {
   const [tab, setTab] = useState<ResultsTab>("fieldwork");
   const { campaign, fieldwork } = snapshot;
+  const tabs = audience === "client" ? ALL_TABS.filter((item) => item.id !== "roster") : ALL_TABS;
   const rosterPagination = useTablePagination(snapshot.assignments);
+  const isClient = audience === "client";
 
   const funnelSteps = useMemo(
     () => [
@@ -58,19 +72,35 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
     <div className="mx-auto max-w-[1400px] space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageIntro
-          eyebrow="Campaign results"
+          eyebrow={isClient ? "Research report" : "Campaign results"}
           title={campaign.title}
           description={`Research analytics for fieldwork delivery, sample composition, and survey item analysis. ${campaign.targetingLabel} · Due ${campaign.completeByDate}.`}
         />
         <div className="flex flex-wrap gap-2">
+          {exportBasePath ? (
+            <a
+              href={exportBasePath}
+              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
+            >
+              {formatHeadingCase("Download CSV")}
+            </a>
+          ) : null}
           <Link
-            href="/admin/campaigns"
+            href={backHref}
             className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
           >
-            Back to campaigns
+            {backLabel}
           </Link>
         </div>
       </div>
+
+      {isClient ? (
+        <BrandedAlert tone="info" title="Scientific reporting standards" showIcon>
+          Metrics use unweighted frequency distributions. Response rates include Wilson 95% confidence intervals.
+          Scale items report mean, median, and standard deviation. Individual panelist identifiers are withheld in
+          the client portal.
+        </BrandedAlert>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(campaign.status)}`}>
@@ -107,7 +137,7 @@ export function AdminCampaignResultsClient({ snapshot }: { snapshot: CampaignRes
       </div>
 
       <div className="flex flex-wrap gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">
-        {TABS.map((item) => (
+        {tabs.map((item) => (
           <button
             key={item.id}
             type="button"
