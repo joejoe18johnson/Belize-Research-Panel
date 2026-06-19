@@ -49,6 +49,7 @@ export default async function ClientCampaignResultsPage({ params }: { params: Pr
     <AdminCampaignResultsClient
       snapshot={snapshot}
       audience="client"
+      clientName={session.organizationName}
       exportBasePath={`/api/client/campaigns/${encodeURIComponent(id)}/export`}
       backHref="/client"
       backLabel="Back to my campaigns"

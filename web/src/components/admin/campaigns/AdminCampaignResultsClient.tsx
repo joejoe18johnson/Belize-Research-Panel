@@ -17,14 +17,22 @@ import type { CampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
-type ResultsTab = "fieldwork" | "sample" | "questions" | "roster";
+type ResultsTab = "fieldwork" | "sample" | "questions" | "responses" | "roster";
 
 const ALL_TABS: { id: ResultsTab; label: string }[] = [
   { id: "fieldwork", label: "Fieldwork" },
   { id: "sample", label: "Sample profile" },
   { id: "questions", label: "Question analysis" },
+  { id: "responses", label: "Individual responses" },
   { id: "roster", label: "Panelist roster" },
 ];
+
+function formatSubmittedAt(iso: string | null): string {
+  if (!iso) return "—";
+  const parsed = Date.parse(iso);
+  if (!Number.isFinite(parsed)) return iso;
+  return new Date(parsed).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+}
 
 function statusBadgeClass(status: CampaignResultsSnapshot["campaign"]["status"]): string {
   if (status === "active") return "bg-teal-100 text-teal-900 dark:text-teal-100";
@@ -35,12 +43,14 @@ function statusBadgeClass(status: CampaignResultsSnapshot["campaign"]["status"])
 export function AdminCampaignResultsClient({
   snapshot,
   audience = "admin",
+  clientName,
   exportBasePath,
   backHref = "/admin/campaigns",
   backLabel = "Back to campaigns",
 }: {
   snapshot: CampaignResultsSnapshot;
   audience?: "admin" | "client";
+  clientName?: string | null;
   exportBasePath?: string;
   backHref?: string;
   backLabel?: string;
@@ -49,6 +59,7 @@ export function AdminCampaignResultsClient({
   const { campaign, fieldwork } = snapshot;
   const tabs = audience === "client" ? ALL_TABS.filter((item) => item.id !== "roster") : ALL_TABS;
   const rosterPagination = useTablePagination(snapshot.assignments);
+  const responsesPagination = useTablePagination(snapshot.respondentAnswers);
   const isClient = audience === "client";
 
   const funnelSteps = useMemo(
@@ -115,6 +126,11 @@ export function AdminCampaignResultsClient({
         {snapshot.surveyTitle ? (
           <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
             Instrument: <strong>{snapshot.surveyTitle}</strong>
+          </span>
+        ) : null}
+        {clientName ? (
+          <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            Client: <strong>{clientName}</strong>
           </span>
         ) : null}
       </div>
@@ -296,6 +312,105 @@ export function AdminCampaignResultsClient({
             ))
           )}
         </div>
+      ) : null}
+
+      {tab === "responses" ? (
+        <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+          <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
+            {formatHeadingCase("Individual responses")}
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            {isClient
+              ? "Submitted questionnaire answers for each respondent. Panelist identifiers are withheld in the client portal."
+              : "Every submitted response with the full answer given to each survey question."}
+          </p>
+          {!snapshot.isInternal ? (
+            <div className="mt-4">
+              <BrandedAlert tone="info" title="On-site survey required" showIcon>
+                Individual response records are available for campaigns that use an on-site survey built in Survey
+                Builder.
+              </BrandedAlert>
+            </div>
+          ) : snapshot.respondentAnswers.length === 0 ? (
+            <div className="mt-4">
+              <BrandedAlert tone="info" showIcon>
+                No submitted responses yet. Individual answer records will appear as panelists complete the survey.
+              </BrandedAlert>
+            </div>
+          ) : (
+            <div className="mt-5 space-y-3">
+              {responsesPagination.paginatedRows.map((record) => (
+                <details
+                  key={record.respondentId}
+                  className="group rounded-xl border border-zinc-100 bg-zinc-50/50 open:bg-white dark:border-zinc-800 dark:bg-zinc-950/50 open:dark:bg-zinc-900"
+                >
+                  <summary className="cursor-pointer list-none px-4 py-3 sm:px-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                          {!isClient && record.panelistName ? record.panelistName : record.respondentId}
+                          {!isClient && record.panelistEmail ? (
+                            <span className="ml-2 text-sm font-normal text-zinc-500 dark:text-zinc-400">
+                              {record.panelistEmail}
+                            </span>
+                          ) : null}
+                        </p>
+                        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                          Submitted {formatSubmittedAt(record.submittedAt)}
+                          {record.district ? ` · ${record.district}` : ""}
+                          {record.constituency ? ` · ${record.constituency}` : ""}
+                        </p>
+                      </div>
+                      <span className="text-xs font-semibold text-teal-700 group-open:hidden dark:text-teal-300">
+                        {formatHeadingCase("View answers")}
+                      </span>
+                    </div>
+                  </summary>
+                  <div className="border-t border-zinc-100 px-4 py-4 dark:border-zinc-800 sm:px-5">
+                    <div className="overflow-x-auto rounded-lg border border-zinc-100 dark:border-zinc-800">
+                      <table className="min-w-full text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+                            <th className="px-4 py-2.5 w-12">#</th>
+                            <th className="px-4 py-2.5">Question</th>
+                            <th className="px-4 py-2.5">Type</th>
+                            <th className="px-4 py-2.5">Answer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {record.answers.map((item) => (
+                            <tr key={item.questionId} className="border-b border-zinc-50 dark:border-zinc-800/80">
+                              <td className="px-4 py-2.5 tabular-nums text-zinc-500 dark:text-zinc-400">
+                                {item.questionNumber}
+                              </td>
+                              <td className="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
+                                {item.title}
+                              </td>
+                              <td className="px-4 py-2.5 text-xs text-zinc-500 dark:text-zinc-400">
+                                {SURVEY_QUESTION_TYPE_LABELS[item.type]}
+                              </td>
+                              <td className="px-4 py-2.5 whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
+                                {item.answer}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </details>
+              ))}
+              <TablePagination
+                page={responsesPagination.page}
+                pageSize={responsesPagination.pageSize}
+                totalPages={responsesPagination.totalPages}
+                totalRows={responsesPagination.totalRows}
+                onPageChange={responsesPagination.setPage}
+                onPageSizeChange={responsesPagination.setPageSize}
+              />
+            </div>
+          )}
+        </section>
       ) : null}
 
       {tab === "roster" ? (
