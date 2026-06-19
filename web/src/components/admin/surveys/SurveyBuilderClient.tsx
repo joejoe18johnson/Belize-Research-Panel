@@ -23,6 +23,11 @@ import {
 } from "@/lib/survey-types";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { applySurveyTemplate, type SurveyTemplate } from "@/lib/survey-templates";
+import {
+  applySurveyCustomTemplate,
+} from "@/lib/survey-custom-template-apply";
+import type { SurveyCustomTemplate } from "@/lib/survey-custom-template-types";
+import { instantiateTemplateQuestions } from "@/lib/survey-template-builders";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import {
   SurveyTemplateBanner,
@@ -31,20 +36,37 @@ import {
 
 const CATEGORIES: SurveyCategory[] = ["political", "market", "civic"];
 
-export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyDefinition }) {
+export function SurveyBuilderClient({
+  mode = "survey",
+  initialSurvey,
+  initialTemplate,
+  customTemplates = [],
+}: {
+  mode?: "survey" | "template";
+  initialSurvey?: SurveyDefinition;
+  initialTemplate?: SurveyCustomTemplate;
+  customTemplates?: SurveyCustomTemplate[];
+}) {
   const router = useRouter();
-  const isEdit = Boolean(initialSurvey);
+  const isTemplateMode = mode === "template";
+  const isEdit = isTemplateMode ? Boolean(initialTemplate) : Boolean(initialSurvey);
 
-  const [showTemplatePicker, setShowTemplatePicker] = useState(!isEdit);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(!isEdit && !isTemplateMode);
   const [selectedTemplateTitle, setSelectedTemplateTitle] = useState<string | null>(null);
-  const [title, setTitle] = useState(initialSurvey?.title ?? "");
-  const [description, setDescription] = useState(initialSurvey?.description ?? "");
-  const [companyIntro, setCompanyIntro] = useState(initialSurvey?.companyIntro ?? "");
-  const [category, setCategory] = useState<SurveyCategory>(initialSurvey?.category ?? "civic");
-  const [status, setStatus] = useState<SurveyDefinition["status"]>(initialSurvey?.status ?? "draft");
-  const [questions, setQuestions] = useState<SurveyQuestion[]>(
-    initialSurvey?.questions?.length ? initialSurvey.questions : [createEmptyQuestion()]
+  const [title, setTitle] = useState(initialSurvey?.title ?? initialTemplate?.title ?? "");
+  const [description, setDescription] = useState(initialSurvey?.description ?? initialTemplate?.description ?? "");
+  const [companyIntro, setCompanyIntro] = useState(initialSurvey?.companyIntro ?? initialTemplate?.companyIntro ?? "");
+  const [category, setCategory] = useState<SurveyCategory>(
+    initialSurvey?.category ?? initialTemplate?.category ?? "civic"
   );
+  const [status, setStatus] = useState<SurveyDefinition["status"]>(initialSurvey?.status ?? "draft");
+  const [questions, setQuestions] = useState<SurveyQuestion[]>(() => {
+    if (initialSurvey?.questions?.length) return initialSurvey.questions;
+    if (initialTemplate?.questions?.length) {
+      return instantiateTemplateQuestions(initialTemplate.questions);
+    }
+    return [createEmptyQuestion()];
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -61,6 +83,19 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
 
   const applyTemplate = (template: SurveyTemplate) => {
     const applied = applySurveyTemplate(template);
+    setTitle(applied.title);
+    setDescription(applied.description);
+    setCompanyIntro(applied.companyIntro);
+    setCategory(applied.category);
+    setQuestions(applied.questions);
+    setSelectedTemplateTitle(template.title);
+    setShowTemplatePicker(false);
+    setError("");
+    setMessage("");
+  };
+
+  const applyCustomTemplate = (template: SurveyCustomTemplate) => {
+    const applied = applySurveyCustomTemplate(template);
     setTitle(applied.title);
     setDescription(applied.description);
     setCompanyIntro(applied.companyIntro);
@@ -89,10 +124,6 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
     setError("");
     setMessage("");
   };
-
-  if (showTemplatePicker) {
-    return <SurveyTemplatePicker onSelectTemplate={applyTemplate} onStartFromScratch={startFromScratch} />;
-  }
 
   const updateQuestion = (id: string, patch: Partial<SurveyQuestion>) => {
     setQuestions((current) => current.map((question) => (question.id === id ? { ...question, ...patch } : question)));
@@ -135,6 +166,75 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
 
   const removeQuestion = (id: string) => {
     setQuestions((current) => (current.length <= 1 ? current : current.filter((question) => question.id !== id)));
+  };
+
+  if (showTemplatePicker) {
+    return (
+      <SurveyTemplatePicker
+        customTemplates={customTemplates}
+        onSelectTemplate={applyTemplate}
+        onSelectCustomTemplate={applyCustomTemplate}
+        onStartFromScratch={startFromScratch}
+      />
+    );
+  }
+
+  const saveTemplate = async () => {
+    setSaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const payload = {
+        title,
+        description,
+        companyIntro,
+        category,
+        questions: questions.map(sanitizeQuestionOptions),
+      };
+      const url = isEdit
+        ? `/api/admin/survey-templates/${encodeURIComponent(initialTemplate!.id)}`
+        : "/api/admin/survey-templates";
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string; template?: SurveyCustomTemplate };
+      if (!res.ok || !data.ok) {
+        setError(data.message ?? "Could not save template.");
+        return;
+      }
+      router.push("/admin/templates");
+      router.refresh();
+    } catch {
+      setError("Network error while saving.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteTemplate = async () => {
+    if (!initialTemplate) return;
+    if (!window.confirm(`Delete template "${initialTemplate.title}"? This cannot be undone.`)) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/survey-templates/${encodeURIComponent(initialTemplate.id)}`, {
+        method: "DELETE",
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string };
+      if (!res.ok || !data.ok) {
+        setError(data.message ?? "Could not delete template.");
+        return;
+      }
+      router.push("/admin/templates");
+      router.refresh();
+    } catch {
+      setError("Network error while deleting.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const saveSurvey = async (nextStatus: SurveyDefinition["status"]) => {
@@ -183,9 +283,21 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <PageIntro
-        eyebrow="Survey builder"
-        title={isEdit ? "Edit survey" : "Create survey"}
-        description="Build interview and questionnaire items on-site — similar to Google Forms or Qualtrics. Publish when ready, then launch via Campaigns."
+        eyebrow={isTemplateMode ? "My templates" : "Survey builder"}
+        title={
+          isTemplateMode
+            ? isEdit
+              ? "Edit template"
+              : "Create template"
+            : isEdit
+              ? "Edit survey"
+              : "Create survey"
+        }
+        description={
+          isTemplateMode
+            ? "Define a reusable questionnaire layout. Surveys created from this template can still be edited before publishing."
+            : "Build interview and questionnaire items on-site — similar to Google Forms or Qualtrics. Publish when ready, then launch via Campaigns."
+        }
       />
 
       {error ? (
@@ -199,19 +311,21 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
         </BrandedAlert>
       ) : null}
 
-      {!isEdit && selectedTemplateTitle ? (
+      {!isEdit && !isTemplateMode && selectedTemplateTitle ? (
         <SurveyTemplateBanner templateTitle={selectedTemplateTitle} onChangeTemplate={changeTemplate} />
       ) : null}
 
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
-        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Survey details")}</h2>
+        <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">
+          {formatHeadingCase(isTemplateMode ? "Template details" : "Survey details")}
+        </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Title</label>
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="e.g. Belize coastal tourism attitudes"
+              placeholder={isTemplateMode ? "e.g. Standard customer satisfaction" : "e.g. Belize coastal tourism attitudes"}
               className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
             />
           </div>
@@ -224,6 +338,20 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
             />
           </div>
+          {isTemplateMode ? (
+            <div className="sm:col-span-2">
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                Default intro text (optional)
+              </label>
+              <textarea
+                rows={3}
+                value={companyIntro}
+                onChange={(event) => setCompanyIntro(event.target.value)}
+                placeholder="Shown at the top of surveys created from this template"
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
+              />
+            </div>
+          ) : null}
           <div>
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Category</label>
             <SiteSelect
@@ -236,23 +364,27 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
               className="mt-1.5"
             />
           </div>
-          <div>
-            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Status</label>
-            <p className="mt-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">{formatHeadingCase(status)}</p>
-          </div>
+          {!isTemplateMode ? (
+            <div>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Status</label>
+              <p className="mt-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">{formatHeadingCase(status)}</p>
+            </div>
+          ) : null}
         </div>
       </section>
 
-      <SurveyBrandingFields
-        surveyId={initialSurvey?.id}
-        initialSurvey={initialSurvey}
-        title={title}
-        description={description}
-        category={category}
-        companyIntro={companyIntro}
-        onCompanyIntroChange={setCompanyIntro}
-        onBrandingChange={handleBrandingChange}
-      />
+      {!isTemplateMode ? (
+        <SurveyBrandingFields
+          surveyId={initialSurvey?.id}
+          initialSurvey={initialSurvey}
+          title={title}
+          description={description}
+          category={category}
+          companyIntro={companyIntro}
+          onCompanyIntroChange={setCompanyIntro}
+          onBrandingChange={handleBrandingChange}
+        />
+      ) : null}
 
       <section className="space-y-4">
         <div>
@@ -400,28 +532,59 @@ export function SurveyBuilderClient({ initialSurvey }: { initialSurvey?: SurveyD
       </section>
 
       <div className="flex flex-wrap gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => saveSurvey("draft")}
-          className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60"
-        >
-          {saving ? "Saving…" : "Save draft"}
-        </button>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => saveSurvey("published")}
-          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
-        >
-          {saving ? "Publishing…" : "Publish survey"}
-        </button>
-        <Link
-          href="/admin/surveys"
-          className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
-        >
-          Back to library
-        </Link>
+        {isTemplateMode ? (
+          <>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={saveTemplate}
+              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+            >
+              {saving ? "Saving…" : isEdit ? "Save template" : "Create template"}
+            </button>
+            {isEdit ? (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={deleteTemplate}
+                className="inline-flex min-h-11 items-center rounded-xl border border-red-200 bg-white px-5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:bg-zinc-900 dark:text-red-300 dark:hover:bg-red-950/40"
+              >
+                Delete template
+              </button>
+            ) : null}
+            <Link
+              href="/admin/templates"
+              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
+            >
+              Back to templates
+            </Link>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => saveSurvey("draft")}
+              className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save draft"}
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => saveSurvey("published")}
+              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+            >
+              {saving ? "Publishing…" : "Publish survey"}
+            </button>
+            <Link
+              href="/admin/surveys"
+              className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
+            >
+              Back to library
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

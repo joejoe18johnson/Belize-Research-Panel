@@ -1,0 +1,242 @@
+[
+  {
+    "id": "template-customer-satisfaction-belize",
+    "title": "Customer satisfaction pulse",
+    "description": "Short post-service survey for rating satisfaction, likelihood to recommend, and open feedback.",
+    "companyIntro": "Thank you for taking a moment to share your experience. Your feedback helps us improve service quality across Belize.",
+    "category": "market",
+    "questions": [
+      {
+        "type": "rating_scale",
+        "title": "Overall, how satisfied are you with the service you received?",
+        "description": "1 = Very dissatisfied · 5 = Very satisfied",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Very dissatisfied",
+        "scaleMaxLabel": "Very satisfied"
+      },
+      {
+        "type": "single_choice",
+        "title": "How likely are you to recommend this service to a friend or colleague?",
+        "description": "",
+        "required": true,
+        "options": [
+          "0 – Not at all likely",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10 – Extremely likely"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Which areas influenced your rating? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Staff helpfulness",
+          "Wait time / speed",
+          "Value for money",
+          "Quality of information",
+          "Cleanliness / environment",
+          "Other"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "long_text",
+        "title": "What is one thing we could do better?",
+        "description": "Optional verbatim feedback.",
+        "required": false,
+        "options": ["Option 1", "Option 2"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      }
+    ],
+    "createdAt": "2026-01-15T10:00:00.000Z",
+    "updatedAt": "2026-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "template-civic-community-priorities",
+    "title": "Community priorities check-in",
+    "description": "Gauge local priorities on infrastructure, safety, and public services for civic research projects.",
+    "companyIntro": "Belize Research Panel is collecting views from residents on issues that affect your community. There are no right or wrong answers.",
+    "category": "civic",
+    "questions": [
+      {
+        "type": "dropdown",
+        "title": "Which district do you live in?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Belize District",
+          "Cayo",
+          "Corozal",
+          "Orange Walk",
+          "Stann Creek",
+          "Toledo",
+          "Other"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Which issues should leaders focus on most in the next year? (Select up to three)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Roads and infrastructure",
+          "Crime and safety",
+          "Healthcare access",
+          "Education quality",
+          "Water and utilities",
+          "Jobs and the economy",
+          "Environment and flooding"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "rating_scale",
+        "title": "I trust local institutions to act on community concerns.",
+        "description": "1 = Strongly disagree · 5 = Strongly agree",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Strongly disagree",
+        "scaleMaxLabel": "Strongly agree"
+      },
+      {
+        "type": "yes_no",
+        "title": "Have you attended a community meeting or town hall in the past 12 months?",
+        "description": "",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "short_text",
+        "title": "In one sentence, what is the most urgent issue in your area?",
+        "description": "",
+        "required": true,
+        "options": ["Option 1", "Option 2"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      }
+    ],
+    "createdAt": "2026-01-15T10:00:00.000Z",
+    "updatedAt": "2026-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "template-election-tracking-brief",
+    "title": "Election tracking brief",
+    "description": "Standard political tracking template with vote intention, party favourability, and key issue salience.",
+    "companyIntro": "This confidential research survey measures public opinion only. Your individual answers are never shared with campaigns or parties.",
+    "category": "political",
+    "questions": [
+      {
+        "type": "yes_no",
+        "title": "Are you registered to vote in Belize?",
+        "description": "",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "single_choice",
+        "title": "If a general election were held tomorrow, which party would you be most likely to support?",
+        "description": "",
+        "required": true,
+        "options": [
+          "People's United Party (PUP)",
+          "United Democratic Party (UDP)",
+          "Another party",
+          "Undecided",
+          "Would not vote"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "rating_scale",
+        "title": "How would you rate the current government's overall performance?",
+        "description": "1 = Very poor · 5 = Very good",
+        "required": true,
+        "options": ["Yes", "No"],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Very poor",
+        "scaleMaxLabel": "Very good"
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Which issues are most important when you decide how to vote? (Select all that apply)",
+        "description": "",
+        "required": true,
+        "options": [
+          "Economy and cost of living",
+          "Corruption and governance",
+          "Healthcare",
+          "Education",
+          "Crime and security",
+          "Infrastructure"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      },
+      {
+        "type": "dropdown",
+        "title": "How closely do you follow news about politics and elections?",
+        "description": "",
+        "required": true,
+        "options": [
+          "Not at all",
+          "Occasionally",
+          "Several times a week",
+          "Daily"
+        ],
+        "scaleMin": 1,
+        "scaleMax": 5,
+        "scaleMinLabel": "Low",
+        "scaleMaxLabel": "High"
+      }
+    ],
+    "createdAt": "2026-01-15T10:00:00.000Z",
+    "updatedAt": "2026-01-15T10:00:00.000Z"
+  }
+]
