@@ -26,7 +26,7 @@ export function ClientCampaignsDashboard({
       <PageIntro
         eyebrow="Client research portal"
         title={organizationName}
-        description="Review fieldwork progress and scientific survey analytics for studies commissioned through the Belize Research Panel."
+        description="Studies commissioned by your organization through the Belize Research Panel. Only campaigns assigned to your account appear here."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -37,14 +37,14 @@ export function ClientCampaignsDashboard({
 
       <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
-          <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Your campaigns")}</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Open a study to view response rates, sample composition, and question-level distributions.
-          </p>
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Your commissioned studies")}</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Only campaigns linked to your client account are shown. Open a study to view response rates, sample composition, and question-level distributions.
+            </p>
         </div>
         {campaigns.length === 0 ? (
           <p className="px-5 py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            No campaigns are linked to your account yet. Contact your Belize Research Panel project manager.
+            No commissioned studies are linked to your account yet. Your Belize Research Panel project manager will assign campaigns when fieldwork opens.
           </p>
         ) : (
           <div className="overflow-x-auto">

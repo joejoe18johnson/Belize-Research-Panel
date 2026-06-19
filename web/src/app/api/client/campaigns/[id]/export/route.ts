@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { notFound } from "next/navigation";
 import { panelistByEmailMap } from "@/lib/admin-data-hub";
 import { buildCampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { buildCampaignResultsCsv, campaignExportFilename } from "@/lib/campaign-results-export";
 import { getClientSession } from "@/lib/client-auth";
-import { loadClientCampaigns } from "@/lib/client-access";
+import { loadClientCampaigns, campaignOwnedByClient } from "@/lib/client-access";
 import { redactCampaignResultsForClient } from "@/lib/client-results-snapshot";
 import { targetingLabel } from "@/lib/campaign-targeting";
 import { loadPanelists } from "@/lib/panelists";
@@ -21,7 +20,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const { id } = await context.params;
   const campaigns = await loadClientCampaigns(session.clientId);
   const campaign = campaigns.find((row) => row.id === id);
-  if (!campaign) {
+  if (!campaign || !campaignOwnedByClient(campaign, session.clientId)) {
     return NextResponse.json({ message: "Campaign not found." }, { status: 404 });
   }
 
@@ -44,8 +43,6 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       surveyDefinition,
     })
   );
-
-  if (!snapshot) notFound();
 
   const csv = buildCampaignResultsCsv({
     snapshot,
