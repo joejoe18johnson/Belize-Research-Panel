@@ -5,9 +5,9 @@ import { buildCampaignAssignmentDetails } from "./campaign-targeting";
 import type { PanelistRow } from "./panelists";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
 import type { SurveyResponseRecord } from "./survey-responses";
-import type { SurveyQuestion, SurveyQuestionType } from "./survey-types";
+import type { SurveyQuestion, SurveyQuestionType, SurveyDefinition } from "./survey-types";
 import { hasAnswerForQuestion } from "./survey-types";
-import type { SurveyDefinition } from "./survey-types";
+import type { SurveyAnswerValue } from "./survey-types";
 import { cleanText } from "./validation";
 
 export interface WilsonInterval {
@@ -64,6 +64,24 @@ export interface QuestionAnalysis {
   textSamples: string[];
 }
 
+export interface RespondentAnswerItem {
+  questionId: string;
+  questionNumber: number;
+  title: string;
+  type: SurveyQuestionType;
+  answer: string;
+}
+
+export interface RespondentAnswerRecord {
+  respondentId: string;
+  panelistName: string | null;
+  panelistEmail: string | null;
+  submittedAt: string | null;
+  district: string | null;
+  constituency: string | null;
+  answers: RespondentAnswerItem[];
+}
+
 export interface CampaignResultsSnapshot {
   campaign: {
     id: string;
@@ -98,11 +116,62 @@ export interface CampaignResultsSnapshot {
   };
   questions: QuestionAnalysis[];
   assignments: CampaignAssignmentDetail[];
+  respondentAnswers: RespondentAnswerRecord[];
   submittedResponseCount: number;
 }
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+function formatSurveyAnswerValue(
+  question: SurveyQuestion,
+  value: SurveyAnswerValue | undefined
+): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (Array.isArray(value)) {
+    const items = value.map((item) => cleanText(String(item))).filter(Boolean);
+    return items.length ? items.join(", ") : "—";
+  }
+  return cleanText(String(value)) || "—";
+}
+
+function panelistDisplayName(panelist: PanelistRow | undefined): string | null {
+  if (!panelist) return null;
+  const name = [cleanText(panelist.first_name), cleanText(panelist.last_name)].filter(Boolean).join(" ");
+  return name || null;
+}
+
+function buildRespondentAnswerRecords(
+  surveyDefinition: SurveyDefinition | null,
+  isInternal: boolean,
+  responses: SurveyResponseRecord[],
+  panelistMap: Map<string, PanelistRow>
+): RespondentAnswerRecord[] {
+  if (!surveyDefinition || !isInternal) return [];
+
+  const submitted = responses.filter((record) => record.submittedAt);
+  return submitted.map((response, index) => {
+    const email = cleanText(response.panelistEmail).toLowerCase();
+    const panelist = panelistMap.get(email);
+    const slice = panelist ? panelistToAnalyticsSlice(panelist) : null;
+
+    return {
+      respondentId: `R${String(index + 1).padStart(3, "0")}`,
+      panelistName: panelistDisplayName(panelist),
+      panelistEmail: email || null,
+      submittedAt: response.submittedAt,
+      district: slice?.district ?? null,
+      constituency: slice?.constituency ?? null,
+      answers: surveyDefinition.questions.map((question, questionIndex) => ({
+        questionId: question.id,
+        questionNumber: questionIndex + 1,
+        title: question.title || "Untitled question",
+        type: question.type,
+        answer: formatSurveyAnswerValue(question, response.answers[question.id]),
+      })),
+    };
+  });
 }
 
 function wilsonInterval(successes: number, n: number, z = 1.96): WilsonInterval {
@@ -361,6 +430,12 @@ export function buildCampaignResultsSnapshot(input: {
     },
     questions,
     assignments: assignmentDetails,
+    respondentAnswers: buildRespondentAnswerRecords(
+      surveyDefinition,
+      campaign.deliveryType === "internal",
+      submittedResponses,
+      panelistMap
+    ),
     submittedResponseCount,
   };
 }
