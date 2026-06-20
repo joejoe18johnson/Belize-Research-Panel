@@ -232,23 +232,15 @@ export function HomePageClient() {
           </div>
 
           <div className="mx-auto w-full max-w-md lg:max-w-none lg:justify-self-end">
-            <div
-              className={
-                onDarkHero
-                  ? "overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-3 shadow-2xl shadow-black/20"
-                  : "overflow-hidden rounded-3xl border border-teal-100 bg-white p-3 shadow-lg shadow-teal-950/10 dark:border-teal-800 dark:bg-zinc-900"
-              }
-            >
-              <Image
-                src={PUBLIC_IMAGES.homeHero}
-                alt={t(copy.heroImageAlt)}
-                width={800}
-                height={800}
-                priority
-                sizes="(max-width: 1024px) 28rem, 32rem"
-                className="h-auto w-full rounded-2xl object-cover"
-              />
-            </div>
+            <Image
+              src={PUBLIC_IMAGES.homeHero}
+              alt={t(copy.heroImageAlt)}
+              width={800}
+              height={800}
+              priority
+              sizes="(max-width: 1024px) 28rem, 32rem"
+              className="h-auto w-full"
+            />
           </div>
         </section>
 
