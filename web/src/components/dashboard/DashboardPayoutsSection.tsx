@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
+import { BrandedPdfActions } from "@/components/shared/BrandedPdfActions";
 import { payoutShortId, formatPayoutPaymentDetails, payoutStatusLabel } from "@/lib/admin-payout-display";
 import type { RedemptionRequest } from "@/lib/reward-redemption";
 import { formatBz } from "@/lib/reward-redemption";
@@ -81,6 +82,12 @@ function PayoutRequestCard({ request, layout }: { request: RedemptionRequest; la
             ))}
           </dl>
         ) : null}
+        <div className="mt-4 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+          <BrandedPdfActions
+            viewHref={`/api/dashboard/payouts/${encodeURIComponent(request.id)}/statement`}
+            compact
+          />
+        </div>
       </div>
     );
   }
@@ -104,6 +111,12 @@ function PayoutRequestCard({ request, layout }: { request: RedemptionRequest; la
       <div className="shrink-0 text-right">
         <p className="text-sm font-bold tabular-nums text-teal-900 dark:text-teal-100">{formatBz(amountBz)}</p>
         <p className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{request.points.toLocaleString()} pts</p>
+        <div className="mt-2 flex justify-end">
+          <BrandedPdfActions
+            viewHref={`/api/dashboard/payouts/${encodeURIComponent(request.id)}/statement`}
+            compact
+          />
+        </div>
       </div>
     </div>
   );

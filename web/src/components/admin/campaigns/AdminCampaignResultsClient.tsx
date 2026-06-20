@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/campaigns/ResearchCharts";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
+import { BrandedPdfActions } from "@/components/shared/BrandedPdfActions";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { CampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { SURVEY_QUESTION_TYPE_LABELS } from "@/lib/survey-types";
@@ -89,12 +90,19 @@ export function AdminCampaignResultsClient({
         />
         <div className="flex flex-wrap gap-2">
           {exportBasePath ? (
-            <a
-              href={exportBasePath}
-              className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800"
-            >
-              {formatHeadingCase("Download CSV")}
-            </a>
+            <>
+              <a
+                href={exportBasePath}
+                className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                {formatHeadingCase("Download CSV")}
+              </a>
+              <BrandedPdfActions
+                viewHref={`${exportBasePath}?format=pdf`}
+                viewLabel="View report PDF"
+                downloadLabel="Download PDF"
+              />
+            </>
           ) : null}
           <Link
             href={backHref}

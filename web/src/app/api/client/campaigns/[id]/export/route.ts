@@ -1,7 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { panelistByEmailMap } from "@/lib/admin-data-hub";
 import { buildCampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { buildCampaignResultsCsv, campaignExportFilename } from "@/lib/campaign-results-export";
+import { buildCampaignResultsPdf } from "@/lib/pdf/campaign-results-pdf";
+import { pdfResponse } from "@/lib/pdf/pdf-response";
 import { getClientSession } from "@/lib/client-auth";
 import { loadClientCampaigns, campaignOwnedByClient } from "@/lib/client-access";
 import { redactCampaignResultsForClient } from "@/lib/client-results-snapshot";
@@ -11,13 +13,16 @@ import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 import { findSurveyDefinitionById } from "@/lib/survey-definitions";
 import { loadSurveyResponsesForCampaign } from "@/lib/survey-responses";
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await getClientSession();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
   }
 
   const { id } = await context.params;
+  const format = request.nextUrl.searchParams.get("format") === "pdf" ? "pdf" : "csv";
+  const download = request.nextUrl.searchParams.get("download") === "1";
+
   const campaigns = await loadClientCampaigns(session.clientId);
   const campaign = campaigns.find((row) => row.id === id);
   if (!campaign || !campaignOwnedByClient(campaign, session.clientId)) {
@@ -43,6 +48,15 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       surveyDefinition,
     })
   );
+
+  if (format === "pdf") {
+    const bytes = await buildCampaignResultsPdf({
+      snapshot,
+      audience: "client",
+      clientName: session.organizationName || session.contactName,
+    });
+    return pdfResponse(bytes, campaignExportFilename(id, "pdf"), download);
+  }
 
   const csv = buildCampaignResultsCsv({
     snapshot,
