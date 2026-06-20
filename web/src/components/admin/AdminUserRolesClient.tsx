@@ -18,8 +18,6 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 type DraftMap = Record<
   string,
   {
-    firstName: string;
-    lastName: string;
     role: StaffRole;
     status: "active" | "inactive";
     password: string;
@@ -31,14 +29,16 @@ function buildDrafts(users: StaffUserPublic[]): DraftMap {
     users.map((user) => [
       user.id,
       {
-        firstName: user.first_name,
-        lastName: user.last_name,
         role: user.role,
         status: user.status,
         password: "",
       },
     ])
   );
+}
+
+function staffDisplayName(user: StaffUserPublic): string {
+  return `${user.first_name} ${user.last_name}`.trim() || user.email;
 }
 
 export function AdminUserRolesClient({
@@ -102,12 +102,7 @@ export function AdminUserRolesClient({
     try {
       const payload: Record<string, string> = options?.roleOnly
         ? { role: draft.role, status: draft.status }
-        : {
-            firstName: draft.firstName,
-            lastName: draft.lastName,
-            role: draft.role,
-            status: draft.status,
-          };
+        : { role: draft.role, status: draft.status };
       if (!options?.roleOnly && draft.password.trim()) payload.password = draft.password.trim();
 
       const res = await fetch(`/api/admin/staff-users/${encodeURIComponent(id)}`, {
@@ -310,8 +305,6 @@ export function AdminUserRolesClient({
           <tbody>
             {pagination.paginatedRows.map((user) => {
               const draft = drafts[user.id] ?? {
-                firstName: user.first_name,
-                lastName: user.last_name,
                 role: user.role,
                 status: user.status,
                 password: "",
@@ -321,19 +314,8 @@ export function AdminUserRolesClient({
 
               return (
                 <tr key={user.id} className="border-b border-zinc-50 align-top dark:border-zinc-800/80">
-                  <td className="px-4 py-3">
-                    <div className="grid gap-2">
-                      <input
-                        value={draft.firstName}
-                        onChange={(event) => updateDraft(user.id, { firstName: event.target.value })}
-                        className="w-full min-w-[8rem] rounded-lg border border-zinc-200 px-2.5 py-1.5 text-sm dark:border-zinc-800"
-                      />
-                      <input
-                        value={draft.lastName}
-                        onChange={(event) => updateDraft(user.id, { lastName: event.target.value })}
-                        className="w-full min-w-[8rem] rounded-lg border border-zinc-200 px-2.5 py-1.5 text-sm dark:border-zinc-800"
-                      />
-                    </div>
+                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                    {staffDisplayName(user)}
                   </td>
                   <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{user.email}</td>
                   <td className="px-4 py-3">
