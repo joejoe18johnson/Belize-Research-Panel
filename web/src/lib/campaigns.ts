@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { CreateCampaignInput, CampaignRecord } from "./campaign-targeting";
 import { resolveCampaignAudience } from "./campaign-targeting";
+import { findPanelistGroupById } from "./panelist-groups";
 import { findSurveyDefinitionById } from "./survey-definitions";
 import { loadSurveyRecordsFromFile, saveSurveyRecordsToFile } from "./panelist-surveys-store";
 import type { PanelistRow } from "./panelists";
@@ -62,7 +63,25 @@ export async function createAndLaunchCampaign(
     surveyDefinitionId = "";
   }
 
-  const audience = resolveCampaignAudience(panelists, input.targeting);
+  let targeting = input.targeting;
+  let resolvedGroup = null;
+  if (targeting.mode === "panelist_group") {
+    const groupId = cleanText(targeting.groupId ?? "");
+    if (!groupId) throw new Error("Select a saved panelist group.");
+    resolvedGroup = await findPanelistGroupById(groupId);
+    if (!resolvedGroup) throw new Error("Selected panelist group was not found.");
+    targeting = {
+      ...targeting,
+      groupId,
+      groupName: resolvedGroup.name,
+    };
+  }
+
+  const audience = resolveCampaignAudience(
+    panelists,
+    targeting,
+    resolvedGroup ? { group: resolvedGroup } : undefined
+  );
   if (audience.length === 0) throw new Error("No panelists match the selected targeting.");
 
   const campaigns = await loadCampaignRecords();
@@ -87,7 +106,7 @@ export async function createAndLaunchCampaign(
     assignedDate: input.assignedDate,
     completeByDate: input.completeByDate,
     deliveryMethod: cleanText(input.deliveryMethod) || (deliveryType === "internal" ? "On-site survey" : "External Survey Link"),
-    targeting: input.targeting,
+    targeting,
     clientId: cleanText(input.clientId ?? "") || undefined,
     createdAt: now,
     launchedAt: now,

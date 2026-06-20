@@ -23,12 +23,17 @@ function parseTargeting(body: Record<string, unknown>): CampaignTargeting {
     .map((value) => cleanText(value).toLowerCase())
     .filter(Boolean);
 
+  const groupId = cleanText(String(body.groupId ?? ""));
+  const groupName = cleanText(String(body.groupName ?? ""));
+
   return {
     mode,
     constituency: constituency || undefined,
     districts: districts.length ? districts : undefined,
     constituencies: constituencies.length ? constituencies : undefined,
     emails: emails.length ? emails : undefined,
+    groupId: groupId || undefined,
+    groupName: groupName || undefined,
   };
 }
 

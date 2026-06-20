@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { createPanelistGroup, loadPanelistGroups } from "@/lib/panelist-groups";
 import type { PanelistGroupType } from "@/lib/panelist-group-types";
-import { normalizeSampleFilters } from "@/lib/panelist-group-resolve";
+import { normalizePanelistGroupEmails, normalizeSampleFilters } from "@/lib/panelist-group-resolve";
 import { cleanText } from "@/lib/validation";
 
 export async function GET() {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       name: cleanText(String(body.name ?? "")),
       description: cleanText(String(body.description ?? "")),
       type: type as PanelistGroupType,
-      emails: Array.isArray(body.emails) ? body.emails.map(String) : String(body.emails ?? ""),
+      emails: normalizePanelistGroupEmails(body.emails),
       filters: normalizeSampleFilters(body.filters),
     });
 

@@ -14,6 +14,8 @@ import {
 } from "@/lib/campaign-targeting";
 import { DELIVERY_METHODS } from "@/lib/admin-survey-distribution";
 import { BELIZE_DISTRICTS, getConstituencyOptions } from "@/lib/constants";
+import type { PanelistGroup } from "@/lib/panelist-group-types";
+import { countPanelistGroupMembers } from "@/lib/panelist-group-resolve";
 import type { PanelistRow } from "@/lib/panelists";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import type { CampaignAssignmentLink } from "@/lib/campaign-survey-links";
@@ -35,10 +37,12 @@ export function AdminCreateCampaignClient({
   panelists,
   publishedSurveys,
   clients,
+  groups,
 }: {
   panelists: PanelistRow[];
   publishedSurveys: SurveyDefinition[];
   clients: ClientUserRecord[];
+  groups: PanelistGroup[];
 }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
@@ -56,12 +60,18 @@ export function AdminCreateCampaignClient({
   const [districts, setDistricts] = useState<string[]>([]);
   const [constituencies, setConstituencies] = useState<string[]>([]);
   const [emails, setEmails] = useState("");
+  const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const [clientId, setClientId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [launchedCampaign, setLaunchedCampaign] = useState<CampaignRecord | null>(null);
   const [launchedSurveyLinks, setLaunchedSurveyLinks] = useState<CampaignAssignmentLink[]>([]);
+
+  const selectedGroup = useMemo(
+    () => groups.find((group) => group.id === groupId) ?? null,
+    [groups, groupId]
+  );
 
   const targeting = useMemo<CampaignTargeting>(
     () => ({
@@ -73,11 +83,21 @@ export function AdminCreateCampaignClient({
         .split(/[\n,;]+/)
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean),
+      groupId: groupId || undefined,
+      groupName: selectedGroup?.name,
     }),
-    [targetMode, constituency, districts, constituencies, emails]
+    [targetMode, constituency, districts, constituencies, emails, groupId, selectedGroup]
   );
 
-  const eligibleCount = useMemo(() => countCampaignAudience(panelists, targeting), [panelists, targeting]);
+  const eligibleCount = useMemo(
+    () =>
+      countCampaignAudience(
+        panelists,
+        targeting,
+        selectedGroup ? { group: selectedGroup } : undefined
+      ),
+    [panelists, targeting, selectedGroup]
+  );
 
   const constituencyOptions = useMemo(() => getConstituencyOptions(), []);
 
@@ -106,6 +126,7 @@ export function AdminCreateCampaignClient({
           districts,
           constituencies,
           emails,
+          groupId,
           clientId,
         }),
       });
@@ -421,6 +442,44 @@ export function AdminCreateCampaignClient({
             </div>
           ) : null}
 
+          {targetMode === "panelist_group" ? (
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                  Saved panelist group
+                </label>
+                <SiteSelect
+                  value={groupId}
+                  onChange={setGroupId}
+                  placeholder="Select a group"
+                  options={[
+                    { value: "", label: "Select a group" },
+                    ...groups.map((group) => ({
+                      value: group.id,
+                      label: group.name,
+                    })),
+                  ]}
+                  className="mt-1.5"
+                />
+              </div>
+              {groups.length === 0 ? (
+                <BrandedAlert tone="info" compact showIcon>
+                  No saved groups yet.{" "}
+                  <Link href="/admin/groups/create" className="font-semibold underline">
+                    Create a group
+                  </Link>{" "}
+                  under Panelists → Groups.
+                </BrandedAlert>
+              ) : selectedGroup ? (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  {selectedGroup.description || "Reusable audience saved from the Groups admin page."}{" "}
+                  {countPanelistGroupMembers(panelists, selectedGroup)} panelist
+                  {countPanelistGroupMembers(panelists, selectedGroup) === 1 ? "" : "s"} currently match.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
           <BrandedAlert tone="info" compact showIcon>
             {eligibleCount} panelist{eligibleCount === 1 ? "" : "s"} will receive this campaign when launched.
             Assignments appear in each panelist&apos;s survey inbox immediately.
@@ -430,7 +489,12 @@ export function AdminCreateCampaignClient({
         <div className="flex flex-wrap gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
           <button
             type="submit"
-            disabled={submitting || eligibleCount === 0 || (deliveryType === "internal" && !surveyDefinitionId)}
+            disabled={
+              submitting ||
+              eligibleCount === 0 ||
+              (deliveryType === "internal" && !surveyDefinitionId) ||
+              (targetMode === "panelist_group" && !groupId)
+            }
             className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
           >
             {submitting ? "Launching…" : `Launch to ${eligibleCount} panelist${eligibleCount === 1 ? "" : "s"}`}

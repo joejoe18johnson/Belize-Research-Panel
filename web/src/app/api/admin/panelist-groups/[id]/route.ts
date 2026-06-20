@@ -7,7 +7,7 @@ import {
   updatePanelistGroup,
 } from "@/lib/panelist-groups";
 import type { PanelistGroupType } from "@/lib/panelist-group-types";
-import { normalizeSampleFilters } from "@/lib/panelist-group-resolve";
+import { normalizePanelistGroupEmails, normalizeSampleFilters } from "@/lib/panelist-group-resolve";
 import { cleanText } from "@/lib/validation";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -39,12 +39,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         body.type !== undefined
           ? ((cleanText(String(body.type)) === "filter" ? "filter" : "static") as PanelistGroupType)
           : undefined,
-      emails:
-        body.emails !== undefined
-          ? Array.isArray(body.emails)
-            ? body.emails.map(String)
-            : String(body.emails)
-          : undefined,
+      emails: body.emails !== undefined ? normalizePanelistGroupEmails(body.emails) : undefined,
       filters: body.filters !== undefined ? normalizeSampleFilters(body.filters) : undefined,
     });
 
