@@ -179,6 +179,17 @@ export function HomePageClient() {
               >
                 {t(copy.register)}
               </Link>
+              {/* Temporary — remove before production */}
+              <Link
+                href="/admin/login"
+                className={
+                  onDarkHero
+                    ? "flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
+                    : "flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                }
+              >
+                Admin login
+              </Link>
             </div>
 
             <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
