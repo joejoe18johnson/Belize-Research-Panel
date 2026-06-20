@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
@@ -12,6 +13,7 @@ import {
   storeHomeLocale,
   type HomeLocale,
 } from "@/lib/home-locale";
+import { PUBLIC_IMAGES } from "@/lib/public-images";
 import { formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -185,48 +187,70 @@ export function HomePageClient() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16">
-        <div className="max-w-3xl">
-          <p
-            className={
-              onDarkHero
-                ? "mb-4 inline-flex rounded-full border border-amber-300/40 bg-amber-400/15 px-4 py-1.5 text-sm font-semibold text-amber-100"
-                : "mb-4 inline-flex rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-900"
-            }
-          >
-            {t(copy.rewardsBadge)}
-          </p>
-          <p className={onDarkHero ? "text-sm font-medium text-teal-200" : "text-sm font-medium text-teal-700"}>
-            {t(copy.eyebrow)}
-          </p>
-          <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t(copy.headline)}</h1>
-          <p
-            className={
-              onDarkHero
-                ? "mt-5 text-base leading-relaxed text-teal-100 sm:mt-6 sm:text-lg"
-                : "mt-5 text-base leading-relaxed text-zinc-600 sm:mt-6 sm:text-lg"
-            }
-          >
-            {t(copy.description)}
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
-            <Link
-              href="/register"
-              className="flex min-h-12 items-center justify-center rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-teal-950 shadow-lg shadow-amber-900/30 hover:bg-amber-300"
-            >
-              {t(copy.registerCta)}
-            </Link>
-            <Link
-              href="/login"
+        <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)]">
+          <div className="max-w-3xl">
+            <p
               className={
                 onDarkHero
-                  ? "flex min-h-12 items-center justify-center rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-                  : "flex min-h-12 items-center justify-center rounded-xl border border-teal-300 px-6 py-3 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+                  ? "mb-4 inline-flex rounded-full border border-amber-300/40 bg-amber-400/15 px-4 py-1.5 text-sm font-semibold text-amber-100"
+                  : "mb-4 inline-flex rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-900"
               }
             >
-              {t(copy.loginCta)}
-            </Link>
+              {t(copy.rewardsBadge)}
+            </p>
+            <p className={onDarkHero ? "text-sm font-medium text-teal-200" : "text-sm font-medium text-teal-700"}>
+              {t(copy.eyebrow)}
+            </p>
+            <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t(copy.headline)}</h1>
+            <p
+              className={
+                onDarkHero
+                  ? "mt-5 text-base leading-relaxed text-teal-100 sm:mt-6 sm:text-lg"
+                  : "mt-5 text-base leading-relaxed text-zinc-600 sm:mt-6 sm:text-lg"
+              }
+            >
+              {t(copy.description)}
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
+              <Link
+                href="/register"
+                className="flex min-h-12 items-center justify-center rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-teal-950 shadow-lg shadow-amber-900/30 hover:bg-amber-300"
+              >
+                {t(copy.registerCta)}
+              </Link>
+              <Link
+                href="/login"
+                className={
+                  onDarkHero
+                    ? "flex min-h-12 items-center justify-center rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                    : "flex min-h-12 items-center justify-center rounded-xl border border-teal-300 px-6 py-3 text-sm font-semibold text-teal-800 hover:bg-teal-50"
+                }
+              >
+                {t(copy.loginCta)}
+              </Link>
+            </div>
           </div>
-        </div>
+
+          <div className="mx-auto w-full max-w-md lg:max-w-none lg:justify-self-end">
+            <div
+              className={
+                onDarkHero
+                  ? "overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-3 shadow-2xl shadow-black/20"
+                  : "overflow-hidden rounded-3xl border border-teal-100 bg-white p-3 shadow-lg shadow-teal-950/10 dark:border-teal-800 dark:bg-zinc-900"
+              }
+            >
+              <Image
+                src={PUBLIC_IMAGES.homeHero}
+                alt={t(copy.heroImageAlt)}
+                width={800}
+                height={800}
+                priority
+                sizes="(max-width: 1024px) 28rem, 32rem"
+                className="h-auto w-full rounded-2xl object-cover"
+              />
+            </div>
+          </div>
+        </section>
 
         <section className="mt-14 sm:mt-20">
           <p

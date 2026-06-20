@@ -9,6 +9,7 @@ export const HOME_COPY = {
     register: "Register",
     eyebrow: "Exclusive research panel · earn rewards",
     headline: "Share your opinion. Get rewarded.",
+    heroImageAlt: "Panelists sharing opinions and earning rewards with Belize Research Panel",
     description:
       "Qualified panelists earn points for every survey they complete — then redeem for cash, mobile phone credit, utility credit, and more. Join Belize's trusted platform for public opinion polling, market research, and governance studies.",
     rewardsBadge: "Qualified panelists get paid for their opinions",
@@ -83,6 +84,7 @@ export const HOME_COPY = {
     register: "Registrarse",
     eyebrow: "Panel de investigación exclusivo · gane recompensas",
     headline: "Comparta su opinión. Reciba recompensas.",
+    heroImageAlt: "Panelistas compartiendo opiniones y ganando recompensas con Belize Research Panel",
     description:
       "Los panelistas calificados ganan puntos por cada encuesta completada — y los canjean por efectivo, crédito telefónico, crédito de servicios públicos y más. Únase a la plataforma de confianza de Belice para encuestas de opinión pública, investigación de mercado y estudios de gobernanza.",
     rewardsBadge: "Los panelistas calificados reciben pago por sus opiniones",

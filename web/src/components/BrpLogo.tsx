@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PUBLIC_IMAGES } from "@/lib/public-images";
 
 /** Text logo for faster loads during testing. Set NEXT_PUBLIC_USE_TEXT_LOGO=false to restore images. */
 export const USE_TEXT_LOGO = process.env.NEXT_PUBLIC_USE_TEXT_LOGO !== "false";
 
 /** Logo for light backgrounds (dashboard, auth, registration). */
-export const LOGO_LIGHT_BG_SRC = "/BRP-Logo-01.png";
+export const LOGO_LIGHT_BG_SRC = PUBLIC_IMAGES.logoLight;
 /** Logo for dark backgrounds (marketing home hero). */
-export const LOGO_DARK_BG_SRC = "/BRP-Logo.png";
+export const LOGO_DARK_BG_SRC = PUBLIC_IMAGES.logoDark;
 
 export type BrpLogoVariant = "light" | "dark";
 
@@ -48,7 +49,7 @@ export function BrpLogo({
 }: {
   /** `light` = light page background; `dark` = dark page background */
   variant?: BrpLogoVariant;
-  /** Optional explicit logo file (e.g. `/BRP-Logo.png` on the home page). */
+  /** Optional explicit logo file (e.g. `/images/BRP-Logo.png` on the home page). */
   src?: string;
   className?: string;
   priority?: boolean;
