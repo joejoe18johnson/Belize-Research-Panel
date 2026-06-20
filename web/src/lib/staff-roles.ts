@@ -34,6 +34,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
   super_admin: ADMIN_MODULES.map((module) => module.slug),
   operations_manager: [
     "panelists",
+    "panelist-groups",
     "admin-dashboard",
     "under-review",
     "notifications",
@@ -53,6 +54,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
   ],
   research_analyst: [
     "admin-dashboard",
+    "panelist-groups",
     "advanced-analytics",
     "survey-builder",
     "survey-templates",
@@ -75,6 +77,7 @@ const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
 const ADMIN_PATH_TO_SLUG: Record<string, string> = {
   "/admin/dashboard": "admin-dashboard",
   "/admin/panelists": "panelists",
+  "/admin/groups": "panelist-groups",
   "/admin/under-review": "under-review",
   "/admin/notifications": "notifications",
   "/admin/payouts": "payouts",
@@ -121,6 +124,7 @@ export function staffDefaultAdminPath(role: StaffRole): string {
 export function pathnameToAdminModuleSlug(pathname: string): string | null {
   if (pathname === "/admin" || pathname === "/admin/") return "admin-dashboard";
   if (pathname.startsWith("/admin/templates")) return "survey-templates";
+  if (pathname.startsWith("/admin/groups")) return "panelist-groups";
   if (pathname.startsWith("/admin/surveys")) return "survey-builder";
   if (ADMIN_PATH_TO_SLUG[pathname]) return ADMIN_PATH_TO_SLUG[pathname];
 
