@@ -4,17 +4,17 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   AdminDataTable,
-  AdminDownloadButton,
   AdminNewBadge,
   AdminStatusPill,
   AdminTableHead,
   AdminTableTh,
   adminNewItemRowClass,
 } from "@/components/admin/shared/AdminUi";
+import { BrandedPdfActions } from "@/components/shared/BrandedPdfActions";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { PayoutQueueRow } from "@/lib/admin-dashboard-metrics";
-import { buildPayoutStatementText, payoutStatusLabel } from "@/lib/admin-payout-display";
+import { payoutStatusLabel } from "@/lib/admin-payout-display";
 import { formatBz } from "@/lib/reward-redemption";
 import type { PayoutProcessAction } from "@/lib/reward-redemption";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -42,25 +42,8 @@ function filterHistoryRows(rows: PayoutQueueRow[], statusFilter: PayoutHistoryFi
   return rows;
 }
 
-function downloadPayoutStatement(row: PayoutQueueRow) {
-  const content = buildPayoutStatementText({
-    id: row.id,
-    name: "Panelist",
-    email: row.email,
-    optionLabel: row.optionLabel,
-    amountBz: row.amountBz,
-    points: row.points,
-    status: row.status,
-    submittedAt: row.submittedAt,
-    payment: { title: row.paymentTitle, lines: row.paymentLines },
-  });
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `payout-${row.shortId}.txt`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+function payoutStatementHref(id: string): string {
+  return `/api/admin/payouts/${encodeURIComponent(id)}/statement`;
 }
 
 function PayoutProcessDialog({
@@ -183,6 +166,9 @@ function PayoutProcessDialog({
           {readOnly ? (
             <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">This request is closed. No further action is required.</p>
           ) : null}
+          <div className="mt-2">
+            <BrandedPdfActions viewHref={payoutStatementHref(row.id)} compact viewLabel="View statement" />
+          </div>
         </div>
 
         <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
@@ -424,7 +410,7 @@ export function AdminPayoutQueueSection({
                       <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.processedBy ?? "—"}</td>
                     ) : null}
                     <td className="px-4 py-3 text-center">
-                      <AdminDownloadButton onClick={() => downloadPayoutStatement(row)} />
+                      <BrandedPdfActions viewHref={payoutStatementHref(row.id)} compact />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button

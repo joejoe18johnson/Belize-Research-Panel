@@ -13,6 +13,7 @@ import {
   type StaffRole,
 } from "@/lib/staff-roles";
 import type { StaffUserPublic } from "@/lib/staff-users";
+import { siteInputClass } from "@/lib/site-controls";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 type DraftMap = Record<
@@ -223,7 +224,7 @@ export function AdminUserRolesClient({
             <input
               value={createForm.firstName}
               onChange={(event) => setCreateForm((current) => ({ ...current, firstName: event.target.value }))}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className={`mt-1.5 ${siteInputClass}`}
             />
           </div>
           <div>
@@ -231,7 +232,7 @@ export function AdminUserRolesClient({
             <input
               value={createForm.lastName}
               onChange={(event) => setCreateForm((current) => ({ ...current, lastName: event.target.value }))}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className={`mt-1.5 ${siteInputClass}`}
             />
           </div>
           <div>
@@ -240,7 +241,7 @@ export function AdminUserRolesClient({
               type="email"
               value={createForm.email}
               onChange={(event) => setCreateForm((current) => ({ ...current, email: event.target.value }))}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className={`mt-1.5 ${siteInputClass}`}
             />
           </div>
           <div>
@@ -258,7 +259,7 @@ export function AdminUserRolesClient({
               type="password"
               value={createForm.password}
               onChange={(event) => setCreateForm((current) => ({ ...current, password: event.target.value }))}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className={`mt-1.5 ${siteInputClass}`}
             />
           </div>
           <div>
@@ -357,7 +358,7 @@ export function AdminUserRolesClient({
                       value={draft.password}
                       onChange={(event) => updateDraft(user.id, { password: event.target.value })}
                       placeholder="Leave blank to keep"
-                      className="w-full min-w-[10rem] rounded-lg border border-zinc-200 px-2.5 py-1.5 text-sm dark:border-zinc-800"
+                      className={`min-w-[10rem] ${siteInputClass}`}
                     />
                   </td>
                   <td className="px-4 py-3">
