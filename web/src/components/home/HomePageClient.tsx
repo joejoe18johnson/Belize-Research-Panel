@@ -79,6 +79,45 @@ function HomeRewardPerkCard({
   );
 }
 
+function HomeHowItWorksStep({
+  step,
+  title,
+  body,
+  onDarkHero,
+}: {
+  step: number;
+  title: string;
+  body: string;
+  onDarkHero: boolean;
+}) {
+  const cardClass = onDarkHero
+    ? "rounded-2xl border border-white/10 bg-white/5 p-5"
+    : "rounded-2xl border border-teal-200 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-zinc-900";
+  const stepClass = onDarkHero
+    ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-sm font-bold text-amber-200 ring-1 ring-amber-300/40"
+    : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-800 ring-1 ring-teal-200 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800";
+  const titleClass = onDarkHero
+    ? "text-base font-semibold text-white"
+    : "text-base font-semibold text-zinc-900 dark:text-zinc-100";
+  const bodyClass = onDarkHero
+    ? "mt-2 text-sm leading-relaxed text-teal-100"
+    : "mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400";
+
+  return (
+    <div className={cardClass}>
+      <div className="flex items-start gap-4">
+        <span className={stepClass} aria-hidden>
+          {step}
+        </span>
+        <div>
+          <h3 className={titleClass}>{title}</h3>
+          <p className={bodyClass}>{body}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HomePageClient() {
   const [locale, setLocale] = useState<HomeLocale>("en");
   const { resolved } = useTheme();
@@ -111,7 +150,6 @@ export function HomePageClient() {
           <BrpLogoLink href="/" variant="light" />
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
             <LanguageSwitcher
               locale={locale}
               onChange={handleLocaleChange}
@@ -119,16 +157,6 @@ export function HomePageClient() {
             />
 
             <div className="hidden items-center gap-3 sm:flex">
-              <Link
-                href="/client/login"
-                className={
-                  onDarkHero
-                    ? "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
-                    : "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100"
-                }
-              >
-                {t(copy.clientPortal)}
-              </Link>
               <Link
                 href="/login"
                 className={
@@ -150,6 +178,8 @@ export function HomePageClient() {
                 {t(copy.register)}
               </Link>
             </div>
+
+            <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
           </div>
         </div>
       </header>
@@ -197,6 +227,38 @@ export function HomePageClient() {
             </Link>
           </div>
         </div>
+
+        <section className="mt-14 sm:mt-20">
+          <p
+            className={
+              onDarkHero
+                ? "text-xs font-bold uppercase tracking-[0.18em] text-amber-200"
+                : "text-xs font-bold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300"
+            }
+          >
+            {t(copy.howItWorksEyebrow)}
+          </p>
+          <h2
+            className={
+              onDarkHero
+                ? "mt-2 text-2xl font-bold text-white sm:text-3xl"
+                : "mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl"
+            }
+          >
+            {t(copy.howItWorksHeadline)}
+          </h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {copy.howItWorksSteps.map((step, index) => (
+              <HomeHowItWorksStep
+                key={step.title}
+                step={index + 1}
+                title={t(step.title)}
+                body={t(step.body)}
+                onDarkHero={onDarkHero}
+              />
+            ))}
+          </div>
+        </section>
 
         <section
           className={

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { RoleTestAccountsReference } from "@/components/admin/RoleTestAccountsReference";
 import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
 import { STAFF_DEMO_PASSWORD } from "@/lib/demo-staff-users";
@@ -50,7 +51,10 @@ export function AdminLoginForm() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white">
       <header className="safe-top px-4 py-4 sm:px-6">
-        <BrpLogoLink href="/" variant="dark" />
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+          <BrpLogoLink href="/" variant="dark" />
+          <ThemeToggle variant="dark" compact />
+        </div>
       </header>
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">
         <div className="w-full max-w-2xl space-y-6">

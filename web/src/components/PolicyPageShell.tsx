@@ -20,13 +20,13 @@ export function PolicyPageShell({
         <div className={`${appContentClass} flex items-center justify-between gap-4 px-4 py-4 sm:px-6`}>
           <BrpLogoLink href="/" variant="light" />
           <div className="flex items-center gap-2">
-            <ThemeToggle compact />
             <Link
               href="/"
-              className="text-sm font-semibold text-teal-700 transition hover:text-teal-900 dark:text-teal-100 hover:underline dark:text-teal-300 dark:hover:text-teal-100"
+              className="text-sm font-semibold text-teal-700 transition hover:text-teal-900 dark:text-teal-300 hover:underline dark:hover:text-teal-100"
             >
               {formatHeadingCase("Back to home")}
             </Link>
+            <ThemeToggle compact />
           </div>
         </div>
       </header>

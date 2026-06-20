@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AccountDeleteHeader } from "@/components/account/AccountDeleteHeader";
 import { DeleteAccountPanel } from "@/components/account/DeleteAccountPanel";
-import { BrpLogoLink } from "@/components/BrpLogo";
 import { getSessionAccount } from "@/lib/auth";
 import { AUTH_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -18,11 +18,7 @@ export default async function DeleteAccountPage() {
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-800">
-      <header className="safe-top shrink-0 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-        <div className={`mx-auto flex ${AUTH_CONTENT_MAX} items-center justify-center px-4 py-4 sm:px-6`}>
-          <BrpLogoLink href={account.panelistRegistered ? "/dashboard" : "/register"} variant="light" />
-        </div>
-      </header>
+      <AccountDeleteHeader logoHref={account.panelistRegistered ? "/dashboard" : "/register"} />
       <main className={`mx-auto w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 ${AUTH_CONTENT_MAX}`}>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{formatHeadingCase("Delete account and opt out")}</h1>

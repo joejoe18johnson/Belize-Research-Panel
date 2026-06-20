@@ -43,6 +43,25 @@ function FlagIcon({ locale, className, clipId }: { locale: HomeLocale; className
   );
 }
 
+function ChevronIcon({ open, variant }: { open: boolean; variant: "dark" | "light" }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={`h-4 w-4 shrink-0 transition ${open ? "rotate-180" : ""} ${
+        variant === "dark" ? "text-white/80" : "text-zinc-500 dark:text-zinc-400"
+      }`}
+    >
+      <path
+        fillRule="evenodd"
+        d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 export function LanguageSwitcher({
   locale,
   onChange,
@@ -107,6 +126,7 @@ export function LanguageSwitcher({
       >
         <FlagIcon locale={locale} className="h-5 w-5 shrink-0" clipId={triggerClipId} />
         <span className="text-sm font-medium">{localeDisplayName(locale)}</span>
+        <ChevronIcon open={open} variant={variant} />
       </button>
 
       {open ? (
