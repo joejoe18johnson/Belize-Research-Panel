@@ -1,5 +1,7 @@
 import type { TargetGroup } from "./admin-survey-distribution";
 import { filterPanelistsForTarget } from "./admin-survey-distribution";
+import { resolvePanelistGroupMembers } from "./panelist-group-resolve";
+import type { PanelistGroup } from "./panelist-group-types";
 import type { PanelistSurveyRecord, SurveyCategory } from "./panelist-surveys-types";
 import { isSurveyOverdue } from "./panelist-surveys-types";
 import type { PanelistRow } from "./panelists";
@@ -11,7 +13,8 @@ export type CampaignTargetMode =
   | TargetGroup
   | "specific_districts"
   | "specific_constituencies"
-  | "specific_emails";
+  | "specific_emails"
+  | "panelist_group";
 
 export interface CampaignTargeting {
   mode: CampaignTargetMode;
@@ -19,6 +22,8 @@ export interface CampaignTargeting {
   districts?: string[];
   constituencies?: string[];
   emails?: string[];
+  groupId?: string;
+  groupName?: string;
 }
 
 export interface CampaignRecord {
@@ -96,6 +101,7 @@ export const CAMPAIGN_TARGET_OPTIONS: { id: CampaignTargetMode; label: string }[
   { id: "specific_districts", label: "Specific districts" },
   { id: "specific_constituencies", label: "Specific constituencies" },
   { id: "specific_emails", label: "Specific panelists (by email)" },
+  { id: "panelist_group", label: "Saved panelist group" },
   { id: "market_target", label: "Market research interests" },
   { id: "custom", label: "All verified (custom sample)" },
 ];
@@ -118,6 +124,8 @@ export function targetingLabel(targeting: CampaignTargeting): string {
         : "Specific constituencies";
     case "specific_emails":
       return `${targeting.emails?.length ?? 0} specific panelist(s)`;
+    case "panelist_group":
+      return targeting.groupName ? `Group: ${targeting.groupName}` : "Saved panelist group";
     case "market_target":
       return "Market research target";
     default:
@@ -125,7 +133,17 @@ export function targetingLabel(targeting: CampaignTargeting): string {
   }
 }
 
-export function resolveCampaignAudience(panelists: PanelistRow[], targeting: CampaignTargeting): PanelistRow[] {
+export function resolveCampaignAudience(
+  panelists: PanelistRow[],
+  targeting: CampaignTargeting,
+  options?: { group?: PanelistGroup | null }
+): PanelistRow[] {
+  if (targeting.mode === "panelist_group") {
+    const group = options?.group;
+    if (!group) return [];
+    return resolvePanelistGroupMembers(panelists, group);
+  }
+
   if (targeting.mode === "specific_emails") {
     const emails = new Set((targeting.emails ?? []).map((email) => cleanText(email).toLowerCase()).filter(Boolean));
     return panelists.filter((row) => emails.has(cleanText(row.email).toLowerCase()));
@@ -154,8 +172,12 @@ export function resolveCampaignAudience(panelists: PanelistRow[], targeting: Cam
   return filterPanelistsForTarget(panelists, targeting.mode as TargetGroup, targeting.constituency ?? "");
 }
 
-export function countCampaignAudience(panelists: PanelistRow[], targeting: CampaignTargeting): number {
-  return resolveCampaignAudience(panelists, targeting).length;
+export function countCampaignAudience(
+  panelists: PanelistRow[],
+  targeting: CampaignTargeting,
+  options?: { group?: PanelistGroup | null }
+): number {
+  return resolveCampaignAudience(panelists, targeting, options).length;
 }
 
 function panelistName(row: PanelistRow | undefined): string {
