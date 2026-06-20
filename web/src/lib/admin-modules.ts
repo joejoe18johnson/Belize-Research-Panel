@@ -6,9 +6,9 @@ export type AdminModuleKind = "page" | "module";
 export type AdminModuleStatus = "working" | "partial" | "planned" | "streamlit";
 
 export type AdminNavSectionId =
+  | "admin-console"
   | "panelists"
   | "campaigns"
-  | "rewards"
   | "research"
   | "operations"
   | "platform";
@@ -32,9 +32,9 @@ export interface AdminModule {
 }
 
 export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
+  { id: "admin-console", label: "Admin Console" },
   { id: "panelists", label: "Panelists" },
   { id: "campaigns", label: "Campaigns" },
-  { id: "rewards", label: "Rewards" },
   { id: "research", label: "Research" },
   { id: "operations", label: "Operations" },
   { id: "platform", label: "Platform" },
@@ -45,6 +45,38 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
  */
 export const ADMIN_MODULES: AdminModule[] = [
   {
+    slug: "admin-dashboard",
+    label: "Admin Dashboard",
+    kind: "page",
+    href: "/admin/dashboard",
+    section: "admin-console",
+    status: "working",
+  },
+  {
+    slug: "payouts",
+    label: "Payouts",
+    kind: "page",
+    href: "/admin/payouts",
+    section: "admin-console",
+    status: "working",
+  },
+  {
+    slug: "fraud-prevention",
+    label: "Fraud Prevention",
+    kind: "page",
+    href: "/admin/fraud-prevention",
+    section: "admin-console",
+    status: "working",
+  },
+  {
+    slug: "reward-settings",
+    label: "Reward Settings",
+    kind: "page",
+    href: "/admin/reward-settings",
+    section: "admin-console",
+    status: "working",
+  },
+  {
     slug: "panelists",
     label: "Panelists",
     kind: "page",
@@ -53,10 +85,10 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
-    slug: "admin-dashboard",
-    label: "Admin Dashboard",
+    slug: "panelist-groups",
+    label: "Groups",
     kind: "page",
-    href: "/admin/dashboard",
+    href: "/admin/groups",
     section: "panelists",
     status: "working",
   },
@@ -73,22 +105,6 @@ export const ADMIN_MODULES: AdminModule[] = [
     label: "Notifications",
     kind: "page",
     href: "/admin/notifications",
-    section: "panelists",
-    status: "working",
-  },
-  {
-    slug: "payouts",
-    label: "Payouts",
-    kind: "page",
-    href: "/admin/payouts",
-    section: "panelists",
-    status: "working",
-  },
-  {
-    slug: "fraud-prevention",
-    label: "Fraud Prevention",
-    kind: "page",
-    href: "/admin/fraud-prevention",
     section: "panelists",
     status: "working",
   },
@@ -130,14 +146,6 @@ export const ADMIN_MODULES: AdminModule[] = [
     kind: "page",
     href: "/admin/templates",
     section: "campaigns",
-    status: "working",
-  },
-  {
-    slug: "reward-settings",
-    label: "Reward Settings",
-    kind: "page",
-    href: "/admin/reward-settings",
-    section: "rewards",
     status: "working",
   },
   {

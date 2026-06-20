@@ -55,6 +55,13 @@ const ICONS: Record<string, ReactNode> = {
       <path strokeLinecap="round" d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z" />
     </IconBase>
   ),
+  "panelist-groups": (
+    <IconBase>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M22 11v6M19 14h6" />
+    </IconBase>
+  ),
   campaigns: (
     <IconBase>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 11h18M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M7 21h10M9 15h6" />
