@@ -1,1 +1,125 @@
-[]
+[
+  {
+    "id": "group-joe-s-test-survey-mqmc2v02",
+    "name": "Joe's Test Survey",
+    "description": "Test Group by Joe",
+    "type": "filter",
+    "filters": {
+      "residence": [
+        "Cayo District",
+        "Corozal District",
+        "Stann Creek District",
+        "Abroad",
+        "Toledo District",
+        "Orange Walk District",
+        "Belize District"
+      ],
+      "districts": [
+        "Cayo District",
+        "Orange Walk District",
+        "Belize District",
+        "Corozal District",
+        "Stann Creek District",
+        "Toledo District"
+      ],
+      "cities": [
+        "Roaring Creek",
+        "Belmopan",
+        "Blackman Eddy",
+        "San Ignacio",
+        "Santa Elena",
+        "San Pedro",
+        "San Narciso",
+        "Belize City",
+        "Benque Viejo",
+        "Big Falls",
+        "Bladen",
+        "Blue Creek",
+        "Caye Caulker",
+        "Corozal Town",
+        "Dangriga",
+        "Douglas",
+        "Guinea Grass",
+        "Hattieville",
+        "Hopkins",
+        "Independence",
+        "Ladyville",
+        "Libertad",
+        "Orange Walk Town",
+        "Pueblo Viejo",
+        "Punta Gorda",
+        "Placencia",
+        "San Antonio",
+        "San Estevan",
+        "San Felipe",
+        "Sarteneja",
+        "Trial Farm"
+      ],
+      "constituencies": [
+        "Albert",
+        "Belize Rural Central",
+        "Belize Rural North",
+        "Belize Rural South",
+        "Belmopan",
+        "Caribbean Shores",
+        "Cayo North",
+        "Cayo South",
+        "Cayo West",
+        "Corozal North",
+        "Corozal South West",
+        "Dangriga",
+        "Freetown",
+        "Orange Walk Central",
+        "Orange Walk North",
+        "Orange Walk South",
+        "Stann Creek West",
+        "Toledo East",
+        "Toledo West"
+      ],
+      "ctvAreas": [
+        "Belize City",
+        "Benque Viejo",
+        "Belmopan",
+        "Buena Vista",
+        "Big Falls",
+        "Bullet Tree",
+        "Caye Caulker",
+        "Hopkins",
+        "Hattieville",
+        "Guinea Grass"
+      ],
+      "countriesAbroad": [],
+      "sexes": [
+        "Female",
+        "Male"
+      ],
+      "ageGroups": [
+        "25–34",
+        "18–24",
+        "45–54",
+        "35–44"
+      ],
+      "ethnicities": [
+        "Creole",
+        "Latino(a)",
+        "East Indian",
+        "Garifuna"
+      ],
+      "educations": [
+        "Associate Degree",
+        "Secondary",
+        "Primary",
+        "Bachelor's Degree"
+      ],
+      "verificationStatuses": [
+        "Verified",
+        "Pending"
+      ],
+      "registeredVotersOnly": false,
+      "ageMin": 18,
+      "ageMax": 100
+    },
+    "createdAt": "2026-06-20T12:28:15.602Z",
+    "updatedAt": "2026-06-20T12:28:15.602Z"
+  }
+]
