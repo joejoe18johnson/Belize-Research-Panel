@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -9,11 +11,13 @@ export function AuthPageShell({
   subtitle,
   children,
   footer,
+  formatTitle = true,
 }: {
   title: string;
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
+  formatTitle?: boolean;
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
@@ -27,8 +31,14 @@ export function AuthPageShell({
       <main className="flex flex-1 items-start justify-center px-3 py-8 sm:items-center sm:px-4 sm:py-16">
         <div className={`w-full ${AUTH_CONTENT_MAX}`}>
           <div className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.04] dark:border-teal-900/50 dark:bg-zinc-900 dark:shadow-black/20 sm:p-8">
-            <h1 className="text-xl font-bold text-teal-950 dark:text-teal-100 sm:text-2xl">{formatSiteCase(title)}</h1>
-            {subtitle ? <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{formatSiteCase(subtitle)}</p> : null}
+            <h1 className="text-xl font-bold text-teal-950 dark:text-teal-100 sm:text-2xl">
+              {formatTitle ? formatSiteCase(title) : title}
+            </h1>
+            {subtitle ? (
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                {formatTitle ? formatSiteCase(subtitle) : subtitle}
+              </p>
+            ) : null}
             <div className="mt-6">{children}</div>
             {footer ? (
               <div className="mt-6 border-t border-zinc-100 pt-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">

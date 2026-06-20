@@ -112,7 +112,11 @@ export function HomePageClient() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
-            <LanguageSwitcher locale={locale} onChange={handleLocaleChange} />
+            <LanguageSwitcher
+              locale={locale}
+              onChange={handleLocaleChange}
+              variant={onDarkHero ? "dark" : "light"}
+            />
 
             <div className="hidden items-center gap-3 sm:flex">
               <Link

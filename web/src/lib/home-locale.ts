@@ -1,6 +1,7 @@
 export type HomeLocale = "en" | "es";
 
 export const HOME_LOCALE_STORAGE_KEY = "brp_home_locale";
+export const REGISTER_LANG_CONFIRMED_KEY = "brp_register_lang_confirmed";
 
 export const HOME_COPY = {
   en: {
@@ -114,6 +115,61 @@ export const HOME_COPY = {
     spanish: "Español",
   },
 } as const;
+
+export const REGISTER_GATE_COPY = {
+  en: {
+    languageStep: {
+      title: "Choose your language",
+      titleBilingual: "Choose your language / Elija su idioma",
+      subtitle: "Select the language you prefer for registration. You can change it later.",
+      continue: "Continue",
+    },
+    title: "Panelist registration",
+    subtitle:
+      "Create an account and verify your email before completing the registration form. Eligibility is checked when you sign up.",
+    steps: [
+      "Confirm your citizenship and age eligibility.",
+      "Create an account with your name, email, and password.",
+      "Verify your email address.",
+      "Complete the panelist registration form.",
+    ],
+    createAccount: "Create account",
+    loginExisting: "Log in to existing account",
+  },
+  es: {
+    languageStep: {
+      title: "Elija su idioma",
+      titleBilingual: "Choose your language / Elija su idioma",
+      subtitle: "Seleccione el idioma que prefiere para el registro. Puede cambiarlo más adelante.",
+      continue: "Continuar",
+    },
+    title: "Registro de panelista",
+    subtitle:
+      "Cree una cuenta y verifique su correo electrónico antes de completar el formulario de registro. La elegibilidad se verifica al registrarse.",
+    steps: [
+      "Confirme su ciudadanía y elegibilidad por edad.",
+      "Cree una cuenta con su nombre, correo electrónico y contraseña.",
+      "Verifique su dirección de correo electrónico.",
+      "Complete el formulario de registro del panelista.",
+    ],
+    createAccount: "Crear cuenta",
+    loginExisting: "Iniciar sesión con cuenta existente",
+  },
+} as const;
+
+export function localeDisplayName(locale: HomeLocale): string {
+  return locale === "en" ? HOME_COPY.en.english : HOME_COPY.es.spanish;
+}
+
+export function isRegisterLanguageConfirmed(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.sessionStorage.getItem(REGISTER_LANG_CONFIRMED_KEY) === "1";
+}
+
+export function confirmRegisterLanguage(): void {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(REGISTER_LANG_CONFIRMED_KEY, "1");
+}
 
 export function isHomeLocale(value: string | null | undefined): value is HomeLocale {
   return value === "en" || value === "es";
