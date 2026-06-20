@@ -233,7 +233,7 @@ export const ADMIN_MODULES: AdminModule[] = [
     label: "User Roles & Permissions",
     kind: "page",
     href: "/admin/user-roles",
-    section: "platform",
+    section: "admin-console",
     status: "working",
   },
   {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "@/lib/admin-session";
 import { CLIENT_SESSION_COOKIE, decodeClientSessionToken } from "@/lib/client-session";
-import { adminPathAllowedForRole, staffDefaultAdminPath } from "@/lib/staff-roles";
+import { adminPathAllowedForSession, staffDefaultAdminPath } from "@/lib/staff-roles";
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login"]);
 const PUBLIC_CLIENT_PATHS = new Set(["/client/login"]);
@@ -24,8 +24,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    if (!adminPathAllowedForRole(session.role, pathname)) {
-      const redirectUrl = new URL(staffDefaultAdminPath(session.role), request.url);
+    if (!adminPathAllowedForSession(session, pathname)) {
+      const redirectUrl = new URL(staffDefaultAdminPath(session.role, session.allowedModules), request.url);
       redirectUrl.searchParams.set("access", "denied");
       return NextResponse.redirect(redirectUrl);
     }

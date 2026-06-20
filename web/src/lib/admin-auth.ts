@@ -10,9 +10,10 @@ import {
   type AdminSession,
 } from "./admin-session";
 import {
-  adminPathAllowedForRole,
+  adminPathAllowedForSession,
   staffDefaultAdminPath,
 } from "./staff-roles";
+import { getRoleModuleSlugs } from "./staff-role-access";
 import { verifyStaffUserLogin, type StaffUserRecord } from "./staff-users";
 
 export type { AdminSession } from "./admin-session";
@@ -75,9 +76,23 @@ export async function requireAdminSession(): Promise<AdminSession> {
 
 export async function requireAdminPathAccess(pathname: string): Promise<AdminSession> {
   const session = await requireAdminSession();
-  if (!adminPathAllowedForRole(session.role, pathname)) {
-    redirect(`${staffDefaultAdminPath(session.role)}?access=denied`);
+  if (!adminPathAllowedForSession(session, pathname)) {
+    redirect(`${staffDefaultAdminPath(session.role, session.allowedModules)}?access=denied`);
   }
+  return session;
+}
+
+export async function requireSuperAdminSession(): Promise<AdminSession> {
+  const session = await requireAdminSession();
+  if (session.role !== "super_admin") {
+    redirect("/admin/dashboard?access=denied");
+  }
+  return session;
+}
+
+export async function getSuperAdminSession(): Promise<AdminSession | null> {
+  const session = await getAdminSession();
+  if (!session || session.role !== "super_admin") return null;
   return session;
 }
 
@@ -92,19 +107,23 @@ export async function authenticateStaffLogin(
   if (trimmedEmail) {
     const user = await verifyStaffUserLogin(trimmedEmail, trimmedPassword);
     if (!user) return null;
+    const allowedModules = await getRoleModuleSlugs(user.role);
     return {
       role: user.role,
       email: user.email,
       staffId: user.id,
       displayName: staffDisplayName(user),
+      allowedModules,
     };
   }
 
   if (!verifyAdminPassword(trimmedPassword)) return null;
+  const allowedModules = await getRoleModuleSlugs("super_admin");
   return {
     role: "super_admin",
     email: "legacy-admin@belizepanel.local",
     staffId: "legacy-admin",
     displayName: "Legacy Admin Password",
+    allowedModules,
   };
 }

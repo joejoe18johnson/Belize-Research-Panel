@@ -13,7 +13,7 @@ import {
   markAdminPayoutsRead,
 } from "@/lib/admin-read-state";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
-import { staffCanAccessModule } from "@/lib/staff-roles";
+import { sessionCanAccessModule } from "@/lib/staff-roles";
 import { cleanText } from "@/lib/validation";
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const ids = Array.isArray(body.ids) ? body.ids.map((id) => cleanText(id)).filter(Boolean) : [];
 
     if (scope === "notifications") {
-      if (session && !staffCanAccessModule(session.role, "notifications")) {
+      if (session && !sessionCanAccessModule(session, "notifications")) {
         return NextResponse.json({ message: "Access denied." }, { status: 403 });
       }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (scope === "payouts") {
-      if (session && !staffCanAccessModule(session.role, "payouts")) {
+      if (session && !sessionCanAccessModule(session, "payouts")) {
         return NextResponse.json({ message: "Access denied." }, { status: 403 });
       }
 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (scope === "campaigns") {
-      if (session && !staffCanAccessModule(session.role, "campaigns")) {
+      if (session && !sessionCanAccessModule(session, "campaigns")) {
         return NextResponse.json({ message: "Access denied." }, { status: 403 });
       }
 
