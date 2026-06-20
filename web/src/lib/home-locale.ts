@@ -6,7 +6,6 @@ export const REGISTER_LANG_CONFIRMED_KEY = "brp_register_lang_confirmed";
 export const HOME_COPY = {
   en: {
     logIn: "Log in",
-    clientPortal: "Client portal",
     register: "Register",
     eyebrow: "Exclusive research panel · earn rewards",
     headline: "Share your opinion. Get rewarded.",
@@ -37,6 +36,26 @@ export const HOME_COPY = {
     ],
     registerCta: "Register & earn rewards",
     loginCta: "Panelist login",
+    howItWorksEyebrow: "How it works",
+    howItWorksHeadline: "From sign-up to rewards in four steps",
+    howItWorksSteps: [
+      {
+        title: "Create your account",
+        body: "Register with your email, confirm eligibility, and verify your address to unlock panelist registration.",
+      },
+      {
+        title: "Join the panel",
+        body: "Complete the registration form with citizenship, residency, and profile details so we can match you to relevant studies.",
+      },
+      {
+        title: "Complete surveys",
+        body: "Receive survey invitations in your dashboard, share your views, and earn points for every verified completion.",
+      },
+      {
+        title: "Redeem rewards",
+        body: "Cash out to your bank, top up DigiCell or Smart!, pay utility bills, and choose from more redemption options in Belize.",
+      },
+    ],
     features: [
       {
         title: "Earn real rewards",
@@ -61,7 +80,6 @@ export const HOME_COPY = {
   },
   es: {
     logIn: "Iniciar sesión",
-    clientPortal: "Portal de clientes",
     register: "Registrarse",
     eyebrow: "Panel de investigación exclusivo · gane recompensas",
     headline: "Comparta su opinión. Reciba recompensas.",
@@ -92,6 +110,26 @@ export const HOME_COPY = {
     ],
     registerCta: "Registrarse y ganar recompensas",
     loginCta: "Acceso de panelistas",
+    howItWorksEyebrow: "Cómo funciona",
+    howItWorksHeadline: "Del registro a las recompensas en cuatro pasos",
+    howItWorksSteps: [
+      {
+        title: "Cree su cuenta",
+        body: "Regístrese con su correo, confirme su elegibilidad y verifique su dirección para desbloquear el registro del panelista.",
+      },
+      {
+        title: "Únase al panel",
+        body: "Complete el formulario de registro con ciudadanía, residencia y datos de perfil para recibir estudios relevantes.",
+      },
+      {
+        title: "Complete encuestas",
+        body: "Reciba invitaciones en su panel, comparta sus opiniones y gane puntos por cada encuesta verificada completada.",
+      },
+      {
+        title: "Canjee recompensas",
+        body: "Reciba efectivo en su banco, recargue DigiCell o Smart!, pague servicios públicos y elija más opciones de canje en Belice.",
+      },
+    ],
     features: [
       {
         title: "Recompensas reales",
