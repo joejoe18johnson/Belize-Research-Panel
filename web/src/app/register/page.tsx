@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { BrpLogoLink } from "@/components/BrpLogo";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { RegisterAuthGate } from "@/components/auth/RegisterAuthGate";
-import { RegistrationForm } from "@/components/registration/RegistrationForm";
+import { RegistrationPageClient } from "@/components/registration/RegistrationPageClient";
 import { getSessionAccount } from "@/lib/auth";
-import { appContentClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export const metadata = {
@@ -56,44 +54,15 @@ export default async function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-800">
-      <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-        <div className={`relative ${appContentClass} flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4`}>
-          <BrpLogoLink href="/" variant="light" />
-          <div className="absolute right-3 flex items-center gap-2 text-sm sm:right-4 sm:gap-4">
-            <Link
-              href="/account/delete"
-              className="hidden text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200 sm:inline"
-            >
-              {formatHeadingCase("Delete account")}
-            </Link>
-            <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 md:inline">{account.email}</span>
-            <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100 sm:px-4" />
-          </div>
-        </div>
-      </header>
-      <main className={`${appContentClass} px-3 py-6 sm:px-4 sm:py-8`}>
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-            {formatHeadingCase("Panelist registration")}
-          </h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-            {formatHeadingCase(
-              "Your account is verified. Complete the steps below to join the panel for public opinion polling, market research, and governance studies."
-            )}
-          </p>
-        </div>
-        <RegistrationForm
-          account={{
-            firstName: account.firstName,
-            lastName: account.lastName,
-            email: account.email,
-            citizenshipStatus: account.citizenshipStatus,
-            commonwealthCountry: account.commonwealthCountry,
-            dob: account.dob,
-          }}
-        />
-      </main>
-    </div>
+    <RegistrationPageClient
+      account={{
+        firstName: account.firstName,
+        lastName: account.lastName,
+        email: account.email,
+        citizenshipStatus: account.citizenshipStatus,
+        commonwealthCountry: account.commonwealthCountry,
+        dob: account.dob,
+      }}
+    />
   );
 }

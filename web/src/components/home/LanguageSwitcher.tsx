@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import type { HomeLocale } from "@/lib/home-locale";
-import { HOME_COPY } from "@/lib/home-locale";
+import { HOME_COPY, localeDisplayName } from "@/lib/home-locale";
 
 function UkFlagIcon({ className = "", clipId }: { className?: string; clipId: string }) {
   return (
@@ -46,9 +46,11 @@ function FlagIcon({ locale, className, clipId }: { locale: HomeLocale; className
 export function LanguageSwitcher({
   locale,
   onChange,
+  variant = "dark",
 }: {
   locale: HomeLocale;
   onChange: (locale: HomeLocale) => void;
+  variant?: "dark" | "light";
 }) {
   const copy = HOME_COPY[locale];
   const [open, setOpen] = useState(false);
@@ -88,6 +90,11 @@ export function LanguageSwitcher({
     { id: "es", label: copy.spanish },
   ];
 
+  const triggerClass =
+    variant === "dark"
+      ? "flex h-10 items-center gap-2 rounded-full bg-white/15 px-3 text-white shadow-sm ring-1 ring-white/20 transition hover:bg-white/25"
+      : "flex h-10 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800";
+
   return (
     <div ref={rootRef} className="relative">
       <button
@@ -96,9 +103,10 @@ export function LanguageSwitcher({
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={copy.languageLabel}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white shadow-sm ring-1 ring-white/20 transition hover:bg-white/25"
+        className={triggerClass}
       >
-        <FlagIcon locale={locale} className="h-6 w-6" clipId={triggerClipId} />
+        <FlagIcon locale={locale} className="h-5 w-5 shrink-0" clipId={triggerClipId} />
+        <span className="text-sm font-medium">{localeDisplayName(locale)}</span>
       </button>
 
       {open ? (
