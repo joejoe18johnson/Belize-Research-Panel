@@ -808,9 +808,9 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
   "user-roles": {
     summary:
       "Staff roles, access scopes, and security controls for admin, operations, research, field, finance, and client viewer accounts.",
-    statusLabel: "Admin password gate live · RBAC pending",
+    statusLabel: "Staff RBAC live",
     statusDetail:
-      "Admin console uses a shared admin password session today. Role-based staff accounts, 2FA, and permission enforcement are planned.",
+      "Super Admins can create staff accounts, assign roles, and deactivate users. Each role sees only the admin modules mapped to that role.",
     liveInPortal: [
       {
         label: "Admin login",

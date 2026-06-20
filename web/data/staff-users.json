@@ -63,6 +63,7 @@
     "password_salt": "client-viewer",
     "password_hash": "70b4c4cfc01a1ecd24dabce8b20470968f31597c3a8916b90a4c0be4b93aacc0",
     "status": "active",
-    "created_at": "2026-01-01T00:00:00.000Z"
+    "created_at": "2026-01-01T00:00:00.000Z",
+    "updated_at": "2026-06-20T23:24:54.014Z"
   }
 ]

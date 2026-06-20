@@ -1,46 +1,30 @@
-import { AdminDataModuleDashboard } from "@/components/admin/AdminDataModuleDashboard";
+import { AdminRolePermissionsEditor } from "@/components/admin/AdminRolePermissionsEditor";
+import { AdminUserRolesClient } from "@/components/admin/AdminUserRolesClient";
 import { RoleTestAccountsReference } from "@/components/admin/RoleTestAccountsReference";
+import { requireSuperAdminSession } from "@/lib/admin-auth";
 import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
-import { loadAdminDataHub } from "@/lib/admin-data-hub";
-import { buildModuleSnapshot } from "@/lib/admin-module-snapshots";
-import { listStaffUsers } from "@/lib/staff-users";
-import { STAFF_ROLE_LABELS, staffRoleModuleSummary } from "@/lib/staff-roles";
+import { getAllRoleDescriptions, getAllRoleModuleAccess } from "@/lib/staff-role-access";
+import { listPublicStaffUsers } from "@/lib/staff-users";
 
 export const metadata = { title: "User Roles & Permissions | Admin" };
 
 export default async function AdminUserRolesPage() {
-  const hub = await loadAdminDataHub();
-  const snapshot = buildModuleSnapshot("user-roles", hub);
-  const staffUsers = await listStaffUsers();
+  const session = await requireSuperAdminSession();
+  const [staffUsers, roleAccess, roleDescriptions] = await Promise.all([
+    listPublicStaffUsers(),
+    getAllRoleModuleAccess(),
+    getAllRoleDescriptions(),
+  ]);
   const showReference = isDemoAccountsEnabled();
-
-  if (!snapshot) {
-    return null;
-  }
-
-  const liveRoleRows = staffUsers.map((user) => ({
-    role: STAFF_ROLE_LABELS[user.role],
-    scope: staffRoleModuleSummary(user.role),
-    modules: user.email,
-    live: "Staff login",
-  }));
-
-  const snapshotWithLiveRoles = {
-    ...snapshot,
-    tables: snapshot.tables.map((table) =>
-      table.id === "roles"
-        ? {
-            ...table,
-            title: "Live staff accounts",
-            rows: liveRoleRows.length > 0 ? liveRoleRows : table.rows,
-          }
-        : table
-    ),
-  };
 
   return (
     <div className="space-y-6">
-      <AdminDataModuleDashboard snapshot={snapshotWithLiveRoles} />
+      <AdminUserRolesClient
+        users={staffUsers}
+        currentStaffId={session.staffId}
+        roleAccess={roleAccess}
+      />
+      <AdminRolePermissionsEditor initialAccess={roleAccess} initialDescriptions={roleDescriptions} />
       {showReference ? <RoleTestAccountsReference /> : null}
     </div>
   );

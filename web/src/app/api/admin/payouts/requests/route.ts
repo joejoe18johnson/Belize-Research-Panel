@@ -5,7 +5,7 @@ import { notifyPanelistOfPayoutUpdate } from "@/lib/payout-panelist-notify";
 import { markAdminPayoutsRead } from "@/lib/admin-read-state";
 import { processRedemptionRequest } from "@/lib/redemption-requests";
 import type { PayoutProcessAction } from "@/lib/reward-redemption";
-import { staffCanAccessModule } from "@/lib/staff-roles";
+import { sessionCanAccessModule } from "@/lib/staff-roles";
 import { cleanText } from "@/lib/validation";
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   }
 
   const session = await getAdminSession();
-  if (session && !staffCanAccessModule(session.role, "payouts")) {
+  if (session && !sessionCanAccessModule(session, "payouts")) {
     return NextResponse.json({ message: "Access denied." }, { status: 403 });
   }
 

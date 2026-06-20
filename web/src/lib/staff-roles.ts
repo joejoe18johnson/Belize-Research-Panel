@@ -30,7 +30,7 @@ export const STAFF_ROLE_DESCRIPTIONS: Record<StaffRole, string> = {
   client_viewer: "Read-only access to assigned client reporting modules.",
 };
 
-const ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
+export const DEFAULT_ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
   super_admin: ADMIN_MODULES.map((module) => module.slug),
   operations_manager: [
     "panelists",
@@ -88,9 +88,15 @@ const ADMIN_PATH_TO_SLUG: Record<string, string> = {
   "/admin/reward-settings": "reward-settings",
   "/admin/survey-distribution": "survey-distribution",
   "/admin/analytics": "advanced-analytics",
+  "/admin/user-roles": "user-roles",
 };
 
 const ALL_MODULE_SLUGS = new Set(ADMIN_MODULES.map((module) => module.slug));
+
+export interface StaffAccessContext {
+  role: StaffRole;
+  allowedModules?: string[];
+}
 
 export function isStaffRole(value: string | null | undefined): value is StaffRole {
   return STAFF_ROLES.includes(value as StaffRole);
@@ -103,20 +109,33 @@ export function normalizeStaffRole(value: string | null | undefined): StaffRole 
   return isStaffRole(value) ? value : null;
 }
 
-export function staffCanAccessModule(role: StaffRole, moduleSlug: string): boolean {
+export function resolveStaffModuleSlugs(role: StaffRole, allowedModules?: string[]): readonly string[] {
+  if (role === "super_admin") return DEFAULT_ROLE_MODULE_ACCESS.super_admin;
+  if (allowedModules?.length) return allowedModules;
+  return DEFAULT_ROLE_MODULE_ACCESS[role] ?? [];
+}
+
+export function staffCanAccessModule(
+  role: StaffRole,
+  moduleSlug: string,
+  allowedModules?: string[]
+): boolean {
   if (role === "super_admin") return true;
-  const access = ROLE_MODULE_ACCESS[role];
-  if (!access) return false;
-  return access.includes(moduleSlug);
+  return resolveStaffModuleSlugs(role, allowedModules).includes(moduleSlug);
 }
 
-export function staffAccessibleModules(role: StaffRole): AdminModule[] {
-  return ADMIN_MODULES.filter((module) => staffCanAccessModule(role, module.slug));
+export function sessionCanAccessModule(access: StaffAccessContext, moduleSlug: string): boolean {
+  return staffCanAccessModule(access.role, moduleSlug, access.allowedModules);
 }
 
-export function staffDefaultAdminPath(role: StaffRole): string {
+export function staffAccessibleModules(role: StaffRole, allowedModules?: string[]): AdminModule[] {
+  const slugs = new Set(resolveStaffModuleSlugs(role, allowedModules));
+  return ADMIN_MODULES.filter((module) => slugs.has(module.slug));
+}
+
+export function staffDefaultAdminPath(role: StaffRole, allowedModules?: string[]): string {
   if (role === "client_viewer") return "/admin/client-reporting";
-  const first = staffAccessibleModules(role)[0];
+  const first = staffAccessibleModules(role, allowedModules)[0];
   if (!first?.href) return "/admin/dashboard";
   return first.href;
 }
@@ -138,15 +157,27 @@ export function pathnameToAdminModuleSlug(pathname: string): string | null {
   return ALL_MODULE_SLUGS.has(slug) ? slug : null;
 }
 
-export function adminPathAllowedForRole(role: StaffRole, pathname: string): boolean {
+export function adminPathAllowedForSession(access: StaffAccessContext, pathname: string): boolean {
   if (pathname === "/admin" || pathname === "/admin/") return true;
   const slug = pathnameToAdminModuleSlug(pathname);
-  if (!slug) return role === "super_admin";
-  return staffCanAccessModule(role, slug);
+  if (!slug) return access.role === "super_admin";
+  return sessionCanAccessModule(access, slug);
 }
 
-export function staffRoleModuleSummary(role: StaffRole): string {
-  return staffAccessibleModules(role)
+/** @deprecated Use adminPathAllowedForSession with session allowedModules when available. */
+export function adminPathAllowedForRole(role: StaffRole, pathname: string): boolean {
+  return adminPathAllowedForSession({ role }, pathname);
+}
+
+export function staffRoleModuleSummary(role: StaffRole, allowedModules?: string[]): string {
+  return staffAccessibleModules(role, allowedModules)
+    .map((module) => module.label)
+    .join(", ");
+}
+
+export function moduleLabelsForSlugs(slugs: string[]): string {
+  const slugSet = new Set(slugs);
+  return ADMIN_MODULES.filter((module) => slugSet.has(module.slug))
     .map((module) => module.label)
     .join(", ");
 }

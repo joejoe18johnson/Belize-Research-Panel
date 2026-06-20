@@ -9,6 +9,8 @@ export interface AdminSession {
   email: string;
   staffId: string;
   displayName: string;
+  /** Module slugs this session may access; set at login from role permissions. */
+  allowedModules?: string[];
   exp: number;
 }
 

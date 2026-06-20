@@ -14,7 +14,7 @@ import { AdminFooter } from "@/components/admin/AdminFooter";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
 import type { AdminNavBadges } from "@/lib/admin-nav-badges";
-import { STAFF_ROLE_LABELS, staffAccessibleModules, staffCanAccessModule } from "@/lib/staff-roles";
+import { STAFF_ROLE_LABELS, sessionCanAccessModule, staffAccessibleModules } from "@/lib/staff-roles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function AdminNavNotificationBadge({ count }: { count: number }) {
@@ -63,7 +63,7 @@ export function AdminShell({
   navBadges?: AdminNavBadges;
 }) {
   const pathname = usePathname();
-  const accessibleModules = staffAccessibleModules(session.role);
+  const accessibleModules = staffAccessibleModules(session.role, session.allowedModules);
   const accessibleSlugs = new Set(accessibleModules.map((module) => module.slug));
 
   return (
@@ -99,7 +99,7 @@ export function AdminShell({
                     </p>
                     <ul className="space-y-0.5">
                       {modules.map((module) => {
-                        if (!staffCanAccessModule(session.role, module.slug)) return null;
+                        if (!sessionCanAccessModule(session, module.slug)) return null;
                         const active = isModuleActive(pathname, module);
                         const href = moduleHref(module);
                         const external = Boolean(module.externalHref);
