@@ -20,7 +20,7 @@ import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
 import { buildPanelistDeleteCode } from "@/lib/admin-delete-confirmation";
-import { FilterMultiSelect } from "@/components/admin/shared/AdminUi";
+import { FilterMultiSelect, adminResponsiveTableClass } from "@/components/admin/shared/AdminUi";
 import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteConfirmDialog";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
@@ -927,7 +927,7 @@ function DataTable({
   >;
 }) {
   return (
-    <table className="min-w-[1100px] text-left text-xs sm:text-sm">
+    <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm md:min-w-[1100px]`}>
       <thead>
         <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           {actions ? (
@@ -944,7 +944,7 @@ function DataTable({
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length + (actions ? 2 : 1)} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            <td colSpan={columns.length + (actions ? 2 : 1)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
               No records on this page.
             </td>
           </tr>
@@ -958,16 +958,20 @@ function DataTable({
                 className={`border-b border-zinc-100 dark:border-zinc-800 ${isFlagged ? "bg-amber-50/80" : ""}`}
               >
                 {actions ? (
-                  <td className="sticky left-0 z-10 bg-inherit px-2 py-2">
+                  <td data-label="Actions" className="sticky left-0 z-10 bg-inherit px-2 py-2 md:sticky">
                     <RowActionButtons email={row.email} actions={actions} flagged={isFlagged} />
                   </td>
                 ) : null}
                 {columns.map((column) => (
-                  <td key={column} className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                  <td
+                    key={column}
+                    data-label={column.replace(/_/g, " ")}
+                    className="max-w-none px-3 py-2 text-zinc-700 dark:text-zinc-300 md:max-w-[14rem] md:truncate md:whitespace-nowrap"
+                  >
                     {row[column] ?? ""}
                   </td>
                 ))}
-                <td className="whitespace-nowrap px-3 py-2">
+                <td data-label="Email · Phone · ID" className="px-3 py-2 md:whitespace-nowrap">
                   {requirements ? (
                     <RequirementStatusGroup
                       email={requirements.email}

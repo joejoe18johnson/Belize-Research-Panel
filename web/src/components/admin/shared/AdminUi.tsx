@@ -208,9 +208,10 @@ export function AdminDocPill({
 
 export { adminTableRowHoverClass, adminTableHeadRowClass } from "@/lib/theme-surfaces";
 export const adminTableScrollClass = "table-scroll";
+export const adminResponsiveTableClass = "admin-responsive-table";
 
 export function AdminTableScroll({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`${adminTableScrollClass} ${className}`.trim()}>{children}</div>;
+  return <div className={`admin-table-scroll max-md:overflow-visible ${className}`.trim()}>{children}</div>;
 }
 
 export function AdminSectionPanel({
@@ -232,7 +233,7 @@ export function AdminSectionPanel({
           </Link>
         ) : null}
       </div>
-      <div className="overflow-x-auto table-scroll">{children}</div>
+      <div className="admin-table-scroll max-md:overflow-visible">{children}</div>
     </section>
   );
 }
@@ -240,11 +241,65 @@ export function AdminSectionPanel({
 export function AdminDataTable({
   children,
   className = "",
+  desktopMinWidthClass = "",
 }: {
   children: ReactNode;
   className?: string;
+  /** e.g. md:min-w-[640px] — horizontal scroll only from md breakpoint */
+  desktopMinWidthClass?: string;
 }) {
-  return <table className={`min-w-full text-left text-sm ${className}`.trim()}>{children}</table>;
+  return (
+    <table
+      className={`${adminResponsiveTableClass} w-full text-left text-sm ${desktopMinWidthClass} ${className}`.trim()}
+    >
+      {children}
+    </table>
+  );
+}
+
+export function AdminTableRow({
+  children,
+  className = "",
+  onClick,
+}: {
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <tr className={`border-b border-zinc-50 align-top hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60 ${className}`.trim()} onClick={onClick}>
+      {children}
+    </tr>
+  );
+}
+
+export function AdminTableTd({
+  label,
+  children,
+  align = "left",
+  className = "",
+  colSpan,
+  empty = false,
+}: {
+  label?: string;
+  children: ReactNode;
+  align?: "left" | "right" | "center";
+  className?: string;
+  colSpan?: number;
+  empty?: boolean;
+}) {
+  const alignClass =
+    align === "right" ? "md:text-right" : align === "center" ? "md:text-center" : "md:text-left";
+
+  return (
+    <td
+      colSpan={colSpan}
+      data-label={label ?? ""}
+      className={`px-4 py-3 ${alignClass} ${empty ? "admin-table-empty" : ""} ${className}`.trim()}
+    >
+      {children}
+    </td>
+  );
 }
 
 export function AdminTableHead({ children }: { children: ReactNode }) {

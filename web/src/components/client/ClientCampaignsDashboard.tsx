@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { MetricCard, PageIntro, adminResponsiveTableClass } from "@/components/admin/shared/AdminUi";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { statusPillClass } from "@/lib/theme-surfaces";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
@@ -48,8 +48,8 @@ export function ClientCampaignsDashboard({
             No commissioned studies are linked to your account yet. Your Belize Research Panel project manager will assign campaigns when fieldwork opens.
           </p>
         ) : (
-          <div className="table-scroll">
-            <table className="min-w-[720px] text-left text-sm">
+          <div className="admin-table-scroll max-md:overflow-visible table-scroll">
+            <table className={`${adminResponsiveTableClass} w-full text-left text-sm md:min-w-[720px]`}>
               <thead>
                 <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                   <th className="px-5 py-3">Study</th>
@@ -64,24 +64,24 @@ export function ClientCampaignsDashboard({
               <tbody>
                 {campaigns.map((row) => (
                   <tr key={row.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30 dark:border-zinc-800/80">
-                    <td className="px-5 py-3">
+                    <td data-label="Study" className="px-5 py-3">
                       <p className="font-semibold text-zinc-900 dark:text-zinc-100">{row.title}</p>
                       <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{formatAdminLabel(row.category)}</p>
                     </td>
-                    <td className="px-5 py-3">
+                    <td data-label="Status" className="px-5 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass(row.status)}`}>
                         {formatAdminLabel(row.status)}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-right tabular-nums">{row.assigned}</td>
-                    <td className="px-5 py-3 text-right tabular-nums">{row.completed}</td>
-                    <td className="px-5 py-3 text-right tabular-nums font-medium text-teal-800 dark:text-teal-200">
+                    <td data-label="Assigned" className="px-5 py-3 text-right tabular-nums md:text-right">{row.assigned}</td>
+                    <td data-label="Completed" className="px-5 py-3 text-right tabular-nums md:text-right">{row.completed}</td>
+                    <td data-label="Response rate" className="px-5 py-3 text-right tabular-nums font-medium text-teal-800 dark:text-teal-200 md:text-right">
                       {row.responseRate}%
                     </td>
-                    <td className="px-5 py-3 text-xs text-zinc-600 dark:text-zinc-400">
+                    <td data-label="Field period" className="px-5 py-3 text-xs text-zinc-600 dark:text-zinc-400">
                       {row.assignedDate} → {row.completeByDate}
                     </td>
-                    <td className="px-5 py-3 text-right">
+                    <td data-label="" className="px-5 py-3 text-right md:text-right">
                       <Link
                         href={`/client/campaigns/${encodeURIComponent(row.id)}/results`}
                         className="inline-flex min-h-9 items-center rounded-lg bg-teal-700 px-3 text-xs font-semibold text-white hover:bg-teal-800"

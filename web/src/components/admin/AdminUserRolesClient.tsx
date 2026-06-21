@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { AdminTableScroll, PageIntro } from "@/components/admin/shared/AdminUi";
+import { AdminTableScroll, PageIntro, adminResponsiveTableClass } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SiteSelect } from "@/components/shared/SiteSelect";
@@ -293,7 +293,7 @@ export function AdminUserRolesClient({
           </p>
         </div>
         <AdminTableScroll>
-        <table className="min-w-[900px] text-left text-sm">
+        <table className={`${adminResponsiveTableClass} w-full text-left text-sm md:min-w-[900px]`}>
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
               <th className="px-4 py-3">Name</th>
@@ -316,11 +316,11 @@ export function AdminUserRolesClient({
 
               return (
                 <tr key={user.id} className="border-b border-zinc-50 align-top dark:border-zinc-800/80">
-                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                  <td data-label="Name" className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
                     {staffDisplayName(user)}
                   </td>
-                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{user.email}</td>
-                  <td className="px-4 py-3">
+                  <td data-label="Email" className="break-all px-4 py-3 text-zinc-700 dark:text-zinc-300">{user.email}</td>
+                  <td data-label="Role" className="px-4 py-3">
                     <SiteSelect
                       value={draft.role}
                       onChange={(value) => updateDraft(user.id, { role: value as StaffRole })}
@@ -342,7 +342,7 @@ export function AdminUserRolesClient({
                       </button>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3">
+                  <td data-label="Status" className="px-4 py-3">
                     <SiteSelect
                       value={draft.status}
                       onChange={(value) =>
@@ -353,7 +353,7 @@ export function AdminUserRolesClient({
                       className="min-w-[8rem]"
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td data-label="New password" className="px-4 py-3">
                     <input
                       type="password"
                       value={draft.password}
@@ -362,7 +362,7 @@ export function AdminUserRolesClient({
                       className={`min-w-[10rem] ${siteInputClass}`}
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td data-label="Actions" className="px-4 py-3">
                     <div className="flex flex-col gap-2">
                       <button
                         type="button"
