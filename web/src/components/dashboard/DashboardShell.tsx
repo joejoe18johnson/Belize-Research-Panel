@@ -222,7 +222,7 @@ export function StatCard({
       ? "border-teal-200 bg-teal-50/90 shadow-sm shadow-teal-950/[0.04] dark:border-teal-800 dark:bg-teal-950/40"
       : tone === "warning"
         ? "border-teal-200 bg-teal-50/80 shadow-sm shadow-teal-950/[0.04] dark:border-teal-800 dark:bg-teal-950/30"
-        : "border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 shadow-sm shadow-teal-950/[0.03]";
+        : "border-teal-200 bg-teal-50/70 shadow-sm shadow-teal-950/[0.03] dark:border-teal-800 dark:bg-teal-950/25";
 
   const iconToneClass =
     tone === "success"

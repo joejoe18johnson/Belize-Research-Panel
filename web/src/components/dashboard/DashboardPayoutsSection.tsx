@@ -156,7 +156,7 @@ function PayoutList({
           {requests.map((request) => (
             <div
               key={request.id}
-              className={`${viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")} ${layout === "list" ? "py-4 first:pt-2" : ""}`}
+              className={`${viewLayoutItemClass(layout)} ${layout === "list" ? "py-4 first:pt-2" : ""}`}
             >
               <PayoutRequestCard request={request} layout={layout} />
             </div>

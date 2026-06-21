@@ -33,9 +33,8 @@ export function defaultViewLayoutForViewport(): ViewLayout {
   return window.matchMedia("(max-width: 639px)").matches ? "list" : "cards";
 }
 
-export function viewLayoutItemClass(layout: ViewLayout, itemWidth?: string): string {
-  if (layout === "list") return "w-full min-w-0";
-  return itemWidth ? `${itemWidth} min-w-0 shrink-0` : "min-w-0 w-full";
+export function viewLayoutItemClass(layout: ViewLayout): string {
+  return layout === "list" ? "w-full min-w-0" : "min-w-0 w-full";
 }
 
 export function viewLayoutContainerClass(
