@@ -5,7 +5,5 @@ export const metadata = {
 };
 
 export default function AdminEmailTemplatesPage() {
-  const resendConfigured = Boolean(process.env.RESEND_API_KEY?.trim());
-
-  return <AdminEmailTemplatesClient resendConfigured={resendConfigured} />;
+  return <AdminEmailTemplatesClient />;
 }

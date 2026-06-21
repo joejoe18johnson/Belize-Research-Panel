@@ -68,7 +68,7 @@ function TemplatePreviewFrame({ templateId }: { templateId: string }) {
   );
 }
 
-export function AdminEmailTemplatesClient({ resendConfigured }: { resendConfigured: boolean }) {
+export function AdminEmailTemplatesClient() {
   const grouped = useMemo(() => listEmailTemplatesByCategory(), []);
   const firstTemplate = grouped[0]?.templates[0]?.id ?? "";
   const [selectedId, setSelectedId] = useState(firstTemplate);
@@ -94,14 +94,6 @@ export function AdminEmailTemplatesClient({ resendConfigured }: { resendConfigur
         title="Email templates"
         description="Branded transactional emails sent through Resend at each step of the panelist and admin workflow. Select a template to preview sample content."
       />
-
-      {!resendConfigured && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
-          Set <code className="font-mono text-xs">RESEND_API_KEY</code> and{" "}
-          <code className="font-mono text-xs">RESEND_FROM_EMAIL</code> in your environment to deliver live emails.
-          Without them, messages are logged to <code className="font-mono text-xs">data/outbound-messages.json</code>.
-        </div>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
         <div className="space-y-4">
