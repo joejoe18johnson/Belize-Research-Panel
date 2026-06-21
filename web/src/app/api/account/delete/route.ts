@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { deleteAccountAndOptOut } from "@/lib/account-deletion";
 import { clearSessionCookie, getSessionAccount } from "@/lib/auth";
+import { sendAccountDeletedEmail } from "@/lib/email/process-emails";
 import { cleanText } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -28,10 +29,18 @@ export async function POST(request: Request) {
     );
   }
 
+  const deleteEmail = session.email;
+  const deleteFirstName = session.firstName;
+
   const result = await deleteAccountAndOptOut(session.id, password);
   if (!result.ok) {
     return NextResponse.json({ ok: false, message: result.error }, { status: 400 });
   }
+
+  void sendAccountDeletedEmail({
+    to: deleteEmail,
+    firstName: deleteFirstName,
+  });
 
   await clearSessionCookie();
   return NextResponse.json({ ok: true });

@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionAccount } from "@/lib/auth";
+import { payoutShortId } from "@/lib/admin-payout-display";
+import { sendRedemptionSubmittedEmail } from "@/lib/email/process-emails";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { resolveRewardSummary } from "@/lib/panelist-points";
@@ -65,6 +67,15 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/dashboard/rewards");
     revalidatePath("/dashboard/payouts");
+
+    void sendRedemptionSubmittedEmail({
+      to: session.email,
+      firstName: panelist.first_name,
+      optionLabel: redemption.optionLabel,
+      amount: validation.valueLabel,
+      referenceId: payoutShortId(redemption.id),
+      origin: request.nextUrl.origin,
+    });
 
     return NextResponse.json({
       ok: true,

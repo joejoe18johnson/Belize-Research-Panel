@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionAccount } from "@/lib/auth";
+import { sendSurveyCompletedEmail } from "@/lib/email/process-emails";
+import { findPanelistByEmail } from "@/lib/panelists";
 import { getSurveyResponse, saveSurveyProgress, submitSurveyResponse } from "@/lib/survey-responses";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 import { findSurveyDefinitionById } from "@/lib/survey-definitions";
@@ -72,11 +74,24 @@ export async function POST(
 
   try {
     if (body.submit) {
+      const assignment = await getAssignmentForAccount(assignmentId, account.email);
       const result = await submitSurveyResponse({
         assignmentId,
         panelistEmail: account.email,
         answers,
       });
+
+      if (assignment) {
+        const panelist = await findPanelistByEmail(account.email);
+        void sendSurveyCompletedEmail({
+          to: account.email,
+          firstName: panelist?.first_name ?? account.firstName,
+          campaignTitle: assignment.title,
+          points: result.points,
+          origin: new URL(request.url).origin,
+        });
+      }
+
       return NextResponse.json({
         ok: true,
         submitted: true,

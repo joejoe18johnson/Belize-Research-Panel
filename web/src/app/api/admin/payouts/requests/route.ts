@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Payout request not found." }, { status: 404 });
     }
 
-    await notifyPanelistOfPayoutUpdate(updated, action);
+    await notifyPanelistOfPayoutUpdate(updated, action, request.nextUrl.origin);
     await markAdminPayoutsRead([updated.id]);
 
     revalidatePath("/admin", "layout");

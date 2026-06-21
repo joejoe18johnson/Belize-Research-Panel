@@ -38,6 +38,12 @@ const ICONS: Record<string, ReactNode> = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.73 21a2 2 0 0 1-3.46 0" />
     </IconBase>
   ),
+  "email-templates": (
+    <IconBase>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" />
+      <path strokeLinecap="round" d="m22 6-10 7L2 6" />
+    </IconBase>
+  ),
   payouts: (
     <IconBase>
       <rect x="2" y="5" width="20" height="14" rx="2" />

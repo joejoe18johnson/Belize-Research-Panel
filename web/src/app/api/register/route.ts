@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findAccountById, markAccountPanelistRegistered } from "@/lib/accounts";
 import { getSessionAccount } from "@/lib/auth";
+import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
 import type { RegistrationMode } from "@/lib/constants";
@@ -116,6 +117,13 @@ export async function POST(request: NextRequest) {
       accountEmail: session.email,
     });
     await markAccountPanelistRegistered(session.id);
+
+    void sendRegistrationSubmittedEmail({
+      to: session.email,
+      firstName: session.firstName,
+      origin: request.nextUrl.origin,
+    });
+
     return NextResponse.json({ ok: true, verificationStatus: result.verificationStatus });
   } catch (error) {
     if (error instanceof Error && error.message === "duplicate") {

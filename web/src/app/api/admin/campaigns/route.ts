@@ -3,8 +3,9 @@ import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { findClientUserById } from "@/lib/client-users";
 import { createAndLaunchCampaign } from "@/lib/campaigns";
-import type { CampaignRecord, CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
 import { buildCampaignAssignmentLinks } from "@/lib/campaign-survey-links";
+import { sendCampaignInvitationEmails } from "@/lib/email/process-emails";
+import type { CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { loadPanelists } from "@/lib/panelists";
 import { cleanText } from "@/lib/validation";
@@ -71,6 +72,18 @@ export async function POST(request: Request) {
     const result = await createAndLaunchCampaign(input, panelists);
     const origin = new URL(request.url).origin;
     const surveyLinks = buildCampaignAssignmentLinks(origin, result.campaign, result.assignedPanelists);
+
+    void sendCampaignInvitationEmails({
+      origin,
+      campaignTitle: result.campaign.title,
+      points: result.campaign.points,
+      completeByDate: result.campaign.completeByDate,
+      assignments: surveyLinks.map((link) => ({
+        email: link.panelistEmail,
+        firstName: link.panelistName.split(" ")[0] ?? "there",
+        surveyLink: link.surveyLink,
+      })),
+    });
 
     revalidatePath("/admin/campaigns");
     revalidatePath("/admin/campaigns/create");

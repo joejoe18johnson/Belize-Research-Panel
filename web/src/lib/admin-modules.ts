@@ -85,6 +85,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "email-templates",
+    label: "Email Templates",
+    kind: "page",
+    href: "/admin/email-templates",
+    section: "admin-console",
+    status: "working",
+  },
+  {
     slug: "panelists",
     label: "Panelists",
     kind: "page",
