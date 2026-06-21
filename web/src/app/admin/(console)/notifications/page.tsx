@@ -1,19 +1,37 @@
 import { Suspense } from "react";
 import { AdminNotificationsDashboard } from "@/components/admin/queues/AdminNotificationsDashboard";
+import { buildCampaignSummaries } from "@/lib/campaign-targeting";
+import { loadCampaignRecords } from "@/lib/campaigns";
 import { buildNotificationQueueRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
-import { unreadAdminNotificationIds } from "@/lib/admin-nav-badges";
+import {
+  unreadAdminNotificationIds,
+  unreadCompletedCampaignIds,
+  unreadNewPayoutIds,
+} from "@/lib/admin-nav-badges";
+import { isAdminDemoNotificationLoopEnabled } from "@/lib/admin-demo-notification-loop";
 import { loadAdminReadState } from "@/lib/admin-read-state";
+import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 
 export const metadata = {
   title: "Notifications | Admin",
 };
 
 export default async function AdminNotificationsPage() {
-  const hub = await loadAdminDataHub();
-  const readState = await loadAdminReadState();
+  const [hub, readState, campaigns, assignments] = await Promise.all([
+    loadAdminDataHub(),
+    loadAdminReadState(),
+    loadCampaignRecords(),
+    loadSurveyRecordsFromFile(),
+  ]);
+  const campaignSummaries = buildCampaignSummaries(campaigns, assignments);
   const rows = buildNotificationQueueRows(hub);
   const unreadIds = unreadAdminNotificationIds(hub, readState);
+  const scopeCounts = {
+    notifications: unreadIds.length,
+    payouts: unreadNewPayoutIds(hub, readState).length,
+    campaigns: unreadCompletedCampaignIds(campaignSummaries, readState).length,
+  };
 
   return (
     <Suspense
@@ -23,7 +41,12 @@ export default async function AdminNotificationsPage() {
         </div>
       }
     >
-      <AdminNotificationsDashboard rows={rows} unreadIds={unreadIds} />
+      <AdminNotificationsDashboard
+        rows={rows}
+        unreadIds={unreadIds}
+        scopeCounts={scopeCounts}
+        demoLoopEnabled={isAdminDemoNotificationLoopEnabled()}
+      />
     </Suspense>
   );
 }

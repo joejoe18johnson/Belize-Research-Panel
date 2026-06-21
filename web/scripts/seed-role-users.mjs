@@ -75,6 +75,8 @@ const PANELIST_PERSONAS = [
     hold_reason: "",
     username: "",
     verification_status: "",
+    email_verified: "false",
+    verification_token: "demo-signup-verify-token",
   },
   {
     id: "persona-00000000-0000-0000-0000-000000000002",
@@ -87,6 +89,8 @@ const PANELIST_PERSONAS = [
     hold_reason: "",
     username: "panelist.pending",
     verification_status: "Pending",
+    pending_phone_whatsapp: "+501 622-3344",
+    phone_change_requested_at: "2026-06-17T10:00:00.000Z",
   },
   {
     id: "persona-00000000-0000-0000-0000-000000000003",
@@ -99,6 +103,8 @@ const PANELIST_PERSONAS = [
     hold_reason: "",
     username: "panelist.verified",
     verification_status: "Verified",
+    pending_email: "panelist.verified.new@belizepanel.test",
+    email_change_requested_at: "2026-06-17T10:00:00.000Z",
   },
   {
     id: "persona-00000000-0000-0000-0000-000000000004",
@@ -221,8 +227,8 @@ async function seedPanelistPersonas(now) {
     email: persona.email,
     password_salt: persona.password_salt,
     password_hash: hashPassword(PANELIST_PASSWORD, persona.password_salt),
-    email_verified: "true",
-    verification_token: "",
+    email_verified: persona.email_verified ?? "true",
+    verification_token: persona.verification_token ?? "",
     verification_sent_at: now,
     created_at: now,
     panelist_registered: persona.panelist_registered,
@@ -231,6 +237,18 @@ async function seedPanelistPersonas(now) {
     dob: "1992-03-15",
     account_status: persona.account_status,
     hold_reason: persona.hold_reason,
+    ...(persona.pending_email
+      ? {
+          pending_email: persona.pending_email,
+          email_change_requested_at: persona.email_change_requested_at ?? now,
+        }
+      : {}),
+    ...(persona.pending_phone_whatsapp
+      ? {
+          pending_phone_whatsapp: persona.pending_phone_whatsapp,
+          phone_change_requested_at: persona.phone_change_requested_at ?? now,
+        }
+      : {}),
   }));
 
   await writeFile(

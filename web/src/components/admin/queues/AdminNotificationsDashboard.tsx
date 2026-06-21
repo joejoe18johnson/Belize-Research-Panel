@@ -7,7 +7,9 @@ import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/co
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { AdminAlertGuide } from "@/components/admin/queues/AdminAlertGuide";
 import type { NotificationQueueRow } from "@/lib/admin-dashboard-metrics";
+import { notificationQueueGuideFor, type AdminAlertScope } from "@/lib/admin-notification-guide";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function matchesNotificationType(row: NotificationQueueRow, typeFilter: string | null): boolean {
@@ -22,9 +24,13 @@ function matchesNotificationType(row: NotificationQueueRow, typeFilter: string |
 export function AdminNotificationsDashboard({
   rows,
   unreadIds = [],
+  scopeCounts = {},
+  demoLoopEnabled = false,
 }: {
   rows: NotificationQueueRow[];
   unreadIds?: string[];
+  scopeCounts?: Partial<Record<AdminAlertScope, number>>;
+  demoLoopEnabled?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -123,6 +129,8 @@ export function AdminNotificationsDashboard({
         </BrandedAlert>
       ) : null}
 
+      <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total pending" value={rows.length} />
         <MetricCard label="Email changes" value={emailChanges} />
@@ -160,13 +168,15 @@ export function AdminNotificationsDashboard({
         ) : (
           <>
             <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
-              <table className="min-w-[900px] text-left text-sm">
+              <table className="min-w-[1100px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Detail</th>
+                    <th className="px-4 py-3">Where shown</th>
+                    <th className="px-4 py-3">Marked read</th>
                     <th className="px-4 py-3">Requested</th>
                     <th className="px-4 py-3">Actions</th>
                   </tr>
@@ -176,6 +186,7 @@ export function AdminNotificationsDashboard({
                   const actionKey = row.id;
                   const canApprove = row.type === "Email change" || row.type === "Phone change";
                   const isNew = unreadSet.has(row.id);
+                  const guide = notificationQueueGuideFor(row.type);
                   return (
                     <tr
                       key={actionKey}
@@ -190,6 +201,11 @@ export function AdminNotificationsDashboard({
                       <td className="px-4 py-2.5">{row.name}</td>
                       <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{row.email}</td>
                       <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.detail}</td>
+                      <td className="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400">
+                        <p>{guide.whereShown}</p>
+                        <p className="mt-1 text-zinc-500 dark:text-zinc-500">{guide.navBadge}</p>
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400">{guide.markedReadWhen}</td>
                       <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.requestedAt}</td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap items-center gap-2">

@@ -13405,5 +13405,20 @@
     "surveyDefinitionId": "survey-vo-tech-training-program-interest-mqi8zha7",
     "deliveryType": "internal",
     "panelistEmail": "panelist.verified@belizepanel.test"
+  },
+  {
+    "id": "campaign-demo-admin-alert",
+    "title": "Demo admin alert — community priorities",
+    "category": "civic",
+    "assignedDate": "2026-06-10",
+    "completeByDate": "2026-06-16",
+    "points": 75,
+    "status": "completed",
+    "progressPercent": 100,
+    "completedDate": "2026-06-16",
+    "surveyUrl": null,
+    "surveyDefinitionId": "survey-demo-admin-alert",
+    "deliveryType": "internal",
+    "panelistEmail": "glen.avilez@belizepanel.test"
   }
 ]

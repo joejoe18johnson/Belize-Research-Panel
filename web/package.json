@@ -11,7 +11,8 @@
     "seed:demo": "node scripts/seed-demo-accounts.mjs",
     "seed:roles": "node scripts/seed-role-users.mjs",
     "seed:campaign": "node scripts/seed-sample-campaign.mjs",
-    "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign"
+    "seed:admin-notifications": "node scripts/seed-admin-notifications.mjs",
+    "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign && npm run seed:admin-notifications"
   },
   "dependencies": {
     "next": "16.2.6",
