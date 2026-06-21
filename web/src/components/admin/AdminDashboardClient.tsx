@@ -8,6 +8,8 @@ import {
   AdminSectionPanel,
   AdminStatusPill,
   AdminTableHead,
+  AdminTableRow,
+  AdminTableTd,
   AdminTableTh,
   IconMetricCard,
   PageIntro,
@@ -155,47 +157,47 @@ export function AdminDashboardClient({
 
       <div className="grid gap-6 xl:grid-cols-2">
         <AdminSectionPanel title="Recent panelists" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
-          <div className="overflow-x-auto">
-            <AdminDataTable className="min-w-[640px]">
-              <AdminTableHead>
-                <AdminTableTh>Name</AdminTableTh>
-                <AdminTableTh>Status</AdminTableTh>
-                <AdminTableTh>Verification</AdminTableTh>
-                <AdminTableTh>Phone</AdminTableTh>
-              </AdminTableHead>
-              <tbody>
-                {recentPanelists.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-                      No panelists registered yet.
-                    </td>
-                  </tr>
-                ) : (
-                  panelistsPagination.paginatedRows.map((row) => (
-                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                          className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-teal-800 dark:text-teal-200"
-                        >
-                          {row.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}>
-                          {row.panelistStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <AdminStatusPill label={row.verificationStatus} tone={verificationTone(row.verificationStatus)} />
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </AdminDataTable>
-          </div>
+          <AdminDataTable desktopMinWidthClass="md:min-w-[640px]">
+            <AdminTableHead>
+              <AdminTableTh>Name</AdminTableTh>
+              <AdminTableTh>Status</AdminTableTh>
+              <AdminTableTh>Verification</AdminTableTh>
+              <AdminTableTh>Phone</AdminTableTh>
+            </AdminTableHead>
+            <tbody>
+              {recentPanelists.length === 0 ? (
+                <AdminTableRow>
+                  <AdminTableTd colSpan={4} empty label="">
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">No panelists registered yet.</span>
+                  </AdminTableTd>
+                </AdminTableRow>
+              ) : (
+                panelistsPagination.paginatedRows.map((row) => (
+                  <AdminTableRow key={row.email}>
+                    <AdminTableTd label="Name">
+                      <Link
+                        href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                        className="font-medium text-zinc-900 hover:text-teal-800 dark:text-zinc-100 dark:hover:text-teal-200"
+                      >
+                        {row.name}
+                      </Link>
+                    </AdminTableTd>
+                    <AdminTableTd label="Status">
+                      <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400"}>
+                        {row.panelistStatus}
+                      </span>
+                    </AdminTableTd>
+                    <AdminTableTd label="Verification">
+                      <AdminStatusPill label={row.verificationStatus} tone={verificationTone(row.verificationStatus)} />
+                    </AdminTableTd>
+                    <AdminTableTd label="Phone" className="break-all md:break-normal">
+                      {row.phone}
+                    </AdminTableTd>
+                  </AdminTableRow>
+                ))
+              )}
+            </tbody>
+          </AdminDataTable>
           {recentPanelists.length > 0 ? (
             <div className="px-4 pb-4">
               <TablePagination
@@ -211,64 +213,68 @@ export function AdminDashboardClient({
         </AdminSectionPanel>
 
         <AdminSectionPanel title="Recent users" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
-          <div className="overflow-x-auto">
-            <AdminDataTable className="min-w-[720px]">
-              <AdminTableHead>
-                <AdminTableTh>Name</AdminTableTh>
-                <AdminTableTh>Email</AdminTableTh>
-                <AdminTableTh>Status</AdminTableTh>
-                <AdminTableTh>Phone</AdminTableTh>
-                <AdminTableTh>Phone approved</AdminTableTh>
-                <AdminTableTh>Docs</AdminTableTh>
-              </AdminTableHead>
-              <tbody>
-                {recentPanelists.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-                      No users registered yet.
-                    </td>
-                  </tr>
-                ) : (
-                  usersPagination.paginatedRows.map((row) => (
-                    <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
-                      <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.name}</td>
-                      <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.email}</td>
-                      <td className="px-4 py-3">
-                        <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}>
-                          {row.panelistStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone}</td>
-                      <td className="px-4 py-3">
-                        {row.phoneApproved ? (
-                          <span className="font-medium text-emerald-600">Yes</span>
-                        ) : (
-                          <span className="text-zinc-400 dark:text-zinc-500">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {row.hasIdDoc ? (
-                            <AdminDocPill
-                              href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                              label="ID"
-                            />
-                          ) : null}
-                          {row.hasAddressDoc ? (
-                            <AdminDocPill
-                              href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                              label="Addr"
-                            />
-                          ) : null}
-                          {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400 dark:text-zinc-500">—</span> : null}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </AdminDataTable>
-          </div>
+          <AdminDataTable desktopMinWidthClass="md:min-w-[720px]">
+            <AdminTableHead>
+              <AdminTableTh>Name</AdminTableTh>
+              <AdminTableTh>Email</AdminTableTh>
+              <AdminTableTh>Status</AdminTableTh>
+              <AdminTableTh>Phone</AdminTableTh>
+              <AdminTableTh>Phone approved</AdminTableTh>
+              <AdminTableTh>Docs</AdminTableTh>
+            </AdminTableHead>
+            <tbody>
+              {recentPanelists.length === 0 ? (
+                <AdminTableRow>
+                  <AdminTableTd colSpan={6} empty label="">
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">No users registered yet.</span>
+                  </AdminTableTd>
+                </AdminTableRow>
+              ) : (
+                usersPagination.paginatedRows.map((row) => (
+                  <AdminTableRow key={`user-${row.email}`}>
+                    <AdminTableTd label="Name">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{row.name}</span>
+                    </AdminTableTd>
+                    <AdminTableTd label="Email" className="break-all">
+                      {row.email}
+                    </AdminTableTd>
+                    <AdminTableTd label="Status">
+                      <span className={row.panelistStatus === "Active" ? "font-medium text-emerald-600" : "text-zinc-600 dark:text-zinc-400"}>
+                        {row.panelistStatus}
+                      </span>
+                    </AdminTableTd>
+                    <AdminTableTd label="Phone" className="break-all md:break-normal">
+                      {row.phone}
+                    </AdminTableTd>
+                    <AdminTableTd label="Phone approved">
+                      {row.phoneApproved ? (
+                        <span className="font-medium text-emerald-600">Yes</span>
+                      ) : (
+                        <span className="text-zinc-400 dark:text-zinc-500">—</span>
+                      )}
+                    </AdminTableTd>
+                    <AdminTableTd label="Docs">
+                      <div className="flex flex-wrap gap-1">
+                        {row.hasIdDoc ? (
+                          <AdminDocPill
+                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                            label="ID"
+                          />
+                        ) : null}
+                        {row.hasAddressDoc ? (
+                          <AdminDocPill
+                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                            label="Addr"
+                          />
+                        ) : null}
+                        {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400 dark:text-zinc-500">—</span> : null}
+                      </div>
+                    </AdminTableTd>
+                  </AdminTableRow>
+                ))
+              )}
+            </tbody>
+          </AdminDataTable>
           {recentPanelists.length > 0 ? (
             <div className="px-4 pb-4">
               <TablePagination
@@ -285,53 +291,55 @@ export function AdminDashboardClient({
       </div>
 
       <AdminSectionPanel title="Recent payouts" viewAllHref={ADMIN_DASHBOARD_LINKS.payouts}>
-        <div className="overflow-x-auto">
-          <AdminDataTable className="min-w-[640px]">
-            <AdminTableHead>
-              <AdminTableTh>Request ID</AdminTableTh>
-              <AdminTableTh>Payment</AdminTableTh>
-              <AdminTableTh>Option</AdminTableTh>
-              <AdminTableTh align="right">Amount</AdminTableTh>
-              <AdminTableTh>Status</AdminTableTh>
-            </AdminTableHead>
-            <tbody>
-              {recentPayouts.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-                    No payout requests yet.
-                  </td>
-                </tr>
-              ) : (
-                payoutsPagination.paginatedRows.map((row) => (
-                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
-                    <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.paymentTitle}</td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.optionLabel}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{formatBz(row.amountBz)}</td>
-                    <td className="px-4 py-3">
-                      <AdminStatusPill
-                        label={formatHeadingCase(
-                          row.status === "fulfilled"
-                            ? "Completed"
-                            : row.status === "approved"
-                              ? "Processing"
-                              : row.status
-                        )}
-                        tone={
-                          row.status === "fulfilled"
-                            ? "success"
-                            : row.status === "approved"
-                              ? "info"
-                              : "warning"
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </AdminDataTable>
-        </div>
+        <AdminDataTable desktopMinWidthClass="md:min-w-[640px]">
+          <AdminTableHead>
+            <AdminTableTh>Request ID</AdminTableTh>
+            <AdminTableTh>Payment</AdminTableTh>
+            <AdminTableTh>Option</AdminTableTh>
+            <AdminTableTh align="right">Amount</AdminTableTh>
+            <AdminTableTh>Status</AdminTableTh>
+          </AdminTableHead>
+          <tbody>
+            {recentPayouts.length === 0 ? (
+              <AdminTableRow>
+                <AdminTableTd colSpan={5} empty label="">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">No payout requests yet.</span>
+                </AdminTableTd>
+              </AdminTableRow>
+            ) : (
+              payoutsPagination.paginatedRows.map((row) => (
+                <AdminTableRow key={row.id}>
+                  <AdminTableTd label="Request ID">
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</span>
+                  </AdminTableTd>
+                  <AdminTableTd label="Payment">{row.paymentTitle}</AdminTableTd>
+                  <AdminTableTd label="Option">{row.optionLabel}</AdminTableTd>
+                  <AdminTableTd label="Amount" align="right">
+                    <span className="tabular-nums">{formatBz(row.amountBz)}</span>
+                  </AdminTableTd>
+                  <AdminTableTd label="Status">
+                    <AdminStatusPill
+                      label={formatHeadingCase(
+                        row.status === "fulfilled"
+                          ? "Completed"
+                          : row.status === "approved"
+                            ? "Processing"
+                            : row.status
+                      )}
+                      tone={
+                        row.status === "fulfilled"
+                          ? "success"
+                          : row.status === "approved"
+                            ? "info"
+                            : "warning"
+                      }
+                    />
+                  </AdminTableTd>
+                </AdminTableRow>
+              ))
+            )}
+          </tbody>
+        </AdminDataTable>
         {recentPayouts.length > 0 ? (
           <div className="px-4 pb-4">
             <TablePagination

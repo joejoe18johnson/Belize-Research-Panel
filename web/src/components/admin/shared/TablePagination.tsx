@@ -57,7 +57,7 @@ export function TablePagination({
   const end = Math.min(page * pageSize, totalRows);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4">
+    <div className="flex flex-col gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-800 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         <label className="flex items-center gap-2">
           <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Rows per page</span>

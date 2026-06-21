@@ -73,6 +73,94 @@ body {
   overscroll-behavior-x: contain;
 }
 
+/* Admin tables — card rows on mobile, standard table from md up */
+@media (max-width: 767px) {
+  .admin-responsive-table {
+    display: block;
+  }
+
+  .admin-responsive-table thead {
+    display: none;
+  }
+
+  .admin-responsive-table tbody {
+    display: block;
+  }
+
+  .admin-responsive-table tr {
+    display: block;
+    margin: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.875rem;
+    background: rgb(250 250 250 / 0.55);
+    box-shadow: 0 1px 2px rgb(9 9 11 / 0.04);
+  }
+
+  .dark .admin-responsive-table tr {
+    border-color: #3f3f46;
+    background: rgb(24 24 27 / 0.72);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+  }
+
+  .admin-responsive-table tr:last-child {
+    margin-bottom: 1rem;
+  }
+
+  .admin-responsive-table td {
+    display: grid;
+    grid-template-columns: minmax(6.25rem, 38%) minmax(0, 1fr);
+    gap: 0.125rem 0.75rem;
+    align-items: start;
+    padding: 0.45rem 0;
+    border: 0;
+    white-space: normal;
+    max-width: none;
+  }
+
+  .admin-responsive-table td::before {
+    content: attr(data-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #71717a;
+    line-height: 1.35;
+    padding-top: 0.125rem;
+  }
+
+  .dark .admin-responsive-table td::before {
+    color: #a1a1aa;
+  }
+
+  .admin-responsive-table td.admin-table-empty,
+  .admin-responsive-table td[data-label=""] {
+    display: block;
+    grid-template-columns: unset;
+    padding: 2rem 0.5rem;
+    text-align: center;
+  }
+
+  .admin-responsive-table td.admin-table-empty::before,
+  .admin-responsive-table td[data-label=""]::before {
+    content: none;
+  }
+
+  .admin-responsive-table td[class*="sticky"] {
+    position: static;
+    border-left: 0;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+}
+
 /* Prevent flex/grid children from forcing page overflow */
 .min-w-0-fluid {
   min-width: 0;

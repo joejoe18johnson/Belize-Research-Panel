@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { PageIntro, AdminTableScroll, adminNewItemRowClass, adminTableRowHoverClass } from "@/components/admin/shared/AdminUi";
+import { PageIntro, AdminTableScroll, adminNewItemRowClass, adminResponsiveTableClass, AdminTableRow, AdminTableTd } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import type { SupportMessageRecord } from "@/lib/support-messages";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -107,7 +107,7 @@ export function AdminSupportInboxClient({
       <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <div className="min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
           <AdminTableScroll>
-            <table className="min-w-full text-left text-sm">
+            <table className={`${adminResponsiveTableClass} w-full text-left text-sm`}>
               <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                 <tr>
                   <th className="px-4 py-3">Received</th>
@@ -118,31 +118,29 @@ export function AdminSupportInboxClient({
               </thead>
               <tbody>
                 {pageRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
-                      No support messages yet.
-                    </td>
-                  </tr>
+                  <AdminTableRow>
+                    <AdminTableTd colSpan={4} empty label="">
+                      <span className="text-zinc-500 dark:text-zinc-400">No support messages yet.</span>
+                    </AdminTableTd>
+                  </AdminTableRow>
                 ) : (
                   pageRows.map((row) => {
                     const active = selected?.id === row.id;
                     return (
-                      <tr
+                      <AdminTableRow
                         key={row.id}
-                        className={`cursor-pointer border-b border-zinc-100 dark:border-zinc-800 ${adminTableRowHoverClass} ${
-                          active ? "bg-teal-50 dark:bg-teal-950/30" : row.status === "new" ? adminNewItemRowClass : ""
-                        }`}
+                        className={`cursor-pointer ${active ? "bg-teal-50 dark:bg-teal-950/30" : adminNewItemRowClass(row.status === "new")}`}
                         onClick={() => setSelectedId(row.id)}
                       >
-                        <td className="px-4 py-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
+                        <AdminTableTd label="Received">
                           {formatTimestamp(row.createdAt)}
-                        </td>
-                        <td className="px-4 py-3">
+                        </AdminTableTd>
+                        <AdminTableTd label="From">
                           <div className="font-medium text-zinc-900 dark:text-zinc-100">{row.name}</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-400">{row.email}</div>
-                        </td>
-                        <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.topicLabel}</td>
-                        <td className="px-4 py-3">
+                          <div className="break-all text-xs text-zinc-500 dark:text-zinc-400">{row.email}</div>
+                        </AdminTableTd>
+                        <AdminTableTd label="Topic">{row.topicLabel}</AdminTableTd>
+                        <AdminTableTd label="Status">
                           <span
                             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
                               row.status === "new"
@@ -152,8 +150,8 @@ export function AdminSupportInboxClient({
                           >
                             {row.status === "new" ? "Unread" : "Read"}
                           </span>
-                        </td>
-                      </tr>
+                        </AdminTableTd>
+                      </AdminTableRow>
                     );
                   })
                 )}

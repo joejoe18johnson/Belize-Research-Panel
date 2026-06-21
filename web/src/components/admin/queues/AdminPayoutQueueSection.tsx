@@ -7,6 +7,8 @@ import {
   AdminNewBadge,
   AdminStatusPill,
   AdminTableHead,
+  AdminTableRow,
+  AdminTableTd,
   AdminTableTh,
   adminNewItemRowClass,
 } from "@/components/admin/shared/AdminUi";
@@ -391,11 +393,11 @@ export function AdminPayoutQueueSection({
       ) : (
         <>
           <div
-            className={`mt-4 rounded-xl border border-zinc-100 dark:border-zinc-800 ${
-              mode === "history" ? "max-h-[min(70vh,40rem)] overflow-auto" : "overflow-x-auto"
+            className={`admin-table-scroll mt-4 max-md:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800 ${
+              mode === "history" ? "max-md:max-h-none max-h-[min(70vh,40rem)] overflow-y-auto" : ""
             }`}
           >
-            <AdminDataTable className={mode === "history" ? "min-w-[1180px]" : "min-w-[960px]"}>
+            <AdminDataTable desktopMinWidthClass={mode === "history" ? "md:min-w-[1180px]" : "md:min-w-[960px]"}>
               <AdminTableHead>
                 <AdminTableTh>Request ID</AdminTableTh>
                 {mode === "history" ? <AdminTableTh>Panelist email</AdminTableTh> : null}
@@ -425,46 +427,64 @@ export function AdminPayoutQueueSection({
                 {pagination.paginatedRows.map((row) => {
                   const isNew = row.status === "pending" && unreadSet.has(row.id);
                   return (
-                  <tr
+                  <AdminTableRow
                     key={row.id}
                     className={adminNewItemRowClass(
                       isNew,
-                      `border-b border-zinc-50 align-top hover:bg-zinc-50/60 dark:hover:bg-zinc-800/60${mode === "history" ? " group" : ""}`
+                      `${mode === "history" ? "group" : ""}`
                     )}
                   >
-                    <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">
-                      <span className="inline-flex items-center gap-2">
+                    <AdminTableTd label="Request ID">
+                      <span className="inline-flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-100">
                         {row.shortId}
                         {isNew ? <AdminNewBadge /> : null}
                       </span>
-                    </td>
+                    </AdminTableTd>
                     {mode === "history" ? (
-                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
+                      <AdminTableTd label="Panelist email" className="break-all">
+                        {row.email}
+                      </AdminTableTd>
                     ) : null}
-                    <td className="px-4 py-3">
+                    <AdminTableTd label="Status">
                       <AdminStatusPill label={payoutStatusLabel(row.status)} tone={payoutStatusTone(row.status)} />
-                    </td>
-                    <td className="max-w-[14rem] px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.optionLabel}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-zinc-800 dark:text-zinc-200">{formatBz(row.amountBz)}</td>
-                    <td className="max-w-[14rem] px-4 py-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                      <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.paymentTitle}</p>
-                      {row.paymentLines.map((line) => (
-                        <p key={`${row.id}-${line}`} className="mt-0.5">
-                          {line}
-                        </p>
-                      ))}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.formattedDate}</td>
+                    </AdminTableTd>
+                    <AdminTableTd label="Redemption option">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{row.optionLabel}</span>
+                    </AdminTableTd>
+                    <AdminTableTd label="Amount" align="right">
+                      <span className="tabular-nums text-zinc-800 dark:text-zinc-200">{formatBz(row.amountBz)}</span>
+                    </AdminTableTd>
+                    <AdminTableTd label="Payment details">
+                      <div className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                        <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.paymentTitle}</p>
+                        {row.paymentLines.map((line) => (
+                          <p key={`${row.id}-${line}`} className="mt-0.5">
+                            {line}
+                          </p>
+                        ))}
+                      </div>
+                    </AdminTableTd>
+                    <AdminTableTd label={mode === "history" ? "Submitted" : "Date"}>
+                      {row.formattedDate}
+                    </AdminTableTd>
                     {mode === "history" ? (
-                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.formattedUpdatedDate}</td>
+                      <AdminTableTd label="Processed">{row.formattedUpdatedDate}</AdminTableTd>
                     ) : null}
                     {mode === "history" ? (
-                      <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.processedBy ?? "—"}</td>
+                      <AdminTableTd label="Processed by">{row.processedBy ?? "—"}</AdminTableTd>
                     ) : null}
-                    <td className={mode === "history" ? payoutStickyStatementClass("body", isNew) : "px-4 py-3 text-center"}>
+                    <AdminTableTd
+                      label="Statement"
+                      align="center"
+                      className={mode === "history" ? payoutStickyStatementClass("body", isNew) : ""}
+                    >
                       <BrandedPdfActions viewHref={payoutStatementHref(row.id)} compact />
-                    </td>
-                    <td className={mode === "history" ? payoutStickyActionClass("body", isNew) : "px-4 py-3 text-center"}>
+                    </AdminTableTd>
+                    <AdminTableTd
+                      label="Action"
+                      align="center"
+                      className={mode === "history" ? payoutStickyActionClass("body", isNew) : ""}
+                    >
                       <button
                         type="button"
                         onClick={() => {
@@ -478,8 +498,8 @@ export function AdminPayoutQueueSection({
                       >
                         {row.status === "pending" || row.status === "approved" ? "Process" : "View"}
                       </button>
-                    </td>
-                  </tr>
+                    </AdminTableTd>
+                  </AdminTableRow>
                   );
                 })}
               </tbody>

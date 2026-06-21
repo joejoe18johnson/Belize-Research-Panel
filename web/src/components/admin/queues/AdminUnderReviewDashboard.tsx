@@ -8,6 +8,8 @@ import {
   AdminSectionPanel,
   AdminStatusPill,
   AdminTableHead,
+  AdminTableRow,
+  AdminTableTd,
   AdminTableTh,
   MetricCard,
   PageIntro,
@@ -182,8 +184,8 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
           </div>
         ) : (
           <>
-            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
-              <AdminDataTable className="min-w-[960px]">
+            <div className="admin-table-scroll mt-4 max-md:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800">
+              <AdminDataTable desktopMinWidthClass="md:min-w-[960px]">
                 <AdminTableHead>
                   <AdminTableTh>Name</AdminTableTh>
                   <AdminTableTh>Email</AdminTableTh>
@@ -196,18 +198,22 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                 </AdminTableHead>
                 <tbody>
                   {pagination.paginatedRows.map((row) => (
-                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
-                      <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-800 dark:text-zinc-200">{row.name}</td>
-                      <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
-                      <td className="whitespace-nowrap px-4 py-3">
+                    <AdminTableRow key={row.email} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/30">
+                      <AdminTableTd label="Name">
+                        <span className="font-medium text-zinc-800 dark:text-zinc-200">{row.name}</span>
+                      </AdminTableTd>
+                      <AdminTableTd label="Email" className="break-all">
+                        {row.email}
+                      </AdminTableTd>
+                      <AdminTableTd label="Email · Phone · ID">
                         <RequirementStatusGroup
                           email={row.emailRequirement}
                           phone={row.phoneRequirement}
                           photoId={row.photoIdRequirement}
                           iconsOnly
                         />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
+                      </AdminTableTd>
+                      <AdminTableTd label="Verification">
                         <AdminStatusPill
                           label={row.verificationStatus}
                           tone={
@@ -218,29 +224,29 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                                 : "neutral"
                           }
                         />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
+                      </AdminTableTd>
+                      <AdminTableTd label="Account">
                         {row.accountStatus === "on_hold" ? (
                           <AdminStatusPill label="On hold" tone="warning" />
                         ) : (
-                          <span className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Active</span>
+                          <span className="text-zinc-500 dark:text-zinc-400">Active</span>
                         )}
-                      </td>
-                      <td className="align-top px-4 py-3">
+                      </AdminTableTd>
+                      <AdminTableTd label="Reason">
                         <ReviewReasonList reasons={row.reasons} />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                        {row.registrationDate || "—"}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
+                      </AdminTableTd>
+                      <AdminTableTd label="Registered">
+                        <span className="tabular-nums">{row.registrationDate || "—"}</span>
+                      </AdminTableTd>
+                      <AdminTableTd label="Actions">
                         <Link
                           href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
                           className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                         >
                           Open record
                         </Link>
-                      </td>
-                    </tr>
+                      </AdminTableTd>
+                    </AdminTableRow>
                   ))}
                 </tbody>
               </AdminDataTable>
