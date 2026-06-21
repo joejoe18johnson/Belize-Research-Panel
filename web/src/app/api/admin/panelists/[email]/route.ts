@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/lib/admin-panelist-actions";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { approveAccountPhoneChange, findAccountByEmail, setAccountEmailVerifiedByAdmin } from "@/lib/accounts";
+import { sendPanelistVerifiedEmail } from "@/lib/email/process-emails";
 import {
   buildPanelistDeleteCode,
   matchesDeleteConfirmation,
@@ -130,6 +131,17 @@ export async function PATCH(
   await syncAccountHoldForVerificationStatus(accountEmail, verificationStatus);
 
   const fullyVerified = verificationStatus === "Verified";
+  const wasVerified = cleanText(panelist.verification_status) === "Verified";
+
+  if (fullyVerified && !wasVerified) {
+    const origin = new URL(request.url).origin;
+    void sendPanelistVerifiedEmail({
+      to: lookupEmail || accountEmail,
+      firstName: panelist.first_name,
+      origin,
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     message: fullyVerified

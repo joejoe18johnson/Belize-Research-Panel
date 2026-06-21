@@ -6,6 +6,7 @@ import {
   findAccountByEmail,
   getPendingPhoneForApproval,
 } from "@/lib/accounts";
+import { sendPhoneChangeApprovedEmail } from "@/lib/email/process-emails";
 import { updatePanelistPhone } from "@/lib/panelists";
 import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
 import { cleanText } from "@/lib/validation";
@@ -56,6 +57,13 @@ export async function POST(request: NextRequest) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/account-on-hold");
+
+    void sendPhoneChangeApprovedEmail({
+      to: email,
+      firstName: account.first_name,
+      newPhone: pendingPhone,
+      origin: request.nextUrl.origin,
+    });
 
     return NextResponse.json({
       ok: true,

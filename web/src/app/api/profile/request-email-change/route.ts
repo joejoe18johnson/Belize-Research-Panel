@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { requestAccountEmailChange } from "@/lib/accounts";
 import { getSessionAccount } from "@/lib/auth";
+import { sendEmailChangeRequestedEmail } from "@/lib/email/process-emails";
 import { cleanText, validEmail } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -42,6 +43,14 @@ export async function POST(request: NextRequest) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/account-on-hold");
+
+    const origin = request.nextUrl.origin;
+    void sendEmailChangeRequestedEmail({
+      to: session.email,
+      firstName: session.firstName,
+      pendingEmail: newEmail,
+      origin,
+    });
 
     return NextResponse.json({
       ok: true,

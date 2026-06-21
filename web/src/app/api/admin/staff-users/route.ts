@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getSuperAdminSession } from "@/lib/admin-auth";
+import { sendStaffWelcomeEmail } from "@/lib/email/process-emails";
 import { createStaffUser, listPublicStaffUsers } from "@/lib/staff-users";
-import { isStaffRole } from "@/lib/staff-roles";
+import { STAFF_ROLE_LABELS, isStaffRole } from "@/lib/staff-roles";
 import { cleanText } from "@/lib/validation";
 
 export async function GET() {
@@ -38,6 +39,14 @@ export async function POST(request: Request) {
     });
 
     revalidatePath("/admin/user-roles");
+
+    void sendStaffWelcomeEmail({
+      to: user.email,
+      firstName: user.first_name,
+      roleLabel: STAFF_ROLE_LABELS[user.role] ?? user.role,
+      origin: new URL(request.url).origin,
+    });
+
     return NextResponse.json({ ok: true, user: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not create staff account.";

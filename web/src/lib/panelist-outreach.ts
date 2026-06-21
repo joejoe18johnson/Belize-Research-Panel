@@ -16,6 +16,8 @@ export interface OutboundMessage {
   body: string;
   context: string;
   sentAt: string;
+  deliveryStatus?: "sent" | "logged" | "failed";
+  resendId?: string;
 }
 
 async function loadMessages(): Promise<OutboundMessage[]> {
@@ -43,43 +45,28 @@ async function logOutboundMessage(input: Omit<OutboundMessage, "id" | "sentAt">)
   await saveMessages(messages.slice(0, 500));
 }
 
-export async function sendPanelistOutreach(input: {
+/** Logs WhatsApp outreach for demo / future integration. Email uses Resend via process-emails. */
+export async function logPanelistWhatsappOutreach(input: {
   email: string;
   phone?: string;
-  subject: string;
   body: string;
   context: string;
-}): Promise<{ emailSent: boolean; whatsappSent: boolean }> {
+}): Promise<boolean> {
   const email = cleanText(input.email).toLowerCase();
   const phone = cleanText(input.phone ?? "");
-  const subject = cleanText(input.subject);
   const body = cleanText(input.body);
-  let emailSent = false;
-  let whatsappSent = false;
 
-  if (email && subject && body) {
-    await logOutboundMessage({
-      email,
-      phone,
-      channel: "email",
-      subject,
-      body,
-      context: input.context,
-    });
-    emailSent = true;
-  }
+  if (!phone || !body) return false;
 
-  if (phone && body) {
-    await logOutboundMessage({
-      email,
-      phone,
-      channel: "whatsapp",
-      subject: subject || "Belize Research Panel",
-      body,
-      context: input.context,
-    });
-    whatsappSent = true;
-  }
+  await logOutboundMessage({
+    email,
+    phone,
+    channel: "whatsapp",
+    subject: "Belize Research Panel",
+    body,
+    context: input.context,
+    deliveryStatus: "logged",
+  });
 
-  return { emailSent, whatsappSent };
+  return true;
 }
