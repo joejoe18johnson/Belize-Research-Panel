@@ -1,6 +1,23 @@
 {
   "glen.avilez@belizepanel.test": [
     {
+      "id": "demo-payout-pending-glen",
+      "email": "glen.avilez@belizepanel.test",
+      "optionId": "gift_card",
+      "optionLabel": "Gift card",
+      "points": 500,
+      "amountBz": 20,
+      "valueLabel": "BZ$20 gift card",
+      "status": "pending",
+      "details": {
+        "retailer": "Brodi's",
+        "deliveryEmail": "glen.avilez@belizepanel.test"
+      },
+      "notes": "Demo payout for admin notification preview.",
+      "submittedAt": "2026-06-17T10:00:00.000Z",
+      "updatedAt": "2026-06-17T10:00:00.000Z"
+    },
+    {
       "id": "glen-redeem-fulfilled-1",
       "email": "glen.avilez@belizepanel.test",
       "optionId": "gift_card",
