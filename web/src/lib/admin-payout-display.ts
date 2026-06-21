@@ -1,3 +1,4 @@
+import { formatBankPayoutCity } from "./bank-payout-location";
 import type { RedemptionRequest, StoredRedemptionOptionId } from "./reward-redemption";
 import { formatBz, getRedemptionOption } from "./reward-redemption";
 import { formatHeadingCase } from "./sentence-case";
@@ -80,9 +81,13 @@ export function formatPayoutPaymentDetails(
     const bankName = BANK_LABELS[cleanText(details.bankName)] ?? (cleanText(details.bankName) || "Bank account");
     const holder = cleanText(details.accountHolderName) || "—";
     const account = formatAccountNumber(details.accountNumber ?? "", maskSensitive);
+    const district = cleanText(details.district);
+    const city = formatBankPayoutCity(details);
     const fields: PayoutPaymentField[] = [
       { label: "Account holder", value: holder },
       { label: "Account number", value: account },
+      ...(district ? [{ label: "District", value: district }] : []),
+      ...(city !== "—" ? [{ label: "City / town / village", value: city }] : []),
     ];
     return {
       title: bankName,
