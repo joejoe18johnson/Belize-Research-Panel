@@ -2,11 +2,15 @@ import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignedInBanner } from "@/components/auth/SignedInBanner";
 import { getSessionAccount } from "@/lib/auth";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "Log in | Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Log in",
+  description:
+    "Sign in to your Belize Research Panel account to take surveys, track rewards, and manage your panelist profile.",
+  path: "/login",
+});
 
 export default async function LoginPage({
   searchParams,

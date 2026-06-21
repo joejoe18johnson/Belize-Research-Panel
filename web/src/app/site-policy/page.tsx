@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { PolicyPageShell, PolicySection } from "@/components/PolicyPageShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Site policy | Belize Research Panel",
+export const metadata = buildPageMetadata({
+  title: "Site policy",
   description: "Terms governing use of the Belize Research Panel website and panelist accounts.",
-};
+  path: "/site-policy",
+});
 
 export default function SitePolicyPage() {
   return (

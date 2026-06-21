@@ -1,9 +1,13 @@
 import { redirect } from "next/navigation";
 import { getSessionAccount } from "@/lib/auth";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Registration successful | Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Registration successful",
+  description: "Your Belize Research Panel registration is complete.",
+  path: "/register/success",
+  noIndex: true,
+});
 
 export default async function RegisterSuccessPage({
   searchParams,
