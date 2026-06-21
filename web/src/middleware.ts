@@ -4,7 +4,7 @@ import { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "@/lib/admin-sessi
 import { CLIENT_SESSION_COOKIE, decodeClientSessionToken } from "@/lib/client-session";
 import { adminPathAllowedForSession, staffDefaultAdminPath } from "@/lib/staff-roles";
 
-const PUBLIC_ADMIN_PATHS = new Set(["/admin/login"]);
+const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot-password", "/admin/reset-password"]);
 const PUBLIC_CLIENT_PATHS = new Set(["/client/login"]);
 
 export async function middleware(request: NextRequest) {

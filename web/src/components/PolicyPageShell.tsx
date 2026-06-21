@@ -9,10 +9,12 @@ export function PolicyPageShell({
   title,
   description,
   children,
+  plainContent = false,
 }: {
   title: string;
   description: string;
   children: ReactNode;
+  plainContent?: boolean;
 }) {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-950">
@@ -36,7 +38,7 @@ export function PolicyPageShell({
             {formatHeadingCase(title)}
           </h1>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
-          <div className="policy-prose mt-8 space-y-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+          <div className={plainContent ? "mt-8" : "policy-prose mt-8 space-y-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"}>
             {children}
           </div>
         </article>

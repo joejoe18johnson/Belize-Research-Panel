@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PolicyPageShell, PolicySection } from "@/components/PolicyPageShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -78,8 +79,12 @@ export default function SitePolicyPage() {
           )}
         </p>
         <p>
-          {formatHeadingCase("Questions about this policy may be sent to")}{" "}
-          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline">
+          {formatHeadingCase("Questions about this policy may be sent through our")}{" "}
+          <Link href="/help" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            help & contact page
+          </Link>{" "}
+          {formatHeadingCase("or by email to")}{" "}
+          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
             privacy@belizepanel.test
           </a>
           .

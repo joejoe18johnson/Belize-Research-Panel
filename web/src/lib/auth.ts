@@ -79,3 +79,11 @@ export function buildVerificationUrl(token: string, origin: string): string {
 export function buildEmailChangeVerificationUrl(token: string, origin: string): string {
   return `${origin.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}&purpose=email-change`;
 }
+
+export function buildPasswordResetUrl(token: string, origin: string): string {
+  return `${origin.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}`;
+}
+
+export function buildStaffPasswordResetUrl(token: string, origin: string): string {
+  return `${origin.replace(/\/$/, "")}/admin/reset-password?token=${encodeURIComponent(token)}`;
+}

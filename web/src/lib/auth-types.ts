@@ -24,6 +24,8 @@ export interface AccountRecord {
   email_change_requested_at?: string;
   pending_phone_whatsapp?: string;
   phone_change_requested_at?: string;
+  password_reset_token?: string;
+  password_reset_sent_at?: string;
 }
 
 export interface SessionAccount {

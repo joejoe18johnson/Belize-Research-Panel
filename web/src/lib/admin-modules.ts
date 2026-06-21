@@ -93,6 +93,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "support-inbox",
+    label: "Support Inbox",
+    kind: "page",
+    href: "/admin/support-inbox",
+    section: "admin-console",
+    status: "working",
+  },
+  {
     slug: "panelists",
     label: "Panelists",
     kind: "page",

@@ -127,3 +127,16 @@ export async function authenticateStaffLogin(
     allowedModules,
   };
 }
+
+export async function adminSessionFromStaffUser(
+  user: StaffUserRecord
+): Promise<Omit<AdminSession, "exp">> {
+  const allowedModules = await getRoleModuleSlugs(user.role);
+  return {
+    role: user.role,
+    email: user.email,
+    staffId: user.id,
+    displayName: staffDisplayName(user),
+    allowedModules,
+  };
+}

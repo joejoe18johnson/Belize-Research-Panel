@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PolicyPageShell, PolicySection } from "@/components/PolicyPageShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -16,9 +17,13 @@ export default function DataUsePolicyPage() {
       <PolicySection title="Data controller">
         <p>
           {formatHeadingCase(
-            "The Belize Research Panel is the data controller for personal information collected through this website and panelist registration. For privacy requests, contact"
+            "The Belize Research Panel is the data controller for personal information collected through this website and panelist registration. For privacy requests, visit our"
           )}{" "}
-          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline">
+          <Link href="/help" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            help & contact page
+          </Link>{" "}
+          {formatHeadingCase("or email")}{" "}
+          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
             privacy@belizepanel.test
           </a>
           .
@@ -108,8 +113,12 @@ export default function DataUsePolicyPage() {
           <li>{formatHeadingCase("Lodge a complaint with a supervisory data protection authority")}</li>
         </ul>
         <p>
-          {formatHeadingCase("To exercise these rights, email")}{" "}
-          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline">
+          {formatHeadingCase("To exercise these rights, use our")}{" "}
+          <Link href="/help" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            help & contact page
+          </Link>{" "}
+          {formatHeadingCase("or email")}{" "}
+          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
             privacy@belizepanel.test
           </a>
           . {formatHeadingCase("We may need to verify your identity before responding.")}
