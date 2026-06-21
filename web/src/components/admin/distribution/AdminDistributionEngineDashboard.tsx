@@ -92,7 +92,7 @@ export function AdminDistributionEngineDashboard({
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           Select mode and study, then download the contact CSV for manual sending or gateway import.
         </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Distribution mode</label>
             <SiteSelect

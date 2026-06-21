@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
+import { statusPillClass } from "@/lib/theme-surfaces";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 function statusClass(status: CampaignSummary["status"]): string {
-  if (status === "active") return "bg-teal-100 text-teal-900 dark:text-teal-100";
-  if (status === "closed") return "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-  return "bg-amber-100 text-amber-900";
+  if (status === "active") return statusPillClass.active;
+  if (status === "closed") return statusPillClass.closed;
+  return statusPillClass.warning;
 }
 
 export function ClientCampaignsDashboard({
@@ -29,7 +30,7 @@ export function ClientCampaignsDashboard({
         description="Studies commissioned by your organization through the Belize Research Panel. Only campaigns assigned to your account appear here."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <MetricCard label="Commissioned studies" value={campaigns.length} hint="Campaigns linked to your account" />
         <MetricCard label="Active fieldwork" value={activeCount} hint="Currently in the field" />
         <MetricCard label="Total completions" value={completedTotal} hint="Across all studies" />
@@ -47,8 +48,8 @@ export function ClientCampaignsDashboard({
             No commissioned studies are linked to your account yet. Your Belize Research Panel project manager will assign campaigns when fieldwork opens.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+          <div className="table-scroll">
+            <table className="min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                   <th className="px-5 py-3">Study</th>
@@ -62,7 +63,7 @@ export function ClientCampaignsDashboard({
               </thead>
               <tbody>
                 {campaigns.map((row) => (
-                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80">
+                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30 dark:border-zinc-800/80">
                     <td className="px-5 py-3">
                       <p className="font-semibold text-zinc-900 dark:text-zinc-100">{row.title}</p>
                       <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{formatAdminLabel(row.category)}</p>

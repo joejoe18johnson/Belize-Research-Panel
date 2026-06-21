@@ -19,6 +19,7 @@ import {
   CheckCircleIcon,
   PhoneIcon,
 } from "./DashboardIcons";
+import { statusPillClass } from "@/lib/theme-surfaces";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import type { ViewLayout } from "@/lib/view-layout";
 import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
@@ -84,7 +85,7 @@ function RedemptionOptionCard({
             <RedemptionOptionIcon optionId={option.id} />
             <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(option.label)}</h4>
             {canRedeemNow ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${statusPillClass.success}`}>
                 <CheckCircleIcon className="h-3.5 w-3.5" />
                 {formatHeadingCase("Ready to redeem")}
               </span>
@@ -93,7 +94,7 @@ function RedemptionOptionCard({
                 {formatHeadingCase("Insufficient available points")}
               </span>
             ) : (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${statusPillClass.warning}`}>
                 {pointsNeeded} pts to unlock ({formatBz(option.minAmountBz)} minimum)
               </span>
             )}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { AnalyticsCountRow } from "@/lib/admin-analytics";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
+import { progressTrackClass } from "@/lib/theme-surfaces";
 
 const AGE_GROUP_ORDER = ["18–24", "25–34", "35–44", "45–54", "55–64", "65+", "Unknown"];
 
@@ -45,7 +46,7 @@ export function HorizontalBarChart({
                   {row.count} <span className="text-zinc-400 dark:text-zinc-500">({row.percent}%)</span>
                 </span>
               </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-teal-50">
+              <div className={`h-2.5 overflow-hidden rounded-full ${progressTrackClass}`}>
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-teal-600 to-teal-500 transition-all"
                   style={{ width: `${width}%` }}
@@ -204,7 +205,7 @@ export function SortableAnalyticsTable({
               </tr>
             ) : (
               sorted.map((row) => (
-                <tr key={row.label} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
+                <tr key={row.label} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                   <td className="max-w-[16rem] truncate px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200" title={row.label}>
                     {formatAdminLabel(row.label)}
                   </td>

@@ -3,6 +3,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siteCheckboxClass } from "@/lib/site-controls";
+import {
+  adminNewRowHighlightClass,
+  adminTableHeadRowClass,
+  docPillClass,
+  filterOptionHoverClass,
+  iconMetricToneClass,
+  statusPillClass,
+} from "@/lib/theme-surfaces";
 import { formatAdminLabel, formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
 
 /** Form and filter labels in the admin console (title case, not all caps). */
@@ -37,7 +45,7 @@ export function FilterMultiSelect({
             return (
               <label
                 key={option}
-                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-teal-50/60"
+                className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-zinc-800 dark:text-zinc-200 ${filterOptionHoverClass}`}
               >
                 <input
                   type="checkbox"
@@ -75,9 +83,9 @@ export function MetricCard({
 }) {
   const className = `block rounded-2xl border bg-white dark:bg-zinc-900 p-4 shadow-sm transition ${
     active
-      ? "border-teal-600 ring-2 ring-teal-200 dark:ring-teal-900"
+      ? "border-teal-600 ring-2 ring-teal-200 dark:ring-teal-800"
       : href
-        ? "border-teal-100 dark:border-teal-900/60 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md"
+        ? "border-teal-100 dark:border-teal-900/60 hover:border-teal-300 hover:shadow-md dark:hover:border-teal-700"
         : "border-teal-100 dark:border-teal-900/60"
   }`;
 
@@ -100,14 +108,7 @@ export function MetricCard({
   return <div className={className}>{content}</div>;
 }
 
-const ICON_METRIC_TONES = {
-  blue: "bg-blue-100 text-blue-700",
-  green: "bg-emerald-100 text-emerald-700",
-  rose: "bg-rose-100 text-rose-700",
-  amber: "bg-amber-100 text-amber-700",
-  violet: "bg-violet-100 text-violet-700",
-  teal: "bg-teal-100 text-teal-700",
-} as const;
+const ICON_METRIC_TONES = iconMetricToneClass;
 
 export function IconMetricCard({
   href,
@@ -141,7 +142,7 @@ export function IconMetricCard({
   );
 
   const className =
-    "flex items-center gap-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm transition hover:border-zinc-300 hover:shadow-md";
+    "flex items-center gap-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm transition hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md";
 
   if (href) {
     return (
@@ -163,12 +164,12 @@ export function AdminStatusPill({
 }) {
   const toneClass =
     tone === "success"
-      ? "bg-emerald-100 text-emerald-800"
+      ? statusPillClass.success
       : tone === "warning"
-        ? "bg-amber-100 text-amber-900"
+        ? statusPillClass.warning
         : tone === "info"
-          ? "bg-sky-100 text-sky-900"
-          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300";
+          ? statusPillClass.info
+          : statusPillClass.neutral;
 
   return (
     <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${toneClass}`}>
@@ -187,7 +188,7 @@ export function AdminDocPill({
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-[11px] font-semibold text-sky-800 hover:bg-sky-100"
+      className={docPillClass}
     >
       <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
         <path
@@ -203,6 +204,13 @@ export function AdminDocPill({
       </svg>
     </Link>
   );
+}
+
+export { adminTableRowHoverClass, adminTableHeadRowClass } from "@/lib/theme-surfaces";
+export const adminTableScrollClass = "table-scroll";
+
+export function AdminTableScroll({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`${adminTableScrollClass} ${className}`.trim()}>{children}</div>;
 }
 
 export function AdminSectionPanel({
@@ -224,7 +232,7 @@ export function AdminSectionPanel({
           </Link>
         ) : null}
       </div>
-      <div className="overflow-x-auto">{children}</div>
+      <div className="overflow-x-auto table-scroll">{children}</div>
     </section>
   );
 }
@@ -325,14 +333,18 @@ export function PageIntro({
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase(title)}</h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? (
+        <div className="w-full shrink-0 sm:w-auto [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_button]:w-full sm:[&_a]:inline-flex sm:[&_a]:w-auto sm:[&_button]:w-auto">
+          {action}
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export function adminNewItemRowClass(isNew: boolean, base = ""): string {
   if (!isNew) return base;
-  return [base, "bg-emerald-50 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100/70"].filter(Boolean).join(" ");
+  return [base, adminNewRowHighlightClass].filter(Boolean).join(" ");
 }
 
 export function AdminNewBadge({ label = "New" }: { label?: string }) {

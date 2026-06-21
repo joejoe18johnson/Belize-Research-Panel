@@ -61,7 +61,7 @@ export function RegistrationPageClient({
 
   if (!languageConfirmed) {
     return (
-      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-800">
+      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
         <header className="safe-top border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
           <div className={`${appContentClass} flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4`}>
             <BrpLogoLink href="/" variant="light" />
@@ -88,9 +88,9 @@ export function RegistrationPageClient({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-800">
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
       <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className={`relative ${appContentClass} flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4`}>
+        <div className={`relative ${appContentClass} flex min-w-0 items-center justify-center px-3 py-3 pr-[9.5rem] sm:px-4 sm:py-4 sm:pr-4`}>
           <BrpLogoLink href="/" variant="light" />
           <div className="absolute right-3 flex items-center gap-2 text-sm sm:right-4 sm:gap-3">
             <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />

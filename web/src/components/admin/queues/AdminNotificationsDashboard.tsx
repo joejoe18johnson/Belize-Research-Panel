@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/components/admin/shared/AdminUi";
+import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass, adminTableRowHoverClass } from "@/components/admin/shared/AdminUi";
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
@@ -167,7 +167,7 @@ export function AdminNotificationsDashboard({
           </div>
         ) : (
           <>
-            <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
+            <div className="mt-4 table-scroll rounded-xl border border-zinc-100 dark:border-zinc-800">
               <table className="min-w-[1100px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
@@ -190,7 +190,7 @@ export function AdminNotificationsDashboard({
                   return (
                     <tr
                       key={actionKey}
-                      className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
+                      className={adminNewItemRowClass(isNew, adminTableRowHoverClass)}
                     >
                       <td className="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                         <span className="inline-flex items-center gap-2">

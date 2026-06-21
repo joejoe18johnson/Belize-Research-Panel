@@ -163,7 +163,7 @@ export function AdminCreateCampaignClient({
         description="Launch a targeted survey campaign to verified panelists by district, constituency, voter status, market interests, or specific email addresses."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <MetricCard label="Eligible panelists" value={eligibleCount} hint="Matches current targeting" />
         <MetricCard label="Verified active" value={panelists.filter((row) => row.verification_status === "Verified" && row.status === "Active").length} />
         <MetricCard label="Total register" value={panelists.length} />

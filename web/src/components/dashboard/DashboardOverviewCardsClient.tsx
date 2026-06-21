@@ -77,7 +77,7 @@ export function DashboardOverviewStats({
       <div className="flex justify-end">
         <ViewLayoutToggle value={layout} onChange={setLayout} />
       </div>
-      <div className={viewLayoutContainerClass(layout, "grid gap-4 sm:grid-cols-2")}>
+      <div className={viewLayoutContainerClass(layout, "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3")}>
         {stats.map((stat) => (
           <div key={stat.key} className={viewLayoutItemClass(layout, "w-[min(72vw,14rem)]")}>
             <StatCard

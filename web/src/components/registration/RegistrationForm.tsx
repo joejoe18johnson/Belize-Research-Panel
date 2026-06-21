@@ -676,7 +676,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={12} title="Confirm contact details">
-            <div className="space-y-1 rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            <div className="space-y-1 rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-950/40 dark:text-sky-100">
               <p><strong>Email:</strong> {form.email || "Not provided"}</p>
               <p><strong>Phone / WhatsApp:</strong> {getFullPhoneNumber(form) || "Not provided"}</p>
               <p><strong>Facebook:</strong> {form.facebook || "Not provided"}</p>

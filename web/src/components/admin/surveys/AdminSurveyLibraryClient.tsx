@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { AdminTableScroll, PageIntro } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SurveyDefinition } from "@/lib/survey-types";
+import { statusPillClass } from "@/lib/theme-surfaces";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinition[] }) {
@@ -38,7 +39,8 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
         </BrandedAlert>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-          <table className="min-w-full text-left text-sm">
+          <AdminTableScroll>
+          <table className="min-w-[720px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 <th className="px-4 py-3 font-semibold">Title</th>
@@ -51,7 +53,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
             </thead>
             <tbody>
               {pagination.paginatedRows.map((survey) => (
-                <tr key={survey.id} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                <tr key={survey.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                   <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{survey.title}</td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(survey.category)}</td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{survey.questions.length}</td>
@@ -59,10 +61,10 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
                     <span
                       className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                         survey.status === "published"
-                          ? "bg-emerald-100 text-emerald-800"
+                          ? statusPillClass.published
                           : survey.status === "closed"
-                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
-                            : "bg-amber-100 text-amber-900"
+                            ? statusPillClass.closed
+                            : statusPillClass.draft
                       }`}
                     >
                       {formatHeadingCase(survey.status)}
@@ -81,6 +83,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
               ))}
             </tbody>
           </table>
+          </AdminTableScroll>
           <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
             <TablePagination
               page={pagination.page}

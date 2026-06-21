@@ -172,7 +172,7 @@ export function AdminExternalDataImportDashboard({
               </thead>
               <tbody>
                 {resultsPagination.paginatedRows.map((result) => (
-                  <tr key={result.row} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                  <tr key={result.row} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                     <td className="px-3 py-2.5 tabular-nums">{result.row}</td>
                     <td className="px-3 py-2.5">
                       {result.firstName} {result.lastName}

@@ -143,7 +143,7 @@ export function AdminCampaignResultsClient({
         ) : null}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <MetricCard label="Assigned (n)" value={fieldwork.assigned} hint="Target sample" />
         <MetricCard label="Response rate" value={`${fieldwork.responseRate}%`} hint="Completed ÷ assigned" />
         <MetricCard
@@ -446,7 +446,7 @@ export function AdminCampaignResultsClient({
                   </tr>
                 ) : (
                   rosterPagination.paginatedRows.map((row) => (
-                    <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20">
+                    <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                       <td className="px-4 py-2.5">
                         <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.panelistName}</p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{row.panelistEmail}</p>

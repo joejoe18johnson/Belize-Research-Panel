@@ -31,7 +31,7 @@ export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) 
       <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">
         {formatHeadingCase("Live duplicate detection")}
       </h2>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {[
           ["Duplicate emails", stats.duplicateEmails],
           ["Duplicate phones", stats.duplicatePhones],

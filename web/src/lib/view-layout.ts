@@ -33,15 +33,15 @@ export function defaultViewLayoutForViewport(): ViewLayout {
   return window.matchMedia("(max-width: 639px)").matches ? "list" : "cards";
 }
 
+export function viewLayoutItemClass(layout: ViewLayout, itemWidth?: string): string {
+  if (layout === "list") return "w-full min-w-0";
+  return itemWidth ? `${itemWidth} min-w-0 shrink-0` : "min-w-0 w-full";
+}
+
 export function viewLayoutContainerClass(
   layout: ViewLayout,
-  cardsGridClass = "grid gap-4 sm:grid-cols-2"
+  cardsGridClass = "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
 ): string {
   if (layout === "list") return "flex flex-col gap-3";
   return cardsGridClass;
-}
-
-export function viewLayoutItemClass(layout: ViewLayout, _itemWidth?: string): string {
-  if (layout === "list") return "w-full";
-  return "";
 }

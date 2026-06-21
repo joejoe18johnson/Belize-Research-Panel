@@ -14,6 +14,7 @@ import { DashboardCard, DashboardInfoNote } from "./DashboardShell";
 import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
 import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
 import type { ViewLayout } from "@/lib/view-layout";
+import { iconMetricToneClass, statusPillClass } from "@/lib/theme-surfaces";
 import { isSurveyInvitationNotificationId } from "@/lib/survey-notifications";
 
 function notificationIcon(id: string) {
@@ -33,12 +34,12 @@ function notificationIcon(id: string) {
 }
 
 function notificationIconTone(id: string, unread: boolean): string {
-  if (!unread) return "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 dark:text-zinc-500";
-  if (isSurveyInvitationNotificationId(id)) return "bg-amber-100 text-amber-700";
-  if (id === "verification" || id === "welcome") return "bg-teal-100 text-teal-700";
-  if (id === "surveys") return "bg-sky-100 text-sky-700";
-  if (id === "rewards") return "bg-amber-100 text-amber-700";
-  return "bg-teal-100 text-teal-700";
+  if (!unread) return "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400";
+  if (isSurveyInvitationNotificationId(id)) return iconMetricToneClass.amber;
+  if (id === "verification" || id === "welcome") return iconMetricToneClass.teal;
+  if (id === "surveys") return statusPillClass.info;
+  if (id === "rewards") return iconMetricToneClass.amber;
+  return iconMetricToneClass.teal;
 }
 
 function NotificationCard({

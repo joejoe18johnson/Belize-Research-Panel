@@ -24,14 +24,14 @@ export async function SiteFooter() {
             className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-teal-800 dark:text-teal-300"
             aria-label="Legal and policy links"
           >
-            <Link href="/site-policy" className="transition hover:text-teal-950 hover:underline">
+            <Link href="/site-policy" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
               {formatHeadingCase("Site policy")}
             </Link>
-            <Link href="/data-use-policy" className="transition hover:text-teal-950 hover:underline">
+            <Link href="/data-use-policy" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
               {formatHeadingCase("Data use policy")}
             </Link>
             {account ? (
-              <Link href="/account/delete" className="transition hover:text-teal-950 hover:underline">
+              <Link href="/account/delete" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
                 {formatHeadingCase("Delete account")}
               </Link>
             ) : null}

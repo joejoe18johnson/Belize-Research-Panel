@@ -77,7 +77,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
+    <div className="mx-auto min-w-0 max-w-[1400px] space-y-6">
       <PageIntro
         eyebrow="Panel review"
         title="Under review"
@@ -196,7 +196,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                 </AdminTableHead>
                 <tbody>
                   {pagination.paginatedRows.map((row) => (
-                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                       <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-800 dark:text-zinc-200">{row.name}</td>
                       <td className="max-w-[12rem] truncate px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
                       <td className="whitespace-nowrap px-4 py-3">

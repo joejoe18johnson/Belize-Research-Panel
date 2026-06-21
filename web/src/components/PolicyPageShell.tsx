@@ -15,8 +15,8 @@ export function PolicyPageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-800 dark:bg-zinc-950">
-      <header className="safe-top shrink-0 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-950">
+      <header className="safe-top shrink-0 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <div className={`${appContentClass} flex items-center justify-between gap-4 px-4 py-4 sm:px-6`}>
           <BrpLogoLink href="/" variant="light" />
           <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export function PolicyPageShell({
         </div>
       </header>
       <main className={`${appContentClass} flex-1 px-4 py-8 sm:px-6 sm:py-12`}>
-        <article className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
+        <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             {formatHeadingCase(title)}
           </h1>

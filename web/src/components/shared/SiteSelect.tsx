@@ -27,7 +27,7 @@ function ChevronIcon({ open }: { open: boolean }) {
       aria-hidden="true"
       viewBox="0 0 20 20"
       fill="currentColor"
-      className={`h-4 w-4 shrink-0 text-zinc-500 transition ${open ? "rotate-180" : ""}`}
+      className={`h-4 w-4 shrink-0 text-zinc-500 transition dark:text-zinc-400 ${open ? "rotate-180" : ""}`}
     >
       <path
         fillRule="evenodd"

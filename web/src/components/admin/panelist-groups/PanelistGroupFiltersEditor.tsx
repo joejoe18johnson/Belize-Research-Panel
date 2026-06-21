@@ -96,7 +96,7 @@ export function PanelistGroupFiltersEditor({
           onChange={(value) => update("verificationStatuses", value)}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Age min</label>
           <input

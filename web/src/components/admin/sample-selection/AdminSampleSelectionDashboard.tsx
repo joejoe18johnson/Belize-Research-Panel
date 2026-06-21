@@ -171,7 +171,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               <FilterMultiSelect label="Education" options={options.educations} selected={filters.educations} onChange={(v) => updateFilter("educations", v)} />
               <FilterMultiSelect label="Verification" options={options.verificationStatuses} selected={filters.verificationStatuses} onChange={(v) => updateFilter("verificationStatuses", v)} />
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age min</label>
                 <input
@@ -208,7 +208,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           <HorizontalBarChart rows={districtBreakdown} title="Filtered pool by district" maxBars={10} />
           <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Draw sample")}</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sampling method</label>
                 <SiteSelect
@@ -386,7 +386,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                   </tr>
                 ) : (
                   tablePagination.paginatedRows.map((row) => (
-                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30">
+                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                       <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                         {row.firstName} {row.lastName}
                       </td>
