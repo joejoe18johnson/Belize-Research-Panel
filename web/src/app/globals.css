@@ -16,7 +16,7 @@
   --background: #09090b;
   --foreground: #fafafa;
   --surface: #18181b;
-  --surface-muted: #09090b;
+  --surface-muted: #0f0f12;
   --border: #3f3f46;
   --control-bg: #18181b;
   --control-border: #52525b;
@@ -64,6 +64,18 @@ body {
 
 .nav-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Horizontally scrollable data tables on small screens */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* Prevent flex/grid children from forcing page overflow */
+.min-w-0-fluid {
+  min-width: 0;
 }
 
 /* Flat selects — remove native browser gradients */

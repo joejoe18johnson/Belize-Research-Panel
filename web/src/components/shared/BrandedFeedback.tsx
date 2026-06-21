@@ -117,7 +117,7 @@ export function BrandedModal({
         <div className={brandedModalHeaderClass}>
           <div>
             {eyebrow ? (
-              <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">{eyebrow}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-300">{eyebrow}</p>
             ) : null}
             <h2 className={`font-semibold text-teal-950 dark:text-teal-100 ${eyebrow ? "mt-0.5 text-lg" : "text-lg"}`}>
               {formatHeadingCase(title)}
@@ -126,7 +126,7 @@ export function BrandedModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-teal-700/70 transition hover:bg-teal-100 hover:text-teal-900 dark:text-teal-100"
+            className="rounded-lg p-2 text-teal-700/70 transition hover:bg-teal-100 hover:text-teal-900 dark:text-teal-300 dark:hover:bg-teal-900/50 dark:hover:text-teal-100"
             aria-label="Close"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">

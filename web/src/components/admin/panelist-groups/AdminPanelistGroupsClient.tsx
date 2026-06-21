@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { AdminTableScroll, PageIntro } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { countPanelistGroupMembers, panelistGroupSummary } from "@/lib/panelist-group-resolve";
@@ -79,7 +79,8 @@ export function AdminPanelistGroupsClient({
         </BrandedAlert>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="min-w-full text-left text-sm">
+          <AdminTableScroll>
+          <table className="min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
                 <th className="px-4 py-3">Name</th>
@@ -93,7 +94,7 @@ export function AdminPanelistGroupsClient({
               {pagination.paginatedRows.map((group) => {
                 const memberCount = memberCounts.get(group.id) ?? 0;
                 return (
-                  <tr key={group.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80">
+                  <tr key={group.id} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                     <td className="px-4 py-3">
                       <p className="font-medium text-zinc-900 dark:text-zinc-100">{group.name}</p>
                       {group.description ? (
@@ -132,6 +133,7 @@ export function AdminPanelistGroupsClient({
               })}
             </tbody>
           </table>
+          </AdminTableScroll>
           <div className="border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
             <TablePagination
               page={pagination.page}

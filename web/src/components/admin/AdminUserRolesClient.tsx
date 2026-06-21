@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { AdminTableScroll, PageIntro } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SiteSelect } from "@/components/shared/SiteSelect";
@@ -292,7 +292,8 @@ export function AdminUserRolesClient({
             <span className="font-semibold">Save changes</span>. You cannot change your own role or deactivate yourself.
           </p>
         </div>
-        <table className="min-w-full text-left text-sm">
+        <AdminTableScroll>
+        <table className="min-w-[900px] text-left text-sm">
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
               <th className="px-4 py-3">Name</th>
@@ -390,6 +391,7 @@ export function AdminUserRolesClient({
             })}
           </tbody>
         </table>
+        </AdminTableScroll>
         <div className="border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
           <TablePagination
             page={pagination.page}

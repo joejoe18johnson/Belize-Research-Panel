@@ -236,7 +236,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
 
       {tab === "interests" ? (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <MetricCard label="Political profiles" value={snapshot.withPoliticalInterests} />
             <MetricCard label="Market profiles" value={snapshot.withMarketInterests} />
             <MetricCard label="Civic profiles" value={snapshot.withCivicInterests} />

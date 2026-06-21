@@ -74,7 +74,7 @@ function SortableTable({
               </tr>
             ) : (
               pagination.paginatedRows.map((row, index) => (
-                <tr key={`${title}-${index}`} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
+                <tr key={`${title}-${index}`} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                   {columns.map((column) => (
                     <td
                       key={column.key}

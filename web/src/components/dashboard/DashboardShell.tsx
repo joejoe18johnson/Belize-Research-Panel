@@ -61,7 +61,7 @@ export function DashboardShell({
         <DashboardNav badges={badges} />
       </header>
       <NewSurveyAlertBanner newSurveyCount={badges.newSurveys} />
-      <main className={`${CONTENT_CLASS} px-3 py-5 sm:px-4 sm:py-8`}>
+      <main className={`${CONTENT_CLASS} min-w-0 px-3 py-5 sm:px-4 sm:py-8`}>
         {verificationStatus && !isAccountVerified(verificationStatus) ? (
           <div className="mb-6">
             <AccountNotVerifiedBanner verificationStatus={verificationStatus} />
@@ -219,17 +219,17 @@ export function StatCard({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-teal-200 bg-teal-50/90 shadow-sm shadow-teal-950/[0.04]"
+      ? "border-teal-200 bg-teal-50/90 shadow-sm shadow-teal-950/[0.04] dark:border-teal-800 dark:bg-teal-950/40"
       : tone === "warning"
-        ? "border-teal-200 bg-teal-50/80 shadow-sm shadow-teal-950/[0.04]"
+        ? "border-teal-200 bg-teal-50/80 shadow-sm shadow-teal-950/[0.04] dark:border-teal-800 dark:bg-teal-950/30"
         : "border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 shadow-sm shadow-teal-950/[0.03]";
 
   const iconToneClass =
     tone === "success"
-      ? "bg-teal-100 text-teal-700"
+      ? "bg-teal-100 text-teal-700 dark:bg-teal-900/60 dark:text-teal-200"
       : tone === "warning"
-        ? "bg-teal-100 text-teal-700 ring-2 ring-amber-200/70"
-        : "bg-teal-50 text-teal-700";
+        ? "bg-teal-100 text-teal-700 ring-2 ring-amber-200/70 dark:bg-teal-900/50 dark:text-teal-200 dark:ring-amber-800/50"
+        : "bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200";
 
   if (layout === "list") {
     return (
@@ -317,7 +317,7 @@ export function QuickLinkCard({
     return (
       <Link
         href={href}
-        className="group flex h-full items-center gap-3 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50"
+        className="group flex h-full items-center gap-3 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
           {icon}
@@ -334,7 +334,7 @@ export function QuickLinkCard({
     return (
       <Link
         href={href}
-        className="group flex h-full flex-col rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10 sm:p-5"
+        className="group flex h-full flex-col rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40 hover:shadow-md hover:shadow-teal-950/10 sm:p-5"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800 dark:text-teal-200">
           {icon}
@@ -350,7 +350,7 @@ export function QuickLinkCard({
   return (
     <Link
       href={href}
-      className="group flex h-full rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 hover:shadow-md hover:shadow-teal-950/10"
+      className="group flex h-full rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40 hover:shadow-md hover:shadow-teal-950/10"
     >
       <div className="flex min-w-0 items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800 dark:text-teal-200">

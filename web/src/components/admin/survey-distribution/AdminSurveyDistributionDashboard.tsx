@@ -244,7 +244,7 @@ export function AdminSurveyDistributionDashboard({
                   </tr>
                 ) : (
                   assignmentsPagination.paginatedRows.map((row) => (
-                    <tr key={row.recordId} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30">
+                    <tr key={row.recordId} className="border-b border-zinc-50 last:border-0 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                       <td className="max-w-[14rem] px-3 py-2.5">
                         <p className="truncate font-medium text-zinc-800 dark:text-zinc-200" title={row.title}>
                           {row.title}

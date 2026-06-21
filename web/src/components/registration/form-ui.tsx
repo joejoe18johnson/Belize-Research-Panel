@@ -141,8 +141,10 @@ export function CheckboxField({
     <div>
       <label
         htmlFor={id}
-        className={`flex items-start gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-800 transition ${
-          disabled ? "cursor-not-allowed bg-zinc-50 text-zinc-500" : "cursor-pointer hover:bg-zinc-50"
+        className={`flex items-start gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-800 transition dark:border-zinc-700 dark:text-zinc-200 ${
+          disabled
+            ? "cursor-not-allowed bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-500"
+            : `cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 ${checked ? "border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30" : ""}`
         }`}
       >
         <input
@@ -185,7 +187,9 @@ export function MultiSelect({
         {options.map((option) => (
           <label
             key={option}
-            className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-900 transition hover:bg-zinc-50"
+            className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800 ${
+              values.includes(option) ? "border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30" : ""
+            }`}
           >
             <input
               type="checkbox"

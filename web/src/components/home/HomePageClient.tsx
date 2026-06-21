@@ -122,6 +122,7 @@ function HomeHowItWorksStep({
 
 export function HomePageClient() {
   const [locale, setLocale] = useState<HomeLocale>("en");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolved } = useTheme();
   const onDarkHero = resolved === "dark";
 
@@ -139,6 +140,19 @@ export function HomePageClient() {
   const copy = HOME_COPY[locale];
   const t = (text: string) => displayCopy(text, locale);
 
+  const loginLinkClassDesktop = onDarkHero
+    ? "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
+    : "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100";
+  const registerLinkClassDesktop = onDarkHero
+    ? "flex min-h-11 items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-teal-900 hover:bg-teal-50"
+    : "flex min-h-11 items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800";
+  const adminLinkClassDesktop = onDarkHero
+    ? "flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
+    : "flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800";
+  const loginLinkClassMobile = `${loginLinkClassDesktop} w-full`;
+  const registerLinkClassMobile = `${registerLinkClassDesktop} w-full`;
+  const adminLinkClassMobile = `${adminLinkClassDesktop} w-full`;
+
   return (
     <div
       className={
@@ -147,9 +161,9 @@ export function HomePageClient() {
           : "min-h-screen bg-gradient-to-b from-teal-50 via-white to-zinc-50 text-zinc-900"
       }
     >
-      <header className="safe-top mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
+      <header className="safe-top relative mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-between gap-3">
-          <BrpLogoLink href="/" variant="light" />
+          <BrpLogoLink href="/" variant={onDarkHero ? "dark" : "light"} />
 
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher
@@ -159,42 +173,65 @@ export function HomePageClient() {
             />
 
             <div className="hidden items-center gap-3 sm:flex">
-              <Link
-                href="/login"
-                className={
-                  onDarkHero
-                    ? "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
-                    : "flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100"
-                }
-              >
+              <Link href="/login" className={loginLinkClassDesktop}>
                 {t(copy.logIn)}
               </Link>
-              <Link
-                href="/register"
-                className={
-                  onDarkHero
-                    ? "flex min-h-11 items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-teal-900 hover:bg-teal-50"
-                    : "flex min-h-11 items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
-                }
-              >
+              <Link href="/register" className={registerLinkClassDesktop}>
                 {t(copy.register)}
               </Link>
               {/* Temporary — remove before production */}
-              <Link
-                href="/admin/login"
-                className={
-                  onDarkHero
-                    ? "flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
-                    : "flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                }
-              >
+              <Link href="/admin/login" className={adminLinkClassDesktop}>
                 Admin login
               </Link>
             </div>
 
+            <button
+              type="button"
+              className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg sm:hidden ${
+                onDarkHero
+                  ? "border border-white/20 text-teal-100 hover:bg-white/10"
+                  : "border border-teal-200 text-teal-800 hover:bg-teal-50"
+              }`}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="home-mobile-menu"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              {mobileMenuOpen ? (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+
             <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
           </div>
         </div>
+
+        {mobileMenuOpen ? (
+          <div
+            id="home-mobile-menu"
+            className={`mt-3 space-y-2 rounded-2xl border p-3 sm:hidden ${
+              onDarkHero
+                ? "border-white/15 bg-black/30 backdrop-blur-sm"
+                : "border-teal-200 bg-white shadow-sm dark:border-teal-800 dark:bg-zinc-900"
+            }`}
+          >
+            <Link href="/login" className={loginLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
+              {t(copy.logIn)}
+            </Link>
+            <Link href="/register" className={registerLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
+              {t(copy.register)}
+            </Link>
+            <Link href="/admin/login" className={adminLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
+              Admin login
+            </Link>
+          </div>
+        ) : null}
       </header>
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16">

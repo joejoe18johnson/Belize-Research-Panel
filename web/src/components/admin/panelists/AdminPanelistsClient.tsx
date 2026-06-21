@@ -403,7 +403,7 @@ export function AdminPanelistsClient({
   const deleteConfirmCode = deleteConfirmRow ? buildPanelistDeleteCode(deleteConfirmRow) : "";
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6 overflow-x-hidden">
+    <div className="mx-auto min-w-0 max-w-[1400px] space-y-6">
       <div className="border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel register</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>

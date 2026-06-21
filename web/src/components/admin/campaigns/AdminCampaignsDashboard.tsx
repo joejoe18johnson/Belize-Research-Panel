@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
-import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass } from "@/components/admin/shared/AdminUi";
+import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass, adminTableRowHoverClass } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
@@ -168,7 +168,7 @@ export function AdminCampaignsDashboard({
                   return (
                   <tr
                     key={row.id}
-                    className={adminNewItemRowClass(isNew, "border-b border-zinc-50 hover:bg-teal-50/30")}
+                    className={adminNewItemRowClass(isNew, adminTableRowHoverClass)}
                   >
                     <td className="px-4 py-2.5">
                       <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">

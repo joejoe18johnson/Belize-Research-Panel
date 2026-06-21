@@ -172,7 +172,7 @@ export function AdminDashboardClient({
                   </tr>
                 ) : (
                   panelistsPagination.paginatedRows.map((row) => (
-                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                    <tr key={row.email} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
@@ -230,7 +230,7 @@ export function AdminDashboardClient({
                   </tr>
                 ) : (
                   usersPagination.paginatedRows.map((row) => (
-                    <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                    <tr key={`user-${row.email}`} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
                       <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.name}</td>
                       <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.email}</td>
                       <td className="px-4 py-3">
@@ -303,7 +303,7 @@ export function AdminDashboardClient({
                 </tr>
               ) : (
                 payoutsPagination.paginatedRows.map((row) => (
-                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60">
+                  <tr key={row.id} className="border-b border-zinc-50 hover:bg-zinc-50/60 dark:border-zinc-800/80 dark:hover:bg-zinc-800/60">
                     <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</td>
                     <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.paymentTitle}</td>
                     <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.optionLabel}</td>

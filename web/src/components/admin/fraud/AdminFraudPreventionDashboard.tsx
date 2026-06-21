@@ -71,7 +71,7 @@ function DuplicateTable({
             </tr>
           ) : (
             rows.map((row) => (
-              <tr key={`${row.duplicateType}:${row.email}:${row.phone}`} className="border-b border-zinc-50 hover:bg-teal-50/30">
+              <tr key={`${row.duplicateType}:${row.email}:${row.phone}`} className="border-b border-zinc-50 hover:bg-teal-50/30 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                 <td className="px-3 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">
                   {row.firstName} {row.lastName}
                 </td>
