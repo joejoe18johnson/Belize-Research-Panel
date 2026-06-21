@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import type { AdminSession } from "@/lib/admin-auth";
@@ -72,6 +72,37 @@ function AdminMobileMenuButton({ open, onToggle }: { open: boolean; onToggle: ()
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       )}
+    </button>
+  );
+}
+
+function AdminLogoutButton({
+  variant = "header",
+  className = "",
+}: {
+  variant?: "header" | "sidebar";
+  className?: string;
+}) {
+  const router = useRouter();
+
+  const logout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.push("/admin/login");
+    router.refresh();
+  };
+
+  const variantClass =
+    variant === "sidebar"
+      ? "w-full border-white/25 bg-white/10 text-white hover:bg-white/15"
+      : "border-teal-200 text-teal-900 hover:bg-teal-50 dark:border-teal-800 dark:text-teal-100 dark:hover:bg-teal-950";
+
+  return (
+    <button
+      type="button"
+      onClick={logout}
+      className={`rounded-xl border px-3 py-2 text-xs font-semibold transition sm:text-sm ${variantClass} ${className}`.trim()}
+    >
+      {formatHeadingCase("Log out")}
     </button>
   );
 }
@@ -174,14 +205,9 @@ export function AdminShell({
         <Link href="/" className="block text-sm text-teal-100/80 transition hover:text-white">
           ← Public site
         </Link>
-        <form action="/api/admin/logout" method="post" className="mt-2">
-          <button
-            type="submit"
-            className="text-sm font-medium text-amber-200 transition hover:text-amber-100"
-          >
-            Sign out
-          </button>
-        </form>
+        <div className="mt-3">
+          <AdminLogoutButton variant="sidebar" />
+        </div>
       </div>
     </>
   );
@@ -225,7 +251,14 @@ export function AdminShell({
                   </p>
                 </div>
               </div>
-              <ThemeToggle compact className="shrink-0" />
+              <div className="flex shrink-0 items-center gap-2">
+                <div className="hidden text-right md:block">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{session.displayName}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">{STAFF_ROLE_LABELS[session.role]}</p>
+                </div>
+                <AdminLogoutButton />
+                <ThemeToggle compact className="shrink-0" />
+              </div>
             </div>
           </header>
           <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-8">

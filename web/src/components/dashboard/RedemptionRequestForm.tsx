@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Field, SelectInput, TextArea, TextInput } from "@/components/registration/form-ui";
+import { BELIZE_DISTRICTS, CITY_TOWN_VILLAGE } from "@/lib/constants";
+import { resolveBankLocationDefaults } from "@/lib/bank-payout-location";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { RedemptionOption, RedemptionRequest } from "@/lib/reward-redemption";
 import {
@@ -20,6 +22,24 @@ import { redemptionMinimumBz, redemptionRateLabel } from "@/lib/reward-settings"
 import { DashboardAlert, DashboardCard, SectionHeading } from "./DashboardShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
+type RedemptionProfile = Pick<
+  PanelistDashboardProfile,
+  "email" | "phone" | "firstName" | "lastName" | "district" | "placeOfResidence" | "cityTownVillage"
+>;
+
+function applyBankLocationDefaults(
+  details: Record<string, string>,
+  profile: RedemptionProfile
+): Record<string, string> {
+  const location = resolveBankLocationDefaults(profile);
+  return {
+    ...details,
+    district: location.district,
+    cityTownVillage: location.cityTownVillage,
+    cityTownVillageOther: location.cityTownVillageOther,
+  };
+}
+
 function defaultFieldValue(
   fieldName: string,
   profile: Pick<PanelistDashboardProfile, "email" | "phone">
@@ -33,7 +53,7 @@ function buildInitialFormState(
   initialOptionId: string | undefined,
   totalPoints: number,
   requests: RedemptionRequest[],
-  profile: Pick<PanelistDashboardProfile, "email" | "phone">,
+  profile: RedemptionProfile,
   rewardSettings: RewardSettings
 ) {
   const availablePoints = getAvailablePoints(totalPoints, requests);
@@ -49,6 +69,9 @@ function buildInitialFormState(
   if (option) {
     for (const field of option.fields) {
       details[field.name] = defaultFieldValue(field.name, profile);
+    }
+    if (option.id === "bank_transfer") {
+      Object.assign(details, resolveBankLocationDefaults(profile));
     }
   }
 
@@ -70,7 +93,7 @@ export function RedemptionRequestForm({
 }: {
   totalPoints: number;
   requests: RedemptionRequest[];
-  profile: Pick<PanelistDashboardProfile, "email" | "phone" | "firstName" | "lastName">;
+  profile: RedemptionProfile;
   rewardSettings: RewardSettings;
   accountOnHold?: boolean;
   initialOptionId?: string;
@@ -140,7 +163,24 @@ export function RedemptionRequestForm({
     for (const field of option.fields) {
       nextDetails[field.name] = details[field.name] ?? defaultFieldValue(field.name, profile);
     }
-    setDetails(nextDetails);
+    setDetails(option.id === "bank_transfer" ? applyBankLocationDefaults(nextDetails, profile) : nextDetails);
+  };
+
+  const updateBankDistrict = (district: string) => {
+    setDetails((current) => ({
+      ...current,
+      district,
+      cityTownVillage: "",
+      cityTownVillageOther: "",
+    }));
+  };
+
+  const updateBankCity = (cityTownVillage: string) => {
+    setDetails((current) => ({
+      ...current,
+      cityTownVillage,
+      cityTownVillageOther: cityTownVillage === "Other" ? current.cityTownVillageOther ?? "" : "",
+    }));
   };
 
   const submit = async () => {
@@ -371,6 +411,18 @@ export function RedemptionRequestForm({
               </Field>
             ))}
 
+            {selectedOption.id === "bank_transfer" ? (
+              <BankPayoutLocationFields
+                district={details.district ?? ""}
+                cityTownVillage={details.cityTownVillage ?? ""}
+                cityTownVillageOther={details.cityTownVillageOther ?? ""}
+                errors={errors}
+                onDistrictChange={updateBankDistrict}
+                onCityChange={updateBankCity}
+                onCityOtherChange={(value) => updateDetail("cityTownVillageOther", value)}
+              />
+            ) : null}
+
             <Field label="Additional notes" hint="Optional — include any special instructions." id="redemption-notes">
               <TextInput
                 id="redemption-notes"
@@ -402,6 +454,86 @@ export function RedemptionRequestForm({
         </button>
       </div>
     </DashboardCard>
+  );
+}
+
+function BankPayoutLocationFields({
+  district,
+  cityTownVillage,
+  cityTownVillageOther,
+  errors,
+  onDistrictChange,
+  onCityChange,
+  onCityOtherChange,
+}: {
+  district: string;
+  cityTownVillage: string;
+  cityTownVillageOther: string;
+  errors: Record<string, string>;
+  onDistrictChange: (value: string) => void;
+  onCityChange: (value: string) => void;
+  onCityOtherChange: (value: string) => void;
+}) {
+  const cityOptions = district ? (CITY_TOWN_VILLAGE[district] ?? []) : [];
+
+  return (
+    <>
+      <Field label="District" required error={errors.district} id="redemption-district">
+        <SelectInput
+          id="redemption-district"
+          value={district}
+          onChange={(event) => onDistrictChange(event.target.value)}
+          error={errors.district}
+        >
+          <option value="">Select district</option>
+          {BELIZE_DISTRICTS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectInput>
+      </Field>
+
+      <Field
+        label={district ? `City / town / village in ${district}` : "City / town / village"}
+        required
+        error={errors.cityTownVillage}
+        id="redemption-cityTownVillage"
+        hint="Where you receive or collect bank payouts in Belize."
+      >
+        <SelectInput
+          id="redemption-cityTownVillage"
+          value={cityTownVillage}
+          onChange={(event) => onCityChange(event.target.value)}
+          error={errors.cityTownVillage}
+          disabled={!district}
+        >
+          <option value="">{district ? "Select city / town / village" : "Select a district first"}</option>
+          {cityOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectInput>
+      </Field>
+
+      {cityTownVillage === "Other" ? (
+        <Field
+          label={district ? `Specify city / town / village in ${district}` : "Specify city / town / village"}
+          required
+          error={errors.cityTownVillageOther}
+          id="redemption-cityTownVillageOther"
+        >
+          <TextInput
+            id="redemption-cityTownVillageOther"
+            value={cityTownVillageOther}
+            onChange={(event) => onCityOtherChange(event.target.value)}
+            placeholder="Enter your city, town, or village"
+            error={errors.cityTownVillageOther}
+          />
+        </Field>
+      ) : null}
+    </>
   );
 }
 

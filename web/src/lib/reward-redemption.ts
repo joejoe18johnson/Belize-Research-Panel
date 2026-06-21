@@ -4,6 +4,10 @@ import {
   redemptionRateLabel,
   type RewardSettings,
 } from "./reward-settings";
+import {
+  mergeBankPayoutLocationDetails,
+  validateBankPayoutLocation,
+} from "./bank-payout-location";
 import { cleanText } from "./validation";
 
 /** @deprecated Use loadRewardSettings() — default snapshot for legacy imports. */
@@ -418,6 +422,11 @@ export function validateRedemptionRequest(input: {
       continue;
     }
     if (raw) details[field.name] = raw;
+  }
+
+  if (option.id === "bank_transfer") {
+    validateBankPayoutLocation(input.details, errors);
+    mergeBankPayoutLocationDetails(details, input.details);
   }
 
   const notes = cleanText(input.notes ?? "");
