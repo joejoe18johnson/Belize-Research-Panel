@@ -216,9 +216,9 @@ export function DashboardNotificationsClient({
         <ViewLayoutToggle value={layout} onChange={setLayout} />
       </div>
 
-      <div className={viewLayoutContainerClass(layout, "space-y-3")}>
+      <div className={viewLayoutContainerClass(layout, "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3")}>
         {notifications.map((notification) => (
-          <div key={notification.id} className={viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")}>
+          <div key={notification.id} className={viewLayoutItemClass(layout)}>
             <NotificationCard
               notification={notification}
               layout={layout}

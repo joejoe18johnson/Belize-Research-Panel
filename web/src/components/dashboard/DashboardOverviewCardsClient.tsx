@@ -37,6 +37,13 @@ export function DashboardOverviewStats({
     return "default";
   }
 
+  function panelTone(status: string): "default" | "success" | "warning" {
+    const normalized = status.toLowerCase();
+    if (normalized === "active") return "success";
+    if (normalized.includes("hold") || normalized.includes("suspend")) return "warning";
+    return "default";
+  }
+
   const stats = [
     {
       key: "verification",
@@ -51,7 +58,7 @@ export function DashboardOverviewStats({
       label: "Panel status",
       value: panelistStatus,
       hint: "Participation eligibility",
-      tone: "default" as const,
+      tone: panelTone(panelistStatus) as "default" | "success" | "warning",
       icon: <UserCircleIcon className="h-5 w-5" />,
     },
     {
@@ -77,9 +84,9 @@ export function DashboardOverviewStats({
       <div className="flex justify-end">
         <ViewLayoutToggle value={layout} onChange={setLayout} />
       </div>
-      <div className={viewLayoutContainerClass(layout, "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3")}>
+      <div className={viewLayoutContainerClass(layout, "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4")}>
         {stats.map((stat) => (
-          <div key={stat.key} className={viewLayoutItemClass(layout, "w-[min(72vw,14rem)]")}>
+          <div key={stat.key} className={viewLayoutItemClass(layout)}>
             <StatCard
               label={stat.label}
               value={stat.value}

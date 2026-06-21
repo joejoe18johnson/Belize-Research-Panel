@@ -105,7 +105,7 @@ export function DashboardSurveysSection({
           </div>
           <div className={`${viewLayoutContainerClass(layout, "grid gap-6 sm:grid-cols-2")} ${surveysLocked ? "pointer-events-none" : ""}`}>
             {surveys.map((survey) => (
-              <div key={survey.id} className={viewLayoutItemClass(layout, "w-[min(88vw,17rem)]")}>
+              <div key={survey.id} className={viewLayoutItemClass(layout)}>
                 <SurveyCard
                   survey={survey}
                   locked={surveysLocked}

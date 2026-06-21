@@ -181,7 +181,7 @@ export function RewardsHistory({
           {filtered.map((entry) => (
             <div
               key={entry.id}
-              className={`${viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")} ${layout === "list" ? "py-4 first:pt-2" : ""}`}
+              className={`${viewLayoutItemClass(layout)} ${layout === "list" ? "py-4 first:pt-2" : ""}`}
             >
               <HistoryEntryCard entry={entry} layout={layout} />
             </div>

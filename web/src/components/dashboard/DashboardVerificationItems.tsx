@@ -156,7 +156,7 @@ export function DashboardVerificationItems({ items }: { items: VerificationCente
       </div>
       <div className={viewLayoutContainerClass(layout, "space-y-4")}>
         {items.map((item) => (
-          <div key={item.id} className={viewLayoutItemClass(layout, "w-[min(88vw,16rem)]")}>
+          <div key={item.id} className={viewLayoutItemClass(layout)}>
             <VerificationItemCard item={item} layout={layout} />
           </div>
         ))}
