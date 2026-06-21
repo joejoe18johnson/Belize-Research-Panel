@@ -46,6 +46,36 @@ function payoutStatementHref(id: string): string {
   return `/api/admin/payouts/${encodeURIComponent(id)}/statement`;
 }
 
+function payoutStickyStatementClass(kind: "head" | "body", isNew = false): string {
+  const bg =
+    kind === "head"
+      ? "bg-zinc-50/95 dark:bg-zinc-950/95"
+      : isNew
+        ? "bg-emerald-50 group-hover:bg-emerald-100/70 dark:bg-zinc-900 dark:group-hover:bg-zinc-900"
+        : "bg-white group-hover:bg-zinc-50/60 dark:bg-zinc-900 dark:group-hover:bg-zinc-800/60";
+
+  return [
+    "sticky right-[5.5rem] z-20 min-w-[10.5rem] border-l border-zinc-200 px-4 py-3 text-center dark:border-zinc-700",
+    "shadow-[-8px_0_16px_-12px_rgba(0,0,0,0.12)] dark:shadow-[-8px_0_16px_-12px_rgba(0,0,0,0.45)]",
+    bg,
+  ].join(" ");
+}
+
+function payoutStickyActionClass(kind: "head" | "body", isNew = false): string {
+  const bg =
+    kind === "head"
+      ? "bg-zinc-50/95 dark:bg-zinc-950/95"
+      : isNew
+        ? "bg-emerald-50 group-hover:bg-emerald-100/70 dark:bg-zinc-900 dark:group-hover:bg-zinc-900"
+        : "bg-white group-hover:bg-zinc-50/60 dark:bg-zinc-900 dark:group-hover:bg-zinc-800/60";
+
+  return [
+    "sticky right-0 z-20 min-w-[5.5rem] border-l border-zinc-200 px-4 py-3 text-center dark:border-zinc-700",
+    "shadow-[-8px_0_16px_-12px_rgba(0,0,0,0.12)] dark:shadow-[-8px_0_16px_-12px_rgba(0,0,0,0.45)]",
+    bg,
+  ].join(" ");
+}
+
 function PayoutProcessDialog({
   row,
   busyAction,
@@ -360,8 +390,12 @@ export function AdminPayoutQueueSection({
         </div>
       ) : (
         <>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
-            <AdminDataTable className="min-w-[960px]">
+          <div
+            className={`mt-4 rounded-xl border border-zinc-100 dark:border-zinc-800 ${
+              mode === "history" ? "max-h-[min(70vh,40rem)] overflow-auto" : "overflow-x-auto"
+            }`}
+          >
+            <AdminDataTable className={mode === "history" ? "min-w-[1180px]" : "min-w-[960px]"}>
               <AdminTableHead>
                 <AdminTableTh>Request ID</AdminTableTh>
                 {mode === "history" ? <AdminTableTh>Panelist email</AdminTableTh> : null}
@@ -372,14 +406,32 @@ export function AdminPayoutQueueSection({
                 <AdminTableTh>{mode === "history" ? "Submitted" : "Date"}</AdminTableTh>
                 {mode === "history" ? <AdminTableTh>Processed</AdminTableTh> : null}
                 {mode === "history" ? <AdminTableTh>Processed by</AdminTableTh> : null}
-                <AdminTableTh align="center">Statement</AdminTableTh>
-                <AdminTableTh align="center">Action</AdminTableTh>
+                {mode === "history" ? (
+                  <th className={`whitespace-nowrap text-[11px] font-semibold ${payoutStickyStatementClass("head")}`}>
+                    Statement
+                  </th>
+                ) : (
+                  <AdminTableTh align="center">Statement</AdminTableTh>
+                )}
+                {mode === "history" ? (
+                  <th className={`whitespace-nowrap text-[11px] font-semibold ${payoutStickyActionClass("head")}`}>
+                    Action
+                  </th>
+                ) : (
+                  <AdminTableTh align="center">Action</AdminTableTh>
+                )}
               </AdminTableHead>
               <tbody>
                 {pagination.paginatedRows.map((row) => {
                   const isNew = row.status === "pending" && unreadSet.has(row.id);
                   return (
-                  <tr key={row.id} className={adminNewItemRowClass(isNew, "border-b border-zinc-50 align-top hover:bg-zinc-50/60")}>
+                  <tr
+                    key={row.id}
+                    className={adminNewItemRowClass(
+                      isNew,
+                      `border-b border-zinc-50 align-top hover:bg-zinc-50/60 dark:hover:bg-zinc-800/60${mode === "history" ? " group" : ""}`
+                    )}
+                  >
                     <td className="px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">
                       <span className="inline-flex items-center gap-2">
                         {row.shortId}
@@ -409,10 +461,10 @@ export function AdminPayoutQueueSection({
                     {mode === "history" ? (
                       <td className="whitespace-nowrap px-4 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.processedBy ?? "—"}</td>
                     ) : null}
-                    <td className="px-4 py-3 text-center">
+                    <td className={mode === "history" ? payoutStickyStatementClass("body", isNew) : "px-4 py-3 text-center"}>
                       <BrandedPdfActions viewHref={payoutStatementHref(row.id)} compact />
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className={mode === "history" ? payoutStickyActionClass("body", isNew) : "px-4 py-3 text-center"}>
                       <button
                         type="button"
                         onClick={() => {
