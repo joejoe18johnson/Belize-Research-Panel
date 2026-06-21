@@ -188,23 +188,27 @@ export class BrandedPdfBuilder {
   }
 
   addSectionTitle(title: string): void {
-    this.ensureSpace(36);
+    this.ensureSpace(44);
+    const titleSize = 12;
+    const barHeight = titleSize + 8;
+    const barBottom = this.y - titleSize + 1;
+
     this.page.drawRectangle({
       x: BRP_PDF_PAGE.marginX,
-      y: this.y - 4,
+      y: barBottom,
       width: 4,
-      height: 22,
+      height: barHeight,
       color: BRP_PDF_COLORS.teal700,
     });
     this.drawText(
       this.bold,
       title,
-      BRP_PDF_PAGE.marginX + 12,
+      BRP_PDF_PAGE.marginX + 14,
       this.y,
-      12,
+      titleSize,
       BRP_PDF_COLORS.teal900
     );
-    this.y -= 28;
+    this.y -= 34;
   }
 
   addParagraph(text: string, options?: { size?: number; color?: RGB; muted?: boolean }): void {
@@ -255,13 +259,17 @@ export class BrandedPdfBuilder {
   }
 
   addHighlightCard(title: string, value: string, subtitle?: string): void {
-    this.ensureSpace(72);
-    const cardHeight = 64;
-    const cardY = this.y - cardHeight + 12;
+    const cardHeight = 76;
+    const gapAfter = 28;
+    this.ensureSpace(cardHeight + gapAfter);
+
+    const cardBottom = this.y - cardHeight;
+    const padX = 18;
+    const cardTop = cardBottom + cardHeight;
 
     this.page.drawRectangle({
       x: BRP_PDF_PAGE.marginX,
-      y: cardY,
+      y: cardBottom,
       width: this.contentWidth(),
       height: cardHeight,
       color: BRP_PDF_COLORS.teal100,
@@ -269,13 +277,13 @@ export class BrandedPdfBuilder {
       borderWidth: 0.75,
     });
 
-    this.drawText(this.bold, title, BRP_PDF_PAGE.marginX + 16, cardY + 40, 9, BRP_PDF_COLORS.teal900);
-    this.drawText(this.bold, value, BRP_PDF_PAGE.marginX + 16, cardY + 22, 18, BRP_PDF_COLORS.teal950);
+    this.drawText(this.bold, title, BRP_PDF_PAGE.marginX + padX, cardTop - 18, 9, BRP_PDF_COLORS.teal900);
+    this.drawText(this.bold, value, BRP_PDF_PAGE.marginX + padX, cardTop - 40, 18, BRP_PDF_COLORS.teal950);
     if (subtitle) {
-      this.drawText(this.regular, subtitle, BRP_PDF_PAGE.marginX + 16, cardY + 8, 8.5, BRP_PDF_COLORS.zinc700);
+      this.drawText(this.regular, subtitle, BRP_PDF_PAGE.marginX + padX, cardBottom + 14, 8.5, BRP_PDF_COLORS.zinc700);
     }
 
-    this.y = cardY - 16;
+    this.y = cardBottom - gapAfter;
   }
 
   addTable(headers: string[], rows: string[][], columnWidths?: number[]): void {
@@ -347,22 +355,25 @@ export class BrandedPdfBuilder {
       neutral: BRP_PDF_COLORS.zinc700,
     } as const;
 
-    this.ensureSpace(24);
-    const badgeWidth = Math.min(this.regular.widthOfTextAtSize(label, 9) + 20, this.contentWidth());
-    const badgeY = this.y - 6;
+    const badgeHeight = 22;
+    const gapAfter = 18;
+    this.ensureSpace(badgeHeight + gapAfter);
+
+    const badgeWidth = Math.min(this.bold.widthOfTextAtSize(label, 9) + 24, this.contentWidth());
+    const badgeBottom = this.y - badgeHeight;
 
     this.page.drawRectangle({
       x: BRP_PDF_PAGE.marginX,
-      y: badgeY - 14,
+      y: badgeBottom,
       width: badgeWidth,
-      height: 20,
+      height: badgeHeight,
       color: BRP_PDF_COLORS.white,
       borderColor: colors[tone],
       borderWidth: 1,
     });
 
-    this.drawText(this.bold, label, BRP_PDF_PAGE.marginX + 10, badgeY - 2, 9, colors[tone]);
-    this.y -= 30;
+    this.drawText(this.bold, label, BRP_PDF_PAGE.marginX + 12, badgeBottom + 7, 9, colors[tone]);
+    this.y = badgeBottom - gapAfter;
   }
 
   addDivider(): void {
