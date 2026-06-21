@@ -2,6 +2,7 @@ import { createHash, randomUUID, timingSafeEqual } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { DEMO_STAFF_USERS } from "./demo-staff-users";
+import { PASSWORD_RESET_TTL_MS } from "./accounts";
 import { STAFF_ROLES, isStaffRole, type StaffRole } from "./staff-roles";
 import { cleanText } from "./validation";
 
@@ -16,6 +17,8 @@ export interface StaffUserRecord {
   status: "active" | "inactive";
   created_at: string;
   updated_at?: string;
+  password_reset_token?: string;
+  password_reset_sent_at?: string;
 }
 
 export type StaffUserPublic = Omit<StaffUserRecord, "password_salt" | "password_hash">;
@@ -107,6 +110,77 @@ export async function findStaffUserByEmail(email: string): Promise<StaffUserReco
 export async function findStaffUserById(id: string): Promise<StaffUserRecord | null> {
   const users = await loadStaffUsersRaw();
   return users.find((user) => user.id === id) ?? null;
+}
+
+export function isStaffPasswordResetTokenValid(user: StaffUserRecord): boolean {
+  const token = cleanText(user.password_reset_token ?? "");
+  const sentAt = cleanText(user.password_reset_sent_at ?? "");
+  if (!token || !sentAt) return false;
+  const sent = Date.parse(sentAt);
+  if (Number.isNaN(sent)) return false;
+  return Date.now() - sent <= PASSWORD_RESET_TTL_MS;
+}
+
+export async function findStaffUserByPasswordResetToken(token: string): Promise<StaffUserRecord | null> {
+  if (!token) return null;
+  const users = await loadStaffUsersRaw();
+  const user = users.find((row) => cleanText(row.password_reset_token ?? "") === token) ?? null;
+  if (!user || user.status !== "active" || !isStaffPasswordResetTokenValid(user)) return null;
+  return user;
+}
+
+export async function createStaffPasswordResetToken(
+  email: string
+): Promise<{ user: StaffUserRecord; resetToken: string } | null> {
+  const user = await findStaffUserByEmail(email);
+  if (!user || user.status !== "active") return null;
+
+  const resetToken = randomUUID().replace(/-/g, "");
+  const now = new Date().toISOString();
+  const users = await loadStaffUsersRaw();
+  const index = users.findIndex((row) => row.id === user.id);
+  if (index < 0) return null;
+
+  users[index] = {
+    ...users[index],
+    password_reset_token: resetToken,
+    password_reset_sent_at: now,
+    updated_at: now,
+  };
+  await saveStaffUsersRaw(users);
+  return { user: users[index], resetToken };
+}
+
+export async function resetStaffUserPassword(
+  token: string,
+  password: string
+): Promise<{ ok: true; user: StaffUserRecord } | { ok: false; error: string }> {
+  const user = await findStaffUserByPasswordResetToken(token);
+  if (!user) {
+    return { ok: false, error: "This password reset link is invalid or has expired." };
+  }
+
+  const trimmed = password.trim();
+  if (trimmed.length < 8) {
+    return { ok: false, error: "Password must be at least 8 characters." };
+  }
+
+  const users = await loadStaffUsersRaw();
+  const index = users.findIndex((row) => row.id === user.id);
+  if (index < 0) {
+    return { ok: false, error: "Staff account not found." };
+  }
+
+  const now = new Date().toISOString();
+  users[index] = {
+    ...users[index],
+    ...createPasswordCredentials(trimmed),
+    password_reset_token: "",
+    password_reset_sent_at: "",
+    updated_at: now,
+  };
+  await saveStaffUsersRaw(users);
+  return { ok: true, user: users[index] };
 }
 
 export async function listStaffUsers(): Promise<StaffUserRecord[]> {

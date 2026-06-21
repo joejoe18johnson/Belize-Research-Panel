@@ -8,7 +8,7 @@ import type {
   AccountStatus,
   SessionAccount,
 } from "./auth-types";
-import { hashPassword, loadPanelists } from "./panelists";
+import { hashPassword, loadPanelists, updatePanelistCredentialsByEmail } from "./panelists";
 import {
   cleanText,
   composePhoneNumber,
@@ -128,6 +128,79 @@ export async function findAccountByEmailChangeToken(token: string): Promise<Acco
   if (!token) return null;
   const accounts = await loadAccountsRaw();
   return accounts.find((account) => account.email_change_token === token) ?? null;
+}
+
+export const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+
+export function isPasswordResetTokenValid(account: AccountRecord): boolean {
+  const token = cleanText(account.password_reset_token ?? "");
+  const sentAt = cleanText(account.password_reset_sent_at ?? "");
+  if (!token || !sentAt) return false;
+  const sent = Date.parse(sentAt);
+  if (Number.isNaN(sent)) return false;
+  return Date.now() - sent <= PASSWORD_RESET_TTL_MS;
+}
+
+export async function findAccountByPasswordResetToken(token: string): Promise<AccountRecord | null> {
+  if (!token) return null;
+  const accounts = await loadAccountsRaw();
+  const account = accounts.find((row) => cleanText(row.password_reset_token ?? "") === token) ?? null;
+  if (!account || !isPasswordResetTokenValid(account)) return null;
+  return account;
+}
+
+export async function createPasswordResetToken(email: string): Promise<{
+  account: AccountRecord;
+  resetToken: string;
+} | null> {
+  const account = await findAccountByEmail(email);
+  if (!account) return null;
+
+  const resetToken = randomUUID().replace(/-/g, "");
+  const now = new Date().toISOString();
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) return null;
+
+  accounts[index] = {
+    ...accounts[index],
+    password_reset_token: resetToken,
+    password_reset_sent_at: now,
+  };
+  await saveAccountsRaw(accounts);
+  return { account: accounts[index], resetToken };
+}
+
+export async function resetAccountPassword(
+  token: string,
+  password: string
+): Promise<{ ok: true; account: AccountRecord } | { ok: false; error: string }> {
+  const account = await findAccountByPasswordResetToken(token);
+  if (!account) {
+    return { ok: false, error: "This password reset link is invalid or has expired." };
+  }
+
+  const { salt, hash } = hashPassword(password);
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) {
+    return { ok: false, error: "Account not found." };
+  }
+
+  accounts[index] = {
+    ...accounts[index],
+    password_salt: salt,
+    password_hash: hash,
+    password_reset_token: "",
+    password_reset_sent_at: "",
+  };
+  await saveAccountsRaw(accounts);
+
+  if (accounts[index].panelist_registered === "true") {
+    await updatePanelistCredentialsByEmail(accounts[index].email, salt, hash);
+  }
+
+  return { ok: true, account: accounts[index] };
 }
 
 export async function createAccount(input: {

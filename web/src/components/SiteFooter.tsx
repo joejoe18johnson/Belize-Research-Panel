@@ -24,6 +24,9 @@ export async function SiteFooter() {
             className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-teal-800 dark:text-teal-300"
             aria-label="Legal and policy links"
           >
+            <Link href="/help" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
+              {formatHeadingCase("Help & contact")}
+            </Link>
             <Link href="/site-policy" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
               {formatHeadingCase("Site policy")}
             </Link>

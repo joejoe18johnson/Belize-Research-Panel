@@ -155,6 +155,12 @@ export function LoginForm({
         />
       </Field>
 
+      <p className="-mt-2 text-right text-sm">
+        <Link href="/forgot-password" className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300">
+          {formatSiteCase("Forgot password?")}
+        </Link>
+      </p>
+
       {errors.submit ? <p className="text-sm text-red-600" role="alert">{formatSiteCase(errors.submit)}</p> : null}
 
       <button

@@ -16,6 +16,7 @@ export type EmailTemplateCategory =
 
 export type EmailTemplateId =
   | "signup-verify-email"
+  | "password-reset"
   | "registration-submitted"
   | "panelist-verified"
   | "panelist-on-hold"
@@ -31,7 +32,10 @@ export type EmailTemplateId =
   | "payout-completed"
   | "payout-rejected"
   | "account-deleted"
-  | "staff-welcome";
+  | "staff-welcome"
+  | "staff-password-reset"
+  | "support-request-received"
+  | "support-inbox-notification";
 
 export interface EmailTemplateMeta {
   id: EmailTemplateId;
@@ -62,6 +66,13 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     description: "Sent after signup with a link to confirm the panelist email.",
     category: "account",
     trigger: "POST /api/auth/signup",
+  },
+  {
+    id: "password-reset",
+    name: "Password reset",
+    description: "Sent when a panelist requests a link to reset their password.",
+    category: "account",
+    trigger: "POST /api/auth/forgot-password",
   },
   {
     id: "registration-submitted",
@@ -175,12 +186,37 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     category: "staff",
     trigger: "POST /api/admin/staff-users",
   },
+  {
+    id: "staff-password-reset",
+    name: "Staff password reset",
+    description: "Sent when an admin staff member requests a password reset link.",
+    category: "staff",
+    trigger: "POST /api/admin/forgot-password",
+  },
+  {
+    id: "support-request-received",
+    name: "Support request received",
+    description: "Confirms a panelist help request was received and gives expected response time.",
+    category: "account",
+    trigger: "POST /api/support/contact",
+  },
+  {
+    id: "support-inbox-notification",
+    name: "Support inbox notification",
+    description: "Alerts the monitored support inbox when a new help request is submitted.",
+    category: "staff",
+    trigger: "POST /api/support/contact",
+  },
 ];
 
 export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, string>> = {
   "signup-verify-email": {
     firstName: "Maria",
     verifyUrl: "https://panel.example.com/verify-email?token=sample-token",
+  },
+  "password-reset": {
+    firstName: "Maria",
+    resetUrl: "https://panel.example.com/reset-password?token=sample-token",
   },
   "registration-submitted": {
     firstName: "Maria",
@@ -272,6 +308,25 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
     loginUrl: "https://panel.example.com/admin/login",
     email: "alex.admin@example.com",
   },
+  "staff-password-reset": {
+    firstName: "Alex",
+    resetUrl: "https://panel.example.com/admin/reset-password?token=sample-token",
+    loginUrl: "https://panel.example.com/admin/login",
+  },
+  "support-request-received": {
+    firstName: "Maria",
+    topicLabel: "Rewards & payouts",
+    referenceId: "SUP-8F2A1C",
+    helpUrl: "https://panel.example.com/help",
+  },
+  "support-inbox-notification": {
+    name: "Maria Lopez",
+    email: "maria@example.com",
+    topicLabel: "Rewards & payouts",
+    referenceId: "SUP-8F2A1C",
+    messagePreview: "I submitted a redemption last week and wanted to check the status.",
+    adminInboxUrl: "https://panel.example.com/admin/support-inbox",
+  },
 };
 
 function pick(data: Record<string, string>, key: string, fallback = ""): string {
@@ -297,6 +352,18 @@ function renderSignupVerifyEmail(data: Record<string, string>): RenderedEmail {
     mutedParagraph("This link expires after 24 hours. If you did not create an account, you can ignore this message."),
   ].join("");
   return finish("Verify your email address", bodyHtml, { label: "Verify email", href: verifyUrl });
+}
+
+function renderPasswordResetEmail(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const resetUrl = pick(data, "resetUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("We received a request to reset the password for your Belize Research Panel account."),
+    paragraph("If you made this request, use the button below to choose a new password."),
+    mutedParagraph("This link expires after one hour. If you did not request a password reset, you can ignore this email — your password will stay the same."),
+  ].join("");
+  return finish("Reset your password", bodyHtml, { label: "Reset password", href: resetUrl });
 }
 
 function renderRegistrationSubmitted(data: Record<string, string>): RenderedEmail {
@@ -524,8 +591,58 @@ function renderStaffWelcome(data: Record<string, string>): RenderedEmail {
   return finish("Welcome to the admin console", bodyHtml, { label: "Admin sign in", href: loginUrl });
 }
 
+function renderStaffPasswordResetEmail(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const resetUrl = pick(data, "resetUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("We received a request to reset the password for your Belize Research Panel admin account."),
+    paragraph("If you made this request, use the button below to choose a new password."),
+    mutedParagraph("This link expires after one hour. If you did not request a password reset, you can ignore this email."),
+  ].join("");
+  return finish("Reset your admin password", bodyHtml, { label: "Reset password", href: resetUrl });
+}
+
+function renderSupportRequestReceived(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const topicLabel = pick(data, "topicLabel", "your enquiry");
+  const referenceId = pick(data, "referenceId", "—");
+  const helpUrl = pick(data, "helpUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("Thanks for contacting the Belize Research Panel support team."),
+    detailTable(
+      detailRow("Topic", topicLabel) + detailRow("Reference", referenceId)
+    ),
+    paragraph("We typically respond within 1–2 business days. If your matter is urgent, reply to this email with your reference number."),
+    mutedParagraph("Please do not share your password or photo ID in email replies."),
+  ].join("");
+  return finish("We received your message", bodyHtml, { label: "Visit help centre", href: helpUrl });
+}
+
+function renderSupportInboxNotification(data: Record<string, string>): RenderedEmail {
+  const name = pick(data, "name", "Panelist");
+  const email = pick(data, "email", "unknown");
+  const topicLabel = pick(data, "topicLabel", "General enquiry");
+  const referenceId = pick(data, "referenceId", "—");
+  const messagePreview = pick(data, "messagePreview", "");
+  const adminInboxUrl = pick(data, "adminInboxUrl", "#");
+  const bodyHtml = [
+    paragraph("A new help request was submitted on the Belize Research Panel website."),
+    detailTable(
+      detailRow("From", name) +
+        detailRow("Email", email) +
+        detailRow("Topic", topicLabel) +
+        detailRow("Reference", referenceId)
+    ),
+    paragraph(messagePreview ? `"${messagePreview}"` : "Open the admin support inbox for the full message."),
+  ].join("");
+  return finish(`Support request: ${topicLabel}`, bodyHtml, { label: "Open support inbox", href: adminInboxUrl });
+}
+
 const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => RenderedEmail> = {
   "signup-verify-email": renderSignupVerifyEmail,
+  "password-reset": renderPasswordResetEmail,
   "registration-submitted": renderRegistrationSubmitted,
   "panelist-verified": renderPanelistVerified,
   "panelist-on-hold": renderPanelistOnHold,
@@ -542,6 +659,9 @@ const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => Rende
   "payout-rejected": renderPayoutRejected,
   "account-deleted": renderAccountDeleted,
   "staff-welcome": renderStaffWelcome,
+  "staff-password-reset": renderStaffPasswordResetEmail,
+  "support-request-received": renderSupportRequestReceived,
+  "support-inbox-notification": renderSupportInboxNotification,
 };
 
 export function isEmailTemplateId(value: string): value is EmailTemplateId {

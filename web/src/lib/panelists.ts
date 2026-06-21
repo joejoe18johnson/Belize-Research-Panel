@@ -113,6 +113,27 @@ export async function updatePanelistPhone(accountEmail: string, phone: string): 
   return true;
 }
 
+export async function updatePanelistCredentialsByEmail(
+  accountEmail: string,
+  passwordSalt: string,
+  passwordHash: string
+): Promise<boolean> {
+  const normalized = cleanText(accountEmail).toLowerCase();
+  if (!normalized) return false;
+
+  const rows = await loadPanelists();
+  const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === normalized);
+  if (index < 0) return false;
+
+  rows[index] = {
+    ...rows[index],
+    password_salt: passwordSalt,
+    password_hash: passwordHash,
+  };
+  await savePanelists(rows);
+  return true;
+}
+
 export async function updatePanelistAdminFields(
   accountEmail: string,
   updates: {

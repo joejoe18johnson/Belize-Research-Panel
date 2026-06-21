@@ -42,6 +42,21 @@ export async function sendSignupVerifyEmail(input: {
   });
 }
 
+export async function sendPasswordResetEmail(input: {
+  to: string;
+  firstName: string;
+  resetUrl: string;
+}): Promise<void> {
+  await sendTemplateEmail({
+    templateId: "password-reset",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      resetUrl: input.resetUrl,
+    },
+  });
+}
+
 export async function sendRegistrationSubmittedEmail(input: {
   to: string;
   firstName: string;
@@ -279,6 +294,71 @@ export async function sendStaffWelcomeEmail(input: {
       loginUrl: originDashboard(input.origin, "/admin/login"),
     },
   });
+}
+
+export async function sendStaffPasswordResetEmail(input: {
+  to: string;
+  firstName: string;
+  resetUrl: string;
+  origin: string;
+}): Promise<void> {
+  await sendTemplateEmail({
+    templateId: "staff-password-reset",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      resetUrl: input.resetUrl,
+      loginUrl: originDashboard(input.origin, "/admin/login"),
+    },
+  });
+}
+
+function supportReferenceId(id: string): string {
+  return `SUP-${id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+}
+
+export async function sendSupportContactEmails(input: {
+  origin: string;
+  record: {
+    id: string;
+    name: string;
+    email: string;
+    topicLabel: string;
+    message: string;
+  };
+  supportInboxEmail: string;
+}): Promise<void> {
+  const referenceId = supportReferenceId(input.record.id);
+  const messagePreview =
+    input.record.message.length > 240 ? `${input.record.message.slice(0, 240)}…` : input.record.message;
+  const firstName = input.record.name.split(" ")[0] ?? "there";
+
+  await Promise.all([
+    sendTemplateEmail({
+      templateId: "support-request-received",
+      to: input.record.email,
+      data: {
+        firstName: panelistFirstName(firstName),
+        topicLabel: input.record.topicLabel,
+        referenceId,
+        helpUrl: originDashboard(input.origin, "/help"),
+      },
+      context: "support-request-received",
+    }),
+    sendTemplateEmail({
+      templateId: "support-inbox-notification",
+      to: input.supportInboxEmail,
+      data: {
+        name: input.record.name,
+        email: input.record.email,
+        topicLabel: input.record.topicLabel,
+        referenceId,
+        messagePreview,
+        adminInboxUrl: originDashboard(input.origin, "/admin/support-inbox"),
+      },
+      context: "support-inbox-notification",
+    }),
+  ]);
 }
 
 export async function sendCampaignInvitationEmails(input: {
