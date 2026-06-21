@@ -2,10 +2,14 @@ import Link from "next/link";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { findAccountByPasswordResetToken } from "@/lib/accounts";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Reset password | Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Reset password",
+  description: "Choose a new password for your Belize Research Panel account.",
+  path: "/reset-password",
+  noIndex: true,
+});
 
 export default async function ResetPasswordPage({
   searchParams,

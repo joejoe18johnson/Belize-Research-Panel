@@ -5,10 +5,14 @@ import { DeleteAccountPanel } from "@/components/account/DeleteAccountPanel";
 import { getSessionAccount } from "@/lib/auth";
 import { AUTH_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Delete account | Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Delete account",
+  description: "Request deletion of your Belize Research Panel account and personal data.",
+  path: "/account/delete",
+  noIndex: true,
+});
 
 export default async function DeleteAccountPage() {
   const account = await getSessionAccount();

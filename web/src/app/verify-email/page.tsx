@@ -3,10 +3,14 @@ import { redirect } from "next/navigation";
 import { verifyAccountEmail } from "@/lib/accounts";
 import { setSessionCookie } from "@/lib/auth";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Verify email | Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Verify email",
+  description: "Confirm your email address for your Belize Research Panel account.",
+  path: "/verify-email",
+  noIndex: true,
+});
 
 export default async function VerifyEmailPage({
   searchParams,

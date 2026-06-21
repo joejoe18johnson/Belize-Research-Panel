@@ -6,6 +6,12 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import type { ReactNode } from "react";
 
+export const adminAuthCardClassName =
+  "rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 shadow-xl dark:border-zinc-700/50 dark:bg-zinc-900/95 dark:text-zinc-100 sm:p-8";
+
+export const adminAuthInputClassName =
+  "mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+
 export function AdminAuthShell({
   eyebrow,
   title,
@@ -27,7 +33,7 @@ export function AdminAuthShell({
       </header>
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">
         <div className="w-full max-w-2xl">
-          <div className="rounded-2xl border border-white/10 bg-white/95 p-6 text-zinc-900 shadow-xl dark:bg-zinc-900/95 dark:text-zinc-100 sm:p-8">
+          <div className={adminAuthCardClassName}>
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-700 dark:text-teal-300">
               {formatHeadingCase(eyebrow)}
             </p>

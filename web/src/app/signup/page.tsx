@@ -2,11 +2,14 @@ import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { SignedInBanner } from "@/components/auth/SignedInBanner";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { getSessionAccount } from "@/lib/auth";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Create account | Belize Research Panel",
-  description: "Create your Belize Research Panel account",
-};
+export const metadata = buildPageMetadata({
+  title: "Create account",
+  description:
+    "Join the Belize Research Panel — create your account, verify your email, and complete registration to start earning rewards.",
+  path: "/signup",
+});
 
 export default async function SignupPage({
   searchParams,

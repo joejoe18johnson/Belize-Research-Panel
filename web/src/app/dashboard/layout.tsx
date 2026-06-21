@@ -1,7 +1,10 @@
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getDashboardNavBadges, requireRegisteredPanelistSession } from "@/lib/dashboard-access";
-import { findPanelistByEmail } from "@/lib/panelists";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
+import { findPanelistByEmail } from "@/lib/panelists";
+import { privateAreaMetadata } from "@/lib/seo/metadata";
+
+export const metadata = privateAreaMetadata("Dashboard");
 
 export default async function DashboardLayout({
   children,

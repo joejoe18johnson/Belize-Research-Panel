@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
 import { ThemeInitScript } from "@/components/theme/ThemeInitScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { rootMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,11 +15,7 @@ const geistSans = Geist({
   preload: true,
 });
 
-export const metadata: Metadata = {
-  title: "Belize Research Panel",
-  description:
-    "Qualified panelists earn rewards for sharing their opinions — redeem points for cash, phone credit, utility credit, and more. Public opinion polling, market research, and governance studies in Belize.",
-};
+export const metadata: Metadata = rootMetadata();
 
 export const viewport = {
   width: "device-width",
@@ -32,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en-BZ" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full min-w-0 flex-col overflow-x-hidden bg-background font-sans text-foreground">
         <ThemeInitScript />
         <ThemeProvider>

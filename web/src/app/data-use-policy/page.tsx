@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { PolicyPageShell, PolicySection } from "@/components/PolicyPageShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Data use policy | Belize Research Panel",
-  description: "How the Belize Research Panel collects, uses, and protects personal data under GDPR-aligned standards.",
-};
+export const metadata = buildPageMetadata({
+  title: "Data use policy",
+  description:
+    "How the Belize Research Panel collects, uses, and protects personal data under GDPR-aligned standards.",
+  path: "/data-use-policy",
+});
 
 export default function DataUsePolicyPage() {
   return (

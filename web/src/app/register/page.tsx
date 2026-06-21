@@ -6,11 +6,14 @@ import { RegisterAuthGate } from "@/components/auth/RegisterAuthGate";
 import { RegistrationPageClient } from "@/components/registration/RegistrationPageClient";
 import { getSessionAccount } from "@/lib/auth";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Register | Belize Research Panel",
-  description: "Join the exclusive Belize Research Panel",
-};
+export const metadata = buildPageMetadata({
+  title: "Register",
+  description: "Complete your Belize Research Panel panelist registration.",
+  path: "/register",
+  noIndex: true,
+});
 
 export default async function RegisterPage() {
   const account = await getSessionAccount();
