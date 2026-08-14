@@ -592,14 +592,8 @@ export function validateProfileUpdateForm(
     errors.registeredCtvArea = "Village / town / city area of voter registration is required for registered voters.";
   }
 
-  if (registeredVoter && data.politicalInterests.length === 0) {
-    errors.politicalInterests = "Please select at least one political / election poll interest.";
-  }
   if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
     errors.marketInterests = "Please select at least one market research interest.";
-  }
-  if (data.civicInterests.length === 0) {
-    errors.civicInterests = "Please select at least one civic / public / social issue.";
   }
 
   if (contactCount < 2 && !cleanText(data.streetAddress)) {

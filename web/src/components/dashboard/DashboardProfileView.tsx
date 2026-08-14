@@ -62,10 +62,7 @@ export function DashboardProfileView({
   emailUpdated?: boolean;
   onDismissSaved?: () => void;
 }) {
-  const residenceSummary =
-    profile.placeOfResidence === "Living abroad"
-      ? [profile.countryIfAbroad, profile.cityTownVillage].filter(Boolean).join(", ")
-      : [profile.district, profile.cityTownVillage].filter(Boolean).join(" · ");
+  const livingAbroad = profile.placeOfResidence === "Living abroad";
 
   return (
     <div className="space-y-6">
@@ -128,7 +125,6 @@ export function DashboardProfileView({
             <ProfileField label="First name" value={profile.firstName} />
             <ProfileField label="Last name(s)" value={profile.lastName} />
             <ProfileField label="Date of birth" value={profile.dob} />
-            <ProfileField label="Age" value={profile.age} />
             <ProfileField label="Sex" value={profile.sex} />
             <ProfileField label="Education" value={profile.education} />
             <ProfileField label="Ethnicity" value={profile.ethnicity} />
@@ -146,16 +142,34 @@ export function DashboardProfileView({
               <ProfileField label="Commonwealth country of citizenship" value={profile.commonwealthCountry} />
             ) : null}
             <ProfileField label="Registered to vote in Belize" value={profile.votingStatus} />
-            <ProfileField label="Voter status" value={profile.voterStatus} />
-            <ProfileField label="Where you currently live" value={profile.placeOfResidence} />
-            {residenceSummary ? (
-              <ProfileField label="Location details" value={residenceSummary} />
-            ) : null}
+            <ProfileField label="Current place of residence" value={profile.placeOfResidence} />
+            {livingAbroad ? (
+              <>
+                {profile.countryIfAbroad ? (
+                  <ProfileField label="Country of residence" value={profile.countryIfAbroad} />
+                ) : null}
+                {profile.cityTownVillage ? (
+                  <ProfileField label="Current city / town / village" value={profile.cityTownVillage} />
+                ) : null}
+              </>
+            ) : (
+              <>
+                {profile.district ? (
+                  <ProfileField label="District" value={profile.district} />
+                ) : null}
+                {profile.cityTownVillage ? (
+                  <ProfileField label="Current city / town / village" value={profile.cityTownVillage} />
+                ) : null}
+              </>
+            )}
             {profile.constituency ? (
               <ProfileField label="Constituency registered to vote" value={profile.constituency} />
             ) : null}
             {profile.registeredCtvArea ? (
-              <ProfileField label="Registered CTV area" value={profile.registeredCtvArea} />
+              <ProfileField
+                label="Place of residence when registered to vote"
+                value={profile.registeredCtvArea}
+              />
             ) : null}
           </dl>
         </DashboardCard>
@@ -180,9 +194,7 @@ export function DashboardProfileView({
         <DashboardCard>
           <ProfileCardHeader title="Research interests" onEdit={() => onEditSection("interests")} />
           <div className="mt-4 space-y-5">
-            <InterestList title="Political / election polls" items={profile.politicalInterests} />
             <InterestList title="Market research" items={profile.marketInterests} />
-            <InterestList title="Civic / public / social issues" items={profile.civicInterests} />
           </div>
         </DashboardCard>
       </div>
