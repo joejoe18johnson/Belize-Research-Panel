@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-BZ" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
-      <body className="flex min-h-full min-w-0 flex-col overflow-x-hidden bg-background font-sans text-foreground">
+      <body className="flex min-h-full min-w-0 flex-col overflow-x-clip bg-background font-sans text-foreground">
         <ThemeInitScript />
         <ThemeProvider>
           <NetlifyDeployBanner />
