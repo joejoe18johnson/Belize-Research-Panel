@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { CLIENT_DEMO_PASSWORD } from "@/lib/demo-clients";
 import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -46,13 +46,18 @@ export function ClientLoginForm() {
   return (
     <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
       <header className="safe-top shrink-0 border-b border-teal-100 bg-white/95 shadow-sm dark:border-teal-900/50 dark:bg-zinc-900/95">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <BrpLogoLink href="/" variant="light" />
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-300">
-              {formatHeadingCase("Panelist login")}
-            </Link>
-            <ThemeToggle compact />
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-3 py-4">
+            <BrpLogoLink href="/" variant="light" />
+            <div className="flex items-center gap-2">
+              <Link href="/login" className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-300">
+                {formatHeadingCase("Panelist login")}
+              </Link>
+              <ThemeSwitch compact className="hidden sm:inline-flex" />
+            </div>
+          </div>
+          <div className="border-t border-teal-100 py-2 dark:border-teal-900/50 sm:hidden">
+            <ThemeMenuToggle variant="light" />
           </div>
         </div>
       </header>

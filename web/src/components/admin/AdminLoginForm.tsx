@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { adminAuthCardClassName, adminAuthInputClassName } from "@/components/admin/AdminAuthShell";
 import { RoleTestAccountsReference } from "@/components/admin/RoleTestAccountsReference";
 import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
@@ -55,7 +55,7 @@ export function AdminLoginForm() {
       <header className="safe-top px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
           <BrpLogoLink href="/" variant="dark" />
-          <ThemeToggle variant="dark" compact />
+          <ThemeSwitch variant="dark" compact />
         </div>
       </header>
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">

@@ -24,55 +24,11 @@ function MoonIcon({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-const VARIANT_CLASS = {
+const SWITCH_SHELL_CLASS = {
   light:
-    "border border-zinc-200 bg-white text-zinc-700 shadow-sm hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 dark:hover:text-teal-100",
-  dark: "border border-white/20 bg-white/10 text-teal-100 hover:bg-white/15 hover:text-white",
-  ghost:
-    "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+    "border border-zinc-200 bg-white text-zinc-800 shadow-sm hover:border-teal-300 hover:bg-teal-50/80 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-teal-700",
+  dark: "border border-white/20 bg-white/10 text-teal-50 hover:bg-white/15",
 } as const;
-
-export function ThemeToggle({
-  className = "",
-  variant = "light",
-  compact = false,
-}: {
-  className?: string;
-  variant?: keyof typeof VARIANT_CLASS;
-  compact?: boolean;
-}) {
-  const { resolved, toggleTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <span
-        className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl ${VARIANT_CLASS[variant]} ${className}`.trim()}
-        aria-hidden
-      />
-    );
-  }
-
-  const isDark = resolved === "dark";
-  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
-
-  return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-2.5 text-sm font-medium transition ${VARIANT_CLASS[variant]} ${compact ? "min-w-10" : "min-w-10 sm:px-3"} ${className}`.trim()}
-      aria-label={label}
-      title={label}
-    >
-      {isDark ? <SunIcon /> : <MoonIcon />}
-      {!compact ? <span className="hidden sm:inline">{isDark ? "Light" : "Dark"}</span> : null}
-    </button>
-  );
-}
 
 const MENU_VARIANT_CLASS = {
   light:
@@ -82,6 +38,103 @@ const MENU_VARIANT_CLASS = {
   heroLight:
     "border border-teal-200 bg-teal-50/80 text-teal-950 hover:bg-teal-100 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-900/40",
 } as const;
+
+function useThemeSwitchState() {
+  const { resolved, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolved === "dark";
+  const statusLabel = isDark ? "ON" : "OFF";
+  const actionLabel = isDark ? "Switch to light mode" : "Switch to dark mode";
+
+  return { mounted, isDark, statusLabel, actionLabel, toggleTheme };
+}
+
+function ThemeSwitchTrack({ isDark, compact = false }: { isDark: boolean; compact?: boolean }) {
+  return (
+    <span
+      className={`relative inline-flex shrink-0 rounded-full transition-colors duration-200 ${
+        compact ? "h-5 w-9" : "h-6 w-11"
+      } ${isDark ? "bg-teal-600 dark:bg-teal-500" : "bg-zinc-300 dark:bg-zinc-600"}`}
+      aria-hidden
+    >
+      <span
+        className={`absolute top-0.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+          compact ? "left-0.5 h-4 w-4" : "left-0.5 h-5 w-5"
+        } ${isDark ? (compact ? "translate-x-4" : "translate-x-5") : "translate-x-0"}`}
+      />
+    </span>
+  );
+}
+
+/** Labeled dark-mode switch for toolbars and headers. */
+export function ThemeSwitch({
+  className = "",
+  variant = "light",
+  showLabel = true,
+  compact = false,
+}: {
+  className?: string;
+  variant?: keyof typeof SWITCH_SHELL_CLASS;
+  showLabel?: boolean;
+  compact?: boolean;
+}) {
+  const { mounted, isDark, statusLabel, actionLabel, toggleTheme } = useThemeSwitchState();
+
+  if (!mounted) {
+    return (
+      <span
+        className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-2.5 ${SWITCH_SHELL_CLASS[variant]} ${className}`.trim()}
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isDark}
+      aria-label={`${actionLabel}. Dark mode is ${statusLabel}.`}
+      title={actionLabel}
+      onClick={toggleTheme}
+      className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${SWITCH_SHELL_CLASS[variant]} ${className}`.trim()}
+    >
+      {showLabel ? (
+        <span className="flex min-w-0 items-center gap-1.5">
+          {isDark ? <MoonIcon className="h-4 w-4 shrink-0 opacity-80" /> : <SunIcon className="h-4 w-4 shrink-0 opacity-80" />}
+          <span className={`whitespace-nowrap font-semibold ${compact ? "text-xs" : "text-sm"}`}>Dark mode</span>
+        </span>
+      ) : null}
+      <ThemeSwitchTrack isDark={isDark} compact={compact} />
+      <span
+        className={`shrink-0 font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 ${
+          compact ? "w-6 text-[10px]" : "w-7 text-[11px]"
+        } ${isDark ? "text-teal-700 dark:text-teal-300" : ""}`}
+        aria-hidden
+      >
+        {statusLabel}
+      </span>
+    </button>
+  );
+}
+
+/** @deprecated Prefer ThemeSwitch — icon-only compact button. */
+export function ThemeToggle({
+  className = "",
+  variant = "light",
+  compact = false,
+}: {
+  className?: string;
+  variant?: keyof typeof SWITCH_SHELL_CLASS;
+  compact?: boolean;
+}) {
+  return <ThemeSwitch className={className} variant={variant} showLabel={!compact} compact={compact} />;
+}
 
 /** Full-width dark mode row for mobile menus and sidebars. */
 export function ThemeMenuToggle({
@@ -93,16 +146,7 @@ export function ThemeMenuToggle({
   variant?: keyof typeof MENU_VARIANT_CLASS;
   onActivate?: () => void;
 }) {
-  const { resolved, toggleTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isDark = mounted && resolved === "dark";
-  const statusLabel = isDark ? "ON" : "OFF";
-  const actionLabel = isDark ? "Switch to light mode" : "Switch to dark mode";
+  const { mounted, isDark, statusLabel, actionLabel, toggleTheme } = useThemeSwitchState();
 
   const handleClick = () => {
     toggleTheme();
@@ -121,24 +165,27 @@ export function ThemeMenuToggle({
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={isDark}
+      aria-label={`${actionLabel}. Dark mode is ${statusLabel}.`}
+      title={actionLabel}
       onClick={handleClick}
       className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left transition ${MENU_VARIANT_CLASS[variant]} ${className}`.trim()}
-      aria-label={`${actionLabel}. Dark mode is currently ${statusLabel}.`}
-      title={actionLabel}
     >
       <span className="flex min-w-0 items-center gap-2.5">
         {isDark ? <MoonIcon className="h-5 w-5 shrink-0" /> : <SunIcon className="h-5 w-5 shrink-0" />}
         <span className="text-sm font-semibold">Dark mode</span>
       </span>
-      <span
-        className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
-          isDark
-            ? "bg-teal-600 text-white dark:bg-teal-500"
-            : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100"
-        }`}
-        aria-hidden
-      >
-        {statusLabel}
+      <span className="flex shrink-0 items-center gap-2">
+        <ThemeSwitchTrack isDark={isDark} />
+        <span
+          className={`w-7 text-center text-[11px] font-bold uppercase tracking-wide ${
+            isDark ? "text-teal-700 dark:text-teal-300" : "text-zinc-500 dark:text-zinc-400"
+          }`}
+          aria-hidden
+        >
+          {statusLabel}
+        </span>
       </span>
     </button>
   );
