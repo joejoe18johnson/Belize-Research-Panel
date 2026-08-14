@@ -710,6 +710,8 @@ async function importCampaigns(supabase, panelistSurveys) {
 
 async function importSurveyAssignments(supabase, panelistIdByEmail) {
   const raw = await readJson("panelist-surveys.json", []);
+  const surveyDefinitions = await readJson("survey-definitions.json", []);
+  const validSurveyIds = new Set(surveyDefinitions.map((def) => def.id));
   const seen = new Set();
   const rows = [];
 
@@ -721,6 +723,7 @@ async function importSurveyAssignments(supabase, panelistIdByEmail) {
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
 
+    const surveyDefinitionId = cleanText(item.surveyDefinitionId || "");
     rows.push({
       id: assignmentRowId(campaignId, email),
       campaign_id: campaignId,
@@ -731,7 +734,10 @@ async function importSurveyAssignments(supabase, panelistIdByEmail) {
       category: item.category,
       status: item.status ?? "available",
       survey_url: cleanText(item.surveyUrl || ""),
-      survey_definition_id: cleanText(item.surveyDefinitionId || "") || null,
+      survey_definition_id:
+        surveyDefinitionId && validSurveyIds.has(surveyDefinitionId)
+          ? surveyDefinitionId
+          : null,
       delivery_type: item.deliveryType === "internal" ? "internal" : "external",
       points: item.points ?? 0,
       assigned_date: parseDateOnly(item.assignedDate),
