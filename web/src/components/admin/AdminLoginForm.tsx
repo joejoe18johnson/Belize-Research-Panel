@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { adminAuthCardClassName, adminAuthInputClassName } from "@/components/admin/AdminAuthShell";
@@ -94,13 +95,12 @@ export function AdminLoginForm() {
                     Forgot password?
                   </Link>
                 </div>
-                <input
+                <PasswordInput
                   id="admin-password"
-                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className={adminAuthInputClassName}
+                  className={`${adminAuthInputClassName} pr-11`}
                 />
               </div>
               {error ? (

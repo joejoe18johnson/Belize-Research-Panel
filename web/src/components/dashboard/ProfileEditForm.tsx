@@ -172,10 +172,6 @@ export function ProfileEditForm({
             <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.dob}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Age</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.age}</dd>
-          </div>
-          <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Sex</dt>
             <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.sex}</dd>
           </div>
@@ -297,7 +293,7 @@ export function ProfileEditForm({
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
                 <Field
-                  label="Registered CTV area"
+                  label={`Where in the "${form.constituency}" constituency were you living when you registered to vote?`}
                   required
                   error={errors.registeredCtvArea}
                   id="registeredCtvArea"
@@ -507,16 +503,6 @@ export function ProfileEditForm({
           Research interests
         </SectionHeading>
         <div className="mt-4 space-y-5">
-          {form.placeOfResidence !== "Abroad" || registeredVoter ? (
-            <Field label="Political / election polls" required={registeredVoter} error={errors.politicalInterests}>
-              <MultiSelect
-                options={POLITICAL_INTERESTS}
-                values={form.politicalInterests}
-                onChange={(values) => update("politicalInterests", values)}
-                error={errors.politicalInterests}
-              />
-            </Field>
-          ) : null}
           {form.placeOfResidence !== "Abroad" ? (
             <Field label="Market research" required error={errors.marketInterests}>
               <MultiSelect
@@ -526,15 +512,12 @@ export function ProfileEditForm({
                 error={errors.marketInterests}
               />
             </Field>
-          ) : null}
-          <Field label="Civic / public / social issues" required error={errors.civicInterests}>
-            <MultiSelect
-              options={CIVIC_INTERESTS}
-              values={form.civicInterests}
-              onChange={(values) => update("civicInterests", values)}
-              error={errors.civicInterests}
-            />
-          </Field>
+          ) : (
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Market research interests apply to panelists living in Belize. You may still receive diaspora and
+              political surveys where eligible.
+            </p>
+          )}
         </div>
       </div>
 
