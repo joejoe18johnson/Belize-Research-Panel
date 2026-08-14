@@ -12,14 +12,18 @@
     "seed:roles": "node scripts/seed-role-users.mjs",
     "seed:campaign": "node scripts/seed-sample-campaign.mjs",
     "seed:admin-notifications": "node scripts/seed-admin-notifications.mjs",
-    "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign && npm run seed:admin-notifications"
+    "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign && npm run seed:admin-notifications",
+    "import:supabase": "node scripts/import-json-to-supabase.mjs",
+    "import:supabase:fresh": "node scripts/import-json-to-supabase.mjs --fresh"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.109.0",
     "next": "16.2.6",
     "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "resend": "^6.14.0"
+    "resend": "^6.14.0",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.15.11",
