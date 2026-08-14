@@ -30,6 +30,13 @@ function normalizeEmail(email: string): string {
 export async function loadNotificationReadState(email: string): Promise<NotificationReadState> {
   const key = normalizeEmail(email);
   if (!key) return {};
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadNotificationReadState } = await import("./supabase/repos");
+    return supabaseLoadNotificationReadState(key);
+  }
+
   const store = await loadStore();
   return store[key] ?? {};
 }
@@ -43,14 +50,21 @@ export async function setNotificationRead(
   const id = cleanText(notificationId);
   if (!key || !id) return {};
 
-  const store = await loadStore();
-  const current = store[key] ?? {};
+  const current = await loadNotificationReadState(key);
 
   current[id] = {
     read,
     updatedAt: new Date().toISOString(),
   };
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseSaveNotificationReadState } = await import("./supabase/repos");
+    await supabaseSaveNotificationReadState(key, current);
+    return current;
+  }
+
+  const store = await loadStore();
   store[key] = current;
   await saveStore(store);
   return current;
@@ -67,8 +81,7 @@ export async function markAllNotificationsRead(
   const key = normalizeEmail(email);
   if (!key) return {};
 
-  const store = await loadStore();
-  const current = store[key] ?? {};
+  const current = await loadNotificationReadState(key);
   const updatedAt = new Date().toISOString();
 
   for (const id of notificationIds) {
@@ -77,6 +90,14 @@ export async function markAllNotificationsRead(
     current[cleanId] = { read: true, updatedAt };
   }
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseSaveNotificationReadState } = await import("./supabase/repos");
+    await supabaseSaveNotificationReadState(key, current);
+    return current;
+  }
+
+  const store = await loadStore();
   store[key] = current;
   await saveStore(store);
   return current;

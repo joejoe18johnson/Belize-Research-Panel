@@ -73,6 +73,11 @@ function normalizeSurveyDefinition(definition: SurveyDefinition): SurveyDefiniti
 }
 
 export async function loadSurveyDefinitions(): Promise<SurveyDefinition[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadSurveyDefinitions } = await import("./supabase/repos");
+    return supabaseLoadSurveyDefinitions();
+  }
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as SurveyDefinition[];

@@ -22,6 +22,11 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const ACCOUNTS_FILE = path.join(DATA_DIR, "accounts.json");
 
 async function loadAccountsRaw(): Promise<AccountRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseListAccounts } = await import("./supabase/repos");
+    return supabaseListAccounts();
+  }
   try {
     const content = await fs.readFile(ACCOUNTS_FILE, "utf-8");
     const parsed = JSON.parse(content) as AccountRecord[];
@@ -32,6 +37,12 @@ async function loadAccountsRaw(): Promise<AccountRecord[]> {
 }
 
 async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertAccounts } = await import("./supabase/repos");
+    await supabaseUpsertAccounts(accounts);
+    return;
+  }
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), "utf-8");
 }

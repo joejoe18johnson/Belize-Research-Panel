@@ -28,6 +28,15 @@ function normalizeEmail(email: string): string {
 export async function loadRewardBalanceSeed(email: string): Promise<PanelistRewardBalanceSeed | null> {
   const key = normalizeEmail(email);
   if (!key) return null;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadRewardBalanceSeed } = await import("./supabase/repos");
+    const total = await supabaseLoadRewardBalanceSeed(key);
+    if (total == null) return null;
+    return { totalPoints: total };
+  }
+
   const store = await loadStore();
   const seed = store[key];
   if (!seed || typeof seed !== "object") return null;
