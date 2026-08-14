@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAccount } from "@/lib/accounts";
-import { buildVerificationUrl, setSessionCookie } from "@/lib/auth";
+import { buildVerificationUrl, resolveRequestOrigin, setSessionCookie } from "@/lib/auth";
 import { sendSignupVerifyEmail } from "@/lib/email/process-emails";
 import type { SignupFormData } from "@/lib/auth-types";
 import { isSignupEligible, validateSignupForm } from "@/lib/signup-validation";
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     await setSessionCookie(result.account.id);
-    const origin = request.nextUrl.origin;
+    const origin = resolveRequestOrigin(request);
     const verifyUrl = buildVerificationUrl(result.verificationToken, origin);
 
     void sendSignupVerifyEmail({

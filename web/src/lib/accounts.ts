@@ -270,7 +270,14 @@ export async function createAccount(input: {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
     const { supabaseInsertAccount } = await import("./supabase/repos");
-    await supabaseInsertAccount(account);
+    try {
+      await supabaseInsertAccount(account);
+    } catch (error) {
+      if (error instanceof Error && error.message === "duplicate_key") {
+        throw new Error("email_exists");
+      }
+      throw error;
+    }
     return { account, verificationToken };
   }
 

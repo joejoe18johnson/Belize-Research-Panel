@@ -72,18 +72,40 @@ export async function getSessionAccount(): Promise<SessionAccount | null> {
   return toSessionAccount(account);
 }
 
+/** Prefer localhost over 0.0.0.0 so verification links work in the browser. */
+export function normalizeAppOrigin(origin: string): string {
+  const trimmed = origin.replace(/\/$/, "");
+  if (trimmed.includes("0.0.0.0")) {
+    return trimmed.replace("0.0.0.0", "localhost");
+  }
+  return trimmed;
+}
+
+export function resolveRequestOrigin(request: { headers: Headers; nextUrl: { origin: string } }): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configured) return normalizeAppOrigin(configured.replace(/\/$/, ""));
+
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (host) {
+    const proto = request.headers.get("x-forwarded-proto") ?? "http";
+    return normalizeAppOrigin(`${proto}://${host}`);
+  }
+
+  return normalizeAppOrigin(request.nextUrl.origin);
+}
+
 export function buildVerificationUrl(token: string, origin: string): string {
-  return `${origin.replace(/\/$/, "")}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
+  return `${normalizeAppOrigin(origin)}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 }
 
 export function buildEmailChangeVerificationUrl(token: string, origin: string): string {
-  return `${origin.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}&purpose=email-change`;
+  return `${normalizeAppOrigin(origin)}/verify-email?token=${encodeURIComponent(token)}&purpose=email-change`;
 }
 
 export function buildPasswordResetUrl(token: string, origin: string): string {
-  return `${origin.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}`;
+  return `${normalizeAppOrigin(origin)}/reset-password?token=${encodeURIComponent(token)}`;
 }
 
 export function buildStaffPasswordResetUrl(token: string, origin: string): string {
-  return `${origin.replace(/\/$/, "")}/admin/reset-password?token=${encodeURIComponent(token)}`;
+  return `${normalizeAppOrigin(origin)}/admin/reset-password?token=${encodeURIComponent(token)}`;
 }
