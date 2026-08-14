@@ -1,5 +1,38 @@
 [
   {
+    "id": "2e4a84fd-71ef-4517-a48e-860d76b403f0",
+    "sentAt": "2026-08-14T02:52:04.379Z",
+    "email": "ana.lopez.regtest1786675924@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Verify your email address\n\n            \n          \n\n          \n            \n              Hi Ana,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "logged"
+  },
+  {
+    "id": "be3b42e0-0f27-4301-9ec3-9892b9a4883c",
+    "sentAt": "2026-08-14T02:51:59.996Z",
+    "email": "john.smith1786675919@btl.net",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Verify your email address\n\n            \n          \n\n          \n            \n              Hi John,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "logged"
+  },
+  {
+    "id": "49cc8817-5c76-416c-8c7d-886fad5ce5b6",
+    "sentAt": "2026-08-14T02:51:54.941Z",
+    "email": "maria.garcia.regtest1786675914@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Verify your email address\n\n            \n          \n\n          \n            \n              Hi Maria,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "logged"
+  },
+  {
     "id": "ff5b7f5a-b465-4748-9267-1cd437a7c718",
     "sentAt": "2026-06-17T16:01:04.955Z",
     "email": "johannesjohnsonj@gmail.com",

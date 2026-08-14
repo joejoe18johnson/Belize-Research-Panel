@@ -73,7 +73,7 @@ export async function getSessionAccount(): Promise<SessionAccount | null> {
 }
 
 export function buildVerificationUrl(token: string, origin: string): string {
-  return `${origin.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}`;
+  return `${origin.replace(/\/$/, "")}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 }
 
 export function buildEmailChangeVerificationUrl(token: string, origin: string): string {

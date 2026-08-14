@@ -1,7 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { verifyAccountEmail } from "@/lib/accounts";
-import { setSessionCookie } from "@/lib/auth";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -15,21 +12,11 @@ export const metadata = buildPageMetadata({
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string; purpose?: string }>;
+  searchParams: Promise<{ token?: string; purpose?: string; error?: string }>;
 }) {
-  const { token, purpose } = await searchParams;
+  const { token, purpose, error } = await searchParams;
 
-  if (!token) {
-    return (
-      <AuthPageShell title="Invalid verification link" subtitle="This verification link is missing or incomplete.">
-        <Link href="/signup" className="inline-block rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800">
-          Create account
-        </Link>
-      </AuthPageShell>
-    );
-  }
-
-  if (purpose === "email-change") {
+  if (purpose === "email-change" && token) {
     return (
       <AuthPageShell
         title="Administrator approval required"
@@ -45,8 +32,17 @@ export default async function VerifyEmailPage({
     );
   }
 
-  const account = await verifyAccountEmail(token);
-  if (!account) {
+  if (error === "missing") {
+    return (
+      <AuthPageShell title="Invalid verification link" subtitle="This verification link is missing or incomplete.">
+        <Link href="/signup" className="inline-block rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800">
+          Create account
+        </Link>
+      </AuthPageShell>
+    );
+  }
+
+  if (error === "expired") {
     return (
       <AuthPageShell title="Verification link expired" subtitle="This link may have already been used or is no longer valid.">
         <div className="flex flex-col gap-3">
@@ -61,6 +57,19 @@ export default async function VerifyEmailPage({
     );
   }
 
-  await setSessionCookie(account.id);
-  redirect("/register");
+  return (
+    <AuthPageShell
+      title="Check your email"
+      subtitle="Open the verification link we sent to your inbox to continue panelist registration."
+    >
+      <div className="flex flex-col gap-3">
+        <Link href="/signup/check-email" className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800">
+          Go to verification help
+        </Link>
+        <Link href="/login" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
+          Log in
+        </Link>
+      </div>
+    </AuthPageShell>
+  );
 }
