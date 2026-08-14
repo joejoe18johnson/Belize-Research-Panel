@@ -27,7 +27,21 @@ Demo accounts: `npm run seed:demo` (also runs automatically on Netlify build).
    - **Build command:** leave blank (uses `netlify.toml`) or `npm run build:netlify`
    - **Publish directory:** **clear this field** or set to `.next` — never `web` (same as base → build fails)
 3. **`netlify.toml`** sets `publish = ".next"` and `@netlify/plugin-nextjs`.
-4. **Required env var:** `AUTH_SESSION_SECRET` — long random string for login sessions.
+4. **Required env vars** (Site configuration → Environment variables):
+
+| Variable | Required | Notes |
+|----------|----------|--------|
+| `AUTH_SESSION_SECRET` | **Yes** | Long random string for login sessions |
+| `NEXT_PUBLIC_SUPABASE_URL` | **Yes** | From Supabase → Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Yes** | Anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Yes** | Service role key (server-only, never expose to client) |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Your live URL, e.g. `https://www.yourdomain.com` |
+| `NEXT_PUBLIC_APP_URL` | Optional | Same as site URL; used for verification/reset links |
+| `RESEND_API_KEY` | Optional | Enables real signup/notification emails |
+
+Without the three Supabase variables, **signup and registration will fail in production** (Netlify’s filesystem cannot store new accounts). Local dev works because `web/.env.local` has Supabase configured.
+
+5. Redeploy after adding env vars.
 
 ### Fix “Page not found” (Netlify generic 404)
 
@@ -48,7 +62,7 @@ This usually means Netlify deployed a **static folder** instead of the Next.js r
 
 ### Netlify limitations
 
-Panelist data lives in JSON/CSV under `web/data/`. The Netlify filesystem is **ephemeral** — seed data reads work for testing, but **writes may not persist** between requests.
+Panelist data lives in **Supabase (PostgreSQL)** in production. JSON/CSV under `web/data/` is for local dev and build-time seeding only — **writes do not persist** on Netlify’s ephemeral filesystem.
 
 ## Performance notes
 
