@@ -33,6 +33,11 @@ function normalizeEmail(email: string): string {
 }
 
 export async function loadRedemptionRequests(email: string): Promise<RedemptionRequest[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadRedemptionRequests } = await import("./supabase/repos");
+    return supabaseLoadRedemptionRequests(email);
+  }
   const key = normalizeEmail(email);
   if (!key) return [];
   const store = await loadStore();
@@ -70,6 +75,13 @@ export async function createRedemptionRequest(input: {
     updatedAt: now,
   };
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertRedemptionRequest } = await import("./supabase/repos");
+    await supabaseUpsertRedemptionRequest(request);
+    return request;
+  }
+
   const store = await loadStore();
   const current = store[key] ?? [];
   current.unshift(request);
@@ -80,6 +92,11 @@ export async function createRedemptionRequest(input: {
 }
 
 export async function loadAllRedemptionRequests(): Promise<RedemptionRequest[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadAllRedemptionRequests } = await import("./supabase/repos");
+    return supabaseLoadAllRedemptionRequests();
+  }
   const store = await loadStore();
   return Object.values(store).flat();
 }
@@ -89,6 +106,14 @@ export async function findRedemptionRequestById(
 ): Promise<{ email: string; request: RedemptionRequest } | null> {
   const id = cleanText(requestId);
   if (!id) return null;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadAllRedemptionRequests } = await import("./supabase/repos");
+    const all = await supabaseLoadAllRedemptionRequests();
+    const request = all.find((entry) => entry.id === id);
+    return request ? { email: request.email, request } : null;
+  }
 
   const store = await loadStore();
   for (const [email, requests] of Object.entries(store)) {
@@ -119,6 +144,14 @@ export async function updateRedemptionRequestStatus(
     updatedAt: new Date().toISOString(),
     ...(options.processedBy ? { processedBy: options.processedBy } : {}),
   };
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpdateRedemptionStatus } = await import("./supabase/repos");
+    await supabaseUpdateRedemptionStatus(updated.id, updated.status, updated.processedBy);
+    return updated;
+  }
+
   current[index] = updated;
   store[key] = current;
   await saveStore(store);

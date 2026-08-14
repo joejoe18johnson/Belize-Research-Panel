@@ -57,6 +57,11 @@ function escapeCsvValue(value: string): string {
 }
 
 export async function loadPanelists(): Promise<PanelistRow[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseListPanelists } = await import("./supabase/repos");
+    return supabaseListPanelists();
+  }
   try {
     const content = await fs.readFile(PANELISTS_FILE, "utf-8");
     const lines = content.trim().split(/\r?\n/);
@@ -170,6 +175,12 @@ export async function updatePanelistAdminFields(
 }
 
 export async function savePanelists(rows: PanelistRow[]): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertPanelists } = await import("./supabase/repos");
+    await supabaseUpsertPanelists(rows);
+    return;
+  }
   await fs.mkdir(DATA_DIR, { recursive: true });
   const headers = [...PANELIST_COLUMNS];
   const extraKeys = new Set<string>();

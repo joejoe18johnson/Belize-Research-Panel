@@ -23,6 +23,11 @@ export interface SurveyResponseRecord {
 }
 
 async function loadSurveyResponsesRaw(): Promise<SurveyResponseRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadSurveyResponses } = await import("./supabase/repos");
+    return supabaseLoadSurveyResponses();
+  }
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as SurveyResponseRecord[];
@@ -33,6 +38,14 @@ async function loadSurveyResponsesRaw(): Promise<SurveyResponseRecord[]> {
 }
 
 async function saveSurveyResponsesRaw(records: SurveyResponseRecord[]): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertSurveyResponse } = await import("./supabase/repos");
+    for (const record of records) {
+      await supabaseUpsertSurveyResponse(record);
+    }
+    return;
+  }
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2), "utf-8");
 }

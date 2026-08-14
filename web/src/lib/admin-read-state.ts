@@ -21,6 +21,11 @@ const EMPTY_STATE: AdminReadState = {
 };
 
 async function loadStore(): Promise<AdminReadState> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadAdminReadState } = await import("./supabase/repos");
+    return supabaseLoadAdminReadState();
+  }
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as Partial<AdminReadState>;
@@ -35,6 +40,12 @@ async function loadStore(): Promise<AdminReadState> {
 }
 
 async function saveStore(store: AdminReadState): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseSaveAdminReadState } = await import("./supabase/repos");
+    await supabaseSaveAdminReadState(store);
+    return;
+  }
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf-8");
 }

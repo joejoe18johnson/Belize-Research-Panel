@@ -18,6 +18,11 @@ export interface ClientUserRecord {
 const DATA_FILE = path.join(process.cwd(), "data", "clients.json");
 
 async function loadClientsRaw(): Promise<ClientUserRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseListClientUsers } = await import("./supabase/repos");
+    return supabaseListClientUsers();
+  }
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as ClientUserRecord[];

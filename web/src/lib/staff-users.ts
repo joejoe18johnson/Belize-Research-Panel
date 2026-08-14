@@ -47,6 +47,11 @@ export function toPublicStaffUser(user: StaffUserRecord): StaffUserPublic {
 }
 
 async function loadStaffUsersRaw(): Promise<StaffUserRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseListStaffUsers } = await import("./supabase/repos");
+    return supabaseListStaffUsers();
+  }
   try {
     const content = await fs.readFile(STAFF_USERS_FILE, "utf-8");
     const parsed = JSON.parse(content) as StaffUserRecord[];
@@ -57,6 +62,12 @@ async function loadStaffUsersRaw(): Promise<StaffUserRecord[]> {
 }
 
 async function saveStaffUsersRaw(users: StaffUserRecord[]): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertStaffUsers } = await import("./supabase/repos");
+    await supabaseUpsertStaffUsers(users);
+    return;
+  }
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(STAFF_USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
 }

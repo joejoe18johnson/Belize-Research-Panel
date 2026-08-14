@@ -47,6 +47,12 @@ export async function loadPointsOverride(email: string): Promise<number | null> 
   const key = normalizeEmail(email);
   if (!key) return null;
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadPointsOverride } = await import("./supabase/repos");
+    return supabaseLoadPointsOverride(key);
+  }
+
   const store = await loadStore();
   const value = store[key];
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
@@ -56,6 +62,13 @@ export async function loadPointsOverride(email: string): Promise<number | null> 
 export async function setPointsOverride(email: string, points: number | null): Promise<number | null> {
   const key = normalizeEmail(email);
   if (!key) return null;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseSetPointsOverride } = await import("./supabase/repos");
+    await supabaseSetPointsOverride(key, points);
+    return points;
+  }
 
   const store = await loadStore();
 

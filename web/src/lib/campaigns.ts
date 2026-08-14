@@ -20,6 +20,11 @@ function slugify(value: string): string {
 }
 
 export async function loadCampaignRecords(): Promise<CampaignRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadCampaigns } = await import("./supabase/repos");
+    return supabaseLoadCampaigns();
+  }
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as CampaignRecord[];
@@ -30,6 +35,12 @@ export async function loadCampaignRecords(): Promise<CampaignRecord[]> {
 }
 
 async function saveCampaignRecords(campaigns: CampaignRecord[]): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpsertCampaigns } = await import("./supabase/repos");
+    await supabaseUpsertCampaigns(campaigns);
+    return;
+  }
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(campaigns, null, 2), "utf-8");
 }
