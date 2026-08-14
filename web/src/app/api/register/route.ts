@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
       passwordSalt: accountRecord.password_salt,
       passwordHash: accountRecord.password_hash,
       accountEmail: session.email,
+      accountId: session.id,
     });
     await markAccountPanelistRegistered(session.id);
 
@@ -136,6 +137,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+    console.error("Registration failed:", error);
     return NextResponse.json({ message: "Registration could not be completed." }, { status: 500 });
   }
 }

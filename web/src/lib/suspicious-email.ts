@@ -216,6 +216,11 @@ const MAJOR_EMAIL_PROVIDER_DOMAINS = new Set(
     "shaw.ca",
     "rogers.com",
     "bell.net",
+    // Belize ISPs and common local domains
+    "btl.net",
+    "belize.net.bz",
+    "ub.edu.bz",
+    "gov.bz",
   ].map((domain) => domain.toLowerCase())
 );
 

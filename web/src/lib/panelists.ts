@@ -315,6 +315,7 @@ export async function registerPanelist(
     passwordSalt: string;
     passwordHash: string;
     accountEmail: string;
+    accountId?: string;
   }
 ): Promise<{ verificationStatus: string }> {
   const rows = await loadPanelists();
@@ -409,6 +410,14 @@ export async function registerPanelist(
   };
 
   rows.push(newRow);
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseInsertPanelist } = await import("./supabase/repos");
+    await supabaseInsertPanelist(newRow, credentials?.accountId);
+    return { verificationStatus };
+  }
+
   await savePanelists(rows);
   return { verificationStatus };
 }
