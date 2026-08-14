@@ -14,7 +14,7 @@ import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeToggle, ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { UserAvatar } from "./UserAvatar";
 
@@ -56,7 +56,12 @@ export function DashboardShell({
               </div>
             </Link>
             <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-2.5 text-xs font-semibold text-teal-900 dark:text-teal-100 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:min-h-11 sm:px-4 sm:text-sm" />
-            <ThemeToggle compact />
+            <ThemeToggle compact className="hidden md:inline-flex" />
+          </div>
+        </div>
+        <div className="border-t border-teal-50 bg-white px-3 py-2 dark:border-teal-900/40 dark:bg-zinc-900 md:hidden">
+          <div className={CONTENT_CLASS}>
+            <ThemeMenuToggle variant="light" />
           </div>
         </div>
         <DashboardNav badges={badges} />

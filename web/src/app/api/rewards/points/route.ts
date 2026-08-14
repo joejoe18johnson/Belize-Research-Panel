@@ -32,8 +32,8 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      totalPoints: rewards.totalPoints,
-      calculatedPoints: rewards.calculatedPoints ?? rewards.totalPoints,
+      totalPoints: rewards.availablePoints,
+      calculatedPoints: rewards.calculatedPoints ?? rewards.availablePoints,
       usingOverride: rewards.usingOverride ?? false,
       override,
     });

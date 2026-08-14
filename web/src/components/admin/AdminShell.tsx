@@ -13,7 +13,7 @@ import {
   type AdminModule,
 } from "@/lib/admin-modules";
 import { AdminFooter } from "@/components/admin/AdminFooter";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
 import type { AdminNavBadges } from "@/lib/admin-nav-badges";
 import { STAFF_ROLE_LABELS, sessionCanAccessModule, staffAccessibleModules } from "@/lib/staff-roles";
@@ -149,6 +149,9 @@ export function AdminShell({
           <span className="mt-0.5 block text-teal-200/90">{STAFF_ROLE_LABELS[session.role]}</span>
         </p>
       </div>
+      <div className="shrink-0 border-b border-white/10 px-4 py-3">
+        <ThemeMenuToggle variant="dark" onActivate={() => setMobileNavOpen(false)} />
+      </div>
       <nav
         className="nav-scroll min-h-0 flex-1 overflow-y-auto px-2 py-3 lg:py-4"
         aria-label="Admin modules"
@@ -260,7 +263,6 @@ export function AdminShell({
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">{STAFF_ROLE_LABELS[session.role]}</p>
                 </div>
                 <AdminLogoutButton />
-                <ThemeToggle compact className="shrink-0" />
               </div>
             </div>
           </header>

@@ -14,7 +14,6 @@ import { findPanelistByEmail } from "./panelists";
 import { loadNotificationReadState } from "./notification-state";
 import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
-import { getAvailablePoints } from "./reward-redemption";
 import { isPanelistVerified } from "./verification-status";
 import { countUnreadSurveyInvitations } from "./survey-notifications";
 
@@ -89,7 +88,6 @@ export async function getDashboardNavBadges(email: string): Promise<DashboardNav
   const redemptionRequests = await loadRedemptionRequests(email);
   const { inbox } = await getPanelistSurveys(email);
   const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests, inboxSurveys: inbox });
-  const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
   const newSurveys = countUnreadSurveyInvitations(notifications);
 
   return {
@@ -97,6 +95,6 @@ export async function getDashboardNavBadges(email: string): Promise<DashboardNav
     inboxSurveys: inbox.length,
     newSurveys,
     verificationAttention: isPanelistVerified(profile.verificationStatus) ? 0 : 1,
-    availablePoints,
+    availablePoints: rewards.availablePoints,
   };
 }

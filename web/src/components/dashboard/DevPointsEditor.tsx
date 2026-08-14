@@ -12,8 +12,8 @@ const QUICK_AMOUNTS = [25, 75, 500, 1250, 2000, 5000] as const;
 
 export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }) {
   const router = useRouter();
-  const calculated = rewards.calculatedPoints ?? rewards.totalPoints;
-  const [input, setInput] = useState(String(rewards.totalPoints));
+  const calculated = rewards.calculatedPoints ?? rewards.availablePoints;
+  const [input, setInput] = useState(String(rewards.availablePoints));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -94,8 +94,8 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
         </div>
         <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm">
           <p className="text-teal-700">{formatHeadingCase("Displayed balance")}</p>
-          <p className="mt-1 text-lg font-bold text-teal-900 dark:text-teal-100">{rewards.totalPoints} pts</p>
-          <p className="text-xs text-teal-700">{formatBz(pointsToBz(rewards.totalPoints))}</p>
+          <p className="mt-1 text-lg font-bold text-teal-900 dark:text-teal-100">{rewards.availablePoints} pts</p>
+          <p className="text-xs text-teal-700">{formatBz(pointsToBz(rewards.availablePoints))}</p>
         </div>
       </div>
 

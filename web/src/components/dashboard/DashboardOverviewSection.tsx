@@ -157,7 +157,7 @@ export function DashboardOverviewSection({
       <DashboardOverviewStats
         verificationStatus={profile.verificationStatus}
         panelistStatus={profile.panelistStatus}
-        totalPoints={rewards.totalPoints}
+        totalPoints={rewards.availablePoints}
         totalPointsToDate={rewards.totalPointsToDate}
         rewardsVerified={rewards.verified}
         unreadCount={unreadCount}

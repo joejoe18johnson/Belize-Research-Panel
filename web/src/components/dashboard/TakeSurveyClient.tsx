@@ -55,7 +55,12 @@ export function TakeSurveyClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers, submit }),
       });
-      const data = (await res.json()) as { ok?: boolean; message?: string; points?: number };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        message?: string;
+        points?: number;
+        rewards?: { availablePoints: number; totalPointsToDate: number; surveyPoints: number };
+      };
       if (!res.ok || !data.ok) {
         setError(data.message ?? "Could not save your responses.");
         return;
@@ -63,7 +68,13 @@ export function TakeSurveyClient({
 
       if (submit) {
         setDone(true);
-        setMessage(`Survey submitted. +${data.points ?? assignment.points} points earned.`);
+        const earned = data.points ?? assignment.points;
+        const balance = data.rewards?.availablePoints;
+        setMessage(
+          balance !== undefined
+            ? `Survey submitted. +${earned} points earned. Your available balance is now ${balance.toLocaleString()} points.`
+            : `Survey submitted. +${earned} points earned.`
+        );
         router.refresh();
         return;
       }

@@ -29,7 +29,7 @@ export async function getPanelistSurveys(email: string): Promise<{
 
   const matched = records.filter((record) => {
     const assignedEmail = cleanText(record.panelistEmail ?? "").toLowerCase();
-    return !assignedEmail || assignedEmail === normalizedEmail;
+    return assignedEmail === normalizedEmail;
   });
 
   const surveys = matched.map(toPanelistSurvey);

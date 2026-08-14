@@ -79,20 +79,6 @@ function sumFulfilledRedemptionPoints(
     .reduce((sum, request) => sum + request.points, 0);
 }
 
-function sumActiveRedemptionPoints(
-  requests: Awaited<ReturnType<typeof loadRedemptionRequests>>
-): number {
-  return getReservedPoints(requests);
-}
-
-function sumRedeemedPoints(
-  requests: Awaited<ReturnType<typeof loadRedemptionRequests>>
-): number {
-  return requests
-    .filter((request) => request.status !== "rejected")
-    .reduce((sum, request) => sum + request.points, 0);
-}
-
 export async function resolveRewardSummary(
   email: string,
   profile: Pick<PanelistDashboardProfile, "verificationStatus">
@@ -111,14 +97,11 @@ export async function resolveRewardSummary(
   const totalPointsToDate = Math.max(calculatedEarned, seedToDate);
 
   const redemptionRequests = await loadRedemptionRequests(email);
-  const fulfilledPoints = sumFulfilledRedemptionPoints(redemptionRequests);
-  const activeHoldPoints = sumActiveRedemptionPoints(redemptionRequests);
-  const redeemedPoints = sumRedeemedPoints(redemptionRequests);
+  const fulfilledRedemptionPoints = sumFulfilledRedemptionPoints(redemptionRequests);
+  const reservedPoints = getReservedPoints(redemptionRequests);
 
-  const balanceBeforeHolds = Math.max(0, totalPointsToDate - fulfilledPoints);
-  const computedAvailable = Math.max(0, balanceBeforeHolds - activeHoldPoints);
-
-  let totalPoints = computedAvailable;
+  const totalPoints = Math.max(0, totalPointsToDate - fulfilledRedemptionPoints);
+  let availablePoints = Math.max(0, totalPoints - reservedPoints);
 
   let calculatedPoints: number | undefined;
   let usingOverride = false;
@@ -126,21 +109,23 @@ export async function resolveRewardSummary(
   if (isPointsOverrideEnabled()) {
     const override = await loadPointsOverride(email);
     if (override !== null) {
-      totalPoints = Math.min(override, totalPointsToDate);
-      calculatedPoints = computedAvailable;
+      availablePoints = Math.min(override, totalPointsToDate);
+      calculatedPoints = Math.max(0, totalPoints - reservedPoints);
       usingOverride = true;
     }
   }
 
-  const redeemedPointsDisplay =
-    totalPointsToDate > totalPoints ? totalPointsToDate - totalPoints : redeemedPoints;
+  const redeemedPoints = fulfilledRedemptionPoints + reservedPoints;
 
   return {
     ...base,
     surveyPoints,
     totalPointsToDate,
-    redeemedPoints: redeemedPointsDisplay,
     totalPoints,
+    availablePoints,
+    fulfilledRedemptionPoints,
+    reservedPoints,
+    redeemedPoints,
     ...(calculatedPoints !== undefined ? { calculatedPoints, usingOverride } : {}),
   };
 }

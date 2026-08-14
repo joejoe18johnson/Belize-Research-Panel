@@ -1,7 +1,7 @@
 import type { DashboardRewardSummary } from "@/lib/panelist-dashboard";
 import type { RedemptionRequest } from "@/lib/reward-redemption";
 import type { RewardsHistoryEntry } from "@/lib/rewards-history";
-import { getAvailablePoints, getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
+import { getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption";
 import type { RewardSettings } from "@/lib/reward-settings";
 import { redemptionRateLabel } from "@/lib/reward-settings";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -30,7 +30,7 @@ export function DashboardRewardsSection({
   rewardSettings: RewardSettings;
   showDevPointsEditor?: boolean;
 }) {
-  const availablePoints = getAvailablePoints(rewards.totalPoints, redemptionRequests);
+  const availablePoints = rewards.availablePoints;
   const redemptionMinimum = rewardSettings.redemptionMinimumPoints;
   const redemptionRateLabelText = redemptionRateLabel(rewardSettings);
   const progressPercent = Math.min(100, Math.round((availablePoints / redemptionMinimum) * 100));
@@ -56,7 +56,7 @@ export function DashboardRewardsSection({
                 <p className="mt-1 text-xs text-teal-100/90">{redemptionRateLabelText}</p>
                 {getReservedPoints(redemptionRequests) > 0 ? (
                   <p className="mt-2 text-xs text-teal-100/90">
-                    {getReservedPoints(redemptionRequests)} pts reserved on pending requests
+                    {rewards.reservedPoints} pts reserved on pending requests
                   </p>
                 ) : null}
               </div>
@@ -98,12 +98,30 @@ export function DashboardRewardsSection({
                   <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate}</span>
                 </div>
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-                  {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative ·{" "}
+                  {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative
+                </p>
+                <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
                   {rewards.registrationPoints} registration + {rewards.verificationPoints} verification +{" "}
-                  {rewards.surveyPoints} surveys
+                  {rewards.surveyPoints} surveys = {rewards.totalPointsToDate}
                 </p>
               </li>
-              {rewards.redeemedPoints > 0 ? (
+              {rewards.fulfilledRedemptionPoints > 0 ? (
+                <li className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                  <span>{formatHeadingCase("Redeemed (completed payouts)")}</span>
+                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                    −{rewards.fulfilledRedemptionPoints}
+                  </span>
+                </li>
+              ) : null}
+              {rewards.reservedPoints > 0 ? (
+                <li className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
+                  <span>{formatHeadingCase("Reserved (pending payouts)")}</span>
+                  <span className="font-semibold">−{rewards.reservedPoints}</span>
+                </li>
+              ) : null}
+              {rewards.redeemedPoints > 0 &&
+              rewards.fulfilledRedemptionPoints === 0 &&
+              rewards.reservedPoints === 0 ? (
                 <li className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-zinc-700 dark:text-zinc-300">
                   <span>{formatHeadingCase("Redeemed or reserved")}</span>
                   <span className="font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">−{rewards.redeemedPoints}</span>
@@ -115,10 +133,11 @@ export function DashboardRewardsSection({
                   <span className="text-lg font-bold text-teal-900 dark:text-teal-100">{availablePoints}</span>
                 </div>
                 <p className="mt-1 text-xs text-teal-800/80">
-                  {formatBz(pointsToBz(availablePoints))} ·{" "}
-                  {rewards.redeemedPoints > 0 || getReservedPoints(redemptionRequests) > 0
-                    ? `${rewards.totalPointsToDate} earned minus ${rewards.redeemedPoints} redeemed or reserved`
-                    : formatHeadingCase("matches points earned to date when nothing has been redeemed")}
+                  {formatBz(pointsToBz(availablePoints))} · {rewards.totalPointsToDate} earned
+                  {rewards.redeemedPoints > 0
+                    ? ` minus ${rewards.redeemedPoints} redeemed or reserved`
+                    : ""}{" "}
+                  = {availablePoints} available
                 </p>
               </li>
               <li className="flex items-center justify-between gap-4 text-zinc-700 dark:text-zinc-300">
