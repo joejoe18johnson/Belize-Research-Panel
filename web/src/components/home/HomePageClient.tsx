@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
   HOME_COPY,
@@ -161,7 +162,14 @@ export function HomePageClient() {
           : "min-h-screen bg-gradient-to-b from-teal-50 via-white to-zinc-50 text-zinc-900"
       }
     >
-      <header className="safe-top relative mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
+      <div
+        className={`safe-top sticky top-0 z-30 border-b backdrop-blur-md ${
+          onDarkHero
+            ? "border-white/10 bg-teal-950/90"
+            : "border-teal-100 bg-white/95 dark:border-teal-900/50 dark:bg-zinc-900/95"
+        }`}
+      >
+        <header className="relative mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-between gap-3">
           <BrpLogoLink href="/" variant={onDarkHero ? "dark" : "light"} />
 
@@ -232,7 +240,8 @@ export function HomePageClient() {
             </Link>
           </div>
         ) : null}
-      </header>
+        </header>
+      </div>
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16">
         <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)]">
@@ -398,6 +407,7 @@ export function HomePageClient() {
           </div>
         </section>
       </main>
+      <BackToTopButton />
     </div>
   );
 }

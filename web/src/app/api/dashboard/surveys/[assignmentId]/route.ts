@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSessionAccount } from "@/lib/auth";
 import { sendSurveyCompletedEmail } from "@/lib/email/process-emails";
 import { findPanelistByEmail } from "@/lib/panelists";
@@ -91,6 +92,10 @@ export async function POST(
           origin: new URL(request.url).origin,
         });
       }
+
+      revalidatePath("/dashboard");
+      revalidatePath("/dashboard/rewards");
+      revalidatePath("/dashboard/surveys");
 
       return NextResponse.json({
         ok: true,
