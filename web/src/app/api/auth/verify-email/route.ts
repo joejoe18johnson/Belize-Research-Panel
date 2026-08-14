@@ -1,24 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccountEmail } from "@/lib/accounts";
-import { setSessionCookie } from "@/lib/auth";
+import { resolveRequestOrigin, setSessionCookie } from "@/lib/auth";
+
+function redirectTo(request: NextRequest, path: string): NextResponse {
+  return NextResponse.redirect(new URL(path, resolveRequestOrigin(request)));
+}
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token")?.trim() ?? "";
   const purpose = request.nextUrl.searchParams.get("purpose")?.trim() ?? "";
 
   if (!token) {
-    return NextResponse.redirect(new URL("/verify-email?error=missing", request.url));
+    return redirectTo(request, "/verify-email?error=missing");
   }
 
   if (purpose === "email-change") {
-    return NextResponse.redirect(new URL(`/verify-email?token=${encodeURIComponent(token)}&purpose=email-change`, request.url));
+    return redirectTo(
+      request,
+      `/verify-email?token=${encodeURIComponent(token)}&purpose=email-change`
+    );
   }
 
-  const account = await verifyAccountEmail(token);
-  if (!account) {
-    return NextResponse.redirect(new URL("/verify-email?error=expired", request.url));
-  }
+  try {
+    const account = await verifyAccountEmail(token);
+    if (!account) {
+      return redirectTo(request, "/verify-email?error=expired");
+    }
 
-  await setSessionCookie(account.id);
-  return NextResponse.redirect(new URL("/register", request.url));
+    await setSessionCookie(account.id);
+    return redirectTo(request, "/register");
+  } catch (error) {
+    console.error("Email verification failed:", error);
+    return redirectTo(request, "/verify-email?error=failed");
+  }
 }

@@ -35,8 +35,12 @@ function db() {
   return getSupabaseAdmin();
 }
 
-function throwIfError(error: { message: string } | null): void {
-  if (error) throw new Error(error.message);
+function throwIfError(error: { message: string; code?: string } | null): void {
+  if (!error) return;
+  if (error.code === "23505") {
+    throw new Error("duplicate_key");
+  }
+  throw new Error(error.message);
 }
 
 export async function supabaseListAccounts(): Promise<AccountRecord[]> {
