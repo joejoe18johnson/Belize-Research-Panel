@@ -37,12 +37,13 @@ async function loadAccountsRaw(): Promise<AccountRecord[]> {
 }
 
 async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
-  const { useSupabase } = await import("./supabase/data-source");
+  const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
   if (useSupabase()) {
     const { supabaseUpsertAccounts } = await import("./supabase/repos");
     await supabaseUpsertAccounts(accounts);
     return;
   }
+  assertCanPersistData();
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), "utf-8");
 }
@@ -267,7 +268,7 @@ export async function createAccount(input: {
     hold_reason: "",
   };
 
-  const { useSupabase } = await import("./supabase/data-source");
+  const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
   if (useSupabase()) {
     const { supabaseInsertAccount } = await import("./supabase/repos");
     try {
@@ -281,6 +282,7 @@ export async function createAccount(input: {
     return { account, verificationToken };
   }
 
+  assertCanPersistData();
   const accounts = await loadAccountsRaw();
   accounts.push(account);
   await saveAccountsRaw(accounts);

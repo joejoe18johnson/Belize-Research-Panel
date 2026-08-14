@@ -42,6 +42,15 @@ export async function POST(request: NextRequest) {
           { status: 409 }
         );
       }
+      if (error instanceof Error && error.message === "storage_not_configured") {
+        return NextResponse.json(
+          {
+            message:
+              "Account storage is not configured on this server. The site administrator must add Supabase environment variables in the hosting dashboard.",
+          },
+          { status: 503 }
+        );
+      }
       throw error;
     }
 

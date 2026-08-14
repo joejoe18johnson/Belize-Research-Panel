@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { getSiteUrl } from "@/lib/seo/site-config";
 import { cookies } from "next/headers";
 import type { SessionAccount } from "./auth-types";
 import { findAccountById, toSessionAccount } from "./accounts";
@@ -87,8 +87,13 @@ export function resolveRequestOrigin(request: { headers: Headers; nextUrl: { ori
 
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   if (host) {
-    const proto = request.headers.get("x-forwarded-proto") ?? "http";
+    const proto = request.headers.get("x-forwarded-proto") ?? "https";
     return normalizeAppOrigin(`${proto}://${host}`);
+  }
+
+  const siteUrl = getSiteUrl();
+  if (siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("0.0.0.0")) {
+    return normalizeAppOrigin(siteUrl);
   }
 
   return normalizeAppOrigin(request.nextUrl.origin);
