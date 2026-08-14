@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { RegistrationForm } from "@/components/registration/RegistrationForm";
@@ -62,7 +63,7 @@ export function RegistrationPageClient({
   if (!languageConfirmed) {
     return (
       <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
-        <header className="safe-top border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
           <div className={`${appContentClass} flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4`}>
             <BrpLogoLink href="/" variant="light" />
             <ThemeToggle compact />
@@ -83,13 +84,14 @@ export function RegistrationPageClient({
             </div>
           </div>
         </main>
+        <BackToTopButton />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
-      <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
         <div className={`relative ${appContentClass} flex min-w-0 items-center justify-center px-3 py-3 pr-[9.5rem] sm:px-4 sm:py-4 sm:pr-4`}>
           <BrpLogoLink href="/" variant="light" />
           <div className="absolute right-3 flex items-center gap-2 text-sm sm:right-4 sm:gap-3">
