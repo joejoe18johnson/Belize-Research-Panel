@@ -62,7 +62,9 @@
     "Toledo West"
   ],
   "CONSTITUENCY_CTV": {
-    "Albert": [],
+    "Albert": [
+      "Belize City"
+    ],
     "Belize Rural Central": [
       "Gales Point",
       "Gracie Rock",
@@ -99,8 +101,12 @@
       "Caye Caulker",
       "San Pedro A.C."
     ],
-    "Belmopan": [],
-    "Caribbean Shores": [],
+    "Belmopan": [
+      "Belmopan"
+    ],
+    "Caribbean Shores": [
+      "Belize City"
+    ],
     "Cayo Central": [
       "Bradley's Bank",
       "Buena Vista",
@@ -149,7 +155,9 @@
       "Calla Creek",
       "Succotz"
     ],
-    "Collet": [],
+    "Collet": [
+      "Belize City"
+    ],
     "Corozal Bay": [],
     "Corozal North": [
       "Chan Chen",
@@ -188,10 +196,18 @@
       "Hope Creek",
       "Sarawee"
     ],
-    "Fort George": [],
-    "Freetown": [],
-    "Lake Independence": [],
-    "Mesopotamia": [],
+    "Fort George": [
+      "Belize City"
+    ],
+    "Freetown": [
+      "Belize City"
+    ],
+    "Lake Independence": [
+      "Belize City"
+    ],
+    "Mesopotamia": [
+      "Belize City"
+    ],
     "Orange Walk Central": [
       "Orange Walk Town",
       "San Estevan"
@@ -223,9 +239,15 @@
       "Trinidad",
       "Yo Creek"
     ],
-    "Pickstock": [],
-    "Port Loyola": [],
-    "Queen Square": [],
+    "Pickstock": [
+      "Belize City"
+    ],
+    "Port Loyola": [
+      "Belize City"
+    ],
+    "Queen Square": [
+      "Belize City"
+    ],
     "Stann Creek West": [
       "Alta Vista",
       "Georgetown",
@@ -329,6 +351,7 @@
   },
   "CITY_TOWN_VILLAGE": {
     "Belize District": [
+      "Belize City",
       "Bermudian Landing",
       "Biscayne",
       "Bomba",
@@ -366,6 +389,7 @@
       "Arenal",
       "Armenia",
       "Benque Viejo",
+      "Belmopan",
       "Billy White",
       "Blackman Eddy",
       "Bradley's Bank",
