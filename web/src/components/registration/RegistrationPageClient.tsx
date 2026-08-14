@@ -123,6 +123,7 @@ export function RegistrationPageClient({
         </div>
         <RegistrationForm account={account} />
       </main>
+      <BackToTopButton />
     </div>
   );
 }

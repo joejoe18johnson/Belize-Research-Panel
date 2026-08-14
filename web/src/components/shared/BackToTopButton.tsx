@@ -17,19 +17,29 @@ export function BackToTopButton({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    let container: HTMLElement | null = null;
+
     const update = () => {
       const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
-      const container = scrollContainerRef?.current ?? null;
-      setVisible(readScrollOffset(windowScroll, container) > showAfter);
+      setVisible(readScrollOffset(windowScroll, scrollContainerRef?.current ?? null) > showAfter);
+    };
+
+    const bindContainer = () => {
+      const next = scrollContainerRef?.current ?? null;
+      if (next === container) return;
+      container?.removeEventListener("scroll", update);
+      container = next;
+      container?.addEventListener("scroll", update, { passive: true });
+      update();
     };
 
     update();
+    bindContainer();
     window.addEventListener("scroll", update, { passive: true });
-
-    const container = scrollContainerRef?.current;
-    container?.addEventListener("scroll", update, { passive: true });
+    const frame = window.requestAnimationFrame(bindContainer);
 
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
       container?.removeEventListener("scroll", update);
     };
