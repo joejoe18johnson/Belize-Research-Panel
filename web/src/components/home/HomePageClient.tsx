@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeToggle, ThemeMenuToggle } from "@/components/theme/ThemeToggle";
+import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
@@ -170,17 +170,18 @@ export function HomePageClient() {
         }`}
       >
         <header className="relative mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
-        <div className="flex items-center justify-between gap-3">
-          <BrpLogoLink href="/" variant={onDarkHero ? "dark" : "light"} />
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <BrpLogoLink href="/" variant={onDarkHero ? "dark" : "light"} className="min-w-0 shrink" />
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher
               locale={locale}
               onChange={handleLocaleChange}
               variant={onDarkHero ? "dark" : "light"}
             />
 
-            <div className="hidden items-center gap-3 sm:flex">
+            <div className="hidden items-center gap-2 sm:flex sm:gap-3">
+              <ThemeSwitch variant={onDarkHero ? "dark" : "light"} compact />
               <Link href="/login" className={loginLinkClassDesktop}>
                 {t(copy.logIn)}
               </Link>
@@ -195,10 +196,10 @@ export function HomePageClient() {
 
             <button
               type="button"
-              className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg sm:hidden ${
+              className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-lg sm:hidden ${
                 onDarkHero
                   ? "border border-white/20 text-teal-100 hover:bg-white/10"
-                  : "border border-teal-200 text-teal-800 hover:bg-teal-50"
+                  : "border border-teal-200 text-teal-800 hover:bg-teal-50 dark:border-teal-700 dark:text-teal-100 dark:hover:bg-teal-900/40"
               }`}
               aria-expanded={mobileMenuOpen}
               aria-controls="home-mobile-menu"
@@ -215,8 +216,6 @@ export function HomePageClient() {
                 </svg>
               )}
             </button>
-
-            <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact className="hidden sm:inline-flex" />
           </div>
         </div>
 

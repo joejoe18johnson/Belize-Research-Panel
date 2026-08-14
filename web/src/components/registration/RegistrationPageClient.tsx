@@ -6,7 +6,7 @@ import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { RegistrationForm } from "@/components/registration/RegistrationForm";
 import { RegistrationLanguageStep } from "@/components/registration/RegistrationLanguageStep";
 import type { RegistrationAccountContext } from "@/components/registration/RegistrationForm";
@@ -64,9 +64,14 @@ export function RegistrationPageClient({
     return (
       <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
         <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
-          <div className={`${appContentClass} flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4`}>
-            <BrpLogoLink href="/" variant="light" />
-            <ThemeToggle compact />
+          <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
+            <div className="flex items-center justify-between gap-3">
+              <BrpLogoLink href="/" variant="light" />
+              <ThemeSwitch compact className="hidden sm:inline-flex" />
+            </div>
+            <div className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800 sm:hidden">
+              <ThemeMenuToggle variant="light" />
+            </div>
           </div>
         </header>
         <main className={`${appContentClass} px-3 py-8 sm:px-4 sm:py-16`}>
@@ -92,19 +97,24 @@ export function RegistrationPageClient({
   return (
     <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
       <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
-        <div className={`relative ${appContentClass} flex min-w-0 items-center justify-center px-3 py-3 pr-[9.5rem] sm:px-4 sm:py-4 sm:pr-4`}>
-          <BrpLogoLink href="/" variant="light" />
-          <div className="absolute right-3 flex items-center gap-2 text-sm sm:right-4 sm:gap-3">
-            <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />
-            <Link
-              href="/account/delete"
-              className="hidden text-xs font-medium text-zinc-500 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200 sm:inline"
-            >
-              {formatHeadingCase("Delete account")}
-            </Link>
-            <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 md:inline">{account.email}</span>
-            <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 sm:px-4" />
-            <ThemeToggle compact />
+        <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />
+              <Link
+                href="/account/delete"
+                className="hidden text-xs font-medium text-zinc-500 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200 sm:inline"
+              >
+                {formatHeadingCase("Delete account")}
+              </Link>
+              <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 md:inline">{account.email}</span>
+              <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 sm:px-4" />
+              <ThemeSwitch compact className="hidden sm:inline-flex" />
+            </div>
+          </div>
+          <div className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800 sm:hidden">
+            <ThemeMenuToggle variant="light" />
           </div>
         </div>
       </header>
