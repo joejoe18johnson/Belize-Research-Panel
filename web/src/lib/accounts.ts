@@ -120,6 +120,11 @@ export function getAccountContactHoldState(record: AccountRecord): AccountContac
 
 export async function findAccountByEmail(email: string): Promise<AccountRecord | null> {
   const normalized = cleanText(email).toLowerCase();
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseFindAccountByEmail } = await import("./supabase/repos");
+    return supabaseFindAccountByEmail(normalized);
+  }
   const accounts = await loadAccountsRaw();
   return accounts.find((account) => cleanText(account.email).toLowerCase() === normalized) ?? null;
 }
@@ -131,6 +136,11 @@ export async function findAccountById(id: string): Promise<AccountRecord | null>
 
 export async function findAccountByVerificationToken(token: string): Promise<AccountRecord | null> {
   if (!token) return null;
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseFindAccountByVerificationToken } = await import("./supabase/repos");
+    return supabaseFindAccountByVerificationToken(token);
+  }
   const accounts = await loadAccountsRaw();
   return accounts.find((account) => account.verification_token === token) ?? null;
 }
@@ -257,6 +267,13 @@ export async function createAccount(input: {
     hold_reason: "",
   };
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseInsertAccount } = await import("./supabase/repos");
+    await supabaseInsertAccount(account);
+    return { account, verificationToken };
+  }
+
   const accounts = await loadAccountsRaw();
   accounts.push(account);
   await saveAccountsRaw(accounts);
@@ -267,17 +284,26 @@ export async function verifyAccountEmail(token: string): Promise<AccountRecord |
   const account = await findAccountByVerificationToken(token);
   if (!account) return null;
 
+  const updated: AccountRecord = {
+    ...account,
+    email_verified: "true",
+    verification_token: "",
+  };
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpdateAccount } = await import("./supabase/repos");
+    await supabaseUpdateAccount(updated);
+    return updated;
+  }
+
   const accounts = await loadAccountsRaw();
   const index = accounts.findIndex((row) => row.id === account.id);
   if (index < 0) return null;
 
-  accounts[index] = {
-    ...accounts[index],
-    email_verified: "true",
-    verification_token: "",
-  };
+  accounts[index] = updated;
   await saveAccountsRaw(accounts);
-  return accounts[index];
+  return updated;
 }
 
 export async function approveAccountEmailChange(
@@ -454,6 +480,15 @@ export async function releaseAccountFromFraudReview(email: string): Promise<bool
 }
 
 export async function markAccountPanelistRegistered(accountId: string): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const account = await findAccountById(accountId);
+    if (!account) return;
+    const { supabaseUpdateAccount } = await import("./supabase/repos");
+    await supabaseUpdateAccount({ ...account, panelist_registered: "true" });
+    return;
+  }
+
   const accounts = await loadAccountsRaw();
   const index = accounts.findIndex((row) => row.id === accountId);
   if (index < 0) return;

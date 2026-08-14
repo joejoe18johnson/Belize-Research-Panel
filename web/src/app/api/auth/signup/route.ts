@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
       email: result.account.email,
       verifyUrl,
     });
-  } catch {
+  } catch (error) {
+    console.error("Signup failed:", error);
     return NextResponse.json({ message: "Could not create account." }, { status: 500 });
   }
 }

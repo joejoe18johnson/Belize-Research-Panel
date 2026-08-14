@@ -35,6 +35,22 @@ function dateOnlyOrEmpty(value: string | null | undefined): string {
   return value.slice(0, 10);
 }
 
+function parseFlexibleDateOnly(value: string | null | undefined): string | null {
+  const v = cleanText(String(value ?? ""));
+  if (!v) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const dmy = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (dmy) {
+    const [, d, m, y] = dmy;
+    return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  }
+  const parsed = Date.parse(v);
+  if (!Number.isNaN(parsed)) {
+    return new Date(parsed).toISOString().slice(0, 10);
+  }
+  return null;
+}
+
 function metadataString(meta: JsonObject, key: string): string {
   const value = meta[key];
   return cleanText(typeof value === "string" ? value : "");
@@ -189,7 +205,7 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     first_name: row.first_name,
     last_name: row.last_name,
     phone: row.phone_whatsapp ?? "",
-    date_of_birth: row.dob || null,
+    date_of_birth: parseFlexibleDateOnly(row.dob) || null,
     gender: row.sex ?? "",
     district: row.district ?? "",
     constituency: row.constituency ?? "",
@@ -210,7 +226,7 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     id_verified: stringToBool(row.admin_photo_id_approved),
     password_salt: row.password_salt ?? "",
     password_hash: row.password_hash ?? "",
-    registration_date: row.registration_date || null,
+    registration_date: parseFlexibleDateOnly(row.registration_date as string),
     metadata,
   };
 }

@@ -45,6 +45,38 @@ export async function supabaseListAccounts(): Promise<AccountRecord[]> {
   return (data ?? []).map((row) => accountRowToRecord(row as Record<string, unknown>));
 }
 
+export async function supabaseFindAccountByEmail(email: string): Promise<AccountRecord | null> {
+  const normalized = cleanText(email).toLowerCase();
+  const { data, error } = await db().from("accounts").select("*").eq("email", normalized).maybeSingle();
+  throwIfError(error);
+  return data ? accountRowToRecord(data as Record<string, unknown>) : null;
+}
+
+export async function supabaseFindAccountByVerificationToken(token: string): Promise<AccountRecord | null> {
+  if (!token) return null;
+  const { data, error } = await db()
+    .from("accounts")
+    .select("*")
+    .eq("verification_token", token)
+    .maybeSingle();
+  throwIfError(error);
+  return data ? accountRowToRecord(data as Record<string, unknown>) : null;
+}
+
+export async function supabaseInsertAccount(account: AccountRecord): Promise<void> {
+  const { error } = await db().from("accounts").insert(accountRecordToRow(account));
+  throwIfError(error);
+}
+
+export async function supabaseUpdateAccount(account: AccountRecord): Promise<void> {
+  const row = accountRecordToRow(account);
+  const { error } = await db()
+    .from("accounts")
+    .update({ ...row, updated_at: new Date().toISOString() })
+    .eq("id", account.id);
+  throwIfError(error);
+}
+
 export async function supabaseUpsertAccounts(accounts: AccountRecord[]): Promise<void> {
   if (!accounts.length) return;
   const rows = accounts.map(accountRecordToRow);
@@ -58,10 +90,22 @@ export async function supabaseListPanelists(): Promise<PanelistRow[]> {
   return (data ?? []).map((row) => panelistRowToRecord(row as Record<string, unknown>));
 }
 
-export async function supabaseUpsertPanelists(rows: PanelistRow[]): Promise<void> {
+export async function supabaseUpsertPanelists(rows: PanelistRow[], options?: { accountId?: string }): Promise<void> {
   if (!rows.length) return;
-  const payload = rows.map((row) => panelistRecordToRow(row));
+  const payload = rows.map((row) => ({
+    ...panelistRecordToRow(row),
+    ...(options?.accountId ? { account_id: options.accountId } : {}),
+  }));
   const { error } = await db().from("panelists").upsert(payload, { onConflict: "email" });
+  throwIfError(error);
+}
+
+export async function supabaseInsertPanelist(row: PanelistRow, accountId?: string): Promise<void> {
+  const payload = {
+    ...panelistRecordToRow(row),
+    ...(accountId ? { account_id: accountId } : {}),
+  };
+  const { error } = await db().from("panelists").insert(payload);
   throwIfError(error);
 }
 

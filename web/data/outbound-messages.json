@@ -1,5 +1,27 @@
 [
   {
+    "id": "d8b4defb-62b8-4e63-801d-944075ecd443",
+    "sentAt": "2026-08-14T02:54:43.723Z",
+    "email": "maria.garcia.flow1786676064@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Registration received",
+    "body": "Registration received\n\n  Registration received\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Registration received\n\n            \n          \n\n          \n            \n              Hi Maria,\n\nWe received your panelist registration. Our team will review your details and verify your documents.\n\nYou can sign in anytime to check your status. We will email you when verification is complete.\n\n              \n        \n          \n            View dashboard\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "registration-submitted",
+    "deliveryStatus": "logged"
+  },
+  {
+    "id": "1e484fa2-a247-4766-beab-8d7f1fc7e74c",
+    "sentAt": "2026-08-14T02:54:25.074Z",
+    "email": "maria.garcia.flow1786676064@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Verify your email address\n\n            \n          \n\n          \n            \n              Hi Maria,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "logged"
+  },
+  {
     "id": "2e4a84fd-71ef-4517-a48e-860d76b403f0",
     "sentAt": "2026-08-14T02:52:04.379Z",
     "email": "ana.lopez.regtest1786675924@gmail.com",
