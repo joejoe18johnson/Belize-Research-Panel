@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { getSessionAccount } from "@/lib/auth";
 import { sendSurveyCompletedEmail } from "@/lib/email/process-emails";
 import { findPanelistByEmail } from "@/lib/panelists";
+import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
+import { resolveRewardSummary } from "@/lib/panelist-points";
 import { getSurveyResponse, saveSurveyProgress, submitSurveyResponse } from "@/lib/survey-responses";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 import { findSurveyDefinitionById } from "@/lib/survey-definitions";
@@ -97,11 +99,23 @@ export async function POST(
       revalidatePath("/dashboard/rewards");
       revalidatePath("/dashboard/surveys");
 
+      const panelist = await findPanelistByEmail(account.email);
+      const rewards = panelist
+        ? await resolveRewardSummary(account.email, panelistRowToDashboardProfile(panelist))
+        : null;
+
       return NextResponse.json({
         ok: true,
         submitted: true,
         points: result.points,
         progressPercent: 100,
+        rewards: rewards
+          ? {
+              availablePoints: rewards.availablePoints,
+              totalPointsToDate: rewards.totalPointsToDate,
+              surveyPoints: rewards.surveyPoints,
+            }
+          : undefined,
       });
     }
 

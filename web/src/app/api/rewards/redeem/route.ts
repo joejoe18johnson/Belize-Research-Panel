@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
       notes: validation.notes,
     });
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/rewards");
     revalidatePath("/dashboard/payouts");
 

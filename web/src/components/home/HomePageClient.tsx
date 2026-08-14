@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeToggle, ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
@@ -216,7 +216,7 @@ export function HomePageClient() {
               )}
             </button>
 
-            <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact />
+            <ThemeToggle variant={onDarkHero ? "dark" : "light"} compact className="hidden sm:inline-flex" />
           </div>
         </div>
 
@@ -229,6 +229,10 @@ export function HomePageClient() {
                 : "border-teal-200 bg-white shadow-sm dark:border-teal-800 dark:bg-zinc-900"
             }`}
           >
+            <ThemeMenuToggle
+              variant={onDarkHero ? "heroDark" : "heroLight"}
+              onActivate={() => setMobileMenuOpen(false)}
+            />
             <Link href="/login" className={loginLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
               {t(copy.logIn)}
             </Link>

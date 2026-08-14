@@ -6,6 +6,8 @@ import { privateAreaMetadata } from "@/lib/seo/metadata";
 
 export const metadata = privateAreaMetadata("Dashboard");
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {

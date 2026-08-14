@@ -77,15 +77,21 @@ function sortNotificationsNewestFirst(notifications: DashboardNotification[]): D
 }
 
 export interface DashboardRewardSummary {
+  /** Balance after fulfilled redemptions, before active holds (pending/approved requests). */
   totalPoints: number;
+  /** Spendable balance after fulfilled redemptions and active holds. */
+  availablePoints: number;
   /** Lifetime points earned (registration, verification, surveys, etc.). */
   totalPointsToDate: number;
   registrationPoints: number;
   verificationPoints: number;
   surveyPoints: number;
+  fulfilledRedemptionPoints: number;
+  reservedPoints: number;
+  /** Fulfilled redemptions plus points reserved on pending/approved requests. */
   redeemedPoints: number;
   verified: boolean;
-  /** Calculated balance before a dev override is applied. */
+  /** Calculated spendable balance before a dev override is applied. */
   calculatedPoints?: number;
   usingOverride?: boolean;
 }
@@ -156,10 +162,13 @@ export function calculateMvpRewardPoints(
 
   return {
     totalPoints: totalPointsToDate,
+    availablePoints: totalPointsToDate,
     totalPointsToDate,
     registrationPoints,
     verificationPoints,
     surveyPoints,
+    fulfilledRedemptionPoints: 0,
+    reservedPoints: 0,
     redeemedPoints: 0,
     verified,
   };
