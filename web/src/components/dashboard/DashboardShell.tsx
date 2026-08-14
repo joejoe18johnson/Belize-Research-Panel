@@ -15,6 +15,7 @@ import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { UserAvatar } from "./UserAvatar";
 
 const CONTENT_CLASS = appContentClass;
@@ -69,6 +70,7 @@ export function DashboardShell({
         ) : null}
         {children}
       </main>
+      <BackToTopButton />
     </div>
   );
 }

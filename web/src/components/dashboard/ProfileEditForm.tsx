@@ -11,7 +11,6 @@ import {
   TextInput,
 } from "@/components/registration/form-ui";
 import {
-  CIVIC_INTERESTS,
   COMMONWEALTH_COUNTRIES,
   COUNTRIES,
   EDUCATION_LEVELS,
@@ -23,7 +22,6 @@ import {
   needsVoterRegistrationQuestion,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
-  POLITICAL_INTERESTS,
   VOTING_STATUS,
   CITY_TOWN_VILLAGE,
 } from "@/lib/constants";

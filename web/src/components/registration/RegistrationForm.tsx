@@ -590,15 +590,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           {form.placeOfResidence !== "Abroad" ? (
             <FormSection step={8} title="Market research interests">
               <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                Select the product and service topics you are willing to give feedback on. Political and social poll
-                topics are matched separately when you are eligible for those studies.
+                Select the product and service topics you are willing to give feedback on.
               </p>
               <Field label="Select all that apply" required error={fieldError("marketInterests")}>
                 <MultiSelect options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests"); }} error={fieldError("marketInterests")} />
               </Field>
             </FormSection>
           ) : (
-            <Alert variant="info">Persons living abroad are eligible for political/election polls and diaspora-focused research where applicable. Market research interests are collected for residents in Belize.</Alert>
+            <Alert variant="info">Persons living abroad may receive diaspora-focused research where applicable. Market research interests are collected for residents in Belize.</Alert>
           )}
         </>
       ) : null}

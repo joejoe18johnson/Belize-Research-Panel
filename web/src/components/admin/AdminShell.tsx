@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
+import { BackToTopButton } from "@/components/shared/BackToTopButton";
+import { portalStickyHeaderClass } from "@/lib/brand";
 import type { AdminSession } from "@/lib/admin-auth";
 import {
   ADMIN_NAV_SECTIONS,
@@ -117,6 +119,7 @@ export function AdminShell({
   navBadges?: AdminNavBadges;
 }) {
   const pathname = usePathname();
+  const mainRef = useRef<HTMLElement>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const accessibleModules = staffAccessibleModules(session.role, session.allowedModules);
   const accessibleSlugs = new Set(accessibleModules.map((module) => module.slug));
@@ -213,7 +216,7 @@ export function AdminShell({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_10rem,#09090b_100%)]">
+    <div className="flex min-h-0 flex-1 flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)] max-lg:h-dvh max-lg:max-h-dvh max-lg:overflow-hidden dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_10rem,#09090b_100%)]">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
         {mobileNavOpen ? (
           <button
@@ -237,7 +240,7 @@ export function AdminShell({
         </aside>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:overflow-hidden">
-          <header className="safe-top shrink-0 border-b border-teal-100 bg-white/90 px-4 py-3 backdrop-blur-sm dark:border-teal-900/50 dark:bg-zinc-900/90 sm:px-6 sm:py-4">
+          <header className={`${portalStickyHeaderClass} px-4 py-3 sm:px-6 sm:py-4`}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
                 <AdminMobileMenuButton open={mobileNavOpen} onToggle={() => setMobileNavOpen((open) => !open)} />
@@ -261,10 +264,11 @@ export function AdminShell({
               </div>
             </div>
           </header>
-          <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-8">
+          <main ref={mainRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-8">
             {children}
           </main>
           <AdminFooter />
+          <BackToTopButton scrollContainerRef={mainRef} />
         </div>
       </div>
     </div>

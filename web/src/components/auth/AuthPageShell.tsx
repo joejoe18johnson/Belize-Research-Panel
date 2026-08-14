@@ -2,7 +2,9 @@
 
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
+import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { portalStickyHeaderClass } from "@/lib/brand";
 import { AUTH_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
@@ -21,7 +23,7 @@ export function AuthPageShell({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
-      <header className="safe-top shrink-0 border-b border-teal-100 bg-white/95 shadow-sm shadow-teal-950/5 backdrop-blur-sm dark:border-teal-900/50 dark:bg-zinc-900/95 dark:shadow-black/20">
+      <header className={portalStickyHeaderClass}>
         <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`mx-auto flex ${AUTH_CONTENT_MAX} items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4`}>
           <BrpLogoLink href="/" variant="light" />
@@ -48,6 +50,7 @@ export function AuthPageShell({
           </div>
         </div>
       </main>
+      <BackToTopButton />
     </div>
   );
 }

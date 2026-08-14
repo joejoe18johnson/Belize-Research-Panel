@@ -104,27 +104,21 @@ export async function resolveRewardSummary(
   const calculatedEarned = base.registrationPoints + base.verificationPoints + surveyPoints;
 
   const seed = await loadRewardBalanceSeed(email);
-  const totalPointsToDate =
+  const seedToDate =
     typeof seed?.totalPointsToDate === "number" && Number.isFinite(seed.totalPointsToDate)
       ? Math.max(0, Math.round(seed.totalPointsToDate))
-      : calculatedEarned;
+      : 0;
+  const totalPointsToDate = Math.max(calculatedEarned, seedToDate);
 
   const redemptionRequests = await loadRedemptionRequests(email);
   const fulfilledPoints = sumFulfilledRedemptionPoints(redemptionRequests);
   const activeHoldPoints = sumActiveRedemptionPoints(redemptionRequests);
   const redeemedPoints = sumRedeemedPoints(redemptionRequests);
 
-  let totalPoints: number;
   const balanceBeforeHolds = Math.max(0, totalPointsToDate - fulfilledPoints);
   const computedAvailable = Math.max(0, balanceBeforeHolds - activeHoldPoints);
 
-  if (typeof seed?.totalPoints === "number" && Number.isFinite(seed.totalPoints)) {
-    totalPoints = Math.max(0, Math.round(seed.totalPoints));
-  } else {
-    totalPoints = computedAvailable;
-  }
-
-  totalPoints = Math.min(totalPoints, totalPointsToDate);
+  let totalPoints = computedAvailable;
 
   let calculatedPoints: number | undefined;
   let usingOverride = false;

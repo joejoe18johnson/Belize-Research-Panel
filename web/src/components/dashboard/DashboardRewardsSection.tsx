@@ -98,8 +98,9 @@ export function DashboardRewardsSection({
                   <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate}</span>
                 </div>
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-                  {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative · registration, verification, and
-                  completed surveys
+                  {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative ·{" "}
+                  {rewards.registrationPoints} registration + {rewards.verificationPoints} verification +{" "}
+                  {rewards.surveyPoints} surveys
                 </p>
               </li>
               {rewards.redeemedPoints > 0 ? (
@@ -115,9 +116,9 @@ export function DashboardRewardsSection({
                 </div>
                 <p className="mt-1 text-xs text-teal-800/80">
                   {formatBz(pointsToBz(availablePoints))} ·{" "}
-                  {rewards.redeemedPoints > 0
-                    ? formatHeadingCase("earned to date minus redemptions")
-                    : formatHeadingCase("same as earned to date when nothing has been redeemed")}
+                  {rewards.redeemedPoints > 0 || getReservedPoints(redemptionRequests) > 0
+                    ? `${rewards.totalPointsToDate} earned minus ${rewards.redeemedPoints} redeemed or reserved`
+                    : formatHeadingCase("matches points earned to date when nothing has been redeemed")}
                 </p>
               </li>
               <li className="flex items-center justify-between gap-4 text-zinc-700 dark:text-zinc-300">
