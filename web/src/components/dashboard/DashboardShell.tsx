@@ -34,40 +34,44 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   return (
-    <div className={dashboardShellClass}>
-      <header className={dashboardHeaderClass}>
+    <div className={`${dashboardShellClass} w-full max-w-full overflow-x-clip`}>
+      <header className={`${dashboardHeaderClass} w-full max-w-full overflow-x-clip`}>
         <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
-        <div className={`${CONTENT_CLASS} flex min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-4 sm:py-4`}>
-          <BrpLogoLink href="/dashboard" variant="light" className="min-w-0" logoClassName="sm:text-base" />
-          <div className="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
-            <PointsBalanceLink availablePoints={badges.availablePoints} />
-            <NotificationBellLink unreadCount={badges.unreadNotifications} />
-            <Link
-              href="/dashboard/profile"
-              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:min-h-11 sm:min-w-11 md:min-w-0 md:gap-2.5"
-              aria-label="View profile"
-            >
-              <UserAvatar firstName={firstName} email={email} />
-              <div className="hidden min-w-0 md:block">
-                {firstName.trim() ? (
-                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{firstName}</p>
-                ) : null}
-                <p className="truncate text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{email}</p>
-              </div>
-            </Link>
-            <LogoutButton className="flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-2.5 text-xs font-semibold text-teal-900 dark:text-teal-100 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:min-h-11 sm:px-4 sm:text-sm" />
-            <ThemeSwitch compact className="hidden lg:inline-flex" />
+        <div className={`${CONTENT_CLASS} min-w-0 px-3 py-2.5 sm:px-4 sm:py-3`}>
+          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
+            <BrpLogoLink href="/dashboard" variant="light" className="min-w-0 shrink" logoClassName="sm:text-base" />
+            <div className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1.5">
+              <PointsBalanceLink availablePoints={badges.availablePoints} />
+              <NotificationBellLink unreadCount={badges.unreadNotifications} />
+              <Link
+                href="/dashboard/profile"
+                className="flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:h-11 sm:w-11 md:w-auto md:min-w-0 md:gap-2.5 md:px-1"
+                aria-label="View profile"
+              >
+                <UserAvatar firstName={firstName} email={email} />
+                <div className="hidden min-w-0 md:block">
+                  {firstName.trim() ? (
+                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{firstName}</p>
+                  ) : null}
+                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{email}</p>
+                </div>
+              </Link>
+              <LogoutButton
+                compact
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:hidden"
+              />
+              <LogoutButton className="hidden min-h-11 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:flex" />
+              <ThemeSwitch compact className="hidden lg:inline-flex" />
+            </div>
           </div>
-        </div>
-        <div className="border-t border-teal-50 bg-white px-3 py-2 dark:border-teal-900/40 dark:bg-zinc-900 lg:hidden">
-          <div className={CONTENT_CLASS}>
+          <div className="mt-2 border-t border-teal-50 pt-2 dark:border-teal-900/40 lg:hidden">
             <ThemeMenuToggle variant="light" />
           </div>
         </div>
         <DashboardNav badges={badges} />
       </header>
       <NewSurveyAlertBanner newSurveyCount={badges.newSurveys} />
-      <main className={`${CONTENT_CLASS} min-w-0 px-3 py-5 sm:px-4 sm:py-8`}>
+      <main className={`${CONTENT_CLASS} relative z-0 min-w-0 max-w-full px-3 py-5 sm:px-4 sm:py-8`}>
         {verificationStatus && !isAccountVerified(verificationStatus) ? (
           <div className="mb-6">
             <AccountNotVerifiedBanner verificationStatus={verificationStatus} />

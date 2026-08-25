@@ -58,10 +58,10 @@ export function BrandedAlert({
 }) {
   return (
     <div
-      className={`rounded-xl text-sm ${brandedAlertSurfaceClass[tone]} ${compact ? "px-3 py-2.5" : "px-4 py-3.5"} ${className}`}
+      className={`w-full min-w-0 rounded-xl text-sm ${brandedAlertSurfaceClass[tone]} ${compact ? "px-3 py-2.5" : "px-4 py-3.5"} ${className}`}
       role={tone === "error" ? "alert" : "status"}
     >
-      <div className={`flex ${showIcon ? "gap-3" : ""}`}>
+      <div className={`flex w-full min-w-0 ${showIcon ? "flex-col gap-3 sm:flex-row sm:items-start sm:gap-3" : ""}`}>
         {showIcon ? (
           <span
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${brandedAlertIconWrapClass[tone]}`}
@@ -69,9 +69,13 @@ export function BrandedAlert({
             <FeedbackIcon tone={tone} />
           </span>
         ) : null}
-        <div className="min-w-0 flex-1">
-          {title ? <p className="font-semibold">{formatHeadingCase(title)}</p> : null}
-          <div className={title ? "mt-1 leading-relaxed opacity-90" : "leading-relaxed"}>{formatSiteText(children)}</div>
+        <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+          {title ? <p className="font-semibold leading-snug">{formatHeadingCase(title)}</p> : null}
+          <div
+            className={`${title ? "mt-1 space-y-2 leading-relaxed opacity-90" : "leading-relaxed"} [&_a]:inline-flex [&_p]:break-words`}
+          >
+            {formatSiteText(children)}
+          </div>
         </div>
       </div>
     </div>

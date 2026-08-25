@@ -14,7 +14,7 @@ export const dashboardShellClass =
   "min-h-screen bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_12rem,#09090b_100%)]";
 
 export const dashboardHeaderClass =
-  "safe-top sticky top-0 z-30 border-b border-teal-100 bg-white/95 shadow-sm shadow-teal-950/5 backdrop-blur-sm dark:border-teal-900/50 dark:bg-zinc-900/95 dark:shadow-black/20";
+  "safe-top sticky top-0 z-30 border-b border-teal-100 bg-white shadow-sm shadow-teal-950/5 dark:border-teal-900/50 dark:bg-zinc-900 dark:shadow-black/20 lg:bg-white/95 lg:backdrop-blur-sm dark:lg:bg-zinc-900/95";
 
 /** Sticky portal header — admin, client, auth, and similar logged-in shells. */
 export const portalStickyHeaderClass =

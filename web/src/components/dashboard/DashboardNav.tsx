@@ -22,11 +22,12 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
   const pathname = usePathname();
 
   return (
-    <nav className="border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30" aria-label="Dashboard sections">
-      <div className="nav-scroll overflow-x-auto overscroll-x-contain">
-        <div
-          className={`mx-auto flex w-max min-w-full max-w-none snap-x snap-mandatory justify-start gap-1.5 px-3 py-2.5 sm:w-full sm:justify-center sm:gap-2 sm:px-4 sm:py-3 ${APP_CONTENT_MAX}`}
-        >
+    <nav
+      className="max-w-full overflow-x-hidden border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30 dark:border-teal-900/40 dark:from-zinc-900 dark:to-zinc-900/80"
+      aria-label="Dashboard sections"
+    >
+      <div className={`nav-scroll mx-auto w-full max-w-full overflow-x-auto overscroll-x-contain ${APP_CONTENT_MAX}`}>
+        <div className="flex w-max min-w-full items-center justify-start gap-1.5 px-3 py-2.5 sm:mx-auto sm:w-full sm:justify-center sm:gap-2 sm:px-4 sm:py-3">
           {DASHBOARD_NAV_SECTIONS.map((item) => {
             const active = isActive(pathname, item.href, item.exact);
             const badgeKey = NAV_BADGE_KEYS[item.href];
@@ -38,7 +39,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`inline-flex min-h-10 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition sm:min-h-11 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm ${
+                className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition sm:min-h-11 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm ${
                   active
                     ? "bg-teal-700 text-white shadow-md shadow-teal-900/20"
                     : "text-teal-900/70 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100"
