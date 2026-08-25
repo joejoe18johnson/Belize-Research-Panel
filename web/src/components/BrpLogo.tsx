@@ -32,19 +32,11 @@ export function BrpLogoText({
 
   return (
     <span
-      className={`inline-flex items-baseline gap-0.5 text-sm font-bold tracking-tight sm:text-base ${className}`.trim()}
+      className={`inline-flex max-w-[12.5rem] flex-wrap items-baseline gap-x-1 text-[0.8125rem] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base ${className}`.trim()}
       aria-label="Belize Research Panel"
     >
-      <span
-        className={`whitespace-nowrap sm:hidden ${isDark ? "text-white" : "text-teal-950 dark:text-teal-100"}`}
-        aria-hidden
-      >
-        BRP
-      </span>
-      <span className="hidden items-baseline gap-0.5 whitespace-nowrap sm:inline-flex">
-        <span className={isDark ? "text-teal-200" : "text-teal-700 dark:text-teal-300"}>Belize</span>
-        <span className={isDark ? "text-white" : "text-teal-950 dark:text-teal-100"}>Research Panel</span>
-      </span>
+      <span className={isDark ? "text-teal-200" : "text-teal-700 dark:text-teal-300"}>Belize</span>
+      <span className={isDark ? "text-white" : "text-teal-950 dark:text-teal-100"}>Research Panel</span>
     </span>
   );
 }
