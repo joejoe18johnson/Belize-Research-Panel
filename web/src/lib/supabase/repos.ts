@@ -104,10 +104,34 @@ export async function supabaseUpsertPanelists(rows: PanelistRow[], options?: { a
   throwIfError(error);
 }
 
-export async function supabaseInsertPanelist(row: PanelistRow, accountId?: string): Promise<void> {
+export async function supabaseUploadPanelistFile(
+  accountId: string,
+  kind: "photo_id" | "residence_proof",
+  file: File
+): Promise<string> {
+  const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : ".bin";
+  const storagePath = `${accountId}/${kind}-${Date.now()}${ext}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const { error } = await db()
+    .storage.from("panelist-documents")
+    .upload(storagePath, buffer, {
+      contentType: file.type || "application/octet-stream",
+      upsert: true,
+    });
+  throwIfError(error);
+  return storagePath;
+}
+
+export async function supabaseInsertPanelist(
+  row: PanelistRow,
+  accountId?: string,
+  options?: { photoIdPath?: string; residenceProofPath?: string }
+): Promise<void> {
   const payload = {
     ...panelistRecordToRow(row),
     ...(accountId ? { account_id: accountId } : {}),
+    ...(options?.photoIdPath ? { photo_id_path: options.photoIdPath } : {}),
+    ...(options?.residenceProofPath ? { residence_proof_path: options.residenceProofPath } : {}),
   };
   const { error } = await db().from("panelists").insert(payload);
   throwIfError(error);

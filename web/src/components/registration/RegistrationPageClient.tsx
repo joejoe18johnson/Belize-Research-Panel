@@ -95,7 +95,7 @@ export function RegistrationPageClient({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 overscroll-y-contain">
       <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
         <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
           <div className="flex min-w-0 items-center justify-between gap-2">

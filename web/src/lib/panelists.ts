@@ -354,11 +354,35 @@ export async function registerPanelist(
   const now = new Date();
   const registrationDate = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-  if (data.photoIdFile) {
-    await saveUploadedFile(data.photoIdFile, `photo-id-${cleanText(username)}`);
-  }
-  if (data.proofOfBelizeResidenceFile) {
-    await saveUploadedFile(data.proofOfBelizeResidenceFile, `residence-proof-${cleanText(username)}`);
+  const { useSupabase } = await import("./supabase/data-source");
+  let photoIdPath = "";
+  let residenceProofPath = "";
+
+  if (useSupabase()) {
+    const { supabaseUploadPanelistFile } = await import("./supabase/repos");
+    const folderId = credentials?.accountId ?? cleanText(username);
+    try {
+      if (data.photoIdFile) {
+        photoIdPath = await supabaseUploadPanelistFile(folderId, "photo_id", data.photoIdFile);
+      }
+      if (data.proofOfBelizeResidenceFile) {
+        residenceProofPath = await supabaseUploadPanelistFile(
+          folderId,
+          "residence_proof",
+          data.proofOfBelizeResidenceFile
+        );
+      }
+    } catch (error) {
+      console.error("Panelist document upload failed:", error);
+      throw new Error("document_upload_failed");
+    }
+  } else {
+    if (data.photoIdFile) {
+      await saveUploadedFile(data.photoIdFile, `photo-id-${cleanText(username)}`);
+    }
+    if (data.proofOfBelizeResidenceFile) {
+      await saveUploadedFile(data.proofOfBelizeResidenceFile, `residence-proof-${cleanText(username)}`);
+    }
   }
 
   const newRow: PanelistRow = {
@@ -411,10 +435,12 @@ export async function registerPanelist(
 
   rows.push(newRow);
 
-  const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
     const { supabaseInsertPanelist } = await import("./supabase/repos");
-    await supabaseInsertPanelist(newRow, credentials?.accountId);
+    await supabaseInsertPanelist(newRow, credentials?.accountId, {
+      photoIdPath: photoIdPath || undefined,
+      residenceProofPath: residenceProofPath || undefined,
+    });
     return { verificationStatus };
   }
 

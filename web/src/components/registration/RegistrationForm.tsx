@@ -63,6 +63,13 @@ import {
   validatePhasesThrough,
   validateRegistrationPhase,
 } from "@/lib/registration-progress";
+import {
+  clearRegistrationDraft,
+  draftRestoredFileHint,
+  loadRegistrationDraft,
+  mergeDraftIntoForm,
+  saveRegistrationDraft,
+} from "@/lib/registration-draft-storage";
 
 function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
   if (!errors[key]) return errors;
@@ -80,9 +87,8 @@ export interface RegistrationAccountContext {
   dob?: string;
 }
 
-export function RegistrationForm({ account }: { account: RegistrationAccountContext }) {
-  const router = useRouter();
-  const [form, setForm] = useState<RegistrationFormData>(() => ({
+function buildInitialForm(account: RegistrationAccountContext): RegistrationFormData {
+  return {
     ...initialRegistrationForm,
     firstName: account.firstName,
     lastName: account.lastName,
@@ -90,13 +96,38 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     citizenshipStatus: account.citizenshipStatus ?? "",
     commonwealthCountry: account.commonwealthCountry ?? "",
     dob: account.dob ?? "",
-  }));
+  };
+}
+
+export function RegistrationForm({ account }: { account: RegistrationAccountContext }) {
+  const router = useRouter();
+  const [form, setForm] = useState<RegistrationFormData>(() => {
+    const base = buildInitialForm(account);
+    const draft = loadRegistrationDraft(account.email);
+    return draft ? mergeDraftIntoForm(base, draft) : base;
+  });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [activePhaseIndex, setActivePhaseIndex] = useState(0);
+  const [activePhaseIndex, setActivePhaseIndex] = useState(() => {
+    const draft = loadRegistrationDraft(account.email);
+    return draft?.activePhaseIndex ?? 0;
+  });
+  const [draftNotice, setDraftNotice] = useState<string | null>(() => {
+    const draft = loadRegistrationDraft(account.email);
+    if (!draft) return null;
+    return draftRestoredFileHint(draft) ?? "Your registration answers were restored after the page refreshed.";
+  });
   const [phaseAttempted, setPhaseAttempted] = useState(false);
   const scrollToTopAfterPhaseChange = useRef(false);
+
+  useEffect(() => {
+    saveRegistrationDraft({
+      accountEmail: account.email,
+      form,
+      activePhaseIndex,
+    });
+  }, [account.email, form, activePhaseIndex]);
 
   const validationOptions = useMemo(
     () => ({ accountBacked: true as const, accountEmail: account.email }),
@@ -304,11 +335,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           setPhaseAttempted(true);
           scrollToTopAfterPhaseChange.current = true;
           setActivePhaseIndex(getFirstPhaseIndexForErrors(data.errors));
-        } else setErrors({ submit: data.message ?? "Registration failed. Please try again." });
+        } else {
+          setErrors({ submit: data.message ?? "Registration failed. Please try again." });
+          scrollToTopAfterPhaseChange.current = true;
+          setActivePhaseIndex(REGISTRATION_PHASES.length - 1);
+        }
         return;
       }
 
       router.push("/dashboard?welcome=1");
+      clearRegistrationDraft(account.email);
     } catch {
       setErrors({ submit: "Network error. Please check your connection and try again." });
     } finally {
@@ -377,6 +413,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         form={form}
         registeredVoter={registeredVoter}
       />
+
+      {draftNotice ? (
+        <Alert variant="info">
+          {draftNotice}
+          <button
+            type="button"
+            className="ml-2 font-medium underline"
+            onClick={() => setDraftNotice(null)}
+          >
+            Dismiss
+          </button>
+        </Alert>
+      ) : null}
 
       <div id="registration-phase-content" className="space-y-6" key={activePhaseIndex} tabIndex={-1}>
       {showPhaseValidationAlert ? (

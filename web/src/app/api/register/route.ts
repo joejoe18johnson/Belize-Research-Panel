@@ -137,7 +137,36 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+    if (error instanceof Error && error.message === "document_upload_failed") {
+      return NextResponse.json(
+        {
+          errors: {
+            submit:
+              "We could not upload your identification documents. Try smaller JPG or PDF files, or try again in a moment.",
+          },
+        },
+        { status: 500 }
+      );
+    }
+    if (error instanceof Error && error.message === "storage_not_configured") {
+      return NextResponse.json(
+        {
+          message:
+            "Registration storage is not configured on this server. Please contact support or try again later.",
+        },
+        { status: 503 }
+      );
+    }
     console.error("Registration failed:", error);
-    return NextResponse.json({ message: "Registration could not be completed." }, { status: 500 });
+    const detail = error instanceof Error ? error.message : "Unknown error";
+    const isDev = process.env.NODE_ENV !== "production";
+    return NextResponse.json(
+      {
+        message: isDev
+          ? `Registration could not be completed: ${detail}`
+          : "Registration could not be completed. Please try again or contact support if the problem continues.",
+      },
+      { status: 500 }
+    );
   }
 }
