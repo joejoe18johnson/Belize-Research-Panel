@@ -433,8 +433,13 @@ export function validateRegistrationForm(
     errors.marketInterests = "Please select at least one market research interest.";
   }
 
-  if (contactCount < 2 && !cleanText(data.streetAddress)) {
-    errors.contact = "Please provide at least two contact methods, or a street address if no electronic contact is available.";
+  if (contactCount < 2) {
+    errors.contact =
+      "Please provide at least two contact methods so we can still reach you if one channel changes, is inactive, or fails during fieldwork.";
+  }
+
+  if (!cleanText(data.streetAddress)) {
+    errors.streetAddress = "Street address is required.";
   }
 
   if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";

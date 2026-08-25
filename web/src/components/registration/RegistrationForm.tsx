@@ -667,11 +667,22 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </FieldGroup>
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
-            {contactCount < 2 ? (
-              <Field label="Street address / physical contact address" required={contactCount === 0} error={fieldError("streetAddress")} id="streetAddress">
-                <TextArea id="streetAddress" value={form.streetAddress} onChange={(e) => update("streetAddress", e.target.value)} onBlur={() => touchAndValidate("streetAddress")} error={fieldError("streetAddress")} />
-              </Field>
-            ) : null}
+            <Field
+              label="Street address / physical contact address"
+              required
+              hint="Required for panel verification and fieldwork correspondence."
+              error={fieldError("streetAddress")}
+              id="streetAddress"
+            >
+              <TextArea
+                id="streetAddress"
+                value={form.streetAddress}
+                onChange={(e) => update("streetAddress", e.target.value)}
+                onBlur={() => touchAndValidate("streetAddress")}
+                error={fieldError("streetAddress")}
+                placeholder="House number, street, village or city, district"
+              />
+            </Field>
           </FormSection>
 
           <FormSection step={12} title="Confirm contact details">
