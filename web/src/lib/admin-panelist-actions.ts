@@ -48,9 +48,8 @@ export async function markNameDobDuplicatesAsPossibleDuplicate(): Promise<number
 export async function flagPanelistAsPossibleDuplicate(email: string): Promise<boolean> {
   const updated = await updatePanelistAdminFields(email, { verification_status: "Possible Duplicate" });
   if (!updated) return false;
-  await putAccountOnHoldForFraudReview(email).then(async (applied) => {
-    if (applied) await notifyFraudHold(email);
-  });
+  const applied = await putAccountOnHoldForFraudReview(email);
+  if (applied) await notifyFraudHold(email);
   return true;
 }
 

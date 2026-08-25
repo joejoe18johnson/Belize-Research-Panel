@@ -135,6 +135,35 @@ function TemplatePreviewPanel({
   onBack: () => void;
   showBack: boolean;
 }) {
+  const [to, setTo] = useState("");
+  const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
+
+  useEffect(() => {
+    setStatus(null);
+  }, [template.id]);
+
+  const sendTest = async () => {
+    setSending(true);
+    setStatus(null);
+    try {
+      const res = await fetch(`/api/admin/email-templates/${encodeURIComponent(template.id)}/send-test`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to }),
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string };
+      setStatus({
+        ok: Boolean(data.ok) && res.ok,
+        message: data.message ?? (res.ok ? "Sent." : "Could not send test email."),
+      });
+    } catch {
+      setStatus({ ok: false, message: "Network error. Please try again." });
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="min-w-0 space-y-4">
       {showBack ? (
@@ -171,6 +200,45 @@ function TemplatePreviewPanel({
             </dd>
           </div>
         </dl>
+
+        <form
+          className="mt-5 space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void sendTest();
+          }}
+        >
+          <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-200" htmlFor="email-test-to">
+            Send test email
+          </label>
+          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+            Without a verified domain, Resend only delivers to your Resend account email or{" "}
+            <code>delivered@resend.dev</code>.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              id="email-test-to"
+              type="email"
+              required
+              value={to}
+              onChange={(event) => setTo(event.target.value)}
+              placeholder="your-resend-login@example.com"
+              className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none ring-teal-600/20 focus:border-teal-600 focus:ring-4 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            />
+            <button
+              type="submit"
+              disabled={sending}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+            >
+              {sending ? "Sending…" : "Send test"}
+            </button>
+          </div>
+          {status ? (
+            <p className={`text-sm ${status.ok ? "text-teal-800 dark:text-teal-200" : "text-red-700 dark:text-red-300"}`}>
+              {status.message}
+            </p>
+          ) : null}
+        </form>
       </div>
 
       <TemplatePreviewFrame templateId={template.id} />
@@ -212,7 +280,7 @@ export function AdminEmailTemplatesClient() {
       <PageIntro
         eyebrow="Admin console"
         title="Email templates"
-        description="Branded transactional emails sent through Resend at each step of the panelist and admin workflow. Select a template to preview sample content."
+        description="Branded transactional emails sent through Resend. Select a template to preview sample content, then send a test to your Resend account email."
       />
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">

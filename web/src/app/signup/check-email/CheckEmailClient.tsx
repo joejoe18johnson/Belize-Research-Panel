@@ -75,8 +75,8 @@ export default function CheckEmailClient() {
 
         {verifyUrl ? (
           <BrandedAlert tone="warning" title="Verify on this site" showIcon>
-            This is the same confirmation step as clicking the email button. It marks your account verified on Belize
-            Research Panel — it does not use Supabase Confirm email.
+            This is the same confirmation as clicking the button in the email. It verifies your address on Belize
+            Research Panel.
             <Link
               href={verifyUrl}
               className="mt-2 inline-block break-all font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100"
