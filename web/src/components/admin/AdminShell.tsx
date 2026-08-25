@@ -132,13 +132,15 @@ export function AdminShell({
   }, [pathname]);
 
   useEffect(() => {
-    if (!mobileNavOpen) return;
-    const previous = document.body.style.overflow;
+    const previousBody = document.body.style.overflow;
+    const previousHtml = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = previous;
+      document.body.style.overflow = previousBody;
+      document.documentElement.style.overflow = previousHtml;
     };
-  }, [mobileNavOpen]);
+  }, []);
 
   const navContent = (
     <>
@@ -156,7 +158,7 @@ export function AdminShell({
         <ThemeMenuToggle variant="dark" onActivate={() => setMobileNavOpen(false)} />
       </div>
       <nav
-        className="nav-scroll min-h-0 flex-1 overflow-y-auto px-2 py-3 lg:py-4"
+        className="nav-scroll min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-2 py-3 lg:py-4"
         aria-label="Admin modules"
       >
         <div className="space-y-5">
@@ -222,8 +224,8 @@ export function AdminShell({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)] max-lg:h-dvh max-lg:max-h-dvh max-lg:overflow-hidden dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_10rem,#09090b_100%)]">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_10rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_10rem,#09090b_100%)]">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden max-lg:flex-col lg:flex-row">
         {mobileNavOpen ? (
           <button
             type="button"
@@ -235,7 +237,7 @@ export function AdminShell({
 
         <aside
           id="admin-mobile-nav"
-          className={`safe-top z-50 flex w-[min(100vw-2rem,18rem)] shrink-0 flex-col border-teal-100 bg-teal-950 text-white dark:border-teal-900/60 lg:static lg:z-auto lg:h-full lg:w-72 lg:border-b-0 lg:border-r ${
+          className={`safe-top z-50 flex w-[min(100vw-2rem,18rem)] shrink-0 flex-col overflow-hidden border-teal-100 bg-teal-950 text-white dark:border-teal-900/60 lg:static lg:z-auto lg:h-full lg:w-72 lg:border-b-0 lg:border-r ${
             mobileNavOpen
               ? "fixed inset-y-0 left-0 border-r shadow-2xl"
               : "hidden lg:flex"
@@ -245,7 +247,7 @@ export function AdminShell({
           {navContent}
         </aside>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <header className={`${portalStickyHeaderClass} px-4 py-3 sm:px-6 sm:py-4`}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
@@ -269,7 +271,7 @@ export function AdminShell({
               </div>
             </div>
           </header>
-          <main ref={mainRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-8">
+          <main ref={mainRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-6 sm:py-8">
             {children}
           </main>
           <AdminFooter />
