@@ -14,7 +14,7 @@ import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
-import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { UserAvatar } from "./UserAvatar";
 
@@ -61,10 +61,9 @@ export function DashboardShell({
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:hidden"
               />
               <LogoutButton className="hidden min-h-11 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:flex" />
-              <ThemeSwitch compact className="hidden lg:inline-flex" />
             </div>
           </div>
-          <div className="mt-2 border-t border-teal-50 pt-2 dark:border-teal-900/40 lg:hidden">
+          <div className="mt-2 border-t border-teal-50 pt-2 dark:border-teal-900/40">
             <ThemeMenuToggle variant="light" />
           </div>
         </div>
