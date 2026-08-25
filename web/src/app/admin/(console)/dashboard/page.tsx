@@ -5,6 +5,7 @@ import {
   buildRecentPanelistRows,
 } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
+import { requireAdminPathAccess } from "@/lib/admin-auth";
 import { loadPanelistPhotoUploadUsernames } from "@/lib/panelist-requirement-context";
 
 export const metadata = {
@@ -12,6 +13,7 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
+  await requireAdminPathAccess("/admin/dashboard");
   const hub = await loadAdminDataHub();
   const photoUploadUsernames = await loadPanelistPhotoUploadUsernames();
   const metrics = buildAdminDashboardMetrics(hub);

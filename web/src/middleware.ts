@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "@/lib/admin-session";
 import { CLIENT_SESSION_COOKIE, decodeClientSessionToken } from "@/lib/client-session";
-import { adminPathAllowedForSession, staffDefaultAdminPath } from "@/lib/staff-roles";
+import {
+  DEFAULT_ROLE_MODULE_ACCESS,
+  adminPathAllowedForSession,
+  staffDefaultAdminPath,
+} from "@/lib/staff-roles";
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot-password", "/admin/reset-password"]);
 const PUBLIC_CLIENT_PATHS = new Set(["/client/login"]);
@@ -16,13 +20,18 @@ export async function middleware(request: NextRequest) {
     }
 
     const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-    const session = token ? await decodeAdminSessionToken(token) : null;
+    const decoded = token ? await decodeAdminSessionToken(token) : null;
 
-    if (!session) {
+    if (!decoded) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    const session = {
+      ...decoded,
+      allowedModules: [...(DEFAULT_ROLE_MODULE_ACCESS[decoded.role] ?? [])],
+    };
 
     if (!adminPathAllowedForSession(session, pathname)) {
       const redirectUrl = new URL(staffDefaultAdminPath(session.role, session.allowedModules), request.url);

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { AdminAuthShell } from "@/components/admin/AdminAuthShell";
 import { AdminResetPasswordForm } from "@/components/admin/AdminResetPasswordForm";
-import { isAdminSessionActive } from "@/lib/admin-auth";
+import { getAdminSession } from "@/lib/admin-auth";
 import { findStaffUserByPasswordResetToken } from "@/lib/staff-users";
+import { staffDefaultAdminPath } from "@/lib/staff-roles";
 import { redirect } from "next/navigation";
 
 export const metadata = {
@@ -14,8 +15,9 @@ export default async function AdminResetPasswordPage({
 }: {
   searchParams: Promise<{ token?: string }>;
 }) {
-  if (await isAdminSessionActive()) {
-    redirect("/admin/dashboard");
+  const session = await getAdminSession();
+  if (session) {
+    redirect(staffDefaultAdminPath(session.role, session.allowedModules));
   }
 
   const { token } = await searchParams;

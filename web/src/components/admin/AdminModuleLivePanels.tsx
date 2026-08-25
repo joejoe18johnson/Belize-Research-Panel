@@ -64,7 +64,7 @@ export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) 
           {submitting ? "Updating…" : "Mark name + DOB duplicates as Possible Duplicate"}
         </button>
         <Link
-          href="/admin/dashboard"
+          href="/admin/panelists?tab=flagged"
           className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40"
         >
           {formatHeadingCase("Open duplicate review table")}

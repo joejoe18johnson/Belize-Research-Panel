@@ -59,7 +59,10 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
   if (!token) return null;
-  return await decodeAdminSessionToken(token);
+  const session = await decodeAdminSessionToken(token);
+  if (!session) return null;
+  const allowedModules = await getRoleModuleSlugs(session.role);
+  return { ...session, allowedModules };
 }
 
 export async function isAdminSessionActive(): Promise<boolean> {
@@ -85,7 +88,7 @@ export async function requireAdminPathAccess(pathname: string): Promise<AdminSes
 export async function requireSuperAdminSession(): Promise<AdminSession> {
   const session = await requireAdminSession();
   if (session.role !== "super_admin") {
-    redirect("/admin/dashboard?access=denied");
+    redirect(`${staffDefaultAdminPath(session.role, session.allowedModules)}?access=denied`);
   }
   return session;
 }

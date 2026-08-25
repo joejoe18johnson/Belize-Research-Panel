@@ -1,4 +1,56 @@
 {
-  "modules": {},
+  "modules": {
+    "operations_manager": [
+      "staff-home",
+      "admin-dashboard",
+      "panelists",
+      "panelist-groups",
+      "under-review",
+      "notifications",
+      "email-templates",
+      "support-inbox",
+      "payouts",
+      "fraud-prevention",
+      "sample-selection",
+      "campaigns",
+      "create-campaign",
+      "reward-settings",
+      "survey-builder",
+      "survey-templates",
+      "survey-distribution",
+      "distribution-engine",
+      "fieldwork-management",
+      "communication-notifications",
+      "external-data-import"
+    ],
+    "research_analyst": [
+      "staff-home",
+      "panelist-groups",
+      "advanced-analytics",
+      "survey-builder",
+      "survey-templates",
+      "survey-distribution",
+      "distribution-engine",
+      "client-reporting",
+      "client-project-management"
+    ],
+    "field_supervisor": [
+      "staff-home",
+      "under-review",
+      "fieldwork-management",
+      "fraud-prevention",
+      "survey-distribution"
+    ],
+    "finance_officer": [
+      "staff-home",
+      "payouts",
+      "financial-revenue",
+      "reward-settings"
+    ],
+    "client_viewer": [
+      "staff-home",
+      "client-reporting"
+    ]
+  },
   "descriptions": {}
 }

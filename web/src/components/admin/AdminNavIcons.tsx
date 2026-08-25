@@ -10,6 +10,11 @@ function IconBase({ children, className = "h-4 w-4" }: { children: ReactNode; cl
 }
 
 const ICONS: Record<string, ReactNode> = {
+  "staff-home": (
+    <IconBase>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" />
+    </IconBase>
+  ),
   panelists: (
     <IconBase>
       <path strokeLinecap="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />

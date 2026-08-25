@@ -45,7 +45,7 @@ export function AdminResetPasswordForm({ token }: { token: string }) {
         return;
       }
 
-      router.push(data.redirectTo ?? "/admin/dashboard");
+      router.push(data.redirectTo ?? "/admin/home");
       router.refresh();
     } catch {
       setErrors({ submit: "Network error. Please try again." });

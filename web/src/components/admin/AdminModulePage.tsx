@@ -149,10 +149,10 @@ export function AdminModulePage({
       {!module.externalHref ? (
         <div className="flex flex-wrap gap-3 pt-2">
           <Link
-            href="/admin/dashboard"
+            href="/admin/home"
             className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white hover:bg-teal-800"
           >
-            {formatHeadingCase("Open admin dashboard")}
+            {formatHeadingCase("Back to staff home")}
           </Link>
         </div>
       ) : null}

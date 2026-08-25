@@ -12,7 +12,7 @@ import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
 import { STAFF_DEMO_PASSWORD } from "@/lib/demo-staff-users";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
-export function AdminLoginForm() {
+export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,14 +34,14 @@ export function AdminLoginForm() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, next: nextPath }),
       });
       const data = (await res.json()) as { ok?: boolean; message?: string; redirectTo?: string };
       if (!res.ok) {
         setError(data.message ?? "Invalid email or password.");
         return;
       }
-      router.push(data.redirectTo ?? "/admin/dashboard");
+      router.push(data.redirectTo ?? "/admin/home");
       router.refresh();
     } catch {
       setError("Network error. Please try again.");

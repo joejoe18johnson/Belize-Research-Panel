@@ -21,6 +21,8 @@ export const STAFF_ROLE_LABELS: Record<StaffRole, string> = {
   client_viewer: "Client Viewer",
 };
 
+export const STAFF_HOME_PATH = "/admin/home";
+
 export const STAFF_ROLE_DESCRIPTIONS: Record<StaffRole, string> = {
   super_admin: "Full access to every admin module, settings, and platform controls.",
   operations_manager: "Panel register, campaigns, sampling, distribution, and fieldwork operations.",
@@ -30,32 +32,35 @@ export const STAFF_ROLE_DESCRIPTIONS: Record<StaffRole, string> = {
   client_viewer: "Read-only access to assigned client reporting modules.",
 };
 
+const OPERATIONS_MODULES = [
+  "staff-home",
+  "admin-dashboard",
+  "panelists",
+  "panelist-groups",
+  "under-review",
+  "notifications",
+  "email-templates",
+  "support-inbox",
+  "payouts",
+  "fraud-prevention",
+  "sample-selection",
+  "campaigns",
+  "create-campaign",
+  "reward-settings",
+  "survey-builder",
+  "survey-templates",
+  "survey-distribution",
+  "distribution-engine",
+  "fieldwork-management",
+  "communication-notifications",
+  "external-data-import",
+] as const;
+
 export const DEFAULT_ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = {
   super_admin: ADMIN_MODULES.map((module) => module.slug),
-  operations_manager: [
-    "panelists",
-    "panelist-groups",
-    "admin-dashboard",
-    "under-review",
-    "notifications",
-    "email-templates",
-    "support-inbox",
-    "payouts",
-    "fraud-prevention",
-    "sample-selection",
-    "campaigns",
-    "create-campaign",
-    "reward-settings",
-    "survey-builder",
-    "survey-templates",
-    "survey-distribution",
-    "distribution-engine",
-    "fieldwork-management",
-    "communication-notifications",
-    "external-data-import",
-  ],
+  operations_manager: OPERATIONS_MODULES,
   research_analyst: [
-    "admin-dashboard",
+    "staff-home",
     "panelist-groups",
     "advanced-analytics",
     "survey-builder",
@@ -66,17 +71,18 @@ export const DEFAULT_ROLE_MODULE_ACCESS: Record<StaffRole, readonly string[]> = 
     "client-project-management",
   ],
   field_supervisor: [
-    "admin-dashboard",
+    "staff-home",
     "under-review",
     "fieldwork-management",
     "fraud-prevention",
     "survey-distribution",
   ],
-  finance_officer: ["admin-dashboard", "payouts", "financial-revenue", "reward-settings"],
-  client_viewer: ["client-reporting"],
+  finance_officer: ["staff-home", "payouts", "financial-revenue", "reward-settings"],
+  client_viewer: ["staff-home", "client-reporting"],
 };
 
 const ADMIN_PATH_TO_SLUG: Record<string, string> = {
+  "/admin/home": "staff-home",
   "/admin/dashboard": "admin-dashboard",
   "/admin/panelists": "panelists",
   "/admin/groups": "panelist-groups",
@@ -137,15 +143,37 @@ export function staffAccessibleModules(role: StaffRole, allowedModules?: string[
   return ADMIN_MODULES.filter((module) => slugs.has(module.slug));
 }
 
-export function staffDefaultAdminPath(role: StaffRole, allowedModules?: string[]): string {
-  if (role === "client_viewer") return "/admin/client-reporting";
-  const first = staffAccessibleModules(role, allowedModules)[0];
-  if (!first?.href) return "/admin/dashboard";
-  return first.href;
+export function staffDefaultAdminPath(_role?: StaffRole, _allowedModules?: string[]): string {
+  return STAFF_HOME_PATH;
+}
+
+export function isStaffLandingPath(pathname: string): boolean {
+  return pathname === "/admin" || pathname === "/admin/" || pathname === STAFF_HOME_PATH;
+}
+
+export function resolveStaffLoginRedirect(
+  access: StaffAccessContext,
+  requestedNext?: string | null
+): string {
+  const home = STAFF_HOME_PATH;
+  const next = (requestedNext ?? "").trim();
+  if (!next.startsWith("/admin") || next.startsWith("//") || next.includes("://")) return home;
+  const pathOnly = next.split("?")[0];
+  if (pathOnly.startsWith("/admin/login") || pathOnly.startsWith("/admin/forgot-password") || pathOnly.startsWith("/admin/reset-password")) {
+    return home;
+  }
+  if (isStaffLandingPath(pathOnly) || adminPathAllowedForSession(access, pathOnly)) return next;
+  return home;
+}
+
+export function staffQuickAccessModules(role: StaffRole, allowedModules?: string[]): AdminModule[] {
+  return staffAccessibleModules(role, allowedModules).filter(
+    (module) => module.slug !== "staff-home" && Boolean(module.href)
+  );
 }
 
 export function pathnameToAdminModuleSlug(pathname: string): string | null {
-  if (pathname === "/admin" || pathname === "/admin/") return "admin-dashboard";
+  if (pathname === "/admin" || pathname === "/admin/") return "staff-home";
   if (pathname.startsWith("/admin/templates")) return "survey-templates";
   if (pathname.startsWith("/admin/groups")) return "panelist-groups";
   if (pathname.startsWith("/admin/surveys")) return "survey-builder";
@@ -162,7 +190,7 @@ export function pathnameToAdminModuleSlug(pathname: string): string | null {
 }
 
 export function adminPathAllowedForSession(access: StaffAccessContext, pathname: string): boolean {
-  if (pathname === "/admin" || pathname === "/admin/") return true;
+  if (isStaffLandingPath(pathname)) return true;
   const slug = pathnameToAdminModuleSlug(pathname);
   if (!slug) return access.role === "super_admin";
   return sessionCanAccessModule(access, slug);

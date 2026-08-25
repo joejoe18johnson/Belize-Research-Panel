@@ -1,6 +1,7 @@
 import { AdminAuthShell } from "@/components/admin/AdminAuthShell";
 import { AdminForgotPasswordForm } from "@/components/admin/AdminForgotPasswordForm";
-import { isAdminSessionActive } from "@/lib/admin-auth";
+import { getAdminSession } from "@/lib/admin-auth";
+import { staffDefaultAdminPath } from "@/lib/staff-roles";
 import { redirect } from "next/navigation";
 
 export const metadata = {
@@ -8,8 +9,9 @@ export const metadata = {
 };
 
 export default async function AdminForgotPasswordPage() {
-  if (await isAdminSessionActive()) {
-    redirect("/admin/dashboard");
+  const session = await getAdminSession();
+  if (session) {
+    redirect(staffDefaultAdminPath(session.role, session.allowedModules));
   }
 
   return (

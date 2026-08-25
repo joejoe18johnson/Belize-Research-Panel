@@ -45,6 +45,14 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
  */
 export const ADMIN_MODULES: AdminModule[] = [
   {
+    slug: "staff-home",
+    label: "Home",
+    kind: "page",
+    href: "/admin/home",
+    section: "admin-console",
+    status: "working",
+  },
+  {
     slug: "admin-dashboard",
     label: "Admin Dashboard",
     kind: "page",

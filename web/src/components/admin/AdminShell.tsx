@@ -41,6 +41,9 @@ function moduleHref(module: AdminModule): string {
 function isModuleActive(pathname: string, module: AdminModule): boolean {
   if (module.href) {
     if (pathname === module.href) return true;
+    if (module.href === "/admin/home") {
+      return pathname === "/admin/home" || pathname === "/admin" || pathname === "/admin/";
+    }
     if (module.href === "/admin/campaigns") {
       return pathname === "/admin/campaigns" || (pathname.startsWith("/admin/campaigns/") && pathname !== "/admin/campaigns/create");
     }
@@ -140,7 +143,7 @@ export function AdminShell({
   const navContent = (
     <>
       <div className="shrink-0 border-b border-white/10 px-4 py-4">
-        <BrpLogoLink href="/admin/dashboard" variant="dark" className="block" />
+        <BrpLogoLink href="/admin/home" variant="dark" className="block" />
         <p className="mt-2 text-xs font-medium tracking-[0.14em] text-teal-200/90">
           {formatHeadingCase("Admin console")}
         </p>
@@ -251,9 +254,9 @@ export function AdminShell({
                   <p className="text-xs font-semibold tracking-[0.14em] text-teal-700 dark:text-teal-300">
                     Belize Research Panel
                   </p>
-                  <p className="mt-1 hidden text-sm text-zinc-600 dark:text-zinc-400 sm:block">
-                    Registration, sample selection, and panel management for public opinion polling, market research, and
-                    governance studies.
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    Signed in as {STAFF_ROLE_LABELS[session.role]}
+                    <span className="hidden sm:inline"> · {session.displayName}</span>
                   </p>
                 </div>
               </div>
