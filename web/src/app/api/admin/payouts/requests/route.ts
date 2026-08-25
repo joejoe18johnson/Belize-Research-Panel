@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession, isAdminSessionActive } from "@/lib/admin-auth";
 import { notifyPanelistOfPayoutUpdate } from "@/lib/payout-panelist-notify";
+import { resolveRequestOrigin } from "@/lib/auth";
 import { markAdminPayoutsRead } from "@/lib/admin-read-state";
 import { processRedemptionRequest } from "@/lib/redemption-requests";
 import type { PayoutProcessAction } from "@/lib/reward-redemption";
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Payout request not found." }, { status: 404 });
     }
 
-    await notifyPanelistOfPayoutUpdate(updated, action, request.nextUrl.origin);
+    await notifyPanelistOfPayoutUpdate(updated, action, resolveRequestOrigin(request));
     await markAdminPayoutsRead([updated.id]);
 
     revalidatePath("/admin", "layout");

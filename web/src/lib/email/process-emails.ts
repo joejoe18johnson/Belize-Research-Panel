@@ -7,7 +7,7 @@ export async function sendTemplateEmail(input: {
   to: string;
   data?: Record<string, string>;
   context?: string;
-}): Promise<{ sent: boolean; logged: boolean }> {
+}): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
   const rendered = renderEmailTemplate(input.templateId, input.data ?? {});
   const result = await sendTransactionalEmail({
     to: input.to,
@@ -16,7 +16,12 @@ export async function sendTemplateEmail(input: {
     text: rendered.text,
     context: input.context ?? input.templateId,
   });
-  return { sent: result.sent, logged: result.logged };
+  return {
+    sent: result.sent,
+    logged: result.logged,
+    resendId: result.resendId,
+    error: result.error,
+  };
 }
 
 function panelistFirstName(firstName?: string): string {
@@ -31,8 +36,8 @@ export async function sendSignupVerifyEmail(input: {
   to: string;
   firstName: string;
   verifyUrl: string;
-}): Promise<void> {
-  await sendTemplateEmail({
+}): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
+  return sendTemplateEmail({
     templateId: "signup-verify-email",
     to: input.to,
     data: {
@@ -168,6 +173,25 @@ export async function sendPhoneChangeApprovedEmail(input: {
       firstName: panelistFirstName(input.firstName),
       newPhone: input.newPhone,
       dashboardUrl: originDashboard(input.origin),
+    },
+  });
+}
+
+export async function sendSurveyReminderEmail(input: {
+  to: string;
+  firstName: string;
+  campaignTitle: string;
+  completeByDate: string;
+  surveyLink: string;
+}): Promise<void> {
+  await sendTemplateEmail({
+    templateId: "survey-reminder",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      campaignTitle: input.campaignTitle,
+      completeByDate: input.completeByDate,
+      surveyLink: input.surveyLink,
     },
   });
 }

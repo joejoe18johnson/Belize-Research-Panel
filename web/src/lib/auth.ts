@@ -82,22 +82,37 @@ export function normalizeAppOrigin(origin: string): string {
   return trimmed;
 }
 
-export function resolveRequestOrigin(request: { headers: Headers; nextUrl: { origin: string } }): string {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+export function resolveRequestOrigin(request: {
+  headers: Headers;
+  url?: string;
+  nextUrl?: { origin: string };
+}): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (configured) return normalizeAppOrigin(configured.replace(/\/$/, ""));
 
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   if (host) {
-    const proto = request.headers.get("x-forwarded-proto") ?? "https";
+    const proto =
+      request.headers.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
     return normalizeAppOrigin(`${proto}://${host}`);
   }
 
-  const siteUrl = getSiteUrl();
-  if (siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("0.0.0.0")) {
-    return normalizeAppOrigin(siteUrl);
+  if (request.nextUrl?.origin) {
+    return normalizeAppOrigin(request.nextUrl.origin);
   }
 
-  return normalizeAppOrigin(request.nextUrl.origin);
+  if (request.url) {
+    try {
+      return normalizeAppOrigin(new URL(request.url).origin);
+    } catch {
+      // fall through
+    }
+  }
+
+  const siteUrl = getSiteUrl();
+  if (siteUrl) return normalizeAppOrigin(siteUrl);
+
+  return "http://localhost:3000";
 }
 
 export function buildVerificationUrl(token: string, origin: string): string {

@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionAccount } from "@/lib/auth";
+import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { payoutShortId } from "@/lib/admin-payout-display";
 import { sendRedemptionSubmittedEmail } from "@/lib/email/process-emails";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       optionLabel: redemption.optionLabel,
       amount: validation.valueLabel,
       referenceId: payoutShortId(redemption.id),
-      origin: request.nextUrl.origin,
+      origin: resolveRequestOrigin(request),
     });
 
     return NextResponse.json({

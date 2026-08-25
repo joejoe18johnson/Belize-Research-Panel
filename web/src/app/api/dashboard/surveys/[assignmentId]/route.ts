@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getSessionAccount } from "@/lib/auth";
+import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendSurveyCompletedEmail } from "@/lib/email/process-emails";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
@@ -91,7 +91,7 @@ export async function POST(
           firstName: panelist?.first_name ?? account.firstName,
           campaignTitle: assignment.title,
           points: result.points,
-          origin: new URL(request.url).origin,
+          origin: resolveRequestOrigin(request),
         });
       }
 

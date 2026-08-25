@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildStaffPasswordResetUrl } from "@/lib/auth";
+import { buildStaffPasswordResetUrl, resolveRequestOrigin } from "@/lib/auth";
 import { sendStaffPasswordResetEmail } from "@/lib/email/process-emails";
 import { createStaffPasswordResetToken } from "@/lib/staff-users";
 import { cleanText, validEmail } from "@/lib/validation";
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const result = await createStaffPasswordResetToken(email);
     if (result) {
-      const origin = request.nextUrl.origin;
+      const origin = resolveRequestOrigin(request);
       void sendStaffPasswordResetEmail({
         to: result.user.email,
         firstName: result.user.first_name,

@@ -6,6 +6,7 @@ import {
   findAccountByEmail,
   getPendingEmailForApproval,
 } from "@/lib/accounts";
+import { resolveRequestOrigin } from "@/lib/auth";
 import { sendEmailChangeApprovedEmail } from "@/lib/email/process-emails";
 import { updatePanelistEmail } from "@/lib/panelists";
 import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       to: pendingEmail,
       firstName: account.first_name,
       newEmail: pendingEmail,
-      origin: request.nextUrl.origin,
+      origin: resolveRequestOrigin(request),
     });
 
     return NextResponse.json({

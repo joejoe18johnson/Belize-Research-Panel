@@ -31,7 +31,7 @@ export const SUPPORT_FAQ: SupportFaqItem[] = [
   {
     question: "How do I verify my email after signing up?",
     answer:
-      "Check your inbox for a verification email after creating your account. You can also open the check-email page from the login screen if you still need to verify. Links expire after 24 hours — use forgot password or sign up again if needed.",
+      "Check your inbox for a verification email after creating your account. Open the link to confirm on this site — we do not use Supabase Confirm email. You can also tap Resend verification email on the check-email page. Links expire after 24 hours.",
   },
   {
     question: "Why is my account on hold?",

@@ -135,7 +135,7 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     name: "Survey reminder",
     description: "Reminds a panelist about an open survey before the due date.",
     category: "surveys",
-    trigger: "Scheduled reminder (manual / future automation)",
+    trigger: "Admin Send reminder / test send from Email templates",
   },
   {
     id: "survey-completed",
@@ -670,6 +670,18 @@ export function isEmailTemplateId(value: string): value is EmailTemplateId {
 
 export function getEmailTemplateMeta(id: EmailTemplateId): EmailTemplateMeta | undefined {
   return EMAIL_TEMPLATES.find((template) => template.id === id);
+}
+
+export function emailTemplateSampleDataForOrigin(
+  id: EmailTemplateId,
+  origin: string
+): Record<string, string> {
+  const base = origin.replace(/\/$/, "");
+  const sample = { ...EMAIL_TEMPLATE_SAMPLE_DATA[id] };
+  for (const [key, value] of Object.entries(sample)) {
+    sample[key] = value.replaceAll("https://panel.example.com", base);
+  }
+  return sample;
 }
 
 export function renderEmailTemplate(

@@ -1,8 +1,21 @@
 import { buildDuplicateNameDobKeyCounts, isDuplicateNameDobMatch } from "./admin-panelists";
-import { putAccountOnHoldForFraudReview, releaseAccountFromFraudReview } from "./accounts";
+import { findAccountByEmail, putAccountOnHoldForFraudReview, releaseAccountFromFraudReview } from "./accounts";
+import { sendPanelistOnHoldEmail } from "./email/process-emails";
 import { loadPanelists, savePanelists, updatePanelistAdminFields } from "./panelists";
+import { getSiteUrl } from "./seo/site-config";
 import { cleanText } from "./validation";
 import { deletePanelistRelatedData } from "./admin-panelist-delete";
+
+async function notifyFraudHold(email: string): Promise<void> {
+  const account = await findAccountByEmail(email);
+  if (!account) return;
+  await sendPanelistOnHoldEmail({
+    to: account.email,
+    firstName: account.first_name,
+    reason: "Your registration is under review because it may match another panelist.",
+    origin: getSiteUrl(),
+  });
+}
 
 /** MVP Admin / Fraud Prevention: mark all name+DOB duplicate clusters as Possible Duplicate. */
 export async function markNameDobDuplicatesAsPossibleDuplicate(): Promise<number> {
@@ -22,7 +35,12 @@ export async function markNameDobDuplicatesAsPossibleDuplicate(): Promise<number
 
   if (updated > 0) {
     await savePanelists(next);
-    await Promise.all(emailsToHold.map((email) => putAccountOnHoldForFraudReview(email)));
+    await Promise.all(
+      emailsToHold.map(async (email) => {
+        const applied = await putAccountOnHoldForFraudReview(email);
+        if (applied) await notifyFraudHold(email);
+      })
+    );
   }
   return updated;
 }
@@ -30,7 +48,9 @@ export async function markNameDobDuplicatesAsPossibleDuplicate(): Promise<number
 export async function flagPanelistAsPossibleDuplicate(email: string): Promise<boolean> {
   const updated = await updatePanelistAdminFields(email, { verification_status: "Possible Duplicate" });
   if (!updated) return false;
-  await putAccountOnHoldForFraudReview(email);
+  await putAccountOnHoldForFraudReview(email).then(async (applied) => {
+    if (applied) await notifyFraudHold(email);
+  });
   return true;
 }
 
@@ -39,7 +59,8 @@ export async function syncAccountHoldForVerificationStatus(
   verificationStatus: string
 ): Promise<void> {
   if (cleanText(verificationStatus) === "Possible Duplicate") {
-    await putAccountOnHoldForFraudReview(email);
+    const applied = await putAccountOnHoldForFraudReview(email);
+    if (applied) await notifyFraudHold(email);
     return;
   }
   await releaseAccountFromFraudReview(email);

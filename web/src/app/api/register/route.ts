@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findAccountById, markAccountPanelistRegistered } from "@/lib/accounts";
-import { getSessionAccount } from "@/lib/auth";
+import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     void sendRegistrationSubmittedEmail({
       to: session.email,
       firstName: session.firstName,
-      origin: request.nextUrl.origin,
+      origin: resolveRequestOrigin(request),
     });
 
     return NextResponse.json({ ok: true, verificationStatus: result.verificationStatus });

@@ -63,7 +63,7 @@ export async function sendTransactionalEmail(input: {
   html: string;
   text?: string;
   context: string;
-}): Promise<{ sent: boolean; logged: boolean; resendId?: string }> {
+}): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
   const email = cleanText(input.to).toLowerCase();
   const subject = cleanText(input.subject);
   const html = input.html;
@@ -71,14 +71,17 @@ export async function sendTransactionalEmail(input: {
   const context = cleanText(input.context);
 
   if (!email || !subject || !html) {
-    return { sent: false, logged: false };
+    return { sent: false, logged: false, error: "Missing email, subject, or body." };
   }
 
   const client = resendClient();
   let deliveryStatus: OutboundMessageRecord["deliveryStatus"] = "logged";
   let resendId: string | undefined;
+  let errorMessage: string | undefined;
 
-  if (client) {
+  if (!client) {
+    errorMessage = "RESEND_API_KEY is not configured.";
+  } else {
     try {
       const result = await client.emails.send({
         from: fromAddress(),
@@ -89,6 +92,7 @@ export async function sendTransactionalEmail(input: {
       });
       if (result.error) {
         deliveryStatus = "failed";
+        errorMessage = result.error.message;
         console.error("[email]", context, result.error.message);
       } else {
         deliveryStatus = "sent";
@@ -96,6 +100,7 @@ export async function sendTransactionalEmail(input: {
       }
     } catch (error) {
       deliveryStatus = "failed";
+      errorMessage = error instanceof Error ? error.message : "Email provider request failed.";
       console.error("[email]", context, error);
     }
   }
@@ -115,5 +120,6 @@ export async function sendTransactionalEmail(input: {
     sent: deliveryStatus === "sent",
     logged: true,
     resendId,
+    error: errorMessage,
   };
 }

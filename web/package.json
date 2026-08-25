@@ -14,7 +14,8 @@
     "seed:admin-notifications": "node scripts/seed-admin-notifications.mjs",
     "seed:all": "npm run seed:demo && npm run seed:roles && npm run seed:campaign && npm run seed:admin-notifications",
     "import:supabase": "node scripts/import-json-to-supabase.mjs",
-    "import:supabase:fresh": "node scripts/import-json-to-supabase.mjs --fresh"
+    "import:supabase:fresh": "node scripts/import-json-to-supabase.mjs --fresh",
+    "upload:resend-templates": "npx --yes tsx scripts/upload-resend-templates.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.109.0",

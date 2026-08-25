@@ -6,6 +6,7 @@ import {
   findAccountByEmail,
   getPendingPhoneForApproval,
 } from "@/lib/accounts";
+import { resolveRequestOrigin } from "@/lib/auth";
 import { sendPhoneChangeApprovedEmail } from "@/lib/email/process-emails";
 import { updatePanelistPhone } from "@/lib/panelists";
 import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       to: email,
       firstName: account.first_name,
       newPhone: pendingPhone,
-      origin: request.nextUrl.origin,
+      origin: resolveRequestOrigin(request),
     });
 
     return NextResponse.json({

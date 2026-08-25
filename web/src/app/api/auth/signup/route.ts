@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
     await setSessionCookie(result.account.id);
     const origin = resolveRequestOrigin(request);
     const verifyUrl = buildVerificationUrl(result.verificationToken, origin);
-
-    void sendSignupVerifyEmail({
+    const delivery = await sendSignupVerifyEmail({
       to: result.account.email,
       firstName: result.account.first_name,
       verifyUrl,
@@ -67,7 +66,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       email: result.account.email,
-      verifyUrl,
+      emailSent: delivery.sent,
+      emailError: delivery.sent ? undefined : delivery.error,
+      verifyUrl: delivery.sent ? undefined : verifyUrl,
     });
   } catch (error) {
     console.error("Signup failed:", error);

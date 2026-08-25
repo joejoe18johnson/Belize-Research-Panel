@@ -5,6 +5,7 @@ import { findClientUserById } from "@/lib/client-users";
 import { createAndLaunchCampaign } from "@/lib/campaigns";
 import { buildCampaignAssignmentLinks } from "@/lib/campaign-survey-links";
 import { sendCampaignInvitationEmails } from "@/lib/email/process-emails";
+import { resolveRequestOrigin } from "@/lib/auth";
 import type { CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targeting";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { loadPanelists } from "@/lib/panelists";
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
 
     const panelists = await loadPanelists();
     const result = await createAndLaunchCampaign(input, panelists);
-    const origin = new URL(request.url).origin;
+    const origin = resolveRequestOrigin(request);
     const surveyLinks = buildCampaignAssignmentLinks(origin, result.campaign, result.assignedPanelists);
 
     void sendCampaignInvitationEmails({

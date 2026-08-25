@@ -3,6 +3,7 @@ import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/l
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { approveAccountPhoneChange, findAccountByEmail, setAccountEmailVerifiedByAdmin } from "@/lib/accounts";
 import { sendPanelistVerifiedEmail } from "@/lib/email/process-emails";
+import { resolveRequestOrigin } from "@/lib/auth";
 import {
   buildPanelistDeleteCode,
   matchesDeleteConfirmation,
@@ -134,7 +135,7 @@ export async function PATCH(
   const wasVerified = cleanText(panelist.verification_status) === "Verified";
 
   if (fullyVerified && !wasVerified) {
-    const origin = new URL(request.url).origin;
+    const origin = resolveRequestOrigin(request);
     void sendPanelistVerifiedEmail({
       to: lookupEmail || accountEmail,
       firstName: panelist.first_name,

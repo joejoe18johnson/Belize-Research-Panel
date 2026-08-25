@@ -153,6 +153,17 @@ export async function findAccountByEmailChangeToken(token: string): Promise<Acco
 }
 
 export const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+export const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+export const EMAIL_VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000;
+
+export function isVerificationTokenValid(account: AccountRecord): boolean {
+  const token = cleanText(account.verification_token ?? "");
+  const sentAt = cleanText(account.verification_sent_at ?? "");
+  if (!token || !sentAt) return false;
+  const sent = Date.parse(sentAt);
+  if (Number.isNaN(sent)) return false;
+  return Date.now() - sent <= EMAIL_VERIFICATION_TTL_MS;
+}
 
 export function isPasswordResetTokenValid(account: AccountRecord): boolean {
   const token = cleanText(account.password_reset_token ?? "");
@@ -289,9 +300,47 @@ export async function createAccount(input: {
   return { account, verificationToken };
 }
 
+export async function issueEmailVerificationToken(accountId: string): Promise<
+  | { ok: true; account: AccountRecord; token: string }
+  | { ok: false; reason: "not_found" | "already_verified" | "throttled" }
+> {
+  const account = await findAccountById(accountId);
+  if (!account) return { ok: false, reason: "not_found" };
+  if (account.email_verified === "true") return { ok: false, reason: "already_verified" };
+
+  const lastSent = Date.parse(cleanText(account.verification_sent_at ?? ""));
+  if (!Number.isNaN(lastSent) && Date.now() - lastSent < EMAIL_VERIFICATION_RESEND_COOLDOWN_MS) {
+    return { ok: false, reason: "throttled" };
+  }
+
+  const token =
+    account.verification_token && isVerificationTokenValid(account)
+      ? account.verification_token
+      : randomUUID().replace(/-/g, "");
+  const updated: AccountRecord = {
+    ...account,
+    verification_token: token,
+    verification_sent_at: new Date().toISOString(),
+  };
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpdateAccount } = await import("./supabase/repos");
+    await supabaseUpdateAccount(updated);
+    return { ok: true, account: updated, token };
+  }
+
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) return { ok: false, reason: "not_found" };
+  accounts[index] = updated;
+  await saveAccountsRaw(accounts);
+  return { ok: true, account: updated, token };
+}
+
 export async function verifyAccountEmail(token: string): Promise<AccountRecord | null> {
   const account = await findAccountByVerificationToken(token);
-  if (!account) return null;
+  if (!account || !isVerificationTokenValid(account)) return null;
 
   const updated: AccountRecord = {
     ...account,
@@ -460,6 +509,9 @@ export async function putAccountOnHoldForFraudReview(email: string): Promise<boo
   const accounts = await loadAccountsRaw();
   const index = accounts.findIndex((account) => cleanText(account.email).toLowerCase() === normalized);
   if (index < 0) return false;
+  if (accounts[index].hold_reason === "fraud_review" && accounts[index].account_status === "on_hold") {
+    return false;
+  }
 
   accounts[index] = applyHoldSync({
     ...accounts[index],

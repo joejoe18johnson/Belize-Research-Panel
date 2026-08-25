@@ -108,6 +108,8 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
       const data = (await res.json()) as {
         ok?: boolean;
         email?: string;
+        emailSent?: boolean;
+        emailError?: string;
         verifyUrl?: string;
         errors?: FieldErrors;
         message?: string;
@@ -122,8 +124,10 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
       const params = new URLSearchParams({
         email: data.email ?? form.email,
         next: nextPath,
+        emailSent: data.emailSent ? "1" : "0",
       });
-      if (data.verifyUrl) params.set("verifyUrl", data.verifyUrl);
+      if (data.verifyUrl && !data.emailSent) params.set("verifyUrl", data.verifyUrl);
+      if (data.emailError && !data.emailSent) params.set("emailError", data.emailError);
       router.push(`/signup/check-email?${params.toString()}`);
     } catch {
       setErrors({ submit: "Network error. Please try again." });

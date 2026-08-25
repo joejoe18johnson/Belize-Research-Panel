@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionAccount } from "@/lib/auth";
+import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendSupportContactEmails } from "@/lib/email/process-emails";
 import { createSupportMessage } from "@/lib/support-messages";
 import { getSupportInboxEmail, isSupportTopicId } from "@/lib/support-contact";
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     void sendSupportContactEmails({
-      origin: request.nextUrl.origin,
+      origin: resolveRequestOrigin(request),
       record: {
         id: record.id,
         name: record.name,

@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { requestAccountPhoneChange } from "@/lib/accounts";
-import { getSessionAccount } from "@/lib/auth";
+import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendPhoneChangeRequestedEmail } from "@/lib/email/process-emails";
 
 export async function POST(request: NextRequest) {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/account-on-hold");
 
-    const origin = request.nextUrl.origin;
+    const origin = resolveRequestOrigin(request);
     const pendingPhone = account.pending_phone_whatsapp ?? "";
     void sendPhoneChangeRequestedEmail({
       to: session.email,
