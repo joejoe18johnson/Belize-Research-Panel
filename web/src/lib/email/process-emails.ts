@@ -8,20 +8,29 @@ export async function sendTemplateEmail(input: {
   data?: Record<string, string>;
   context?: string;
 }): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
-  const rendered = renderEmailTemplate(input.templateId, input.data ?? {});
-  const result = await sendTransactionalEmail({
-    to: input.to,
-    subject: rendered.subject,
-    html: rendered.html,
-    text: rendered.text,
-    context: input.context ?? input.templateId,
-  });
-  return {
-    sent: result.sent,
-    logged: result.logged,
-    resendId: result.resendId,
-    error: result.error,
-  };
+  try {
+    const rendered = renderEmailTemplate(input.templateId, input.data ?? {});
+    const result = await sendTransactionalEmail({
+      to: input.to,
+      subject: rendered.subject,
+      html: rendered.html,
+      text: rendered.text,
+      context: input.context ?? input.templateId,
+    });
+    return {
+      sent: result.sent,
+      logged: result.logged,
+      resendId: result.resendId,
+      error: result.error,
+    };
+  } catch (error) {
+    console.error("[email] template send failed", input.templateId, error);
+    return {
+      sent: false,
+      logged: false,
+      error: error instanceof Error ? error.message : "Email send failed.",
+    };
+  }
 }
 
 function panelistFirstName(firstName?: string): string {

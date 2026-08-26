@@ -34,14 +34,20 @@ async function saveMessages(messages: OutboundMessageRecord[]): Promise<void> {
   await fs.writeFile(DATA_FILE, JSON.stringify(messages, null, 2), "utf-8");
 }
 
-async function logOutboundMessage(input: Omit<OutboundMessageRecord, "id" | "sentAt">): Promise<void> {
-  const messages = await loadMessages();
-  messages.unshift({
-    id: randomUUID(),
-    sentAt: new Date().toISOString(),
-    ...input,
-  });
-  await saveMessages(messages.slice(0, 500));
+async function logOutboundMessage(input: Omit<OutboundMessageRecord, "id" | "sentAt">): Promise<boolean> {
+  try {
+    const messages = await loadMessages();
+    messages.unshift({
+      id: randomUUID(),
+      sentAt: new Date().toISOString(),
+      ...input,
+    });
+    await saveMessages(messages.slice(0, 500));
+    return true;
+  } catch (error) {
+    console.error("[email] could not persist outbound message log", error);
+    return false;
+  }
 }
 
 function resendClient(): Resend | null {
@@ -105,7 +111,7 @@ export async function sendTransactionalEmail(input: {
     }
   }
 
-  await logOutboundMessage({
+  const logged = await logOutboundMessage({
     email,
     phone: "",
     channel: "email",
@@ -118,7 +124,7 @@ export async function sendTransactionalEmail(input: {
 
   return {
     sent: deliveryStatus === "sent",
-    logged: true,
+    logged,
     resendId,
     error: errorMessage,
   };

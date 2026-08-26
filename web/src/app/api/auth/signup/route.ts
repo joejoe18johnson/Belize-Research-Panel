@@ -54,21 +54,37 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    await setSessionCookie(result.account.id);
-    const origin = resolveRequestOrigin(request);
-    const verifyUrl = buildVerificationUrl(result.verificationToken, origin);
-    const delivery = await sendSignupVerifyEmail({
-      to: result.account.email,
-      firstName: result.account.first_name,
-      verifyUrl,
-    });
+    let emailSent = false;
+    let emailError: string | undefined;
+    let verifyUrl: string | undefined;
+
+    try {
+      await setSessionCookie(result.account.id);
+    } catch (error) {
+      console.error("Signup session cookie failed:", error);
+    }
+
+    try {
+      const origin = resolveRequestOrigin(request);
+      verifyUrl = buildVerificationUrl(result.verificationToken, origin);
+      const delivery = await sendSignupVerifyEmail({
+        to: result.account.email,
+        firstName: result.account.first_name,
+        verifyUrl,
+      });
+      emailSent = delivery.sent;
+      emailError = delivery.sent ? undefined : delivery.error;
+    } catch (error) {
+      console.error("Signup verification email failed:", error);
+      emailError = error instanceof Error ? error.message : "Verification email could not be sent.";
+    }
 
     return NextResponse.json({
       ok: true,
       email: result.account.email,
-      emailSent: delivery.sent,
-      emailError: delivery.sent ? undefined : delivery.error,
-      verifyUrl: delivery.sent ? undefined : verifyUrl,
+      emailSent,
+      emailError: emailSent ? undefined : emailError,
+      verifyUrl: emailSent ? undefined : verifyUrl,
     });
   } catch (error) {
     console.error("Signup failed:", error);
