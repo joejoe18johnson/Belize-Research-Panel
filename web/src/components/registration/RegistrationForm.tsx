@@ -59,6 +59,7 @@ import { formatDobDisplay } from "@/lib/dob";
 import {
   getPhaseFieldKeys,
   getFirstPhaseIndexForErrors,
+  getOrderedErrorKeys,
   REGISTRATION_PHASES,
   validatePhasesThrough,
   validateRegistrationPhase,
@@ -76,6 +77,34 @@ function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
   const next = { ...errors };
   delete next[key];
   return next;
+}
+
+function findRegistrationErrorTarget(key: string): HTMLElement | null {
+  const candidates = [key, `${key}-section`];
+  if (key.startsWith("consent")) candidates.push("consent-section");
+  if (key === "contact") candidates.push("contact-section");
+  if (key === "photoIdFile" || key === "photoIdType") candidates.push("photo-id-section");
+  for (const id of candidates) {
+    const el = document.getElementById(id);
+    if (el) return el;
+  }
+  const byName = document.querySelector(`[name="${CSS.escape(key)}"]`);
+  if (byName instanceof HTMLElement) return byName;
+  return null;
+}
+
+function scrollElementIntoView(el: HTMLElement) {
+  const header = document.querySelector("header");
+  const headerHeight = header instanceof HTMLElement ? header.getBoundingClientRect().height : 88;
+  const y = el.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
+  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+  if (typeof el.focus === "function") {
+    try {
+      el.focus({ preventScroll: true });
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export interface RegistrationAccountContext {
@@ -120,6 +149,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   });
   const [phaseAttempted, setPhaseAttempted] = useState(false);
   const scrollToTopAfterPhaseChange = useRef(false);
+  const pendingErrorScrollKeys = useRef<string[] | null>(null);
 
   useEffect(() => {
     saveRegistrationDraft({
@@ -248,8 +278,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     [form, otherPlatform, account.email]
   );
 
-  const validateField = (key: keyof RegistrationFormData) => {
-    const fieldErrors = validateRegistrationForm(form, validationOptions);
+  const validateField = <K extends keyof RegistrationFormData>(
+    key: K,
+    nextValue?: RegistrationFormData[K]
+  ) => {
+    const data = nextValue === undefined ? form : { ...form, [key]: nextValue };
+    const fieldErrors = validateRegistrationForm(data, validationOptions);
     const message = fieldErrors[key as string];
     setErrors((prev) => (message ? { ...prev, [key]: message } : clearFieldError(prev, String(key))));
   };
@@ -262,27 +296,56 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const scrollToRegistrationTop = useCallback(() => {
     const anchor = document.getElementById("registration-phase-content");
     if (anchor) {
-      const y = anchor.getBoundingClientRect().top + window.scrollY - 24;
-      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-      anchor.focus({ preventScroll: true });
+      scrollElementIntoView(anchor);
       return;
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const scrollToFirstError = (errorKeys: string[]) => {
+  const scrollToFirstError = useCallback((errorKeys: string[]) => {
     for (const key of errorKeys) {
-      const el = document.getElementById(key);
+      const el = findRegistrationErrorTarget(key);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        el.focus({ preventScroll: true });
+        scrollElementIntoView(el);
         return;
       }
     }
+    const firstAlert = document.querySelector("#registration-phase-content [role='alert']");
+    if (firstAlert instanceof HTMLElement) {
+      scrollElementIntoView(firstAlert);
+      return;
+    }
     scrollToRegistrationTop();
+  }, [scrollToRegistrationTop]);
+
+  const scheduleErrorScroll = useCallback(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const keys = pendingErrorScrollKeys.current;
+        pendingErrorScrollKeys.current = null;
+        if (keys?.length) scrollToFirstError(keys);
+        else scrollToRegistrationTop();
+      });
+    });
+  }, [scrollToFirstError, scrollToRegistrationTop]);
+
+  const revealFirstError = (validationErrors: FieldErrors) => {
+    const keys = getOrderedErrorKeys(validationErrors);
+    pendingErrorScrollKeys.current = keys;
+    const nextPhase = getFirstPhaseIndexForErrors(validationErrors);
+    if (nextPhase !== activePhaseIndex) {
+      scrollToTopAfterPhaseChange.current = false;
+      setActivePhaseIndex(nextPhase);
+      return;
+    }
+    scheduleErrorScroll();
   };
 
   useEffect(() => {
+    if (pendingErrorScrollKeys.current?.length) {
+      scheduleErrorScroll();
+      return;
+    }
     if (!scrollToTopAfterPhaseChange.current) return;
     scrollToTopAfterPhaseChange.current = false;
     requestAnimationFrame(() => {
@@ -290,7 +353,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         scrollToRegistrationTop();
       });
     });
-  }, [activePhaseIndex, scrollToRegistrationTop]);
+  }, [activePhaseIndex, scheduleErrorScroll, scrollToRegistrationTop]);
 
   const currentPhaseErrors = validateRegistrationPhase(activePhaseIndex, progressInput, validationOptions);
   const showPhaseValidationAlert =
@@ -306,8 +369,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
     if (Object.keys(validationErrors).length > 0) {
       setPhaseAttempted(true);
-      scrollToTopAfterPhaseChange.current = true;
-      setActivePhaseIndex(getFirstPhaseIndexForErrors(validationErrors));
+      revealFirstError(validationErrors);
       return;
     }
 
@@ -333,8 +395,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         if (data.errors) {
           setErrors(data.errors);
           setPhaseAttempted(true);
-          scrollToTopAfterPhaseChange.current = true;
-          setActivePhaseIndex(getFirstPhaseIndexForErrors(data.errors));
+          revealFirstError(data.errors);
         } else {
           setErrors({ submit: data.message ?? "Registration failed. Please try again." });
           scrollToTopAfterPhaseChange.current = true;
@@ -358,7 +419,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const handleNextPhase = async () => {
     setPhaseAttempted(true);
 
-    const { errors: phaseErrors, firstErrorPhase } = validatePhasesThrough(
+    const { errors: phaseErrors } = validatePhasesThrough(
       activePhaseIndex,
       progressInput,
       validationOptions
@@ -373,12 +434,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
     if (Object.keys(phaseErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...phaseErrors }));
-      if (firstErrorPhase !== null && firstErrorPhase < activePhaseIndex) {
-        scrollToTopAfterPhaseChange.current = true;
-        setActivePhaseIndex(firstErrorPhase);
-      } else {
-        scrollToFirstError(Object.keys(phaseErrors));
-      }
+      revealFirstError(phaseErrors);
       return;
     }
 
@@ -642,7 +698,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 Select the product and service topics you are willing to give feedback on.
               </p>
               <Field label="Select all that apply" required error={fieldError("marketInterests")}>
-                <MultiSelect options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests"); }} error={fieldError("marketInterests")} />
+                <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
               </Field>
             </FormSection>
           ) : (
@@ -653,7 +709,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 3 ? (
         <>
-          <FormSection step={11} title="Preferred ways to contact you">
+          <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Please enter contact details carefully. At least two contact methods are encouraged so we can still reach you if one channel changes, is inactive, or fails during fieldwork.</p>
             <FieldGroup columns={2}>
               <Field label="Email address" hint="This is your verified account email." error={fieldError("email")} id="email">
@@ -745,14 +801,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <p><strong>Other contact detail:</strong> {form.otherContact || "Not provided"}</p>
               <p><strong>Street address:</strong> {form.streetAddress || "Not provided"}</p>
             </div>
-            <CheckboxField id="contactDetailsConfirmed" label="I confirm that the contact information shown above is correct. *" checked={form.contactDetailsConfirmed} onChange={(checked) => { update("contactDetailsConfirmed", checked); touch("contactDetailsConfirmed"); validateField("contactDetailsConfirmed"); }} error={fieldError("contactDetailsConfirmed")} />
+            <CheckboxField id="contactDetailsConfirmed" label="I confirm that the contact information shown above is correct. *" checked={form.contactDetailsConfirmed} onChange={(checked) => { update("contactDetailsConfirmed", checked); touch("contactDetailsConfirmed"); validateField("contactDetailsConfirmed", checked); }} error={fieldError("contactDetailsConfirmed")} />
           </FormSection>
         </>
       ) : null}
 
       {activePhaseIndex === 4 ? (
         <>
-          <FormSection step={13} title="Photo identification">
+          <FormSection step={13} title="Photo identification" id="photo-id-section">
             <div className="space-y-3">
               <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
               <div className="flex flex-wrap gap-4">
@@ -778,7 +834,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </SelectInput>
               </Field>
               <Field label={form.registrationMode === "Self-registration" ? "Upload photo ID image or PDF" : "Upload photo ID image or PDF — optional for authorised registration"} required={form.registrationMode === "Self-registration"} error={fieldError("photoIdFile")}>
-                <FileInput accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("photoIdFile", file); touch("photoIdFile"); validateField("photoIdFile"); }} error={fieldError("photoIdFile")} optional={form.registrationMode === "Registration by authorised person"} />
+                <FileInput id="photoIdFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("photoIdFile", file); touch("photoIdFile"); validateField("photoIdFile", file); }} error={fieldError("photoIdFile")} optional={form.registrationMode === "Registration by authorised person"} />
               </Field>
             </FieldGroup>
             <Alert variant="info">Photo identification is used only to verify your identity and eligibility. We do not keep or store ID images or copies in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.</Alert>
@@ -800,7 +856,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   </SelectInput>
                 </Field>
                 <Field label="Upload proof of Belize residence" required error={fieldError("proofOfBelizeResidenceFile")}>
-                  <FileInput accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile"); }} error={fieldError("proofOfBelizeResidenceFile")} />
+                  <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
                 </Field>
               </>
             ) : null}
@@ -810,11 +866,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 5 ? (
         <>
-          <FormSection step={14} title="Consent">
+          <FormSection step={14} title="Consent" id="consent-section">
             <div className="space-y-4">
-              <CheckboxField id="consentResearch" label="I agree to be considered for surveys, polls, interviews, or research activities. *" checked={form.consentResearch} onChange={(c) => { update("consentResearch", c); touch("consentResearch"); validateField("consentResearch"); }} error={fieldError("consentResearch")} />
-              <CheckboxField id="consentContact" label="I agree to be contacted using the contact details I provided. *" checked={form.consentContact} onChange={(c) => { update("consentContact", c); touch("consentContact"); validateField("consentContact"); }} error={fieldError("consentContact")} />
-              <CheckboxField id="consentPrivacy" label="I understand that my information should be kept confidential and used only for legitimate research-related purposes. *" checked={form.consentPrivacy} onChange={(c) => { update("consentPrivacy", c); touch("consentPrivacy"); validateField("consentPrivacy"); }} error={fieldError("consentPrivacy")} />
+              <CheckboxField id="consentResearch" label="I agree to be considered for surveys, polls, interviews, or research activities. *" checked={form.consentResearch} onChange={(c) => { update("consentResearch", c); touch("consentResearch"); validateField("consentResearch", c); }} error={fieldError("consentResearch")} />
+              <CheckboxField id="consentContact" label="I agree to be contacted using the contact details I provided. *" checked={form.consentContact} onChange={(c) => { update("consentContact", c); touch("consentContact"); validateField("consentContact", c); }} error={fieldError("consentContact")} />
+              <CheckboxField id="consentPrivacy" label="I understand that my information should be kept confidential and used only for legitimate research-related purposes. *" checked={form.consentPrivacy} onChange={(c) => { update("consentPrivacy", c); touch("consentPrivacy"); validateField("consentPrivacy", c); }} error={fieldError("consentPrivacy")} />
             </div>
           </FormSection>
 
@@ -845,7 +901,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </tbody>
               </table>
             </div>
-            <CheckboxField id="finalReviewConfirmed" label="I have reviewed the full form and confirm that the information is correct. *" checked={form.finalReviewConfirmed} onChange={(c) => { update("finalReviewConfirmed", c); touch("finalReviewConfirmed"); validateField("finalReviewConfirmed"); }} error={fieldError("finalReviewConfirmed")} />
+            <CheckboxField id="finalReviewConfirmed" label="I have reviewed the full form and confirm that the information is correct. *" checked={form.finalReviewConfirmed} onChange={(c) => { update("finalReviewConfirmed", c); touch("finalReviewConfirmed"); validateField("finalReviewConfirmed", c); }} error={fieldError("finalReviewConfirmed")} />
           </FormSection>
         </>
       ) : null}

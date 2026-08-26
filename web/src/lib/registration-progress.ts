@@ -102,6 +102,21 @@ export function getFirstPhaseIndexForErrors(errors: FieldErrors): number {
   return found ? minPhase : 0;
 }
 
+/** Field keys with errors, in form order so the first one is the one to scroll to. */
+export function getOrderedErrorKeys(errors: FieldErrors): string[] {
+  const keys: string[] = [];
+  for (const phaseKeys of PHASE_ERROR_KEYS) {
+    for (const key of phaseKeys) {
+      if (errors[key] && !keys.includes(key)) keys.push(key);
+    }
+  }
+  for (const key of Object.keys(errors)) {
+    if (key === "submit") continue;
+    if (!keys.includes(key)) keys.push(key);
+  }
+  return keys;
+}
+
 export function getPhaseFieldKeys(phaseIndex: number): readonly string[] {
   return PHASE_ERROR_KEYS[phaseIndex] ?? [];
 }

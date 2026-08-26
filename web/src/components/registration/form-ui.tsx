@@ -22,13 +22,15 @@ export function FormSection({
   step,
   title,
   children,
+  id,
 }: {
   step: number;
   title: string;
   children: ReactNode;
+  id?: string;
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+    <section id={id} className="scroll-mt-28 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
       <h2 className="mb-5 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
         <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-teal-700 text-sm text-white">
           {step}
@@ -167,11 +169,13 @@ export function MultiSelect({
   values,
   onChange,
   error,
+  id,
 }: {
   options: string[];
   values: string[];
   onChange: (values: string[]) => void;
   error?: string;
+  id?: string;
 }) {
   const toggle = (option: string) => {
     if (values.includes(option)) {
@@ -182,7 +186,7 @@ export function MultiSelect({
   };
 
   return (
-    <div>
+    <div id={id}>
       <div className={`grid gap-3 sm:grid-cols-2 ${error ? "rounded-lg ring-2 ring-red-500/30 p-2" : ""}`}>
         {options.map((option) => (
           <label
@@ -225,15 +229,18 @@ export function FileInput({
   onChange,
   error,
   optional,
+  id,
 }: {
   accept?: string;
   onChange: (file: File | null) => void;
   error?: string;
   optional?: boolean;
+  id?: string;
 }) {
   return (
     <div>
       <input
+        id={id}
         type="file"
         accept={accept}
         onChange={(e) => onChange(e.target.files?.[0] ?? null)}
