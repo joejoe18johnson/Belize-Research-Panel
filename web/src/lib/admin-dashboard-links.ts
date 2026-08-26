@@ -6,6 +6,7 @@ export const ADMIN_DASHBOARD_LINKS = {
   panelistsFlagged: "/admin/panelists?tab=flagged",
   verified: "/admin/panelists?verification=Verified",
   underReview: "/admin/under-review",
+  underReviewPending: "/admin/under-review?queue=pending",
   underReviewIncomplete: "/admin/under-review?queue=incomplete",
   underReviewFlagged: "/admin/panelists?tab=flagged",
   underReviewOnHold: "/admin/under-review?queue=on_hold",
@@ -16,10 +17,11 @@ export const ADMIN_DASHBOARD_LINKS = {
   phoneChanges: "/admin/notifications?type=phone",
 } as const;
 
-export type UnderReviewQueueFilter = "incomplete" | "flagged" | "on_hold";
+export type UnderReviewQueueFilter = "pending" | "incomplete" | "flagged" | "on_hold";
 
 export function parseUnderReviewQueueFilter(value: string | undefined): UnderReviewQueueFilter | null {
   const normalized = (value ?? "").trim().toLowerCase();
+  if (normalized === "pending" || normalized === "verification" || normalized === "verify") return "pending";
   if (normalized === "incomplete" || normalized === "requirements") return "incomplete";
   if (normalized === "flagged" || normalized === "duplicate") return "flagged";
   if (normalized === "on_hold" || normalized === "hold" || normalized === "onhold") return "on_hold";
@@ -36,6 +38,13 @@ export function filterUnderReviewRowsByQueue<
   },
 >(rows: T[], queue: UnderReviewQueueFilter | null): T[] {
   if (!queue) return rows;
+
+  if (queue === "pending") {
+    return rows.filter((row) => {
+      const status = cleanText(row.verificationStatus) || "Pending";
+      return status === "Pending" || status === "Needs Follow-up";
+    });
+  }
 
   if (queue === "incomplete") {
     return rows.filter(
@@ -54,6 +63,7 @@ export function filterUnderReviewRowsByQueue<
 }
 
 export const UNDER_REVIEW_QUEUE_LABELS: Record<UnderReviewQueueFilter, string> = {
+  pending: "Pending verification",
   incomplete: "Requirements incomplete",
   flagged: "Flagged (possible duplicate)",
   on_hold: "Accounts on hold",

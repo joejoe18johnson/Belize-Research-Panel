@@ -242,7 +242,7 @@ export function buildPanelistReviewReasons(
 ): string[] {
   const requirements = assessPanelistRequirements(panelist, context);
   const reasons: string[] = [];
-  const status = cleanText(panelist.verification_status);
+  const status = panelistVerificationStatus(panelist);
 
   if (options.duplicateNameDobMatch) {
     reasons.push("Same name and date of birth as another panelist (review in Duplicate Review)");
@@ -269,13 +269,23 @@ export function buildPanelistReviewReasons(
   return [...new Set(reasons)];
 }
 
+export function panelistVerificationStatus(panelist: PanelistRow): string {
+  return cleanText(panelist.verification_status) || "Pending";
+}
+
+/** New or follow-up panelists waiting for an administrator to verify the account. */
+export function panelistNeedsAdminVerification(panelist: PanelistRow): boolean {
+  const status = panelistVerificationStatus(panelist);
+  return status === "Pending" || status === "Needs Follow-up";
+}
+
 export function panelistRequiresAdminReview(
   panelist: PanelistRow,
   context: RequirementContext = {},
   options: { accountOnHold?: boolean; duplicateNameDobMatch?: boolean } = {}
 ): boolean {
   const requirements = assessPanelistRequirements(panelist, context);
-  const status = cleanText(panelist.verification_status);
+  const status = panelistVerificationStatus(panelist);
 
   if (options.accountOnHold) return true;
   if (!requirements.allApproved) return true;

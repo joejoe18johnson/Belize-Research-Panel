@@ -319,7 +319,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         setDeleteDialogError(data.message ?? "Could not delete record.");
         return;
       }
-      const successMessage = `The panelist record for ${label} has been successfully deleted.`;
+      const successMessage = `The panelist record and login account for ${label} have been successfully deleted.`;
       setDeleteDialogSuccess(successMessage);
       setActionMessage(successMessage);
       router.refresh();

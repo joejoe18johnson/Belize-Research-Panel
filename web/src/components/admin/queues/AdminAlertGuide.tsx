@@ -20,8 +20,8 @@ export function AdminAlertGuide({
           {formatHeadingCase("Where admin alerts appear")}
         </h2>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Admin alerts use three separate read-state scopes. Unread items show a green highlight in their queue and
-          increment the matching sidebar badge.
+          Admin alerts use four related queues. Unread items show a green highlight in their queue and
+          increment the matching sidebar badge. Panelist verification appears on both Notifications and Under Review.
         </p>
         {demoLoopEnabled ? (
           <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
@@ -31,7 +31,7 @@ export function AdminAlertGuide({
         ) : null}
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {ADMIN_ALERT_SCOPE_GUIDES.map((guide) => {
           const unread = scopeCounts[guide.scope] ?? 0;
           return (

@@ -4,11 +4,7 @@ import { buildCampaignSummaries } from "@/lib/campaign-targeting";
 import { loadCampaignRecords } from "@/lib/campaigns";
 import { buildNotificationQueueRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
-import {
-  unreadAdminNotificationIds,
-  unreadCompletedCampaignIds,
-  unreadNewPayoutIds,
-} from "@/lib/admin-nav-badges";
+import { unreadAdminNotificationIds, unreadCompletedCampaignIds, unreadNewPayoutIds, unreadPanelistVerificationIds } from "@/lib/admin-nav-badges";
 import { isAdminDemoNotificationLoopEnabled } from "@/lib/admin-demo-notification-loop";
 import { loadAdminReadState } from "@/lib/admin-read-state";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
@@ -31,6 +27,7 @@ export default async function AdminNotificationsPage() {
     notifications: unreadIds.length,
     payouts: unreadNewPayoutIds(hub, readState).length,
     campaigns: unreadCompletedCampaignIds(campaignSummaries, readState).length,
+    "under-review": unreadPanelistVerificationIds(hub, readState).length,
   };
 
   return (

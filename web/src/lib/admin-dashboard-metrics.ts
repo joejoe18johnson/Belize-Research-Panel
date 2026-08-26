@@ -8,6 +8,7 @@ import type { RequirementApprovalStatus } from "./panelist-requirements";
 import {
   assessPanelistRequirements,
   buildPanelistReviewReasons,
+  panelistNeedsAdminVerification,
   panelistRequiresAdminReview,
   requirementContextFromAccount,
 } from "./panelist-requirements";
@@ -17,7 +18,7 @@ import {
   formatPayoutPaymentDetails,
   payoutShortId,
 } from "./admin-payout-display";
-import { adminNotificationId } from "./admin-read-state";
+import { adminNotificationId, adminPanelistVerificationId, PANELIST_VERIFICATION_NOTIFICATION_TYPE } from "./admin-read-state";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -69,11 +70,17 @@ export interface UnderReviewRow {
   hasAddressDocument: boolean;
 }
 
+export type NotificationQueueType =
+  | "Email change"
+  | "Phone change"
+  | "Email verification"
+  | "Panelist verification";
+
 export interface NotificationQueueRow {
   id: string;
   email: string;
   name: string;
-  type: "Email change" | "Phone change" | "Email verification";
+  type: NotificationQueueType;
   detail: string;
   requestedAt: string;
 }
@@ -371,6 +378,29 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
         requestedAt: cleanText(account.created_at) || "—",
       });
     }
+  }
+
+  const seenPanelistEmails = new Set<string>();
+  for (const panelist of hub.panelists) {
+    if (!panelistNeedsAdminVerification(panelist)) continue;
+    const email = cleanText(panelist.email).toLowerCase();
+    if (!email || seenPanelistEmails.has(email)) continue;
+    seenPanelistEmails.add(email);
+
+    const account = hub.accounts.find((item) => cleanText(item.email).toLowerCase() === email);
+    const context = requirementContextFromAccount(account);
+    const reasons = buildPanelistReviewReasons(panelist, context, {
+      accountOnHold: cleanText(account?.account_status) === "on_hold",
+    });
+
+    rows.push({
+      id: adminPanelistVerificationId(email),
+      email,
+      name: panelistName(panelist, account),
+      type: PANELIST_VERIFICATION_NOTIFICATION_TYPE,
+      detail: reasons[0] || "Awaiting administrator verification",
+      requestedAt: cleanText(panelist.registration_date) || cleanText(account?.created_at) || "—",
+    });
   }
 
   return rows

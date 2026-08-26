@@ -18,6 +18,9 @@ function matchesNotificationType(row: NotificationQueueRow, typeFilter: string |
   if (normalized === "phone") return row.type === "Phone change";
   if (normalized === "email") return row.type === "Email change";
   if (normalized === "verification") return row.type === "Email verification";
+  if (normalized === "panelist" || normalized === "review" || normalized === "under-review") {
+    return row.type === "Panelist verification";
+  }
   return row.type.toLowerCase().includes(normalized);
 }
 
@@ -59,6 +62,7 @@ export function AdminNotificationsDashboard({
   const emailChanges = rows.filter((row) => row.type === "Email change").length;
   const phoneChanges = rows.filter((row) => row.type === "Phone change").length;
   const emailVerification = rows.filter((row) => row.type === "Email verification").length;
+  const panelistVerification = rows.filter((row) => row.type === "Panelist verification").length;
   const newCount = rows.filter((row) => unreadSet.has(row.id)).length;
 
   const markNotificationRead = async (id: string) => {
@@ -110,13 +114,19 @@ export function AdminNotificationsDashboard({
       <PageIntro
         eyebrow="Admin action queue"
         title="Notifications"
-        description="Contact change approvals and signup email verification backlog requiring administrator attention."
+        description="Contact change approvals, signup email confirmation, and new panelists waiting for administrator verification."
         action={<AdminMarkReadButton scope="notifications" />}
       />
 
       {typeFilter ? (
         <BrandedAlert tone="info" compact showIcon>
-          Showing {typeFilter === "phone" ? "phone change" : typeFilter} notifications.{" "}
+          Showing{" "}
+          {typeFilter === "phone"
+            ? "phone change"
+            : typeFilter === "panelist" || typeFilter === "review"
+              ? "panelist verification"
+              : typeFilter}{" "}
+          notifications.{" "}
           <Link href="/admin/notifications" className="font-semibold underline">
             Show all notifications
           </Link>
@@ -131,11 +141,33 @@ export function AdminNotificationsDashboard({
 
       <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Total pending" value={rows.length} />
-        <MetricCard label="Email changes" value={emailChanges} />
-        <MetricCard label="Phone changes" value={phoneChanges} />
-        <MetricCard label="Email verification" value={emailVerification} />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <MetricCard label="Total pending" value={rows.length} href="/admin/notifications" active={!typeFilter} />
+        <MetricCard
+          label="Email changes"
+          value={emailChanges}
+          href="/admin/notifications?type=email"
+          active={typeFilter === "email"}
+        />
+        <MetricCard
+          label="Phone changes"
+          value={phoneChanges}
+          href="/admin/notifications?type=phone"
+          active={typeFilter === "phone"}
+        />
+        <MetricCard
+          label="Email verification"
+          value={emailVerification}
+          href="/admin/notifications?type=verification"
+          active={typeFilter === "verification"}
+        />
+        <MetricCard
+          label="Panelist verification"
+          value={panelistVerification}
+          hint="Also on Under Review"
+          href="/admin/notifications?type=panelist"
+          active={typeFilter === "panelist" || typeFilter === "review"}
+        />
       </div>
 
       {message ? (
@@ -162,7 +194,7 @@ export function AdminNotificationsDashboard({
         {rows.length === 0 ? (
           <div className="mt-4">
             <BrandedAlert tone="success" title="Queue clear" showIcon>
-              No pending notifications or contact approvals.
+              No pending notifications, contact approvals, or panelist verification items.
             </BrandedAlert>
           </div>
         ) : (
@@ -220,12 +252,28 @@ export function AdminNotificationsDashboard({
                             </button>
                           ) : null}
                           <Link
-                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                            href={
+                              row.type === "Panelist verification"
+                                ? "/admin/under-review?queue=pending"
+                                : `/admin/panelists?email=${encodeURIComponent(row.email)}`
+                            }
                             className="text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
-                            onClick={() => void markNotificationRead(row.id)}
+                            onClick={() => {
+                              if (row.type === "Panelist verification") return;
+                              void markNotificationRead(row.id);
+                            }}
                           >
-                            Open record
+                            {row.type === "Panelist verification" ? "Open Under Review" : "Open record"}
                           </Link>
+                          {row.type === "Panelist verification" ? (
+                            <Link
+                              href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                              className="text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
+                              onClick={() => void markNotificationRead(row.id)}
+                            >
+                              Open record
+                            </Link>
+                          ) : null}
                         </div>
                       </td>
                     </tr>

@@ -352,7 +352,7 @@ export function AdminPanelistsClient({
         return;
       }
       if (editingEmail === email) closeEdit();
-      const successMessage = `The panelist record for ${label} has been successfully deleted.`;
+      const successMessage = `The panelist record and login account for ${label} have been successfully deleted.`;
       setDeleteDialogSuccess(successMessage);
       setRowActionMessage(successMessage);
       router.refresh();

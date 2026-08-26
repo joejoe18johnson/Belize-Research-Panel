@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   AdminDataTable,
-  AdminSectionPanel,
   AdminStatusPill,
   AdminTableHead,
   AdminTableRow,
   AdminTableTd,
   AdminTableTh,
+  AdminNewBadge,
   MetricCard,
   PageIntro,
   ReviewReasonList,
+  adminNewItemRowClass,
 } from "@/components/admin/shared/AdminUi";
+import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
@@ -29,13 +31,25 @@ import {
   UNDER_REVIEW_FILTER_LABELS,
   UNDER_REVIEW_QUEUE_LABELS,
 } from "@/lib/admin-dashboard-links";
+import { adminPanelistVerificationId } from "@/lib/admin-read-state";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
-export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) {
+export function AdminUnderReviewDashboard({
+  rows,
+  unreadEmails = [],
+}: {
+  rows: UnderReviewRow[];
+  unreadEmails?: string[];
+}) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const requirementFilter = parseUnderReviewRequirementFilter(searchParams.get("requirement") ?? undefined);
   const queueFilter = parseUnderReviewQueueFilter(searchParams.get("queue") ?? undefined);
   const [search, setSearch] = useState("");
+  const unreadSet = useMemo(
+    () => new Set(unreadEmails.map((email) => email.trim().toLowerCase())),
+    [unreadEmails]
+  );
 
   const requirementFiltered = useMemo(
     () => filterUnderReviewRowsByRequirement(rows, requirementFilter),
@@ -61,6 +75,10 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
 
   const pagination = useTablePagination(filtered);
 
+  const pendingVerification = rows.filter((row) => {
+    const status = row.verificationStatus.trim() || "Pending";
+    return status === "Pending" || status === "Needs Follow-up";
+  }).length;
   const incompleteRequirements = rows.filter(
     (row) =>
       row.emailRequirement !== "approved" ||
@@ -69,6 +87,17 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
   ).length;
   const flagged = rows.filter((row) => isFlaggedPanelist({ verification_status: row.verificationStatus })).length;
   const onHold = rows.filter((row) => row.accountStatus === "on_hold").length;
+  const newCount = rows.filter((row) => unreadSet.has(row.email.toLowerCase())).length;
+
+  const markUnderReviewRead = async (email: string) => {
+    if (!unreadSet.has(email.toLowerCase())) return;
+    await fetch("/api/admin/read-state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scope: "under-review", ids: [adminPanelistVerificationId(email)] }),
+    });
+    router.refresh();
+  };
 
   const queueHref = (queue: string | null) => {
     const params = new URLSearchParams();
@@ -90,6 +119,7 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
               ? `Showing panelists with ${UNDER_REVIEW_FILTER_LABELS[requirementFilter].toLowerCase()} needing review.`
               : "Panelists with incomplete email, phone, or photo ID requirements, plus possible-duplicate flags, pending verification, or on-hold accounts."
         }
+        action={newCount > 0 ? <AdminMarkReadButton scope="under-review" /> : undefined}
       />
 
       {queueFilter ? (
@@ -120,12 +150,35 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
         </p>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {newCount > 0 ? (
+        <BrandedAlert tone="success" compact showIcon>
+          {newCount} new panelist{newCount === 1 ? "" : "s"} awaiting verification, highlighted in green below. Also listed in{" "}
+          <Link href="/admin/notifications?type=panelist" className="font-semibold underline">
+            Notifications
+          </Link>
+          .
+        </BrandedAlert>
+      ) : null}
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <MetricCard
+          label="New"
+          value={newCount}
+          hint="Unread verification"
+          href={queueHref("pending")}
+          active={queueFilter === "pending"}
+        />
         <MetricCard
           label="Total in queue"
           value={rows.length}
           href="/admin/under-review#under-review-queue"
           active={!queueFilter && !requirementFilter}
+        />
+        <MetricCard
+          label="Pending verification"
+          value={pendingVerification}
+          href={queueHref("pending")}
+          active={queueFilter === "pending"}
         />
         <MetricCard
           label="Requirements incomplete"
@@ -197,10 +250,18 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                   <AdminTableTh>Actions</AdminTableTh>
                 </AdminTableHead>
                 <tbody>
-                  {pagination.paginatedRows.map((row) => (
-                    <AdminTableRow key={row.email} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/30">
+                  {pagination.paginatedRows.map((row) => {
+                    const isNew = unreadSet.has(row.email.toLowerCase());
+                    return (
+                    <AdminTableRow
+                      key={row.email}
+                      className={adminNewItemRowClass(isNew, "hover:bg-teal-50/30 dark:hover:bg-teal-950/30")}
+                    >
                       <AdminTableTd label="Name">
-                        <span className="font-medium text-zinc-800 dark:text-zinc-200">{row.name}</span>
+                        <span className="inline-flex items-center gap-2 font-medium text-zinc-800 dark:text-zinc-200">
+                          {row.name}
+                          {isNew ? <AdminNewBadge /> : null}
+                        </span>
                       </AdminTableTd>
                       <AdminTableTd label="Email" className="break-all">
                         {row.email}
@@ -242,12 +303,14 @@ export function AdminUnderReviewDashboard({ rows }: { rows: UnderReviewRow[] }) 
                         <Link
                           href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
                           className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
+                          onClick={() => void markUnderReviewRead(row.email)}
                         >
                           Open record
                         </Link>
                       </AdminTableTd>
                     </AdminTableRow>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </AdminDataTable>
             </div>

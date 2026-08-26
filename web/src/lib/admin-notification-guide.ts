@@ -1,6 +1,6 @@
 import type { NotificationQueueRow } from "./admin-dashboard-metrics";
 
-export type AdminAlertScope = "notifications" | "payouts" | "campaigns";
+export type AdminAlertScope = "notifications" | "payouts" | "campaigns" | "under-review";
 
 export interface AdminAlertScopeGuide {
   scope: AdminAlertScope;
@@ -19,7 +19,7 @@ export interface NotificationQueueGuide {
   filterHref?: string;
 }
 
-/** Cross-module admin alert scopes — each has its own read-state bucket. */
+/** Cross-module admin alert scopes. Panelist verification is listed on Notifications and Under Review. */
 export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
   {
     scope: "notifications",
@@ -27,7 +27,7 @@ export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
     navLabel: "Notifications",
     href: "/admin/notifications",
     description:
-      "Pending email changes, phone/WhatsApp changes, and signup emails awaiting verification.",
+      "Pending email changes, phone/WhatsApp changes, signup emails awaiting confirmation, and panelists waiting for administrator verification.",
     markedReadWhen:
       "Open record (per row), Approve (email/phone only — also completes the request), or Mark all read on this page.",
   },
@@ -47,6 +47,15 @@ export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
     href: "/admin/campaigns",
     description: "Campaigns whose assigned surveys are fully submitted, or campaigns explicitly closed.",
     markedReadWhen: "Open campaign results for that campaign (automatic), or Mark all read on Campaigns.",
+  },
+  {
+    scope: "under-review",
+    title: "Panelist verification",
+    navLabel: "Under Review",
+    href: "/admin/under-review?queue=pending",
+    description: "New panelists whose identity, documents, or follow-up still need an administrator to verify.",
+    markedReadWhen:
+      "Open record from Notifications or Under Review, or Mark all read on either of those pages.",
   },
 ];
 
@@ -72,6 +81,13 @@ export const NOTIFICATION_QUEUE_GUIDES: NotificationQueueGuide[] = [
     navBadge: "Notifications nav badge",
     markedReadWhen: "Open record or Mark all read",
     filterHref: "/admin/notifications?type=verification",
+  },
+  {
+    type: "Panelist verification",
+    whereShown: "Admin Console → Notifications and Under Review",
+    navBadge: "Notifications and Under Review nav badges",
+    markedReadWhen: "Open record or Mark all read on Notifications or Under Review",
+    filterHref: "/admin/notifications?type=panelist",
   },
 ];
 

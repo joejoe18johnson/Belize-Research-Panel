@@ -7,7 +7,7 @@ export function AdminMarkReadButton({
   scope,
   label = "Mark all as read",
 }: {
-  scope: "notifications" | "payouts" | "campaigns";
+  scope: "notifications" | "payouts" | "campaigns" | "under-review";
   label?: string;
 }) {
   const router = useRouter();

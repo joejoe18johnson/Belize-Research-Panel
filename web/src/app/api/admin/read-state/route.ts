@@ -5,7 +5,7 @@ import { unreadCompletedCampaignIds } from "@/lib/admin-nav-badges";
 import { buildCampaignSummaries } from "@/lib/campaign-targeting";
 import { loadCampaignRecords } from "@/lib/campaigns";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
-import { unreadAdminNotificationIds, unreadNewPayoutIds } from "@/lib/admin-nav-badges";
+import { unreadAdminNotificationIds, unreadNewPayoutIds, unreadPanelistVerificationIds } from "@/lib/admin-nav-badges";
 import {
   loadAdminReadState,
   markAdminCampaignsRead,
@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
       const targetIds = body.markAll ? unreadAdminNotificationIds(hub, readState) : ids;
       const updated = await markAdminNotificationsRead(targetIds);
       revalidateAdminShell();
+      revalidatePath("/admin/notifications");
+      revalidatePath("/admin/under-review");
       return NextResponse.json({ ok: true, unreadNotifications: unreadAdminNotificationIds(hub, updated).length });
     }
 
@@ -68,6 +70,24 @@ export async function POST(request: NextRequest) {
       const updated = await markAdminPayoutsRead(targetIds);
       revalidateAdminShell();
       return NextResponse.json({ ok: true, unreadPayouts: unreadNewPayoutIds(hub, updated).length });
+    }
+
+    if (scope === "under-review") {
+      if (session && !sessionCanAccessModule(session, "under-review")) {
+        return NextResponse.json({ message: "Access denied." }, { status: 403 });
+      }
+
+      const hub = await loadAdminDataHub();
+      const readState = await loadAdminReadState();
+      const targetIds = body.markAll ? unreadPanelistVerificationIds(hub, readState) : ids;
+      const updated = await markAdminNotificationsRead(targetIds);
+      revalidateAdminShell();
+      revalidatePath("/admin/under-review");
+      revalidatePath("/admin/notifications");
+      return NextResponse.json({
+        ok: true,
+        unreadUnderReview: unreadPanelistVerificationIds(hub, updated).length,
+      });
     }
 
     if (scope === "campaigns") {
@@ -91,7 +111,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ message: "Scope must be notifications, payouts, or campaigns." }, { status: 400 });
+    return NextResponse.json({ message: "Scope must be notifications, payouts, campaigns, or under-review." }, { status: 400 });
   } catch {
     return NextResponse.json({ message: "Read state could not be updated." }, { status: 500 });
   }

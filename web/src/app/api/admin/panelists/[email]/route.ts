@@ -163,8 +163,9 @@ export async function DELETE(
   const accountEmail = decodeURIComponent(email);
 
   const panelist = await findPanelistByEmail(accountEmail);
-  if (!panelist) {
-    return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+  const account = await findAccountByEmail(accountEmail);
+  if (!panelist && !account) {
+    return NextResponse.json({ ok: false, message: "User record not found." }, { status: 404 });
   }
 
   let confirmCode = "";
@@ -175,7 +176,12 @@ export async function DELETE(
     confirmCode = "";
   }
 
-  const expectedCode = buildPanelistDeleteCode(panelist);
+  const expectedCode = panelist
+    ? buildPanelistDeleteCode(panelist)
+    : buildPanelistDeleteCode({
+        first_name: account?.first_name,
+        registration_date: account?.created_at,
+      });
   if (!matchesDeleteConfirmation(confirmCode, expectedCode)) {
     return NextResponse.json(
       {
@@ -189,7 +195,7 @@ export async function DELETE(
   const deleted = await deletePanelistByEmail(accountEmail);
 
   if (!deleted) {
-    return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
+    return NextResponse.json({ ok: false, message: "User record not found." }, { status: 404 });
   }
 
   return NextResponse.json({

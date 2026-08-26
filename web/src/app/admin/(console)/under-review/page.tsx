@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { AdminUnderReviewDashboard } from "@/components/admin/queues/AdminUnderReviewDashboard";
 import { buildUnderReviewRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
+import { unreadPanelistVerificationEmails } from "@/lib/admin-nav-badges";
+import { loadAdminReadState } from "@/lib/admin-read-state";
 import { loadPanelistPhotoUploadUsernames } from "@/lib/panelist-requirement-context";
 
 export const metadata = {
@@ -9,7 +11,11 @@ export const metadata = {
 };
 
 export default async function AdminUnderReviewPage() {
-  const [hub, photoUploadUsernames] = await Promise.all([loadAdminDataHub(), loadPanelistPhotoUploadUsernames()]);
+  const [hub, photoUploadUsernames, readState] = await Promise.all([
+    loadAdminDataHub(),
+    loadPanelistPhotoUploadUsernames(),
+    loadAdminReadState(),
+  ]);
 
   return (
     <Suspense
@@ -19,7 +25,10 @@ export default async function AdminUnderReviewPage() {
         </div>
       }
     >
-      <AdminUnderReviewDashboard rows={buildUnderReviewRows(hub, photoUploadUsernames)} />
+      <AdminUnderReviewDashboard
+        rows={buildUnderReviewRows(hub, photoUploadUsernames)}
+        unreadEmails={unreadPanelistVerificationEmails(hub, readState)}
+      />
     </Suspense>
   );
 }
