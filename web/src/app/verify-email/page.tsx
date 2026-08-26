@@ -13,12 +13,36 @@ export const metadata = buildPageMetadata({
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string; purpose?: string; error?: string }>;
+  searchParams: Promise<{ token?: string; purpose?: string; error?: string; verified?: string }>;
 }) {
-  const { token, purpose, error } = await searchParams;
+  const { token, purpose, error, verified } = await searchParams;
 
   if (token && !error && purpose !== "email-change") {
     redirect(`/api/auth/verify-email?token=${encodeURIComponent(token)}`);
+  }
+
+  if (verified === "1") {
+    return (
+      <AuthPageShell
+        title="Congratulations, your email has been verified"
+        subtitle="Please log in to continue with account registration."
+      >
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/login?next=/register&verified=1"
+            className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            Log in
+          </Link>
+          <Link
+            href="/"
+            className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            Back to home
+          </Link>
+        </div>
+      </AuthPageShell>
+    );
   }
 
   if (purpose === "email-change" && token) {

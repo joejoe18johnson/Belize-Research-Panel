@@ -7,6 +7,7 @@ import {
   renderEmailTemplate,
   type EmailTemplateId,
 } from "../src/lib/email/email-templates";
+import { resolveResendFromAddress } from "../src/lib/email/send-transactional-email";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://api.resend.com";
@@ -149,9 +150,7 @@ async function main() {
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is missing. Add it to web/.env.local");
   }
-  const from =
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    "Belize Research Panel <onboarding@resend.dev>";
+  const from = resolveResendFromAddress();
 
   const existing = await listAllTemplates(apiKey);
   const byAlias = new Map(

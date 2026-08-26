@@ -56,11 +56,24 @@ function resendClient(): Resend | null {
   return new Resend(apiKey);
 }
 
+const FROM_DISPLAY_NAME = "Belize Research Panel";
+const FROM_FALLBACK_EMAIL = "onboarding@resend.dev";
+const FROM_EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+
+/** Resend requires `email@domain` or `Name <email@domain>`. Netlify often strips `<>`. */
+export function resolveResendFromAddress(raw = process.env.RESEND_FROM_EMAIL): string {
+  const value = raw?.trim() ?? "";
+  const email = value.match(FROM_EMAIL_RE)?.[0] ?? FROM_FALLBACK_EMAIL;
+  if (value && !FROM_EMAIL_RE.test(value)) {
+    console.error(
+      "[email] RESEND_FROM_EMAIL has no valid address. Set it to a plain email on your verified domain, e.g. noreply@info.dashboardresearch.com"
+    );
+  }
+  return `${FROM_DISPLAY_NAME} <${email}>`;
+}
+
 function fromAddress(): string {
-  return (
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    "Belize Research Panel <onboarding@resend.dev>"
-  );
+  return resolveResendFromAddress();
 }
 
 export async function sendTransactionalEmail(input: {

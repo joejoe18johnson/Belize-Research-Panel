@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccountEmail } from "@/lib/accounts";
-import { resolveRequestOrigin, setSessionCookie } from "@/lib/auth";
+import { clearSessionCookie, resolveRequestOrigin } from "@/lib/auth";
 
 function redirectTo(request: NextRequest, path: string): NextResponse {
   return NextResponse.redirect(new URL(path, resolveRequestOrigin(request)));
@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
       return redirectTo(request, "/verify-email?error=expired");
     }
 
-    await setSessionCookie(account.id);
-    return redirectTo(request, "/register");
+    await clearSessionCookie();
+    return redirectTo(request, "/verify-email?verified=1");
   } catch (error) {
     console.error("Email verification failed:", error);
     return redirectTo(request, "/verify-email?error=failed");

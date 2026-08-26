@@ -1,6 +1,7 @@
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignedInBanner } from "@/components/auth/SignedInBanner";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { getSessionAccount } from "@/lib/auth";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { redirect } from "next/navigation";
@@ -15,9 +16,9 @@ export const metadata = buildPageMetadata({
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; email?: string }>;
+  searchParams: Promise<{ next?: string; email?: string; verified?: string }>;
 }) {
-  const { next: nextPath, email: initialEmail } = await searchParams;
+  const { next: nextPath, email: initialEmail, verified } = await searchParams;
   const account = await getSessionAccount();
   const destination = nextPath ?? "/dashboard";
 
@@ -30,6 +31,11 @@ export default async function LoginPage({
       title="Panelist login"
       subtitle="Sign in with the email and password you used when creating your account."
     >
+      {verified === "1" ? (
+        <BrandedAlert tone="success" title="Congratulations, your email has been verified" className="mb-6" showIcon>
+          Please log in to continue with account registration.
+        </BrandedAlert>
+      ) : null}
       {account ? <SignedInBanner account={account} nextPath={destination} /> : null}
       <LoginForm nextPath={destination} initialEmail={initialEmail ?? ""} />
     </AuthPageShell>
