@@ -36,6 +36,10 @@ async function loadAccountsRaw(): Promise<AccountRecord[]> {
   }
 }
 
+export async function listAccounts(): Promise<AccountRecord[]> {
+  return loadAccountsRaw();
+}
+
 async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
   const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
   if (useSupabase()) {

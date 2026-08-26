@@ -87,12 +87,16 @@ async function removeAccountByEmail(email: string): Promise<void> {
 }
 
 export async function deletePanelistRelatedData(email: string, username: string): Promise<void> {
-  await Promise.all([
-    deletePanelistUploads(username),
-    removePanelistSurveyAssignments(email),
-    removeJsonStoreKey(NOTIFICATION_STATE_FILE, email),
-    removeJsonStoreKey(POINTS_OVERRIDE_FILE, email),
-    removeJsonStoreKey(REDEMPTION_REQUESTS_FILE, email),
-    removeAccountByEmail(email),
-  ]);
+  try {
+    await Promise.all([
+      deletePanelistUploads(username),
+      removePanelistSurveyAssignments(email),
+      removeJsonStoreKey(NOTIFICATION_STATE_FILE, email),
+      removeJsonStoreKey(POINTS_OVERRIDE_FILE, email),
+      removeJsonStoreKey(REDEMPTION_REQUESTS_FILE, email),
+      removeAccountByEmail(email),
+    ]);
+  } catch (error) {
+    console.error("Panelist related-data cleanup failed:", error);
+  }
 }

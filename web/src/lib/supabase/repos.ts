@@ -94,6 +94,31 @@ export async function supabaseListPanelists(): Promise<PanelistRow[]> {
   return (data ?? []).map((row) => panelistRowToRecord(row as Record<string, unknown>));
 }
 
+export async function supabaseDeleteAccountByEmail(email: string): Promise<void> {
+  const { error } = await db().from("accounts").delete().eq("email", normalizePanelistEmail(email));
+  throwIfError(error);
+}
+
+export async function supabaseDeletePanelistByEmail(email: string): Promise<boolean> {
+  const { data, error } = await db()
+    .from("panelists")
+    .delete()
+    .eq("email", normalizePanelistEmail(email))
+    .select("id");
+  throwIfError(error);
+  return (data?.length ?? 0) > 0;
+}
+
+export async function supabaseDeletePanelistStorage(accountId: string): Promise<void> {
+  const folder = cleanText(accountId);
+  if (!folder) return;
+  const { data, error } = await db().storage.from("panelist-documents").list(folder);
+  if (error || !data?.length) return;
+  await db()
+    .storage.from("panelist-documents")
+    .remove(data.map((file) => `${folder}/${file.name}`));
+}
+
 export async function supabaseUpsertPanelists(rows: PanelistRow[], options?: { accountId?: string }): Promise<void> {
   if (!rows.length) return;
   const payload = rows.map((row) => ({

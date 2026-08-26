@@ -192,5 +192,8 @@ export async function DELETE(
     return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
   }
 
-  return NextResponse.json({ ok: true, message: "Panelist record deleted." });
+  return NextResponse.json({
+    ok: true,
+    message: "Panelist record and login account deleted.",
+  });
 }

@@ -1,5 +1,6 @@
 import { AdminPanelistsClient } from "@/components/admin/panelists/AdminPanelistsClient";
 import { getUniqueFilterValues } from "@/lib/admin-panelists";
+import { listAccounts } from "@/lib/accounts";
 import { loadPanelists } from "@/lib/panelists";
 import {
   loadPanelistPhotoUploadUsernames,
@@ -8,20 +9,7 @@ import {
 } from "@/lib/panelist-requirement-context";
 import { assessPanelistRequirements } from "@/lib/panelist-requirements";
 import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
-import { promises as fs } from "fs";
-import path from "path";
-import type { AccountRecord } from "@/lib/auth-types";
 import { cleanText } from "@/lib/validation";
-
-async function loadAccounts(): Promise<AccountRecord[]> {
-  try {
-    const content = await fs.readFile(path.join(process.cwd(), "data", "accounts.json"), "utf-8");
-    const parsed = JSON.parse(content) as AccountRecord[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
 
 export const metadata = {
   title: "Panelists | Admin | Belize Research Panel",
@@ -37,7 +25,7 @@ export default async function AdminPanelistsPage({
     params.tab === "flagged" ? "flagged" : params.tab === "duplicates" ? "duplicates" : undefined;
   const [rows, accounts, photoUploadUsernames, residenceUploadUsernames] = await Promise.all([
     loadPanelists(),
-    loadAccounts(),
+    listAccounts(),
     loadPanelistPhotoUploadUsernames(),
     loadPanelistResidenceUploadUsernames(),
   ]);

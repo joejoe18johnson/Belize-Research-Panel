@@ -1,7 +1,7 @@
 import { buildDuplicateNameDobKeyCounts, isDuplicateNameDobMatch } from "./admin-panelists";
 import { findAccountByEmail, putAccountOnHoldForFraudReview, releaseAccountFromFraudReview } from "./accounts";
 import { sendPanelistOnHoldEmail } from "./email/process-emails";
-import { loadPanelists, savePanelists, updatePanelistAdminFields } from "./panelists";
+import { findPanelistByEmail, loadPanelists, savePanelists, updatePanelistAdminFields } from "./panelists";
 import { getSiteUrl } from "./seo/site-config";
 import { cleanText } from "./validation";
 import { deletePanelistRelatedData } from "./admin-panelist-delete";
@@ -69,14 +69,43 @@ export async function deletePanelistByEmail(email: string): Promise<boolean> {
   const normalized = cleanText(email).toLowerCase();
   if (!normalized) return false;
 
-  const rows = await loadPanelists();
-  const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === normalized);
-  if (index < 0) return false;
+  const [panelist, account] = await Promise.all([
+    findPanelistByEmail(normalized),
+    findAccountByEmail(normalized),
+  ]);
+  if (!panelist && !account) return false;
 
-  const row = rows[index];
-  await deletePanelistRelatedData(normalized, cleanText(row.username));
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const {
+      supabaseDeleteAccountByEmail,
+      supabaseDeletePanelistByEmail,
+      supabaseDeletePanelistStorage,
+    } = await import("./supabase/repos");
 
-  const next = rows.filter((_, i) => i !== index);
-  await savePanelists(next);
+    if (account?.id) {
+      try {
+        await supabaseDeletePanelistStorage(account.id);
+      } catch (error) {
+        console.error("Panelist storage delete failed:", error);
+      }
+    }
+
+    if (panelist) {
+      await supabaseDeletePanelistByEmail(normalized);
+    }
+    if (account) {
+      await supabaseDeleteAccountByEmail(normalized);
+    }
+
+    await deletePanelistRelatedData(normalized, cleanText(panelist?.username ?? ""));
+    return true;
+  }
+
+  await deletePanelistRelatedData(normalized, cleanText(panelist?.username ?? ""));
+  if (panelist) {
+    const rows = await loadPanelists();
+    await savePanelists(rows.filter((row) => cleanText(row.email).toLowerCase() !== normalized));
+  }
   return true;
 }

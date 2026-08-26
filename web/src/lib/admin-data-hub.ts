@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import type { AccountRecord } from "./auth-types";
+import { listAccounts } from "./accounts";
 import { loadPanelists, type PanelistRow } from "./panelists";
 import { loadSurveyRecordsFromFile } from "./panelist-surveys-store";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
@@ -100,6 +101,11 @@ async function statDataFile(
 }
 
 export async function loadAllRedemptionRequests(): Promise<RedemptionRequest[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadAllRedemptionRequests } = await import("./supabase/repos");
+    return supabaseLoadAllRedemptionRequests();
+  }
   const store = await readJsonFile<Record<string, RedemptionRequest[]>>(path.join(DATA_DIR, "redemption-requests.json"), {});
   return Object.values(store).flat();
 }
@@ -109,7 +115,7 @@ export async function loadAdminDataHub(): Promise<AdminDataHub> {
     loadPanelists(),
     loadSurveyRecordsFromFile(),
     loadAllRedemptionRequests(),
-    readJsonFile<AccountRecord[]>(path.join(DATA_DIR, "accounts.json"), []),
+    listAccounts(),
     readJsonFile<Record<string, NotificationStateEntry>>(path.join(DATA_DIR, "panelist-notification-state.json"), {}),
     Promise.all([
       statDataFile("panelists.csv", "Panel register", countCsvRows),

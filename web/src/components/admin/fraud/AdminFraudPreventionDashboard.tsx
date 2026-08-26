@@ -214,6 +214,8 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
   const [flaggingEmail, setFlaggingEmail] = useState("");
   const [deletingEmail, setDeletingEmail] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SuspiciousEmailRow | null>(null);
+  const [deleteDialogError, setDeleteDialogError] = useState("");
+  const [deleteDialogSuccess, setDeleteDialogSuccess] = useState("");
 
   const verificationOptions = useMemo(
     () => detail.verificationSummary.map((row) => row.status),
@@ -301,8 +303,11 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
 
   const confirmDelete = async (confirmCode: string) => {
     if (!deleteTarget) return;
+    const label = `${deleteTarget.firstName} ${deleteTarget.lastName}`.trim() || deleteTarget.email;
     setDeletingEmail(deleteTarget.email);
     setActionMessage("");
+    setDeleteDialogError("");
+    setDeleteDialogSuccess("");
     try {
       const res = await fetch(`/api/admin/panelists/${encodeURIComponent(deleteTarget.email)}`, {
         method: "DELETE",
@@ -311,14 +316,15 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
       });
       const data = (await res.json()) as { message?: string };
       if (!res.ok) {
-        setActionMessage(data.message ?? "Could not delete record.");
+        setDeleteDialogError(data.message ?? "Could not delete record.");
         return;
       }
-      setDeleteTarget(null);
-      setActionMessage(`Deleted ${deleteTarget.email}.`);
+      const successMessage = `The panelist record for ${label} has been successfully deleted.`;
+      setDeleteDialogSuccess(successMessage);
+      setActionMessage(successMessage);
       router.refresh();
     } catch {
-      setActionMessage("Network error while deleting record.");
+      setDeleteDialogError("Network error while deleting record.");
     } finally {
       setDeletingEmail("");
     }
@@ -502,8 +508,14 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         }
         confirmCode={deleteConfirmCode}
         loading={Boolean(deletingEmail)}
+        error={deleteDialogError}
+        success={deleteDialogSuccess}
         onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => {
+          setDeleteTarget(null);
+          setDeleteDialogError("");
+          setDeleteDialogSuccess("");
+        }}
       />
     </div>
   );

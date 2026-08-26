@@ -112,6 +112,8 @@ export function AdminPanelistsClient({
   const [flaggingEmail, setFlaggingEmail] = useState("");
   const [deletingEmail, setDeletingEmail] = useState("");
   const [deleteConfirmEmail, setDeleteConfirmEmail] = useState<string | null>(null);
+  const [deleteDialogError, setDeleteDialogError] = useState("");
+  const [deleteDialogSuccess, setDeleteDialogSuccess] = useState("");
   const [rowActionMessage, setRowActionMessage] = useState("");
 
   const filteredRows = useMemo(
@@ -316,7 +318,15 @@ export function AdminPanelistsClient({
   };
 
   const deleteRecord = (email: string) => {
+    setDeleteDialogError("");
+    setDeleteDialogSuccess("");
     setDeleteConfirmEmail(email);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteConfirmEmail(null);
+    setDeleteDialogError("");
+    setDeleteDialogSuccess("");
   };
 
   const confirmDeleteRecord = async (confirmCode: string) => {
@@ -327,6 +337,8 @@ export function AdminPanelistsClient({
     const label = row ? panelistDisplayLabel(row) : email;
 
     setDeletingEmail(email);
+    setDeleteDialogError("");
+    setDeleteDialogSuccess("");
     setRowActionMessage("");
     try {
       const res = await fetch(`/api/admin/panelists/${encodeURIComponent(email)}`, {
@@ -336,15 +348,16 @@ export function AdminPanelistsClient({
       });
       const data = (await res.json()) as { message?: string };
       if (!res.ok) {
-        setRowActionMessage(data.message ?? "Could not delete record.");
+        setDeleteDialogError(data.message ?? "Could not delete record.");
         return;
       }
-      setDeleteConfirmEmail(null);
       if (editingEmail === email) closeEdit();
-      setRowActionMessage(`Deleted ${label}.`);
+      const successMessage = `The panelist record for ${label} has been successfully deleted.`;
+      setDeleteDialogSuccess(successMessage);
+      setRowActionMessage(successMessage);
       router.refresh();
     } catch {
-      setRowActionMessage("Network error while deleting record.");
+      setDeleteDialogError("Network error while deleting record.");
     } finally {
       setDeletingEmail("");
     }
@@ -642,15 +655,17 @@ export function AdminPanelistsClient({
       ) : null}
 
       <AdminDeleteConfirmDialog
-        open={Boolean(deleteConfirmEmail && deleteConfirmCode)}
+        open={Boolean((deleteConfirmEmail && deleteConfirmCode) || deleteDialogSuccess)}
         title="Delete panelist record"
-        description={`Delete panelist record for ${deleteConfirmLabel}? This removes the register entry and related survey data.`}
+        description={`Delete panelist record for ${deleteConfirmLabel}? This removes the register entry, login account, and related survey data from Supabase.`}
         confirmCode={deleteConfirmCode}
         confirmLabel="Delete record"
         cancelLabel="Keep record"
         loading={Boolean(deletingEmail)}
+        error={deleteDialogError}
+        success={deleteDialogSuccess}
         onConfirm={confirmDeleteRecord}
-        onCancel={() => setDeleteConfirmEmail(null)}
+        onCancel={closeDeleteDialog}
       />
     </div>
   );
