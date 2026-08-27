@@ -90,7 +90,9 @@ export default async function TakeSurveyPage({ params }: { params: Promise<{ ass
     <TakeSurveyClient
       assignment={assignment}
       definition={definition}
+      accountEmail={account.email}
       initialAnswers={response?.answers ?? {}}
+      serverUpdatedAt={response?.updatedAt ?? null}
       submitted={assignment.status === "completed"}
     />
   );

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const email = body.email?.trim() ?? "";
   const password = body.password?.trim() ?? "";
 
-  const session = await authenticateStaffLogin(email || undefined, password);
+  const session = await authenticateStaffLogin(email, password);
   if (!session) {
     return NextResponse.json(
       { ok: false, message: "Invalid email or password." },

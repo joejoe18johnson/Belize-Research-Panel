@@ -117,6 +117,7 @@ export async function POST(
       ok: true,
       submitted: false,
       progressPercent: result.progressPercent,
+      updatedAt: result.response.updatedAt,
     });
   } catch (error) {
     if (error instanceof SurveyValidationError) {

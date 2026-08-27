@@ -79,6 +79,7 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
+                  required
                   placeholder="name.role@belizepanel.test"
                   className={adminAuthInputClassName}
                 />
@@ -116,13 +117,6 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
                 {submitting ? "Signing in…" : "Enter admin console"}
               </button>
             </form>
-            <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
-              Legacy fallback: leave email blank and use the shared{" "}
-              <code className="rounded bg-zinc-100 px-1 py-0.5 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
-                ADMIN_PASSWORD
-              </code>{" "}
-              env value for super admin access.
-            </p>
             <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
               <Link href="/" className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-200">
                 ← Back to public site

@@ -113,12 +113,13 @@ export async function saveSurveyProgress(input: {
   if (!definition) throw new Error("Survey definition not found.");
 
   const now = new Date().toISOString();
-  const progressPercent = calculateSurveyProgress(definition.questions, input.answers);
+  const answers = { ...(existing?.answers ?? {}), ...input.answers };
+  const progressPercent = calculateSurveyProgress(definition.questions, answers);
   const response: SurveyResponseRecord = {
     assignmentId: input.assignmentId,
     surveyDefinitionId: assignment.surveyDefinitionId,
     panelistEmail: email,
-    answers: input.answers,
+    answers,
     startedAt: existing?.startedAt ?? now,
     updatedAt: now,
     submittedAt: null,

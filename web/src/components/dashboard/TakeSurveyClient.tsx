@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { SurveyBrandingHeader } from "@/components/surveys/SurveyBrandingHeader";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
@@ -16,6 +16,13 @@ import {
 } from "@/lib/survey-types";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import {
+  clearSurveyDraft,
+  loadSurveyDraft,
+  resolveSurveyDraftAnswers,
+  saveSurveyDraft,
+  surveyAnswersEqual,
+} from "@/lib/survey-draft-storage";
 
 function questionElementId(questionId: string): string {
   return `survey-question-${questionId}`;
@@ -30,15 +37,23 @@ function scrollToQuestion(questionId: string) {
   }, 280);
 }
 
+function isOffline(): boolean {
+  return typeof navigator !== "undefined" && navigator.onLine === false;
+}
+
 export function TakeSurveyClient({
   assignment,
   definition,
+  accountEmail,
   initialAnswers,
+  serverUpdatedAt,
   submitted,
 }: {
   assignment: PanelistSurveyRecord;
   definition: SurveyDefinition;
+  accountEmail: string;
   initialAnswers: Record<string, SurveyAnswerValue>;
+  serverUpdatedAt?: string | null;
   submitted: boolean;
 }) {
   const router = useRouter();
@@ -49,6 +64,173 @@ export function TakeSurveyClient({
   const [error, setError] = useState("");
   const [issues, setIssues] = useState<SurveyValidationIssue[]>([]);
   const [done, setDone] = useState(submitted || assignment.status === "completed");
+  const [syncNote, setSyncNote] = useState("");
+  const [restoredNotice, setRestoredNotice] = useState("");
+
+  const answersRef = useRef(answers);
+  const doneRef = useRef(done);
+  const serverUpdatedAtRef = useRef(serverUpdatedAt ?? "");
+  const inFlightRef = useRef(false);
+  const queuedRef = useRef(false);
+  const lastSyncedRef = useRef<Record<string, SurveyAnswerValue>>(initialAnswers);
+  const autosaveTimerRef = useRef<number | null>(null);
+
+  answersRef.current = answers;
+  doneRef.current = done;
+
+  const writeLocalDraft = (nextAnswers: Record<string, SurveyAnswerValue>) => {
+    if (doneRef.current) return;
+    saveSurveyDraft({
+      accountEmail,
+      assignmentId: assignment.id,
+      answers: nextAnswers,
+      serverUpdatedAt: serverUpdatedAtRef.current || undefined,
+    });
+  };
+
+  const persistToServer = async (
+    submit: boolean,
+    snapshot: Record<string, SurveyAnswerValue>,
+    options: { keepalive?: boolean; silent?: boolean } = {}
+  ) => {
+    const res = await fetch(`/api/dashboard/surveys/${encodeURIComponent(assignment.id)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      keepalive: options.keepalive === true,
+      body: JSON.stringify({ answers: snapshot, submit }),
+    });
+    const data = (await res.json()) as {
+      ok?: boolean;
+      message?: string;
+      points?: number;
+      updatedAt?: string;
+      issues?: SurveyValidationIssue[];
+      missingQuestionIds?: string[];
+      rewards?: { availablePoints: number; totalPointsToDate: number; surveyPoints: number };
+    };
+    return { res, data };
+  };
+
+  const flushAutosave = async () => {
+    if (doneRef.current || inFlightRef.current || submitting) return;
+    const snapshot = answersRef.current;
+    if (surveyAnswersEqual(snapshot, lastSyncedRef.current)) {
+      return;
+    }
+    if (isOffline()) {
+      writeLocalDraft(snapshot);
+      setSyncNote("Saved on this device. We'll upload when you're back online.");
+      return;
+    }
+
+    inFlightRef.current = true;
+    setSyncNote("Saving…");
+    try {
+      const { res, data } = await persistToServer(false, snapshot, { silent: true });
+      if (!res.ok || !data.ok) {
+        writeLocalDraft(snapshot);
+        setSyncNote("Saved on this device. We'll retry uploading.");
+        return;
+      }
+      lastSyncedRef.current = snapshot;
+      if (data.updatedAt) serverUpdatedAtRef.current = data.updatedAt;
+      writeLocalDraft(snapshot);
+      setSyncNote("Progress saved.");
+    } catch {
+      writeLocalDraft(snapshot);
+      setSyncNote("Saved on this device. We'll upload when you're back online.");
+    } finally {
+      inFlightRef.current = false;
+      if (queuedRef.current) {
+        queuedRef.current = false;
+        void flushAutosave();
+      }
+    }
+  };
+
+  const scheduleAutosave = () => {
+    if (doneRef.current) return;
+    if (autosaveTimerRef.current) window.clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = window.setTimeout(() => {
+      if (inFlightRef.current) {
+        queuedRef.current = true;
+        return;
+      }
+      void flushAutosave();
+    }, 1200);
+  };
+
+  useLayoutEffect(() => {
+    if (done) {
+      clearSurveyDraft(accountEmail, assignment.id);
+      return;
+    }
+    const draft = loadSurveyDraft(accountEmail, assignment.id);
+    const resolved = resolveSurveyDraftAnswers({
+      serverAnswers: initialAnswers,
+      serverUpdatedAt,
+      draft,
+    });
+    answersRef.current = resolved.answers;
+    lastSyncedRef.current = initialAnswers;
+    if (resolved.restoredFromDraft) {
+      setAnswers(resolved.answers);
+      writeLocalDraft(resolved.answers);
+      setRestoredNotice("Your answers were restored after the page refreshed.");
+      scheduleAutosave();
+    } else if (draft && !surveyAnswersEqual(draft.answers, initialAnswers)) {
+      writeLocalDraft(initialAnswers);
+    }
+    // Restore once on mount for this assignment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignment.id, accountEmail]);
+
+  useEffect(() => {
+    const onOnline = () => {
+      setSyncNote("Back online. Saving your progress…");
+      void flushAutosave();
+    };
+    const onOffline = () => {
+      writeLocalDraft(answersRef.current);
+      setSyncNote("You're offline. Answers are still saved on this device.");
+    };
+    const persistBeforeLeave = () => {
+      if (doneRef.current) return;
+      const snapshot = answersRef.current;
+      writeLocalDraft(snapshot);
+      if (isOffline()) return;
+      if (surveyAnswersEqual(snapshot, lastSyncedRef.current)) return;
+      try {
+        void fetch(`/api/dashboard/surveys/${encodeURIComponent(assignment.id)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          keepalive: true,
+          body: JSON.stringify({ answers: snapshot, submit: false }),
+        });
+      } catch {
+        writeLocalDraft(snapshot);
+      }
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") persistBeforeLeave();
+    };
+
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("pagehide", persistBeforeLeave);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      if (autosaveTimerRef.current) window.clearTimeout(autosaveTimerRef.current);
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("pagehide", persistBeforeLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountEmail, assignment.id]);
 
   const progressPercent = useMemo(
     () => calculateSurveyProgress(definition.questions, answers),
@@ -64,8 +246,15 @@ export function TakeSurveyClient({
   );
 
   const updateAnswer = (questionId: string, value: SurveyAnswerValue) => {
-    setAnswers((current) => ({ ...current, [questionId]: value }));
+    setAnswers((current) => {
+      const next = { ...current, [questionId]: value };
+      answersRef.current = next;
+      writeLocalDraft(next);
+      return next;
+    });
     setIssues((current) => current.filter((issue) => issue.questionId !== questionId));
+    setRestoredNotice("");
+    scheduleAutosave();
   };
 
   const showQuestionIssues = (nextIssues: SurveyValidationIssue[]) => {
@@ -81,12 +270,22 @@ export function TakeSurveyClient({
   };
 
   const persist = async (submit: boolean) => {
+    const snapshot = answersRef.current;
+    writeLocalDraft(snapshot);
+
     if (submit) {
-      const nextIssues = collectSurveyValidationIssues(definition.questions, answers);
+      const nextIssues = collectSurveyValidationIssues(definition.questions, snapshot);
       if (nextIssues.length > 0) {
         showQuestionIssues(nextIssues);
         return;
       }
+    }
+
+    if (!submit && isOffline()) {
+      setError("");
+      setMessage("Saved on this device. We'll upload when you're back online.");
+      setSyncNote("Saved on this device. We'll upload when you're back online.");
+      return;
     }
 
     if (submit) setSubmitting(true);
@@ -96,19 +295,7 @@ export function TakeSurveyClient({
     setIssues([]);
 
     try {
-      const res = await fetch(`/api/dashboard/surveys/${encodeURIComponent(assignment.id)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers, submit }),
-      });
-      const data = (await res.json()) as {
-        ok?: boolean;
-        message?: string;
-        points?: number;
-        issues?: SurveyValidationIssue[];
-        missingQuestionIds?: string[];
-        rewards?: { availablePoints: number; totalPointsToDate: number; surveyPoints: number };
-      };
+      const { res, data } = await persistToServer(submit, snapshot);
       if (!res.ok || !data.ok) {
         if (data.issues?.length) {
           showQuestionIssues(data.issues);
@@ -116,7 +303,7 @@ export function TakeSurveyClient({
         }
         if (data.missingQuestionIds?.length) {
           showQuestionIssues(
-            collectSurveyValidationIssues(definition.questions, answers).filter((issue) =>
+            collectSurveyValidationIssues(definition.questions, snapshot).filter((issue) =>
               data.missingQuestionIds?.includes(issue.questionId)
             )
           );
@@ -127,6 +314,8 @@ export function TakeSurveyClient({
       }
 
       if (submit) {
+        clearSurveyDraft(accountEmail, assignment.id);
+        setDone(true);
         const earned = data.points ?? assignment.points;
         const params = new URLSearchParams({
           tab: "completed",
@@ -138,9 +327,19 @@ export function TakeSurveyClient({
         return;
       }
 
+      lastSyncedRef.current = snapshot;
+      if (data.updatedAt) serverUpdatedAtRef.current = data.updatedAt;
+      writeLocalDraft(snapshot);
       setMessage("Progress saved.");
+      setSyncNote("Progress saved.");
     } catch {
-      setError("Network error while saving.");
+      writeLocalDraft(snapshot);
+      if (submit) {
+        setError("Network error while submitting. Your answers are saved on this device — try again when you're online.");
+      } else {
+        setMessage("Saved on this device. We'll upload when you're back online.");
+        setSyncNote("Saved on this device. We'll upload when you're back online.");
+      }
     } finally {
       setSaving(false);
       setSubmitting(false);
@@ -167,9 +366,9 @@ export function TakeSurveyClient({
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <div className="mb-2 flex items-center justify-between gap-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
           <span>{formatHeadingCase("Progress")}</span>
-          <span>{done ? 100 : progressPercent}%</span>
+          <span className="shrink-0">{done ? 100 : progressPercent}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
           <div
@@ -177,13 +376,26 @@ export function TakeSurveyClient({
             style={{ width: `${done ? 100 : Math.max(progressPercent, 4)}%` }}
           />
         </div>
-        {!done && requiredRemaining > 0 ? (
+        {!done ? (
           <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-            {requiredRemaining} required question{requiredRemaining === 1 ? "" : "s"} still need
-            {requiredRemaining === 1 ? "s" : ""} an answer before you can submit.
+            {requiredRemaining > 0
+              ? `${requiredRemaining} required question${requiredRemaining === 1 ? "" : "s"} still need${
+                  requiredRemaining === 1 ? "s" : ""
+                } an answer before you can submit.`
+              : "All required questions are answered. You can submit when you're ready."}{" "}
+            Answers are saved on this device as you go, even if you refresh or lose internet.
           </p>
         ) : null}
+        {!done && syncNote ? (
+          <p className="mt-1 text-xs font-medium text-teal-800 dark:text-teal-200">{syncNote}</p>
+        ) : null}
       </div>
+
+      {restoredNotice ? (
+        <BrandedAlert tone="info" title="Answers restored" showIcon>
+          {restoredNotice}
+        </BrandedAlert>
+      ) : null}
 
       {error ? (
         <BrandedAlert tone="error" title="Please complete the highlighted questions" showIcon>

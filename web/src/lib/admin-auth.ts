@@ -1,4 +1,3 @@
-import { timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
@@ -18,18 +17,6 @@ import { verifyStaffUserLogin, type StaffUserRecord } from "./staff-users";
 
 export type { AdminSession } from "./admin-session";
 export { ADMIN_SESSION_COOKIE, decodeAdminSessionToken } from "./admin-session";
-
-export function adminPassword(): string {
-  return process.env.ADMIN_PASSWORD?.trim() || "admin123";
-}
-
-export function verifyAdminPassword(password: string): boolean {
-  const expected = adminPassword();
-  const provided = Buffer.from(password);
-  const target = Buffer.from(expected);
-  if (provided.length !== target.length) return false;
-  return timingSafeEqual(provided, target);
-}
 
 function staffDisplayName(user: StaffUserRecord): string {
   return `${user.first_name} ${user.last_name}`.trim();
@@ -105,28 +92,16 @@ export async function authenticateStaffLogin(
 ): Promise<Omit<AdminSession, "exp"> | null> {
   const trimmedEmail = email?.trim() ?? "";
   const trimmedPassword = password.trim();
-  if (!trimmedPassword) return null;
+  if (!trimmedEmail || !trimmedPassword) return null;
 
-  if (trimmedEmail) {
-    const user = await verifyStaffUserLogin(trimmedEmail, trimmedPassword);
-    if (!user) return null;
-    const allowedModules = await getRoleModuleSlugs(user.role);
-    return {
-      role: user.role,
-      email: user.email,
-      staffId: user.id,
-      displayName: staffDisplayName(user),
-      allowedModules,
-    };
-  }
-
-  if (!verifyAdminPassword(trimmedPassword)) return null;
-  const allowedModules = await getRoleModuleSlugs("super_admin");
+  const user = await verifyStaffUserLogin(trimmedEmail, trimmedPassword);
+  if (!user) return null;
+  const allowedModules = await getRoleModuleSlugs(user.role);
   return {
-    role: "super_admin",
-    email: "legacy-admin@belizepanel.local",
-    staffId: "legacy-admin",
-    displayName: "Legacy Admin Password",
+    role: user.role,
+    email: user.email,
+    staffId: user.id,
+    displayName: staffDisplayName(user),
     allowedModules,
   };
 }
