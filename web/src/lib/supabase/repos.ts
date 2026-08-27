@@ -84,8 +84,90 @@ export async function supabaseUpdateAccount(account: AccountRecord): Promise<voi
 export async function supabaseUpsertAccounts(accounts: AccountRecord[]): Promise<void> {
   if (!accounts.length) return;
   const rows = accounts.map(accountRecordToRow);
-  const { error } = await db().from("accounts").upsert(rows, { onConflict: "email" });
+  const { error } = await db().from("accounts").upsert(rows, { onConflict: "id" });
   throwIfError(error);
+}
+
+async function retargetSurveyAssignmentIds(oldEmail: string, newEmail: string): Promise<void> {
+  const from = normalizePanelistEmail(oldEmail);
+  const to = normalizePanelistEmail(newEmail);
+  const { data, error } = await db()
+    .from("survey_assignments")
+    .select("id, campaign_id, panelist_email")
+    .or(`panelist_email.eq.${from},panelist_email.eq.${to}`);
+  throwIfError(error);
+
+  for (const row of data ?? []) {
+    const campaignId = cleanText(String(row.campaign_id));
+    const nextId = resolveDbAssignmentId(campaignId, to);
+    const currentId = String(row.id);
+    if (currentId === nextId && String(row.panelist_email).toLowerCase() === to) continue;
+
+    if (currentId !== nextId) {
+      const { data: existing } = await db().from("survey_assignments").select("*").eq("id", currentId).maybeSingle();
+      if (existing) {
+        const nextRow = { ...(existing as Record<string, unknown>), id: nextId, panelist_email: to };
+        const { error: insertError } = await db().from("survey_assignments").insert(nextRow);
+        if (insertError && insertError.code !== "23505") throwIfError(insertError);
+        await db().from("survey_responses").update({ assignment_id: nextId, panelist_email: to }).eq("assignment_id", currentId);
+        await db()
+          .from("point_transactions")
+          .update({ reference_id: nextId })
+          .eq("reference_type", "survey_assignment")
+          .eq("reference_id", currentId);
+        await db().from("survey_assignments").delete().eq("id", currentId);
+      }
+    } else {
+      await db().from("survey_assignments").update({ panelist_email: to }).eq("id", currentId);
+    }
+  }
+}
+
+export async function supabaseRetargetPanelistEmail(oldEmail: string, newEmail: string): Promise<boolean> {
+  const from = normalizePanelistEmail(oldEmail);
+  const to = normalizePanelistEmail(newEmail);
+  if (!from || !to || from === to) return false;
+
+  const { data: panelist, error: panelistError } = await db().from("panelists").select("*").eq("email", from).maybeSingle();
+  throwIfError(panelistError);
+  if (!panelist) return false;
+
+  const { error: directError } = await db().from("panelists").update({ email: to }).eq("email", from);
+  if (!directError) {
+    await retargetSurveyAssignmentIds(from, to);
+    return true;
+  }
+
+  const accountId = panelist.account_id ?? null;
+  const { error: unlinkError } = await db().from("panelists").update({ account_id: null }).eq("email", from);
+  throwIfError(unlinkError);
+
+  const clone = { ...(panelist as Record<string, unknown>) };
+  delete clone.id;
+  clone.email = to;
+  clone.account_id = accountId;
+  const { error: insertError } = await db().from("panelists").insert(clone);
+  throwIfError(insertError);
+
+  const emailTables = [
+    "survey_assignments",
+    "survey_responses",
+    "redemption_requests",
+    "panelist_notification_reads",
+    "panelist_reward_balance_seeds",
+    "panelist_points_overrides",
+    "support_messages",
+  ] as const;
+  for (const table of emailTables) {
+    const { error } = await db().from(table).update({ panelist_email: to }).eq("panelist_email", from);
+    if (error && error.code !== "42P01" && error.code !== "42703") throwIfError(error);
+  }
+
+  await retargetSurveyAssignmentIds(from, to);
+
+  const { error: deleteError } = await db().from("panelists").delete().eq("email", from);
+  throwIfError(deleteError);
+  return true;
 }
 
 export async function supabaseListPanelists(): Promise<PanelistRow[]> {

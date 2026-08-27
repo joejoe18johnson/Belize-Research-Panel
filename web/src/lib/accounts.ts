@@ -40,6 +40,20 @@ export async function listAccounts(): Promise<AccountRecord[]> {
   return loadAccountsRaw();
 }
 
+async function persistAccount(account: AccountRecord): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseUpdateAccount } = await import("./supabase/repos");
+    await supabaseUpdateAccount(account);
+    return;
+  }
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) throw new Error("not_found");
+  accounts[index] = account;
+  await saveAccountsRaw(accounts);
+}
+
 async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
   const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
   if (useSupabase()) {
@@ -50,6 +64,17 @@ async function saveAccountsRaw(accounts: AccountRecord[]): Promise<void> {
   assertCanPersistData();
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), "utf-8");
+}
+
+async function deleteStrayAccount(accountId: string): Promise<void> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseDeleteAccountById } = await import("./supabase/repos");
+    await supabaseDeleteAccountById(accountId);
+    return;
+  }
+  const accounts = await loadAccountsRaw();
+  await saveAccountsRaw(accounts.filter((row) => row.id !== accountId));
 }
 
 function hasPendingEmailChange(record: AccountRecord): boolean {
@@ -378,16 +403,18 @@ export async function approveAccountEmailChange(
   if (!newEmail || !validEmail(newEmail)) return null;
 
   const taken = await findAccountByEmail(newEmail);
-  if (taken && taken.id !== account.id) return null;
+  if (taken && taken.id !== account.id) {
+    const strayDuplicate =
+      !cleanText(taken.pending_email) &&
+      cleanText(taken.first_name).toLowerCase() === cleanText(account.first_name).toLowerCase() &&
+      cleanText(taken.last_name).toLowerCase() === cleanText(account.last_name).toLowerCase();
+    if (!strayDuplicate) return null;
+    await deleteStrayAccount(taken.id);
+  }
 
-  const accounts = await loadAccountsRaw();
-  const index = accounts.findIndex((row) => row.id === account.id);
-  if (index < 0) return null;
-
-  const previousEmail = accounts[index].email;
-
+  const previousEmail = account.email;
   let updated: AccountRecord = {
-    ...accounts[index],
+    ...account,
     email: newEmail,
     pending_email: "",
     email_change_token: "",
@@ -395,8 +422,7 @@ export async function approveAccountEmailChange(
     email_change_requested_at: "",
   };
   updated = applyHoldSync(updated);
-  accounts[index] = updated;
-  await saveAccountsRaw(accounts);
+  await persistAccount(updated);
 
   return { account: updated, previousEmail };
 }
@@ -415,20 +441,15 @@ export async function denyAccountEmailChange(accountEmail: string): Promise<{
   if (!account || !hasPendingEmailChange(account)) return null;
 
   const deniedEmail = cleanText(account.pending_email).toLowerCase();
-  const accounts = await loadAccountsRaw();
-  const index = accounts.findIndex((row) => row.id === account.id);
-  if (index < 0) return null;
-
   let updated: AccountRecord = {
-    ...accounts[index],
+    ...account,
     pending_email: "",
     email_change_token: "",
     email_change_sent_at: "",
     email_change_requested_at: "",
   };
   updated = applyHoldSync(updated);
-  accounts[index] = updated;
-  await saveAccountsRaw(accounts);
+  await persistAccount(updated);
   return { account: updated, deniedEmail };
 }
 
