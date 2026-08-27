@@ -56,12 +56,17 @@ export const SUPPORT_FAQ: SupportFaqItem[] = [
   {
     question: "How do I exercise my privacy rights?",
     answer:
-      "Email privacy@belizepanel.test for access, correction, or erasure requests. You can also use the contact form below and choose “Privacy & data requests”. We may verify your identity before responding.",
+      "Use the contact form below and choose “Privacy & data requests”, or send a message from your signed-in account. We may verify your identity before responding.",
   },
 ];
 
 const DEFAULT_SUPPORT_INBOX = "support@belizepanel.test";
 const DEFAULT_PRIVACY_INBOX = "privacy@belizepanel.test";
+
+function isPlaceholderInbox(email: string): boolean {
+  const lower = email.trim().toLowerCase();
+  return lower.endsWith(".test") || lower.endsWith("example.com") || lower.endsWith("resend.dev");
+}
 
 export function getSupportInboxEmail(): string {
   return (
@@ -71,8 +76,18 @@ export function getSupportInboxEmail(): string {
   );
 }
 
+export function getPublicSupportInboxEmail(): string {
+  const inbox = getSupportInboxEmail();
+  return isPlaceholderInbox(inbox) ? "" : inbox;
+}
+
 export function getPrivacyContactEmail(): string {
   return process.env.PRIVACY_CONTACT_EMAIL?.trim() || DEFAULT_PRIVACY_INBOX;
+}
+
+export function getPublicPrivacyContactEmail(): string {
+  const inbox = getPrivacyContactEmail();
+  return isPlaceholderInbox(inbox) ? "" : inbox;
 }
 
 export function getSupportTopicLabel(topicId: string): string {

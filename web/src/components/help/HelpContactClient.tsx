@@ -125,11 +125,17 @@ export function HelpContactClient({
             <strong className="font-semibold text-zinc-800 dark:text-zinc-200">1–2 business days</strong>.
           </p>
           <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            Email{" "}
-            <a href={`mailto:${supportEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
-              {supportEmail}
-            </a>{" "}
-            directly, or use the form below.
+            {supportEmail ? (
+              <>
+                Email{" "}
+                <a href={`mailto:${supportEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+                  {supportEmail}
+                </a>{" "}
+                directly, or use the form below.
+              </>
+            ) : (
+              "Use the form below and our team will follow up by email."
+            )}
           </p>
 
           {submitted ? (
@@ -212,10 +218,17 @@ export function HelpContactClient({
 
           <p className="mt-5 border-t border-teal-200/80 pt-4 text-xs leading-relaxed text-zinc-500 dark:border-teal-900/50 dark:text-zinc-400">
             {formatHeadingCase("Privacy requests")}:{" "}
-            <a href={`mailto:${privacyEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
-              {privacyEmail}
-            </a>{" "}
-            or choose “Privacy & data requests” above. See also our{" "}
+            {privacyEmail ? (
+              <>
+                <a href={`mailto:${privacyEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+                  {privacyEmail}
+                </a>{" "}
+                or choose “Privacy & data requests” above.
+              </>
+            ) : (
+              <>Choose “Privacy & data requests” above.</>
+            )}{" "}
+            See also our{" "}
             <Link href="/data-use-policy" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
               data use policy
             </Link>

@@ -10,6 +10,7 @@ import type { StaffUserRecord } from "../staff-users";
 import type { ClientUserRecord } from "../client-users";
 import type { NotificationReadState } from "../notification-state";
 import type { AdminReadState } from "../admin-read-state";
+import type { SupportMessageRecord } from "../support-messages";
 import { cleanText } from "../validation";
 import { normalizePanelistEmail } from "./assignment-id";
 
@@ -353,6 +354,22 @@ export function rewardSettingsRowToSettings(row: Record<string, unknown>): Rewar
       : [100, 150, 200],
     updatedAt: isoOrEmpty(row.updated_at as string),
     updatedBy: cleanText(String(row.updated_by ?? "")),
+  };
+}
+
+export function supportRowToMessage(row: Record<string, unknown>): SupportMessageRecord {
+  return {
+    id: String(row.id),
+    name: cleanText(String(row.name ?? "")),
+    email: normalizePanelistEmail(String(row.email)),
+    topic: cleanText(String(row.topic ?? "")),
+    topicLabel: cleanText(String(row.topic_label ?? "")),
+    message: cleanText(String(row.message ?? "")),
+    panelistEmail: normalizePanelistEmail(String(row.panelist_email ?? "")),
+    accountId: cleanText(String(row.account_id ?? "")),
+    status: row.status === "read" ? "read" : "new",
+    createdAt: isoOrEmpty(row.created_at as string),
+    readAt: isoOrEmpty(row.read_at as string),
   };
 }
 

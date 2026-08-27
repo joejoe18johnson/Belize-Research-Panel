@@ -10,6 +10,7 @@ import type { StaffUserRecord } from "../staff-users";
 import type { ClientUserRecord } from "../client-users";
 import type { NotificationReadState } from "../notification-state";
 import type { AdminReadState } from "../admin-read-state";
+import type { SupportMessageRecord } from "../support-messages";
 import { normalizeRewardSettings } from "../reward-settings";
 import { cleanText } from "../validation";
 import { getSupabaseAdmin } from "./server";
@@ -27,6 +28,7 @@ import {
   redemptionRowToRequest,
   rewardSettingsRowToSettings,
   staffRowToRecord,
+  supportRowToMessage,
   surveyDefinitionRowsToDefinition,
   surveyResponseRowToRecord,
 } from "./mappers";
@@ -730,6 +732,65 @@ export async function supabaseUpsertRedemptionRequest(request: RedemptionRequest
     processed_by: request.processedBy ?? null,
   });
   throwIfError(error);
+}
+
+function optionalUuid(value: string | undefined): string | null {
+  const id = cleanText(value ?? "");
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null;
+}
+
+export async function supabaseLoadSupportMessages(): Promise<SupportMessageRecord[]> {
+  const { data, error } = await db()
+    .from("support_messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+  throwIfError(error);
+  return (data ?? []).map((row) => supportRowToMessage(row as Record<string, unknown>));
+}
+
+export async function supabaseCreateSupportMessage(record: SupportMessageRecord): Promise<void> {
+  const email = normalizePanelistEmail(record.email);
+  const panelistEmail = normalizePanelistEmail(record.panelistEmail || record.email);
+  const { data: panelist } = await db().from("panelists").select("id").eq("email", panelistEmail).maybeSingle();
+
+  const payload = {
+    id: record.id,
+    name: record.name,
+    email,
+    topic: record.topic,
+    topic_label: record.topicLabel,
+    message: record.message,
+    panelist_id: panelist?.id ?? null,
+    panelist_email: panelistEmail,
+    account_id: optionalUuid(record.accountId),
+    status: record.status,
+    created_at: record.createdAt,
+    read_at: record.readAt || null,
+  };
+
+  const first = await db().from("support_messages").upsert(payload, { onConflict: "id" });
+  if (first.error?.code === "23503") {
+    const retry = await db()
+      .from("support_messages")
+      .upsert({ ...payload, panelist_id: null, account_id: null }, { onConflict: "id" });
+    throwIfError(retry.error);
+    return;
+  }
+  throwIfError(first.error);
+}
+
+export async function supabaseMarkSupportMessageRead(id: string): Promise<SupportMessageRecord | null> {
+  const { data, error } = await db()
+    .from("support_messages")
+    .update({
+      status: "read",
+      read_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
+  throwIfError(error);
+  return data ? supportRowToMessage(data as Record<string, unknown>) : null;
 }
 
 export async function supabaseUpdateRedemptionStatus(

@@ -59,7 +59,8 @@ export async function POST(request: NextRequest) {
       referenceId: record.id,
       message: "Your message has been sent. We will respond by email within 1–2 business days.",
     });
-  } catch {
+  } catch (error) {
+    console.error("[support] contact form failed", error);
     return NextResponse.json({ message: "Could not send your message." }, { status: 500 });
   }
 }

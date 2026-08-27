@@ -22,7 +22,7 @@ export interface SupportMessageRecord {
   readAt: string;
 }
 
-export async function loadSupportMessages(): Promise<SupportMessageRecord[]> {
+async function loadJsonSupportMessages(): Promise<SupportMessageRecord[]> {
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(content) as SupportMessageRecord[];
@@ -30,6 +30,15 @@ export async function loadSupportMessages(): Promise<SupportMessageRecord[]> {
   } catch {
     return [];
   }
+}
+
+export async function loadSupportMessages(): Promise<SupportMessageRecord[]> {
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseLoadSupportMessages } = await import("./supabase/repos");
+    return supabaseLoadSupportMessages();
+  }
+  return loadJsonSupportMessages();
 }
 
 async function saveSupportMessages(messages: SupportMessageRecord[]): Promise<void> {
@@ -59,14 +68,28 @@ export async function createSupportMessage(input: {
     readAt: "",
   };
 
-  const messages = await loadSupportMessages();
+  const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseCreateSupportMessage } = await import("./supabase/repos");
+    await supabaseCreateSupportMessage(record);
+    return record;
+  }
+
+  assertCanPersistData();
+  const messages = await loadJsonSupportMessages();
   messages.unshift(record);
   await saveSupportMessages(messages.slice(0, 500));
   return record;
 }
 
 export async function markSupportMessageRead(id: string): Promise<SupportMessageRecord | null> {
-  const messages = await loadSupportMessages();
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseMarkSupportMessageRead } = await import("./supabase/repos");
+    return supabaseMarkSupportMessageRead(id);
+  }
+
+  const messages = await loadJsonSupportMessages();
   const index = messages.findIndex((message) => message.id === id);
   if (index < 0) return null;
 

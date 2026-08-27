@@ -401,6 +401,9 @@ export async function sendSupportContactEmails(input: {
   const messagePreview =
     input.record.message.length > 240 ? `${input.record.message.slice(0, 240)}…` : input.record.message;
   const firstName = input.record.name.split(" ")[0] ?? "there";
+  const inbox = input.supportInboxEmail.trim().toLowerCase();
+  const notifyInbox =
+    inbox && !inbox.endsWith(".test") && !inbox.endsWith("example.com") && !inbox.endsWith("resend.dev");
 
   await Promise.all([
     sendTemplateEmail({
@@ -414,19 +417,21 @@ export async function sendSupportContactEmails(input: {
       },
       context: "support-request-received",
     }),
-    sendTemplateEmail({
-      templateId: "support-inbox-notification",
-      to: input.supportInboxEmail,
-      data: {
-        name: input.record.name,
-        email: input.record.email,
-        topicLabel: input.record.topicLabel,
-        referenceId,
-        messagePreview,
-        adminInboxUrl: originDashboard(input.origin, "/admin/support-inbox"),
-      },
-      context: "support-inbox-notification",
-    }),
+    notifyInbox
+      ? sendTemplateEmail({
+          templateId: "support-inbox-notification",
+          to: input.supportInboxEmail,
+          data: {
+            name: input.record.name,
+            email: input.record.email,
+            topicLabel: input.record.topicLabel,
+            referenceId,
+            messagePreview,
+            adminInboxUrl: originDashboard(input.origin, "/admin/support-inbox"),
+          },
+          context: "support-inbox-notification",
+        })
+      : Promise.resolve(),
   ]);
 }
 

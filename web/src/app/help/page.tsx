@@ -5,8 +5,8 @@ import { getSessionAccount } from "@/lib/auth";
 import { faqPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import {
-  getPrivacyContactEmail,
-  getSupportInboxEmail,
+  getPublicPrivacyContactEmail,
+  getPublicSupportInboxEmail,
   SUPPORT_FAQ,
 } from "@/lib/support-contact";
 
@@ -43,8 +43,8 @@ export default async function HelpPage() {
       />
       <HelpContactClient
         faq={SUPPORT_FAQ}
-        supportEmail={getSupportInboxEmail()}
-        privacyEmail={getPrivacyContactEmail()}
+        supportEmail={getPublicSupportInboxEmail()}
+        privacyEmail={getPublicPrivacyContactEmail()}
         defaultName={defaultName}
         defaultEmail={defaultEmail}
       />
