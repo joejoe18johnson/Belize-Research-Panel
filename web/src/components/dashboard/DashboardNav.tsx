@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
-import { APP_CONTENT_MAX } from "@/lib/layout-widths";
+import { appContentFrameClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DASHBOARD_NAV_SECTIONS } from "./dashboard-sections";
 
@@ -26,8 +26,8 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
       className="max-w-full overflow-x-hidden border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30 dark:border-teal-900/40 dark:from-zinc-900 dark:to-zinc-900/80"
       aria-label="Dashboard sections"
     >
-      <div className={`nav-scroll mx-auto w-full max-w-full overflow-x-auto overscroll-x-contain ${APP_CONTENT_MAX}`}>
-        <div className="flex w-max min-w-full items-center justify-start gap-1.5 px-3 py-2.5 sm:mx-auto sm:w-full sm:justify-center sm:gap-2 sm:px-4 sm:py-3">
+      <div className={`nav-scroll overflow-x-auto overscroll-x-contain ${appContentFrameClass}`}>
+        <div className="flex w-max min-w-full items-center justify-start gap-1.5 py-2.5 sm:mx-auto sm:w-full sm:justify-center sm:gap-2 sm:py-3">
           {DASHBOARD_NAV_SECTIONS.map((item) => {
             const active = isActive(pathname, item.href, item.exact);
             const badgeKey = NAV_BADGE_KEYS[item.href];

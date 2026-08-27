@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { appContentFrameClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 const DISMISS_KEY = "brp-new-survey-banner-dismissed";
@@ -39,7 +40,7 @@ export function NewSurveyAlertBanner({ newSurveyCount }: { newSurveyCount: numbe
       role="status"
       aria-live="polite"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-4">
+      <div className={`${appContentFrameClass} flex flex-wrap items-center justify-between gap-3 py-3`}>
         <div className="flex min-w-0 flex-1 items-start gap-3">
           <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white shadow-sm">
             {newSurveyCount > 9 ? "9+" : newSurveyCount}

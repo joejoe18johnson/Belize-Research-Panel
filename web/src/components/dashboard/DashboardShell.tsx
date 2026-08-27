@@ -6,7 +6,7 @@ import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
 import { dashboardCardClass, dashboardHeaderClass, dashboardShellClass } from "@/lib/brand";
-import { appContentClass, MEDIUM_CONTENT_MAX } from "@/lib/layout-widths";
+import { appContentFrameClass, MEDIUM_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
 import { DashboardNav } from "./DashboardNav";
 import { AccountNotVerifiedBanner } from "./AccountNotVerifiedBanner";
@@ -18,7 +18,7 @@ import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { UserAvatar } from "./UserAvatar";
 
-const CONTENT_CLASS = appContentClass;
+const CONTENT_CLASS = appContentFrameClass;
 
 export function DashboardShell({
   email,
@@ -37,7 +37,7 @@ export function DashboardShell({
     <div className={`${dashboardShellClass} w-full max-w-full overflow-x-clip`}>
       <header className={`${dashboardHeaderClass} w-full max-w-full overflow-x-clip`}>
         <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
-        <div className={`${CONTENT_CLASS} min-w-0 px-3 py-2.5 sm:px-4 sm:py-3`}>
+        <div className={`${CONTENT_CLASS} py-2.5 sm:py-3`}>
           <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
             <BrpLogoLink href="/dashboard" variant="light" className="min-w-0 shrink" logoClassName="sm:text-base" />
             <div className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1.5">
@@ -70,7 +70,7 @@ export function DashboardShell({
         <DashboardNav badges={badges} />
       </header>
       <NewSurveyAlertBanner newSurveyCount={badges.newSurveys} />
-      <main className={`${CONTENT_CLASS} relative z-0 min-w-0 max-w-full px-3 py-5 sm:px-4 sm:py-8`}>
+      <main className={`${CONTENT_CLASS} relative z-0 py-5 sm:py-8`}>
         {verificationStatus && !isAccountVerified(verificationStatus) ? (
           <div className="mb-6">
             <AccountNotVerifiedBanner verificationStatus={verificationStatus} />
