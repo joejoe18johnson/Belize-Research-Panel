@@ -130,7 +130,7 @@ export function DashboardSurveysSection({
         {formatHeadingCase(
           surveysLocked
             ? "Survey participation requires a verified, active account. Your invitations will unlock automatically once verification is complete."
-            : "Survey links open in a new tab. Automatic completion tracking will connect when the survey distribution module is fully implemented."
+            : "On-site surveys open in your dashboard. You can save progress and submit when every required question is answered. External survey links open in a new tab."
         )}
       </DashboardInfoNote>
     </div>

@@ -18,7 +18,6 @@ export function SurveyQuestionField({
   disabled?: boolean;
   invalid?: boolean;
 }) {
-  const label = question.title || "Untitled question";
   const fieldId = `survey-field-${question.id}`;
   const describedBy = invalid ? `survey-error-${question.id}` : undefined;
   const inputClass = `mt-2 w-full rounded-xl border px-3 py-2.5 text-sm ${
@@ -67,7 +66,14 @@ export function SurveyQuestionField({
     const options = Array.from({ length: max - min + 1 }, (_, index) => min + index);
 
     return (
-      <div className="mt-3 space-y-3" role="group" aria-invalid={invalid} aria-describedby={describedBy}>
+      <div
+        id={fieldId}
+        className="mt-3 space-y-3"
+        role="group"
+        aria-invalid={invalid}
+        aria-describedby={describedBy}
+        tabIndex={invalid ? -1 : undefined}
+      >
         <div className="flex flex-wrap gap-2">
           {options.map((option) => (
             <button
@@ -116,7 +122,14 @@ export function SurveyQuestionField({
   if (question.type === "multiple_choice") {
     const selected = Array.isArray(value) ? value : [];
     return (
-      <div className="mt-3 space-y-2" role="group" aria-invalid={invalid} aria-describedby={describedBy}>
+      <div
+        id={fieldId}
+        className="mt-3 space-y-2"
+        role="group"
+        aria-invalid={invalid}
+        aria-describedby={describedBy}
+        tabIndex={invalid ? -1 : undefined}
+      >
         {question.options.map((option) => {
           const checked = selected.includes(option);
           return (
@@ -142,7 +155,14 @@ export function SurveyQuestionField({
   const selected = typeof value === "string" ? value : "";
 
   return (
-    <div className="mt-3 space-y-2" role="radiogroup" aria-invalid={invalid} aria-describedby={describedBy}>
+    <div
+      id={fieldId}
+      className="mt-3 space-y-2"
+      role="radiogroup"
+      aria-invalid={invalid}
+      aria-describedby={describedBy}
+      tabIndex={invalid ? -1 : undefined}
+    >
       {options.map((option) => (
         <label key={option} className={choiceClass}>
           <input

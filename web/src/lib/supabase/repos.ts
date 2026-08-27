@@ -43,6 +43,29 @@ function throwIfError(error: { message: string; code?: string } | null): void {
   throw new Error(error.message);
 }
 
+function errorMessage(error: { message?: string; code?: string } | null): string {
+  return (error?.message ?? "").toLowerCase();
+}
+
+function isMissingColumnError(error: { message?: string; code?: string } | null, column: string): boolean {
+  if (!error) return false;
+  const message = errorMessage(error);
+  const col = column.toLowerCase();
+  const mentionsColumn = message.includes(`'${col}'`) || message.includes(`"${col}"`) || message.includes(col);
+  return (
+    mentionsColumn &&
+    (error.code === "PGRST204" ||
+      message.includes("schema cache") ||
+      message.includes("could not find") ||
+      message.includes("does not exist"))
+  );
+}
+
+function isNotNullViolation(error: { message?: string; code?: string } | null, column: string): boolean {
+  if (!error) return false;
+  return error.code === "23502" && errorMessage(error).includes(column.toLowerCase());
+}
+
 export async function supabaseListAccounts(): Promise<AccountRecord[]> {
   const { data, error } = await db().from("accounts").select("*");
   throwIfError(error);
@@ -460,6 +483,22 @@ export async function supabaseUpdateSurveyAssignmentProgress(
     query = query.neq("status", "completed");
   }
   const { error } = await query;
+  if (
+    error &&
+    (isMissingColumnError(error, "progress_percent") || isMissingColumnError(error, "completed_date"))
+  ) {
+    let fallback = db()
+      .from("survey_assignments")
+      .update({ status: patch.status, updated_at: now })
+      .eq("campaign_id", campaignId)
+      .eq("panelist_email", email);
+    if (patch.status !== "completed") {
+      fallback = fallback.neq("status", "completed");
+    }
+    const { error: fallbackError } = await fallback;
+    throwIfError(fallbackError);
+    return;
+  }
   throwIfError(error);
 }
 
@@ -516,19 +555,43 @@ export async function supabaseLoadSurveyResponsesForEmail(email: string): Promis
 export async function supabaseUpsertSurveyResponse(response: SurveyResponseRecord): Promise<void> {
   const email = normalizePanelistEmail(response.panelistEmail);
   const assignmentId = await lookupDbAssignmentId(response.assignmentId, email);
-  const { error } = await db().from("survey_responses").upsert(
-    {
-      assignment_id: assignmentId,
-      panelist_email: email,
-      survey_definition_id: response.surveyDefinitionId || null,
-      answers: response.answers,
-      started_at: response.startedAt || null,
-      updated_at: response.updatedAt || new Date().toISOString(),
-      submitted_at: response.submittedAt || null,
-    },
-    { onConflict: "assignment_id" }
-  );
-  throwIfError(error);
+  const payload: Record<string, unknown> = {
+    assignment_id: assignmentId,
+    panelist_email: email,
+    survey_definition_id: response.surveyDefinitionId || null,
+    answers: response.answers,
+    started_at: response.startedAt || null,
+    updated_at: response.updatedAt || new Date().toISOString(),
+    submitted_at: response.submittedAt || null,
+  };
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const { error } = await db().from("survey_responses").upsert(payload, { onConflict: "assignment_id" });
+    if (!error) return;
+
+    if (isMissingColumnError(error, "started_at") && "started_at" in payload) {
+      delete payload.started_at;
+      continue;
+    }
+    if (isMissingColumnError(error, "updated_at") && "updated_at" in payload) {
+      delete payload.updated_at;
+      continue;
+    }
+    if (
+      (isNotNullViolation(error, "submitted_at") ||
+        (errorMessage(error).includes("submitted_at") && payload.submitted_at == null)) &&
+      "submitted_at" in payload
+    ) {
+      if (response.submittedAt) {
+        payload.submitted_at = response.submittedAt;
+      } else {
+        delete payload.submitted_at;
+      }
+      continue;
+    }
+    throwIfError(error);
+  }
+  throw new Error("Could not save survey responses.");
 }
 
 export async function supabaseRecordSurveyCompletionPoints(input: {

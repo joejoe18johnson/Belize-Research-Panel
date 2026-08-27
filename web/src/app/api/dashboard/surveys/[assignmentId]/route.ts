@@ -7,7 +7,7 @@ import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { resolveRewardSummary } from "@/lib/panelist-points";
 import { getSurveyResponse, saveSurveyProgress, submitSurveyResponse } from "@/lib/survey-responses";
 import { findAssignmentForAccount, resolveSurveyDefinitionForAssignment } from "@/lib/survey-assignment-lookup";
-import { SurveyValidationError, type SurveyAnswerValue } from "@/lib/survey-definitions";
+import { SurveyValidationError, type SurveyAnswerValue } from "@/lib/survey-types";
 
 export async function GET(
   _request: Request,

@@ -125,11 +125,15 @@ export async function saveSurveyProgress(input: {
   };
 
   await saveSurveyResponse(response);
-  await updateSurveyAssignmentProgress(input.assignmentId, email, {
-    progressPercent,
-    status: progressPercent > 0 ? "in_progress" : "available",
-    completedDate: null,
-  });
+  try {
+    await updateSurveyAssignmentProgress(input.assignmentId, email, {
+      progressPercent,
+      status: progressPercent > 0 ? "in_progress" : "available",
+      completedDate: null,
+    });
+  } catch (error) {
+    console.error("[survey] assignment progress could not be updated", error);
+  }
 
   return { response, progressPercent };
 }

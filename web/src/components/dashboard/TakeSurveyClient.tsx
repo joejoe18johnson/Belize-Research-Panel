@@ -8,12 +8,27 @@ import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SurveyQuestionField } from "@/components/surveys/SurveyQuestionField";
 import {
   calculateSurveyProgress,
+  collectSurveyValidationIssues,
   type SurveyAnswerValue,
   type SurveyDefinition,
   type SurveyQuestion,
+  type SurveyValidationIssue,
 } from "@/lib/survey-types";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+
+function questionElementId(questionId: string): string {
+  return `survey-question-${questionId}`;
+}
+
+function scrollToQuestion(questionId: string) {
+  const target = document.getElementById(questionElementId(questionId));
+  target?.scrollIntoView({ behavior: "smooth", block: "center" });
+  window.setTimeout(() => {
+    const field = document.getElementById(`survey-field-${questionId}`);
+    if (field instanceof HTMLElement) field.focus({ preventScroll: true });
+  }, 280);
+}
 
 export function TakeSurveyClient({
   assignment,
@@ -32,22 +47,53 @@ export function TakeSurveyClient({
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [issues, setIssues] = useState<SurveyValidationIssue[]>([]);
   const [done, setDone] = useState(submitted || assignment.status === "completed");
 
   const progressPercent = useMemo(
     () => calculateSurveyProgress(definition.questions, answers),
     [definition.questions, answers]
   );
+  const requiredRemaining = useMemo(
+    () => collectSurveyValidationIssues(definition.questions, answers).length,
+    [definition.questions, answers]
+  );
+  const issueByQuestionId = useMemo(
+    () => new Map(issues.map((issue) => [issue.questionId, issue])),
+    [issues]
+  );
 
   const updateAnswer = (questionId: string, value: SurveyAnswerValue) => {
     setAnswers((current) => ({ ...current, [questionId]: value }));
+    setIssues((current) => current.filter((issue) => issue.questionId !== questionId));
+  };
+
+  const showQuestionIssues = (nextIssues: SurveyValidationIssue[]) => {
+    setIssues(nextIssues);
+    const summary =
+      nextIssues.length === 1
+        ? nextIssues[0].message
+        : `Please answer ${nextIssues.length} required questions. They are highlighted below.`;
+    setError(summary);
+    if (nextIssues[0]) {
+      requestAnimationFrame(() => scrollToQuestion(nextIssues[0].questionId));
+    }
   };
 
   const persist = async (submit: boolean) => {
+    if (submit) {
+      const nextIssues = collectSurveyValidationIssues(definition.questions, answers);
+      if (nextIssues.length > 0) {
+        showQuestionIssues(nextIssues);
+        return;
+      }
+    }
+
     if (submit) setSubmitting(true);
     else setSaving(true);
     setError("");
     setMessage("");
+    setIssues([]);
 
     try {
       const res = await fetch(`/api/dashboard/surveys/${encodeURIComponent(assignment.id)}`, {
@@ -59,9 +105,23 @@ export function TakeSurveyClient({
         ok?: boolean;
         message?: string;
         points?: number;
+        issues?: SurveyValidationIssue[];
+        missingQuestionIds?: string[];
         rewards?: { availablePoints: number; totalPointsToDate: number; surveyPoints: number };
       };
       if (!res.ok || !data.ok) {
+        if (data.issues?.length) {
+          showQuestionIssues(data.issues);
+          return;
+        }
+        if (data.missingQuestionIds?.length) {
+          showQuestionIssues(
+            collectSurveyValidationIssues(definition.questions, answers).filter((issue) =>
+              data.missingQuestionIds?.includes(issue.questionId)
+            )
+          );
+          return;
+        }
         setError(data.message ?? "Could not save your responses.");
         return;
       }
@@ -118,11 +178,32 @@ export function TakeSurveyClient({
             style={{ width: `${done ? 100 : Math.max(progressPercent, 4)}%` }}
           />
         </div>
+        {!done && requiredRemaining > 0 ? (
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            {requiredRemaining} required question{requiredRemaining === 1 ? "" : "s"} still need
+            {requiredRemaining === 1 ? "s" : ""} an answer before you can submit.
+          </p>
+        ) : null}
       </div>
 
       {error ? (
-        <BrandedAlert tone="error" showIcon>
-          {error}
+        <BrandedAlert tone="error" title="Please complete the highlighted questions" showIcon>
+          <p>{error}</p>
+          {issues.length > 0 ? (
+            <ul className="mt-3 space-y-1.5">
+              {issues.map((issue) => (
+                <li key={issue.questionId}>
+                  <button
+                    type="button"
+                    onClick={() => scrollToQuestion(issue.questionId)}
+                    className="text-left font-semibold underline underline-offset-2"
+                  >
+                    Jump to question {issue.questionNumber}: {issue.title}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </BrandedAlert>
       ) : null}
       {message ? (
@@ -132,23 +213,41 @@ export function TakeSurveyClient({
       ) : null}
 
       <div className="space-y-4">
-        {definition.questions.map((question: SurveyQuestion, index: number) => (
-          <section key={question.id} className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
-            <label className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {index + 1}. {question.title || "Untitled question"}
-              {question.required ? <span className="text-red-600"> *</span> : null}
-            </label>
-            {question.description ? (
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p>
-            ) : null}
-            <SurveyQuestionField
-              question={question}
-              value={answers[question.id]}
-              onChange={(value) => updateAnswer(question.id, value)}
-              disabled={done}
-            />
-          </section>
-        ))}
+        {definition.questions.map((question: SurveyQuestion, index: number) => {
+          const issue = issueByQuestionId.get(question.id);
+          const invalid = Boolean(issue);
+          return (
+            <section
+              key={question.id}
+              id={questionElementId(question.id)}
+              className={`scroll-mt-24 rounded-2xl border bg-white p-5 shadow-sm dark:bg-zinc-900 ${
+                invalid
+                  ? "border-red-400 ring-2 ring-red-200 dark:border-red-500 dark:ring-red-900/60"
+                  : "border-zinc-200 dark:border-zinc-800"
+              }`}
+            >
+              <label className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100" htmlFor={`survey-field-${question.id}`}>
+                {index + 1}. {question.title || "Untitled question"}
+                {question.required ? <span className="text-red-600"> *</span> : null}
+              </label>
+              {question.description ? (
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p>
+              ) : null}
+              {invalid ? (
+                <p id={`survey-error-${question.id}`} className="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
+                  {issue?.message ?? "This question is required."}
+                </p>
+              ) : null}
+              <SurveyQuestionField
+                question={question}
+                value={answers[question.id]}
+                onChange={(value) => updateAnswer(question.id, value)}
+                disabled={done}
+                invalid={invalid}
+              />
+            </section>
+          );
+        })}
       </div>
 
       {!done ? (
