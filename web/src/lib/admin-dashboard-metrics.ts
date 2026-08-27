@@ -18,7 +18,7 @@ import {
   formatPayoutPaymentDetails,
   payoutShortId,
 } from "./admin-payout-display";
-import { adminNotificationId, adminPanelistVerificationId, PANELIST_VERIFICATION_NOTIFICATION_TYPE } from "./admin-read-state";
+import { adminNotificationId, adminPanelistVerificationId, PANELIST_VERIFICATION_NOTIFICATION_TYPE } from "./admin-read-ids";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {

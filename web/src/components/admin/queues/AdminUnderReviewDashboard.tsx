@@ -31,7 +31,7 @@ import {
   UNDER_REVIEW_FILTER_LABELS,
   UNDER_REVIEW_QUEUE_LABELS,
 } from "@/lib/admin-dashboard-links";
-import { adminPanelistVerificationId } from "@/lib/admin-read-state";
+import { adminPanelistVerificationId } from "@/lib/admin-read-ids";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminUnderReviewDashboard({

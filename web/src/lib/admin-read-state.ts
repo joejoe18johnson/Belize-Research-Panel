@@ -2,6 +2,12 @@ import { promises as fs } from "fs";
 import path from "path";
 import { cleanText } from "./validation";
 
+export {
+  adminNotificationId,
+  adminPanelistVerificationId,
+  PANELIST_VERIFICATION_NOTIFICATION_TYPE,
+} from "./admin-read-ids";
+
 const DATA_FILE = path.join(process.cwd(), "data", "admin-read-state.json");
 
 export interface AdminReadEntry {
@@ -48,16 +54,6 @@ async function saveStore(store: AdminReadState): Promise<void> {
   }
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf-8");
-}
-
-export const PANELIST_VERIFICATION_NOTIFICATION_TYPE = "Panelist verification";
-
-export function adminNotificationId(type: string, email: string): string {
-  return `${cleanText(type).toLowerCase()}:${cleanText(email).toLowerCase()}`;
-}
-
-export function adminPanelistVerificationId(email: string): string {
-  return adminNotificationId(PANELIST_VERIFICATION_NOTIFICATION_TYPE, email);
 }
 
 export async function loadAdminReadState(): Promise<AdminReadState> {

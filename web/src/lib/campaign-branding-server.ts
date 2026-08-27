@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { useSupabase } from "./supabase/data-source";
 
-const UPLOADS_ROOT = path.join(process.cwd(), "data", "uploads", "campaigns");
+const UPLOADS_ROOT = path.join(/* turbopackIgnore: true */ process.cwd(), "data", "uploads", "campaigns");
 const STORAGE_BUCKET = "survey-assets";
 export const CAMPAIGN_COVER_BASENAME = "cover-image";
 

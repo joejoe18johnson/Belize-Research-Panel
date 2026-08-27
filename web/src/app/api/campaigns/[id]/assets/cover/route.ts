@@ -31,7 +31,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ ok: false, message: "Cover image not found." }, { status: 404 });
   }
 
-  return new NextResponse(asset.buffer, {
+  return new NextResponse(new Uint8Array(asset.buffer), {
     headers: {
       "Content-Type": asset.contentType,
       "Content-Disposition": `inline; filename="${asset.filename}"`,
