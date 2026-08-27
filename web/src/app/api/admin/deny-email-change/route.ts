@@ -52,13 +52,23 @@ export async function POST(request: NextRequest) {
       origin: resolveRequestOrigin(request),
     });
 
+    const accountStatus = result.account.account_status;
+    const holdNote =
+      accountStatus === "on_hold"
+        ? "The account is still on hold for another pending item."
+        : "The account is active again.";
+
     return NextResponse.json({
       ok: true,
       email,
       deniedEmail: result.deniedEmail,
-      accountStatus: result.account.account_status,
+      accountStatus,
+      message: `Email change denied. ${email} stays as the login address. ${holdNote} They were notified at ${email}.`,
     });
   } catch {
-    return NextResponse.json({ message: "Email change could not be denied." }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, message: "The email change could not be denied. Try again." },
+      { status: 500 }
+    );
   }
 }

@@ -102,16 +102,49 @@ export function calculateSurveyProgress(
   return Math.round((answered / questions.length) * 100);
 }
 
+export interface SurveyValidationIssue {
+  questionId: string;
+  questionNumber: number;
+  title: string;
+  message: string;
+}
+
+export function collectSurveyValidationIssues(
+  questions: SurveyQuestion[],
+  answers: Record<string, SurveyAnswerValue>
+): SurveyValidationIssue[] {
+  const issues: SurveyValidationIssue[] = [];
+  questions.forEach((question, index) => {
+    if (!question.required) return;
+    if (hasAnswerForQuestion(question, answers[question.id])) return;
+    const title = question.title || "Untitled question";
+    issues.push({
+      questionId: question.id,
+      questionNumber: index + 1,
+      title,
+      message: `Question ${index + 1} is required: “${title}”.`,
+    });
+  });
+  return issues;
+}
+
 export function validateSurveySubmission(
   questions: SurveyQuestion[],
   answers: Record<string, SurveyAnswerValue>
 ): string[] {
-  const errors: string[] = [];
-  for (const question of questions) {
-    if (!question.required) continue;
-    if (!hasAnswerForQuestion(question, answers[question.id])) {
-      errors.push(`"${question.title || "Untitled question"}" is required.`);
-    }
+  return collectSurveyValidationIssues(questions, answers).map((issue) => issue.message);
+}
+
+export class SurveyValidationError extends Error {
+  issues: SurveyValidationIssue[];
+
+  constructor(issues: SurveyValidationIssue[]) {
+    super(
+      issues.length === 1
+        ? issues[0].message
+        : `Please answer ${issues.length} required questions highlighted below.`
+    );
+    this.name = "SurveyValidationError";
+    this.issues = issues;
   }
-  return errors;
 }

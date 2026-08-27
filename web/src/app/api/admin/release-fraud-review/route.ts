@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/account-on-hold");
 
-    return NextResponse.json({ ok: true, email });
+    return NextResponse.json({
+      ok: true,
+      email,
+      message: `Duplicate-review hold released for ${email}. The account is active again unless another hold is pending.`,
+    });
   } catch {
     return NextResponse.json({ message: "Could not release this account hold." }, { status: 500 });
   }

@@ -140,8 +140,8 @@ export async function sendEmailChangeApprovedEmail(input: {
   firstName: string;
   newEmail: string;
   origin: string;
-}): Promise<void> {
-  await sendTemplateEmail({
+}): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
+  return sendTemplateEmail({
     templateId: "email-change-approved",
     to: input.to,
     data: {

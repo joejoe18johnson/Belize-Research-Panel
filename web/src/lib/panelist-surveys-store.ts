@@ -112,3 +112,21 @@ export async function updateSurveyAssignmentProgress(
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(assignments, null, 2), "utf-8");
 }
+
+export async function reassignSurveyAssignmentEmail(oldEmail: string, newEmail: string): Promise<void> {
+  const from = cleanText(oldEmail).toLowerCase();
+  const to = cleanText(newEmail).toLowerCase();
+  if (!from || !to || from === to) return;
+  if (useSupabase()) return;
+
+  const assignments = await loadSurveyRecordsFromFile();
+  let changed = false;
+  const next = assignments.map((record) => {
+    if (cleanText(record.panelistEmail ?? "").toLowerCase() !== from) return record;
+    changed = true;
+    return { ...record, panelistEmail: to };
+  });
+  if (!changed) return;
+  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(next, null, 2), "utf-8");
+}

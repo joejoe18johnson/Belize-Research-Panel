@@ -2,7 +2,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import {
   calculateSurveyProgress,
-  validateSurveySubmission,
+  collectSurveyValidationIssues,
+  SurveyValidationError,
   type SurveyAnswerValue,
 } from "./survey-types";
 import { findSurveyDefinitionById } from "./survey-definitions";
@@ -151,8 +152,8 @@ export async function submitSurveyResponse(input: {
   const definition = await findSurveyDefinitionById(assignment.surveyDefinitionId);
   if (!definition) throw new Error("Survey definition not found.");
 
-  const errors = validateSurveySubmission(definition.questions, input.answers);
-  if (errors.length > 0) throw new Error(errors[0]);
+  const issues = collectSurveyValidationIssues(definition.questions, input.answers);
+  if (issues.length > 0) throw new SurveyValidationError(issues);
 
   const now = new Date().toISOString();
   const response: SurveyResponseRecord = {
@@ -171,7 +172,11 @@ export async function submitSurveyResponse(input: {
     status: "completed",
     completedDate: now.slice(0, 10),
   });
-  await recordCompletionPoints(assignment, email);
+  try {
+    await recordCompletionPoints(assignment, email);
+  } catch (error) {
+    console.error("[survey] completion points could not be recorded", error);
+  }
 
   return { response, points: assignment.points };
 }
@@ -195,4 +200,22 @@ export async function loadSurveyResponsesForEmail(email: string): Promise<Survey
   }
   const records = await loadSurveyResponsesRaw();
   return records.filter((record) => cleanText(record.panelistEmail).toLowerCase() === normalized);
+}
+
+export async function reassignSurveyResponseEmail(oldEmail: string, newEmail: string): Promise<void> {
+  const from = cleanText(oldEmail).toLowerCase();
+  const to = cleanText(newEmail).toLowerCase();
+  if (!from || !to || from === to) return;
+  if (useSupabase()) return;
+
+  const records = await loadSurveyResponsesRaw();
+  let changed = false;
+  const next = records.map((record) => {
+    if (cleanText(record.panelistEmail).toLowerCase() !== from) return record;
+    changed = true;
+    return { ...record, panelistEmail: to };
+  });
+  if (!changed) return;
+  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(next, null, 2), "utf-8");
 }

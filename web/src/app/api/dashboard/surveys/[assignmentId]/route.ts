@@ -7,7 +7,7 @@ import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { resolveRewardSummary } from "@/lib/panelist-points";
 import { getSurveyResponse, saveSurveyProgress, submitSurveyResponse } from "@/lib/survey-responses";
 import { findAssignmentForAccount, resolveSurveyDefinitionForAssignment } from "@/lib/survey-assignment-lookup";
-import type { SurveyAnswerValue } from "@/lib/survey-definitions";
+import { SurveyValidationError, type SurveyAnswerValue } from "@/lib/survey-definitions";
 
 export async function GET(
   _request: Request,
@@ -119,6 +119,17 @@ export async function POST(
       progressPercent: result.progressPercent,
     });
   } catch (error) {
+    if (error instanceof SurveyValidationError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: error.message,
+          missingQuestionIds: error.issues.map((issue) => issue.questionId),
+          issues: error.issues,
+        },
+        { status: 400 }
+      );
+    }
     const message = error instanceof Error ? error.message : "Could not save survey.";
     return NextResponse.json({ ok: false, message }, { status: 400 });
   }

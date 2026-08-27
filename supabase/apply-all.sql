@@ -388,7 +388,7 @@ CREATE TABLE survey_assignments (
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (campaign_id, panelist_email),
   CONSTRAINT survey_assignments_panelist_fk
-    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON DELETE CASCADE
+    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX survey_assignments_panelist_email_idx ON survey_assignments (panelist_email);
@@ -404,7 +404,7 @@ CREATE TRIGGER survey_assignments_updated_at
 
 CREATE TABLE survey_responses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  assignment_id text NOT NULL UNIQUE REFERENCES survey_assignments(id) ON DELETE CASCADE,
+  assignment_id text NOT NULL UNIQUE REFERENCES survey_assignments(id) ON UPDATE CASCADE ON DELETE CASCADE,
   panelist_email citext NOT NULL,
   survey_definition_id text REFERENCES survey_definitions(id) ON DELETE SET NULL,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -412,7 +412,7 @@ CREATE TABLE survey_responses (
   updated_at timestamptz,
   submitted_at timestamptz,
   CONSTRAINT survey_responses_panelist_fk
-    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON DELETE CASCADE
+    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX survey_responses_panelist_email_idx ON survey_responses (panelist_email);
@@ -437,14 +437,14 @@ CREATE TRIGGER reward_settings_updated_at
 
 -- Legacy seed balances (migrated from panelist-reward-balances.json)
 CREATE TABLE panelist_reward_balance_seeds (
-  panelist_email citext PRIMARY KEY REFERENCES panelists(email) ON DELETE CASCADE,
+  panelist_email citext PRIMARY KEY REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE,
   total_points integer NOT NULL DEFAULT 0 CHECK (total_points >= 0),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- Admin manual point overrides
 CREATE TABLE panelist_points_overrides (
-  panelist_email citext PRIMARY KEY REFERENCES panelists(email) ON DELETE CASCADE,
+  panelist_email citext PRIMARY KEY REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE,
   total_points integer NOT NULL CHECK (total_points >= 0),
   note text NOT NULL DEFAULT '',
   updated_by citext,
@@ -486,7 +486,7 @@ CREATE TABLE redemption_requests (
   updated_at timestamptz NOT NULL DEFAULT now(),
   processed_by citext,
   CONSTRAINT redemption_requests_panelist_fk
-    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON DELETE CASCADE
+    FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX redemption_requests_panelist_id_idx ON redemption_requests (panelist_id);
@@ -496,7 +496,7 @@ CREATE INDEX redemption_requests_requested_at_idx ON redemption_requests (submit
 -- ─── Notifications & admin read state ─────────────────────────────────────────
 
 CREATE TABLE panelist_notification_reads (
-  panelist_email citext NOT NULL REFERENCES panelists(email) ON DELETE CASCADE,
+  panelist_email citext NOT NULL REFERENCES panelists(email) ON UPDATE CASCADE ON DELETE CASCADE,
   notification_id text NOT NULL,
   read boolean NOT NULL DEFAULT false,
   updated_at timestamptz NOT NULL DEFAULT now(),

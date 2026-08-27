@@ -84,6 +84,7 @@ export interface NotificationQueueRow {
   type: NotificationQueueType;
   detail: string;
   requestedAt: string;
+  pendingEmail?: string;
 }
 
 export interface PayoutQueueRow {
@@ -354,6 +355,7 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
         type: "Email change",
         detail: `${email} → ${pendingEmail}`,
         requestedAt: cleanText(account.email_change_requested_at) || "—",
+        pendingEmail,
       });
     }
 

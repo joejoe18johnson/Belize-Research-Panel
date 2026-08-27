@@ -18,14 +18,17 @@ export type {
   SurveyDefinitionStatus,
   SurveyQuestion,
   SurveyQuestionType,
+  SurveyValidationIssue,
 } from "./survey-types";
 
 export {
   SURVEY_QUESTION_TYPES,
   SURVEY_QUESTION_TYPE_LABELS,
   calculateSurveyProgress,
+  collectSurveyValidationIssues,
   createEmptyQuestion,
   hasAnswerForQuestion,
+  SurveyValidationError,
   validateSurveySubmission,
 } from "./survey-types";
 

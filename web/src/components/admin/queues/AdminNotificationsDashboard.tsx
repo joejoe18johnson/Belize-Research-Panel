@@ -41,12 +41,18 @@ export function AdminNotificationsDashboard({
   const typeFilter = searchParams.get("type");
   const [search, setSearch] = useState("");
   const [actingKey, setActingKey] = useState("");
-  const [message, setMessage] = useState("");
+  const [resolvedIds, setResolvedIds] = useState<string[]>([]);
+  const [result, setResult] = useState<{ tone: "success" | "error"; title: string; body: string } | null>(null);
   const unreadSet = useMemo(() => new Set(unreadIds), [unreadIds]);
+
+  const visibleRows = useMemo(
+    () => rows.filter((row) => !resolvedIds.includes(row.id)),
+    [rows, resolvedIds]
+  );
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return rows.filter((row) => {
+    return visibleRows.filter((row) => {
       if (!matchesNotificationType(row, typeFilter)) return false;
       if (!query) return true;
       return (
@@ -56,16 +62,16 @@ export function AdminNotificationsDashboard({
         row.detail.toLowerCase().includes(query)
       );
     });
-  }, [rows, search, typeFilter]);
+  }, [visibleRows, search, typeFilter]);
 
   const pagination = useTablePagination(filtered);
 
-  const emailChanges = rows.filter((row) => row.type === "Email change").length;
-  const phoneChanges = rows.filter((row) => row.type === "Phone change").length;
-  const duplicateReviews = rows.filter((row) => row.type === "Duplicate review").length;
-  const emailVerification = rows.filter((row) => row.type === "Email verification").length;
-  const panelistVerification = rows.filter((row) => row.type === "Panelist verification").length;
-  const newCount = rows.filter((row) => unreadSet.has(row.id)).length;
+  const emailChanges = visibleRows.filter((row) => row.type === "Email change").length;
+  const phoneChanges = visibleRows.filter((row) => row.type === "Phone change").length;
+  const duplicateReviews = visibleRows.filter((row) => row.type === "Duplicate review").length;
+  const emailVerification = visibleRows.filter((row) => row.type === "Email verification").length;
+  const panelistVerification = visibleRows.filter((row) => row.type === "Panelist verification").length;
+  const newCount = visibleRows.filter((row) => unreadSet.has(row.id)).length;
 
   const markNotificationRead = async (id: string) => {
     if (!unreadSet.has(id)) return;
@@ -80,7 +86,7 @@ export function AdminNotificationsDashboard({
   const decideChange = async (row: NotificationQueueRow, decision: "approve" | "deny") => {
     const key = `${row.id}:${decision}`;
     setActingKey(key);
-    setMessage("");
+    setResult(null);
 
     const endpoint =
       row.type === "Email change"
@@ -95,13 +101,25 @@ export function AdminNotificationsDashboard({
             ? "/api/admin/release-fraud-review"
             : null;
 
-    if (!endpoint) return;
+    if (!endpoint) {
+      setActingKey("");
+      return;
+    }
 
-    if (decision === "deny") {
+    const pendingEmail = row.pendingEmail || row.detail.split("→")[1]?.trim() || "the new address";
+    if (decision === "approve" && row.type === "Email change") {
+      const confirmed = window.confirm(
+        `Approve the email change for ${row.name || row.email}?\n\nLogin will change from ${row.email} to ${pendingEmail}.\nThey will need to sign in with the new address, and a confirmation will be sent there.\nThe hold for this email change will be cleared.`
+      );
+      if (!confirmed) {
+        setActingKey("");
+        return;
+      }
+    } else if (decision === "deny") {
       const confirmed = window.confirm(
         row.type === "Email change"
-          ? `Deny the email change for ${row.email}? They will keep their current email and the account will be reactivated if nothing else is pending.`
-          : `Deny the phone change for ${row.email}? They will keep their current number and the account will be reactivated if nothing else is pending.`
+          ? `Deny the email change for ${row.email}?\n\nThey will keep ${row.email} and will not be switched to ${pendingEmail}. The account will be reactivated if nothing else is pending.`
+          : `Deny the phone change for ${row.email}?\n\nThey will keep their current number and the account will be reactivated if nothing else is pending.`
       );
       if (!confirmed) {
         setActingKey("");
@@ -115,23 +133,44 @@ export function AdminNotificationsDashboard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: row.email }),
       });
-      const data = (await res.json()) as { message?: string };
-      if (!res.ok) {
-        setMessage(data.message ?? (decision === "approve" ? "Approval failed." : "Could not deny this request."));
+      const data = (await res.json()) as { ok?: boolean; message?: string; email?: string };
+      if (!res.ok || data.ok === false) {
+        setResult({
+          tone: "error",
+          title: decision === "approve" ? "Approval did not complete" : "Denial did not complete",
+          body: data.message ?? "The request could not be completed. The queue item is still pending.",
+        });
         return;
       }
-      setMessage(
-        decision === "approve"
-          ? `${row.type} approved for ${row.email}.`
-          : `${row.type} denied for ${row.email}.`
-      );
+
+      setResolvedIds((current) => (current.includes(row.id) ? current : [...current, row.id]));
+      const demoNote =
+        demoLoopEnabled && row.email.toLowerCase().includes("belizepanel.test")
+          ? " Sample demo alerts can reappear after a refresh while demo notifications are enabled."
+          : "";
+      setResult({
+        tone: "success",
+        title:
+          row.type === "Email change" && decision === "approve"
+            ? "Email change approved"
+            : row.type === "Email change" && decision === "deny"
+              ? "Email change denied"
+              : `${row.type} ${decision === "approve" ? "approved" : "denied"}`,
+        body: (data.message ??
+          (decision === "approve"
+            ? `${row.type} approved for ${row.email}.`
+            : `${row.type} denied for ${row.email}.`)) + demoNote,
+      });
       router.refresh();
     } catch {
-      setMessage(
-        decision === "approve"
-          ? "Network error while approving change."
-          : "Network error while denying change."
-      );
+      setResult({
+        tone: "error",
+        title: "Network error",
+        body:
+          decision === "approve"
+            ? "The approval could not be sent. Check your connection and try again. The queue item is still pending."
+            : "The denial could not be sent. Check your connection and try again. The queue item is still pending.",
+      });
     } finally {
       setActingKey("");
     }
@@ -145,6 +184,18 @@ export function AdminNotificationsDashboard({
         description="Contact change approvals and denials, duplicate-review holds, signup email confirmation, and new panelists waiting for administrator verification."
         action={<AdminMarkReadButton scope="notifications" />}
       />
+
+      {result ? (
+        <BrandedAlert tone={result.tone} title={result.title} showIcon>
+          {result.body}
+        </BrandedAlert>
+      ) : null}
+
+      {actingKey ? (
+        <BrandedAlert tone="info" compact showIcon>
+          {actingKey.endsWith(":deny") ? "Saving denial…" : "Saving approval…"} Please wait until the result appears.
+        </BrandedAlert>
+      ) : null}
 
       {typeFilter ? (
         <BrandedAlert tone="info" compact showIcon>
@@ -172,7 +223,7 @@ export function AdminNotificationsDashboard({
       <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <MetricCard label="Total pending" value={rows.length} href="/admin/notifications" active={!typeFilter} />
+        <MetricCard label="Total pending" value={visibleRows.length} href="/admin/notifications" active={!typeFilter} />
         <MetricCard
           label="Email changes"
           value={emailChanges}
@@ -206,12 +257,6 @@ export function AdminNotificationsDashboard({
         />
       </div>
 
-      {message ? (
-        <BrandedAlert tone={message.toLowerCase().includes("failed") || message.toLowerCase().includes("error") ? "error" : "success"} showIcon>
-          {message}
-        </BrandedAlert>
-      ) : null}
-
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -227,7 +272,7 @@ export function AdminNotificationsDashboard({
           />
         </div>
 
-        {rows.length === 0 ? (
+        {visibleRows.length === 0 ? (
           <div className="mt-4">
             <BrandedAlert tone="success" title="Queue clear" showIcon>
               No pending notifications, contact approvals, or panelist verification items.

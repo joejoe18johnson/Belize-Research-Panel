@@ -222,6 +222,9 @@ async function restoreDemoReadState(): Promise<void> {
 export async function restoreAdminDemoNotificationFixtures(): Promise<void> {
   if (!isAdminDemoNotificationLoopEnabled()) return;
 
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) return;
+
   await Promise.all([
     restoreDemoAccounts(),
     restoreDemoPanelists(),

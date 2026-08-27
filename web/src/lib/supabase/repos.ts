@@ -88,38 +88,55 @@ export async function supabaseUpsertAccounts(accounts: AccountRecord[]): Promise
   throwIfError(error);
 }
 
-async function retargetSurveyAssignmentIds(oldEmail: string, newEmail: string): Promise<void> {
+function ignoreMissingTable(error: { message: string; code?: string } | null): void {
+  if (!error) return;
+  if (error.code === "42P01" || error.code === "42703" || error.code === "23505") return;
+  throwIfError(error);
+}
+
+async function retargetSurveyAssignmentIds(
+  oldEmail: string,
+  newEmail: string,
+  newPanelistId?: string
+): Promise<void> {
   const from = normalizePanelistEmail(oldEmail);
   const to = normalizePanelistEmail(newEmail);
-  const { data, error } = await db()
-    .from("survey_assignments")
-    .select("id, campaign_id, panelist_email")
-    .or(`panelist_email.eq.${from},panelist_email.eq.${to}`);
+  const { data, error } = await db().from("survey_assignments").select("*").eq("panelist_email", from);
   throwIfError(error);
 
-  for (const row of data ?? []) {
-    const campaignId = cleanText(String(row.campaign_id));
+  for (const existing of data ?? []) {
+    const campaignId = cleanText(String(existing.campaign_id));
     const nextId = resolveDbAssignmentId(campaignId, to);
-    const currentId = String(row.id);
-    if (currentId === nextId && String(row.panelist_email).toLowerCase() === to) continue;
+    const currentId = String(existing.id);
+    const identityPatch = {
+      panelist_email: to,
+      ...(newPanelistId ? { panelist_id: newPanelistId } : {}),
+    };
 
-    if (currentId !== nextId) {
-      const { data: existing } = await db().from("survey_assignments").select("*").eq("id", currentId).maybeSingle();
-      if (existing) {
-        const nextRow = { ...(existing as Record<string, unknown>), id: nextId, panelist_email: to };
-        const { error: insertError } = await db().from("survey_assignments").insert(nextRow);
-        if (insertError && insertError.code !== "23505") throwIfError(insertError);
-        await db().from("survey_responses").update({ assignment_id: nextId, panelist_email: to }).eq("assignment_id", currentId);
-        await db()
-          .from("point_transactions")
-          .update({ reference_id: nextId })
-          .eq("reference_type", "survey_assignment")
-          .eq("reference_id", currentId);
-        await db().from("survey_assignments").delete().eq("id", currentId);
-      }
-    } else {
-      await db().from("survey_assignments").update({ panelist_email: to }).eq("id", currentId);
+    if (currentId === nextId) {
+      const { error: updateError } = await db().from("survey_assignments").update(identityPatch).eq("id", currentId);
+      throwIfError(updateError);
+      continue;
     }
+
+    const nextRow = { ...(existing as Record<string, unknown>), id: nextId, ...identityPatch };
+    const { error: insertError } = await db().from("survey_assignments").insert(nextRow);
+    if (insertError && insertError.code !== "23505") throwIfError(insertError);
+
+    const { error: responseError } = await db()
+      .from("survey_responses")
+      .update({ assignment_id: nextId, panelist_email: to })
+      .eq("assignment_id", currentId);
+    ignoreMissingTable(responseError);
+
+    await db()
+      .from("point_transactions")
+      .update({ reference_id: nextId })
+      .eq("reference_type", "survey_assignment")
+      .eq("reference_id", currentId);
+
+    const { error: deleteError } = await db().from("survey_assignments").delete().eq("id", currentId);
+    throwIfError(deleteError);
   }
 }
 
@@ -132,40 +149,61 @@ export async function supabaseRetargetPanelistEmail(oldEmail: string, newEmail: 
   throwIfError(panelistError);
   if (!panelist) return false;
 
-  const { error: directError } = await db().from("panelists").update({ email: to }).eq("email", from);
+  const { data: existingTarget, error: targetError } = await db()
+    .from("panelists")
+    .select("id")
+    .eq("email", to)
+    .maybeSingle();
+  throwIfError(targetError);
+  if (existingTarget && String(existingTarget.id) !== String(panelist.id)) {
+    throw new Error("The new email is already used by another panelist.");
+  }
+
+  const { error: directError } = await db().from("panelists").update({ email: to }).eq("id", panelist.id);
   if (!directError) {
-    await retargetSurveyAssignmentIds(from, to);
+    await retargetSurveyAssignmentIds(from, to, String(panelist.id));
     return true;
   }
 
   const accountId = panelist.account_id ?? null;
-  const { error: unlinkError } = await db().from("panelists").update({ account_id: null }).eq("email", from);
+  const oldId = String(panelist.id);
+
+  const { error: unlinkError } = await db().from("panelists").update({ account_id: null }).eq("id", oldId);
   throwIfError(unlinkError);
 
-  const clone = { ...(panelist as Record<string, unknown>) };
-  delete clone.id;
-  clone.email = to;
-  clone.account_id = accountId;
-  const { error: insertError } = await db().from("panelists").insert(clone);
+  const insertPayload = panelistRecordToRow(panelistRowToRecord(panelist as Record<string, unknown>));
+  delete insertPayload.id;
+  insertPayload.email = to;
+  insertPayload.account_id = accountId;
+
+  const { data: inserted, error: insertError } = await db().from("panelists").insert(insertPayload).select("id").single();
   throwIfError(insertError);
+  const newId = String(inserted?.id ?? "");
+  if (!newId) throw new Error("Could not create the updated panelist record.");
+
+  await retargetSurveyAssignmentIds(from, to, newId);
 
   const emailTables = [
-    "survey_assignments",
     "survey_responses",
-    "redemption_requests",
     "panelist_notification_reads",
     "panelist_reward_balance_seeds",
     "panelist_points_overrides",
-    "support_messages",
   ] as const;
   for (const table of emailTables) {
     const { error } = await db().from(table).update({ panelist_email: to }).eq("panelist_email", from);
-    if (error && error.code !== "42P01" && error.code !== "42703") throwIfError(error);
+    ignoreMissingTable(error);
   }
 
-  await retargetSurveyAssignmentIds(from, to);
+  ignoreMissingTable(
+    (await db().from("redemption_requests").update({ panelist_id: newId, panelist_email: to }).eq("panelist_id", oldId)).error
+  );
+  ignoreMissingTable((await db().from("point_transactions").update({ panelist_id: newId }).eq("panelist_id", oldId)).error);
+  ignoreMissingTable((await db().from("panelist_uploads").update({ panelist_id: newId }).eq("panelist_id", oldId)).error);
+  ignoreMissingTable(
+    (await db().from("support_messages").update({ panelist_id: newId, panelist_email: to }).eq("panelist_id", oldId)).error
+  );
 
-  const { error: deleteError } = await db().from("panelists").delete().eq("email", from);
+  const { error: deleteError } = await db().from("panelists").delete().eq("id", oldId);
   throwIfError(deleteError);
   return true;
 }
@@ -174,6 +212,11 @@ export async function supabaseListPanelists(): Promise<PanelistRow[]> {
   const { data, error } = await db().from("panelists").select("*");
   throwIfError(error);
   return (data ?? []).map((row) => panelistRowToRecord(row as Record<string, unknown>));
+}
+
+export async function supabaseDeleteAccountById(id: string): Promise<void> {
+  const { error } = await db().from("accounts").delete().eq("id", id);
+  throwIfError(error);
 }
 
 export async function supabaseDeleteAccountByEmail(email: string): Promise<void> {

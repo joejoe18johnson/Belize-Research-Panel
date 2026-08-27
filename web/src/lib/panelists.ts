@@ -94,14 +94,28 @@ export async function findPanelistByEmail(email: string): Promise<PanelistRow | 
 export async function updatePanelistEmail(oldEmail: string, newEmail: string): Promise<boolean> {
   const oldNorm = cleanText(oldEmail).toLowerCase();
   const newNorm = cleanText(newEmail).toLowerCase();
-  if (!oldNorm || !newNorm) return false;
+  if (!oldNorm || !newNorm || oldNorm === newNorm) return false;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseRetargetPanelistEmail } = await import("./supabase/repos");
+    return supabaseRetargetPanelistEmail(oldNorm, newNorm);
+  }
 
   const rows = await loadPanelists();
   const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === oldNorm);
   if (index < 0) return false;
+  if (rows.some((row, i) => i !== index && cleanText(row.email).toLowerCase() === newNorm)) {
+    throw new Error("The new email is already used by another panelist.");
+  }
 
   rows[index] = { ...rows[index], email: newNorm };
   await savePanelists(rows);
+
+  const { reassignSurveyAssignmentEmail } = await import("./panelist-surveys-store");
+  await reassignSurveyAssignmentEmail(oldNorm, newNorm);
+  const { reassignSurveyResponseEmail } = await import("./survey-responses");
+  await reassignSurveyResponseEmail(oldNorm, newNorm);
   return true;
 }
 

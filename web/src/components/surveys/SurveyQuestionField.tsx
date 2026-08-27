@@ -10,22 +10,37 @@ export function SurveyQuestionField({
   value,
   onChange,
   disabled = false,
+  invalid = false,
 }: {
   question: SurveyQuestion;
   value: SurveyAnswerValue | undefined;
   onChange: (value: SurveyAnswerValue) => void;
   disabled?: boolean;
+  invalid?: boolean;
 }) {
   const label = question.title || "Untitled question";
+  const fieldId = `survey-field-${question.id}`;
+  const describedBy = invalid ? `survey-error-${question.id}` : undefined;
+  const inputClass = `mt-2 w-full rounded-xl border px-3 py-2.5 text-sm ${
+    invalid
+      ? "border-red-500 bg-red-50/60 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+      : "border-zinc-200 dark:border-zinc-800"
+  }`;
+  const choiceClass = `flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 hover:bg-teal-50/40 ${
+    invalid ? "border-red-300 bg-red-50/40" : "border-zinc-200 dark:border-zinc-800"
+  }`;
 
   if (question.type === "short_text") {
     return (
       <input
+        id={fieldId}
         type="text"
         value={typeof value === "string" ? value : ""}
         disabled={disabled}
+        aria-invalid={invalid}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
+        className={inputClass}
       />
     );
   }
@@ -33,11 +48,14 @@ export function SurveyQuestionField({
   if (question.type === "long_text") {
     return (
       <textarea
+        id={fieldId}
         rows={4}
         value={typeof value === "string" ? value : ""}
         disabled={disabled}
+        aria-invalid={invalid}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm"
+        className={inputClass}
       />
     );
   }
@@ -49,7 +67,7 @@ export function SurveyQuestionField({
     const options = Array.from({ length: max - min + 1 }, (_, index) => min + index);
 
     return (
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 space-y-3" role="group" aria-invalid={invalid} aria-describedby={describedBy}>
         <div className="flex flex-wrap gap-2">
           {options.map((option) => (
             <button
@@ -60,7 +78,9 @@ export function SurveyQuestionField({
               className={`min-h-10 min-w-10 rounded-full border px-3 text-sm font-semibold transition ${
                 selected === option
                   ? "border-teal-600 bg-teal-700 text-white"
-                  : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-teal-300 dark:hover:border-teal-700"
+                  : invalid
+                    ? "border-red-400 bg-white text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                    : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-teal-300 dark:hover:border-teal-700"
               }`}
             >
               {option}
@@ -78,10 +98,12 @@ export function SurveyQuestionField({
   if (question.type === "dropdown") {
     return (
       <SiteSelect
+        id={fieldId}
         value={typeof value === "string" ? value : ""}
         onChange={(next) => onChange(next)}
         placeholder="Select an option"
         disabled={disabled}
+        error={invalid}
         options={[
           { value: "", label: "Select an option" },
           ...mapStringOptions(question.options),
@@ -94,11 +116,11 @@ export function SurveyQuestionField({
   if (question.type === "multiple_choice") {
     const selected = Array.isArray(value) ? value : [];
     return (
-      <div className="mt-3 space-y-2">
+      <div className="mt-3 space-y-2" role="group" aria-invalid={invalid} aria-describedby={describedBy}>
         {question.options.map((option) => {
           const checked = selected.includes(option);
           return (
-            <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 hover:bg-teal-50/40">
+            <label key={option} className={choiceClass}>
               <input
                 type="checkbox"
                 checked={checked}
@@ -120,9 +142,9 @@ export function SurveyQuestionField({
   const selected = typeof value === "string" ? value : "";
 
   return (
-    <div className="mt-3 space-y-2">
+    <div className="mt-3 space-y-2" role="radiogroup" aria-invalid={invalid} aria-describedby={describedBy}>
       {options.map((option) => (
-        <label key={option} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 hover:bg-teal-50/40">
+        <label key={option} className={choiceClass}>
           <input
             type="radio"
             name={question.id}
