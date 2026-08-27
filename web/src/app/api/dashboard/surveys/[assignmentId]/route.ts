@@ -6,21 +6,8 @@ import { findPanelistByEmail } from "@/lib/panelists";
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { resolveRewardSummary } from "@/lib/panelist-points";
 import { getSurveyResponse, saveSurveyProgress, submitSurveyResponse } from "@/lib/survey-responses";
-import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
-import { findSurveyDefinitionById } from "@/lib/survey-definitions";
+import { findAssignmentForAccount, resolveSurveyDefinitionForAssignment } from "@/lib/survey-assignment-lookup";
 import type { SurveyAnswerValue } from "@/lib/survey-definitions";
-import { cleanText } from "@/lib/validation";
-
-async function getAssignmentForAccount(assignmentId: string, email: string) {
-  const normalized = cleanText(email).toLowerCase();
-  const assignments = await loadSurveyRecordsFromFile();
-  return (
-    assignments.find(
-      (record) =>
-        record.id === assignmentId && cleanText(record.panelistEmail ?? "").toLowerCase() === normalized
-    ) ?? null
-  );
-}
 
 export async function GET(
   _request: Request,
@@ -32,20 +19,20 @@ export async function GET(
   }
 
   const { assignmentId } = await context.params;
-  const assignment = await getAssignmentForAccount(assignmentId, account.email);
+  const assignment = await findAssignmentForAccount(assignmentId, account.email);
   if (!assignment) {
     return NextResponse.json({ ok: false, message: "Survey not found." }, { status: 404 });
   }
-  if (!assignment.surveyDefinitionId) {
-    return NextResponse.json({ ok: false, message: "This survey uses an external link." }, { status: 400 });
-  }
 
-  const definition = await findSurveyDefinitionById(assignment.surveyDefinitionId);
+  const definition = await resolveSurveyDefinitionForAssignment(assignment);
   if (!definition) {
+    if (assignment.deliveryType === "external") {
+      return NextResponse.json({ ok: false, message: "This survey uses an external link." }, { status: 400 });
+    }
     return NextResponse.json({ ok: false, message: "Survey definition not found." }, { status: 404 });
   }
 
-  const response = await getSurveyResponse(assignmentId, account.email);
+  const response = await getSurveyResponse(assignment.id, account.email);
 
   return NextResponse.json({
     ok: true,
@@ -68,6 +55,11 @@ export async function POST(
   }
 
   const { assignmentId } = await context.params;
+  const assignment = await findAssignmentForAccount(assignmentId, account.email);
+  if (!assignment) {
+    return NextResponse.json({ ok: false, message: "Survey not found." }, { status: 404 });
+  }
+
   const body = (await request.json()) as {
     answers?: Record<string, SurveyAnswerValue>;
     submit?: boolean;
@@ -77,29 +69,25 @@ export async function POST(
 
   try {
     if (body.submit) {
-      const assignment = await getAssignmentForAccount(assignmentId, account.email);
       const result = await submitSurveyResponse({
-        assignmentId,
+        assignmentId: assignment.id,
         panelistEmail: account.email,
         answers,
       });
 
-      if (assignment) {
-        const panelist = await findPanelistByEmail(account.email);
-        void sendSurveyCompletedEmail({
-          to: account.email,
-          firstName: panelist?.first_name ?? account.firstName,
-          campaignTitle: assignment.title,
-          points: result.points,
-          origin: resolveRequestOrigin(request),
-        });
-      }
+      const panelist = await findPanelistByEmail(account.email);
+      void sendSurveyCompletedEmail({
+        to: account.email,
+        firstName: panelist?.first_name ?? account.firstName,
+        campaignTitle: assignment.title,
+        points: result.points,
+        origin: resolveRequestOrigin(request),
+      });
 
       revalidatePath("/dashboard");
       revalidatePath("/dashboard/rewards");
       revalidatePath("/dashboard/surveys");
 
-      const panelist = await findPanelistByEmail(account.email);
       const rewards = panelist
         ? await resolveRewardSummary(account.email, panelistRowToDashboardProfile(panelist))
         : null;
@@ -120,7 +108,7 @@ export async function POST(
     }
 
     const result = await saveSurveyProgress({
-      assignmentId,
+      assignmentId: assignment.id,
       panelistEmail: account.email,
       answers,
     });

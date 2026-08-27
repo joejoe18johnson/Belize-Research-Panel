@@ -31,10 +31,10 @@ export function SignedInBanner({
             </Link>
           ) : account.panelistRegistered ? (
             <Link
-              href="/dashboard"
+              href={nextPath}
               className="rounded-lg bg-teal-700 px-4 py-2 text-xs font-semibold text-white hover:bg-teal-800"
             >
-              Go to dashboard
+              Continue
             </Link>
           ) : (
             <Link

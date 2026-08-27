@@ -74,7 +74,8 @@ export type NotificationQueueType =
   | "Email change"
   | "Phone change"
   | "Email verification"
-  | "Panelist verification";
+  | "Panelist verification"
+  | "Duplicate review";
 
 export interface NotificationQueueRow {
   id: string;
@@ -365,6 +366,17 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
         type: "Phone change",
         detail: pendingPhone,
         requestedAt: cleanText(account.phone_change_requested_at) || "—",
+      });
+    }
+
+    if (account.hold_reason === "fraud_review") {
+      rows.push({
+        id: adminNotificationId("Duplicate review", email),
+        email,
+        name,
+        type: "Duplicate review",
+        detail: "Account on hold for possible duplicate registration",
+        requestedAt: cleanText(account.created_at) || "—",
       });
     }
 

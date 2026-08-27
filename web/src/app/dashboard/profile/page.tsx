@@ -36,7 +36,7 @@ export default async function DashboardProfilePage({
     <>
       <DashboardPageHeader
         title="Profile"
-        description="View and update your profile. Biographical details stay locked; email and phone changes require administrator approval."
+        description="View and update your profile. Biographical details stay locked; email and phone changes need administrator review."
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />
       <NewSurveyProfileBanner newSurveyCount={badges.newSurveys} />

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { PanelistSurvey, SurveyCategory } from "@/lib/panelist-surveys-types";
 import { isSurveyOverdue } from "@/lib/panelist-surveys-types";
 import type { ViewLayout } from "@/lib/view-layout";
+import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
 import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, DashboardCardMedia } from "./DashboardShell";
@@ -50,11 +51,27 @@ function SurveyProgressBar({
 function SurveyCategoryBadge({
   category,
   compact = false,
+  coverUrl,
 }: {
   category: SurveyCategory;
   compact?: boolean;
+  coverUrl?: string | null;
 }) {
   const style = CATEGORY_STYLES[category];
+
+  if (coverUrl) {
+    return (
+      <div
+        className={`relative shrink-0 overflow-hidden ${
+          compact ? "h-14 w-14 rounded-xl" : "aspect-[16/9] min-h-[5.5rem] w-full"
+        }`}
+        aria-hidden="true"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={coverUrl} alt="" className="h-full w-full object-cover" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -157,12 +174,13 @@ export function SurveyCard({
   const style = CATEGORY_STYLES[survey.category];
   const completed = survey.status === "completed";
   const overdue = isSurveyOverdue(survey);
+  const coverUrl = campaignHasCover(survey) ? campaignCoverAssetUrl(survey.id) : null;
 
   if (layout === "list") {
     return (
       <DashboardCard className={`p-4 ${locked ? "opacity-50 grayscale" : ""}`}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <SurveyCategoryBadge category={survey.category} compact />
+          <SurveyCategoryBadge category={survey.category} compact coverUrl={coverUrl} />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
@@ -203,17 +221,29 @@ export function SurveyCard({
         </div>
       ) : null}
       <DashboardCardMedia top={!locked}>
-        <div
-          className={`relative flex aspect-[16/9] items-end bg-gradient-to-br ${style.gradient} p-5`}
-          aria-hidden="true"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_55%)]" />
-          <div className="relative">
-            <span className="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-              {style.icon} {formatHeadingCase(style.label)}
-            </span>
+        {coverUrl ? (
+          <div className="relative aspect-[16/9]" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={coverUrl} alt="" className="h-full w-full object-cover" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-5">
+              <span className="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                {style.icon} {formatHeadingCase(style.label)}
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            className={`relative flex aspect-[16/9] items-end bg-gradient-to-br ${style.gradient} p-5`}
+            aria-hidden="true"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_55%)]" />
+            <div className="relative">
+              <span className="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                {style.icon} {formatHeadingCase(style.label)}
+              </span>
+            </div>
+          </div>
+        )}
       </DashboardCardMedia>
 
       <div className="space-y-4 p-5">

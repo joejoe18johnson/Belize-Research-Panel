@@ -2,7 +2,6 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SessionAccount } from "@/lib/auth-types";
-import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AccountOnHoldView({ account }: { account: SessionAccount }) {
@@ -19,7 +18,7 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
       >
         {fraudReview
           ? "Your panelist account is on hold while an administrator reviews a possible duplicate registration. Dashboard access, surveys, profile editing, and rewards are paused until the review is complete."
-          : "Your panelist account is temporarily on hold while we verify a contact detail change. Dashboard access, surveys, and profile editing are paused until an administrator approves the update."}
+          : "Your panelist account is temporarily on hold while we verify a contact detail change. Dashboard access, surveys, and profile editing are paused until an administrator reviews the update."}
       </BrandedAlert>
 
       <div className="space-y-4 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-6 shadow-sm shadow-teal-950/5">
@@ -40,19 +39,9 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
               Requested address: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingEmail}</span>
             </p>
             <p className="mt-2 text-teal-900/80">
-              An administrator must approve this change before your account is reactivated. Your login email stays{" "}
-              <span className="font-medium">{account.email}</span> until then.
+              An administrator will approve or deny this change before your account is reactivated. Your login email
+              stays <span className="font-medium">{account.email}</span> until then.
             </p>
-            {isDemoAccountsEnabled() ? (
-              <p className="mt-2 text-xs text-teal-800/70">
-                Dev: approve with{" "}
-                <code className="rounded bg-teal-100 px-1 py-0.5">
-                  POST /api/admin/approve-email-change
-                </code>{" "}
-                and body{" "}
-                <code className="rounded bg-teal-100 px-1 py-0.5">{`{"email":"${account.email}"}`}</code>
-              </p>
-            ) : null}
           </div>
         ) : null}
 
@@ -63,19 +52,9 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
               Requested number: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingPhone}</span>
             </p>
             <p className="mt-2 text-teal-900/80">
-              An administrator must approve this change before your account is reactivated. Current number on file
-              remains active until then.
+              An administrator will approve or deny this change before your account is reactivated. Current number on
+              file remains active until then.
             </p>
-            {isDemoAccountsEnabled() ? (
-              <p className="mt-2 text-xs text-teal-800/70">
-                Dev: approve with{" "}
-                <code className="rounded bg-teal-100 px-1 py-0.5">
-                  POST /api/admin/approve-phone-change
-                </code>{" "}
-                and body{" "}
-                <code className="rounded bg-teal-100 px-1 py-0.5">{`{"email":"${account.email}"}`}</code>
-              </p>
-            ) : null}
           </div>
         ) : null}
 

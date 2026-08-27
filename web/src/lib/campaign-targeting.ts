@@ -41,6 +41,7 @@ export interface CampaignRecord {
   deliveryMethod: string;
   targeting: CampaignTargeting;
   clientId?: string;
+  coverImageFile?: string;
   createdAt: string;
   launchedAt: string;
 }
@@ -58,6 +59,7 @@ export interface CampaignSummary {
   deliveryMethod: string;
   targetingLabel: string;
   launchedAt: string;
+  coverImageFile?: string;
   assigned: number;
   pending: number;
   opened: number;
@@ -92,6 +94,7 @@ export interface CreateCampaignInput {
   deliveryMethod: string;
   targeting: CampaignTargeting;
   clientId?: string;
+  coverImageFile?: string;
 }
 
 export const CAMPAIGN_TARGET_OPTIONS: { id: CampaignTargetMode; label: string }[] = [
@@ -203,6 +206,7 @@ function inferCampaignFromAssignments(id: string, records: PanelistSurveyRecord[
     completeByDate: sample.completeByDate,
     deliveryMethod: "External Survey Link",
     targeting: { mode: "all_verified" },
+    coverImageFile: "",
     createdAt: sample.assignedDate || new Date().toISOString().slice(0, 10),
     launchedAt: sample.assignedDate || new Date().toISOString().slice(0, 10),
   };
@@ -253,6 +257,7 @@ export function buildCampaignSummaries(
         deliveryMethod: campaign.deliveryMethod,
         targetingLabel: targetingLabel(campaign.targeting),
         launchedAt: campaign.launchedAt,
+        coverImageFile: campaign.coverImageFile || "",
         assigned,
         pending,
         opened,

@@ -29,7 +29,7 @@ export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
     description:
       "Pending email changes, phone/WhatsApp changes, signup emails awaiting confirmation, and panelists waiting for administrator verification.",
     markedReadWhen:
-      "Open record (per row), Approve (email/phone only — also completes the request), or Mark all read on this page.",
+      "Open record (per row), Approve or Deny (contact changes), Release hold (duplicate review), or Mark all read on this page.",
   },
   {
     scope: "payouts",
@@ -65,15 +65,22 @@ export const NOTIFICATION_QUEUE_GUIDES: NotificationQueueGuide[] = [
     type: "Email change",
     whereShown: "Admin Console → Notifications (this page)",
     navBadge: "Notifications nav badge",
-    markedReadWhen: "Approve, Open record, or Mark all read",
+    markedReadWhen: "Approve, Deny, Open record, or Mark all read",
     filterHref: "/admin/notifications?type=email",
   },
   {
     type: "Phone change",
     whereShown: "Admin Console → Notifications (this page)",
     navBadge: "Notifications nav badge",
-    markedReadWhen: "Approve, Open record, or Mark all read",
+    markedReadWhen: "Approve, Deny, Open record, or Mark all read",
     filterHref: "/admin/notifications?type=phone",
+  },
+  {
+    type: "Duplicate review",
+    whereShown: "Admin Console → Notifications (this page) and Under Review",
+    navBadge: "Notifications nav badge",
+    markedReadWhen: "Release hold, Open record, or Mark all read",
+    filterHref: "/admin/notifications?type=duplicate",
   },
   {
     type: "Email verification",

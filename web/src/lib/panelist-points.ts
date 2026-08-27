@@ -99,14 +99,26 @@ export async function resolveRewardSummary(
   const settings = await loadRewardSettings();
   const base = calculateMvpRewardPoints(profile, settings);
   const { completed } = await getPanelistSurveys(email);
-  const surveyPoints = completed.reduce((sum, survey) => sum + survey.points, 0);
+  let surveyPoints = completed.reduce((sum, survey) => sum + survey.points, 0);
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseSumSurveyCompletionPoints } = await import("./supabase/repos");
+    const ledgerPoints = await supabaseSumSurveyCompletionPoints(email);
+    surveyPoints = Math.max(surveyPoints, ledgerPoints);
+  }
+
   const calculatedEarned = base.registrationPoints + base.verificationPoints + surveyPoints;
 
   const seed = await loadRewardBalanceSeed(email);
-  const seedToDate =
+  const seedToDate = Math.max(
     typeof seed?.totalPointsToDate === "number" && Number.isFinite(seed.totalPointsToDate)
       ? Math.max(0, Math.round(seed.totalPointsToDate))
-      : 0;
+      : 0,
+    typeof seed?.totalPoints === "number" && Number.isFinite(seed.totalPoints)
+      ? Math.max(0, Math.round(seed.totalPoints))
+      : 0
+  );
   const totalPointsToDate = Math.max(calculatedEarned, seedToDate);
 
   const redemptionRequests = await loadRedemptionRequests(email);

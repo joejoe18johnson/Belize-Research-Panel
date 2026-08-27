@@ -34,7 +34,7 @@ export async function loadRewardBalanceSeed(email: string): Promise<PanelistRewa
     const { supabaseLoadRewardBalanceSeed } = await import("./supabase/repos");
     const total = await supabaseLoadRewardBalanceSeed(key);
     if (total == null) return null;
-    return { totalPoints: total };
+    return { totalPointsToDate: total, totalPoints: total };
   }
 
   const store = await loadStore();

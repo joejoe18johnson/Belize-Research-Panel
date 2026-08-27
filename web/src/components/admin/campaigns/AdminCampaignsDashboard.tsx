@@ -8,6 +8,7 @@ import { TablePagination, useTablePagination } from "@/components/admin/shared/T
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { isCampaignAdminNotifiable } from "@/lib/admin-campaign-notifications";
+import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
@@ -171,11 +172,23 @@ export function AdminCampaignsDashboard({
                     className={adminNewItemRowClass(isNew, adminTableRowHoverClass)}
                   >
                     <td className="px-4 py-2.5">
-                      <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">
-                        {row.title}
-                        {isNew ? <AdminNewBadge label="Completed" /> : null}
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(row.category)}</p>
+                      <div className="flex items-center gap-3">
+                        {campaignHasCover(row) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={campaignCoverAssetUrl(row.id)}
+                            alt=""
+                            className="h-10 w-16 shrink-0 rounded-md object-cover"
+                          />
+                        ) : null}
+                        <div className="min-w-0">
+                          <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">
+                            {row.title}
+                            {isNew ? <AdminNewBadge label="Completed" /> : null}
+                          </p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(row.category)}</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-2.5">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(row.status)}`}>

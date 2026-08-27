@@ -41,8 +41,8 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
       "The Next.js registration at /register implements and extends the Streamlit MVP: phased form, duplicate blocking, photo ID handling, and consent capture.",
     liveInPortal: [
       { label: "Registration flow", href: "/register", detail: "Self-registration and authorised-person modes with eligibility gates at each phase." },
-      { label: "Registration API", detail: "POST /api/register validates fields, blocks hard duplicates, and writes panelists.csv." },
-      { label: "Username check", detail: "GET /api/check-username ensures unique usernames before submit." },
+      { label: "Registration", href: "/register", detail: "Validates fields, blocks hard duplicates, and saves the panelist record." },
+      { label: "Username check", detail: "Confirms the chosen username is unique before submit." },
     ],
     sections: [
       {
@@ -115,7 +115,7 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
       },
     ],
     adminActions: [
-      "Approve email/phone changes via admin API routes",
+      "Approve or deny email and phone changes from Notifications",
       "Edit verification and panelist status in Admin Dashboard",
     ],
     dataSources: ["data/accounts.json", "data/panelists.csv"],
@@ -140,8 +140,8 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
         detail: "Panelists redeem at 500 points = BZ$20 minimum. Options: mobile top-up (DigiCell / Smart!), gift cards, bank transfer, utility credit.",
       },
       {
-        label: "Redemption API",
-        detail: "POST /api/rewards/redeem validates balance, reserves points, and stores requests in data/redemption-requests.json.",
+        label: "Redemption requests",
+        detail: "Validates the panelist balance, reserves points, and stores the payout request for staff review.",
       },
     ],
     sections: [
@@ -622,8 +622,8 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
         detail: "Unread counts, verification updates, survey invitations, and account status messages.",
       },
       {
-        label: "Notifications API",
-        detail: "GET /api/notifications serves panelist notification state.",
+        label: "In-app notifications",
+        detail: "Panelist notification state for surveys, verification, and account messages.",
       },
       {
         label: "Email verification",
@@ -665,7 +665,7 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
       },
     ],
     adminActions: [
-      "Approve email and phone changes via POST /api/admin/approve-email-change and approve-phone-change (x-admin-key)",
+      "Approve or deny email and phone changes from Notifications",
       "Monitor unread notification counts from panelist accounts during support",
     ],
     dataSources: ["Notification state per panelist session", "data/accounts.json"],
@@ -1028,11 +1028,11 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
       },
     ],
     liveInPortal: [
-      { label: "Auth", detail: "POST /api/auth/login, signup, logout · GET /api/auth/me" },
-      { label: "Registration", detail: "POST /api/register · GET /api/check-username" },
-      { label: "Profile", detail: "GET/PATCH /api/profile · email/phone change request routes" },
-      { label: "Rewards", detail: "POST /api/rewards/redeem · GET/PATCH /api/rewards/points" },
-      { label: "Admin approval", detail: "POST /api/admin/approve-email-change · approve-phone-change (x-admin-key)" },
+      { label: "Auth", detail: "Panelist sign in, sign up, logout, and session check" },
+      { label: "Registration", detail: "Panelist registration and username uniqueness check" },
+      { label: "Profile", detail: "Profile updates, including email and phone change requests" },
+      { label: "Rewards", detail: "Redemption requests and points balance" },
+      { label: "Admin approval", detail: "Approve or deny email and phone changes from Notifications" },
     ],
     plannedNext: [
       "Survey platform webhooks for completion sync",

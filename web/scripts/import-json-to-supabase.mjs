@@ -662,6 +662,7 @@ async function importCampaigns(supabase, panelistSurveys) {
       target_custom: targeting,
       created_at: campaign.createdAt ?? new Date().toISOString(),
       launched_at: parseTimestamp(campaign.launchedAt),
+      cover_image_path: cleanText(campaign.coverImageFile || ""),
       updated_at: campaign.updatedAt ?? campaign.createdAt ?? new Date().toISOString(),
     };
   }

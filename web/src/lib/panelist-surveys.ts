@@ -1,5 +1,6 @@
 import type { PanelistSurvey, PanelistSurveyRecord } from "./panelist-surveys-types";
 import { formatSurveyDate } from "./panelist-surveys-types";
+import { loadCampaignRecords } from "./campaigns";
 import { cleanText } from "./validation";
 
 export type { PanelistSurvey, PanelistSurveyRecord, SurveyCategory, SurveyStatus } from "./panelist-surveys-types";
@@ -15,24 +16,26 @@ function toPanelistSurvey(record: PanelistSurveyRecord): PanelistSurvey {
   };
 }
 
-async function loadSurveyRecords(): Promise<PanelistSurveyRecord[]> {
-  const { loadSurveyRecordsFromFile } = await import("./panelist-surveys-store");
-  return loadSurveyRecordsFromFile();
-}
-
 export async function getPanelistSurveys(email: string): Promise<{
   inbox: PanelistSurvey[];
   completed: PanelistSurvey[];
 }> {
   const normalizedEmail = cleanText(email).toLowerCase();
-  const records = await loadSurveyRecords();
+  const { loadSurveyRecordsForEmail } = await import("./panelist-surveys-store");
+  const [records, campaigns] = await Promise.all([
+    loadSurveyRecordsForEmail(normalizedEmail),
+    loadCampaignRecords(),
+  ]);
+  const coversByCampaignId = new Map(
+    campaigns.map((campaign) => [campaign.id, campaign.coverImageFile ?? ""] as const)
+  );
 
-  const matched = records.filter((record) => {
-    const assignedEmail = cleanText(record.panelistEmail ?? "").toLowerCase();
-    return assignedEmail === normalizedEmail;
-  });
-
-  const surveys = matched.map(toPanelistSurvey);
+  const surveys = records.map((record) =>
+    toPanelistSurvey({
+      ...record,
+      coverImageFile: coversByCampaignId.get(record.id) || record.coverImageFile || "",
+    })
+  );
 
   const byAssignedNewest = (a: PanelistSurvey, b: PanelistSurvey) =>
     b.assignedDate.localeCompare(a.assignedDate) || b.id.localeCompare(a.id);

@@ -103,7 +103,7 @@ export function ProfileContactChangePanel({
         {formatHeadingCase("Email and phone")}
       </h3>
       <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-        Changing your email or phone puts your account on hold until an administrator approves the update.
+        Changing your email or phone puts your account on hold until an administrator approves or denies the update.
       </p>
 
       {onHold ? (

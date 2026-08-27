@@ -22,8 +22,10 @@ export type EmailTemplateId =
   | "panelist-on-hold"
   | "email-change-requested"
   | "email-change-approved"
+  | "email-change-denied"
   | "phone-change-requested"
   | "phone-change-approved"
+  | "phone-change-denied"
   | "survey-invitation"
   | "survey-reminder"
   | "survey-completed"
@@ -65,147 +67,161 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     name: "Verify email address",
     description: "Sent after signup with a link to confirm the panelist email.",
     category: "account",
-    trigger: "POST /api/auth/signup",
+    trigger: "When a panelist creates an account",
   },
   {
     id: "password-reset",
     name: "Password reset",
     description: "Sent when a panelist requests a link to reset their password.",
     category: "account",
-    trigger: "POST /api/auth/forgot-password",
+    trigger: "When a panelist requests a password reset",
   },
   {
     id: "registration-submitted",
     name: "Registration submitted",
     description: "Confirms panelist registration was received and is under review.",
     category: "account",
-    trigger: "POST /api/register",
+    trigger: "When panelist registration is submitted",
   },
   {
     id: "panelist-verified",
     name: "Panelist verified",
     description: "Sent when an administrator fully verifies a panelist.",
     category: "verification",
-    trigger: "PATCH /api/admin/panelists/[email]",
+    trigger: "When an administrator verifies a panelist",
   },
   {
     id: "panelist-on-hold",
     name: "Account on hold",
     description: "Sent when a profile change puts the account on hold pending review.",
     category: "verification",
-    trigger: "Email or phone change request",
+    trigger: "When email, phone, or duplicate review puts an account on hold",
   },
   {
     id: "email-change-requested",
     name: "Email change requested",
     description: "Acknowledges a pending email change awaiting admin approval.",
     category: "verification",
-    trigger: "POST /api/profile/request-email-change",
+    trigger: "When a panelist requests an email change",
   },
   {
     id: "email-change-approved",
     name: "Email change approved",
     description: "Confirms the new email address is active on the account.",
     category: "verification",
-    trigger: "POST /api/admin/approve-email-change",
+    trigger: "When an administrator approves an email change",
+  },
+  {
+    id: "email-change-denied",
+    name: "Email change denied",
+    description: "Tells the panelist the requested email change was not approved.",
+    category: "verification",
+    trigger: "When an administrator denies an email change",
   },
   {
     id: "phone-change-requested",
     name: "Phone change requested",
     description: "Acknowledges a pending phone change awaiting admin approval.",
     category: "verification",
-    trigger: "POST /api/profile/request-phone-change",
+    trigger: "When a panelist requests a phone change",
   },
   {
     id: "phone-change-approved",
     name: "Phone change approved",
     description: "Confirms the new phone number is verified on the account.",
     category: "verification",
-    trigger: "POST /api/admin/approve-phone-change",
+    trigger: "When an administrator approves a phone change",
+  },
+  {
+    id: "phone-change-denied",
+    name: "Phone change denied",
+    description: "Tells the panelist the requested phone change was not approved.",
+    category: "verification",
+    trigger: "When an administrator denies a phone change",
   },
   {
     id: "survey-invitation",
     name: "Survey invitation",
     description: "Invites a verified panelist to a new survey campaign.",
     category: "surveys",
-    trigger: "POST /api/admin/campaigns",
+    trigger: "When a campaign is launched",
   },
   {
     id: "survey-reminder",
     name: "Survey reminder",
     description: "Reminds a panelist about an open survey before the due date.",
     category: "surveys",
-    trigger: "Admin Send reminder / test send from Email templates",
+    trigger: "Admin send reminder from Email templates",
   },
   {
     id: "survey-completed",
     name: "Survey completed",
     description: "Thanks a panelist after they complete a survey assignment.",
     category: "surveys",
-    trigger: "Survey submission",
+    trigger: "When a survey is submitted",
   },
   {
     id: "redemption-submitted",
     name: "Redemption submitted",
     description: "Confirms a reward redemption request was received.",
     category: "rewards",
-    trigger: "POST /api/rewards/redeem",
+    trigger: "When a panelist submits a redemption request",
   },
   {
     id: "payout-processing",
     name: "Payout processing",
     description: "Notifies a panelist their payout is being processed.",
     category: "rewards",
-    trigger: "POST /api/admin/payouts/requests (start)",
+    trigger: "When payout processing starts",
   },
   {
     id: "payout-completed",
     name: "Payout completed",
     description: "Confirms a payout has been completed.",
     category: "rewards",
-    trigger: "POST /api/admin/payouts/requests (complete)",
+    trigger: "When a payout is marked complete",
   },
   {
     id: "payout-rejected",
     name: "Payout declined",
     description: "Notifies a panelist their redemption was not approved.",
     category: "rewards",
-    trigger: "POST /api/admin/payouts/requests (reject)",
+    trigger: "When a payout is declined",
   },
   {
     id: "account-deleted",
     name: "Account deleted",
     description: "Confirms account deletion and opt-out from the panel.",
     category: "account",
-    trigger: "POST /api/account/delete",
+    trigger: "When a panelist deletes their account",
   },
   {
     id: "staff-welcome",
     name: "Staff welcome",
     description: "Welcome email for new admin staff accounts.",
     category: "staff",
-    trigger: "POST /api/admin/staff-users",
+    trigger: "When a staff account is created",
   },
   {
     id: "staff-password-reset",
     name: "Staff password reset",
     description: "Sent when an admin staff member requests a password reset link.",
     category: "staff",
-    trigger: "POST /api/admin/forgot-password",
+    trigger: "When a staff member requests a password reset",
   },
   {
     id: "support-request-received",
     name: "Support request received",
     description: "Confirms a panelist help request was received and gives expected response time.",
     category: "account",
-    trigger: "POST /api/support/contact",
+    trigger: "When a support request is submitted",
   },
   {
     id: "support-inbox-notification",
     name: "Support inbox notification",
     description: "Alerts the monitored support inbox when a new help request is submitted.",
     category: "staff",
-    trigger: "POST /api/support/contact",
+    trigger: "When a support request is submitted",
   },
 ];
 
@@ -241,6 +257,12 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
     newEmail: "maria.new@example.com",
     dashboardUrl: "https://panel.example.com/dashboard",
   },
+  "email-change-denied": {
+    firstName: "Maria",
+    currentEmail: "maria@example.com",
+    deniedEmail: "maria.new@example.com",
+    dashboardUrl: "https://panel.example.com/dashboard",
+  },
   "phone-change-requested": {
     firstName: "Maria",
     pendingPhone: "+501 612-3456",
@@ -249,6 +271,11 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
   "phone-change-approved": {
     firstName: "Maria",
     newPhone: "+501 612-3456",
+    dashboardUrl: "https://panel.example.com/dashboard",
+  },
+  "phone-change-denied": {
+    firstName: "Maria",
+    deniedPhone: "+501 612-3456",
     dashboardUrl: "https://panel.example.com/dashboard",
   },
   "survey-invitation": {
@@ -427,6 +454,20 @@ function renderEmailChangeApproved(data: Record<string, string>): RenderedEmail 
   return finish("Email change approved", bodyHtml, { label: "Sign in", href: dashboardUrl });
 }
 
+function renderEmailChangeDenied(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const currentEmail = pick(data, "currentEmail", "your current email");
+  const deniedEmail = pick(data, "deniedEmail", "the requested address");
+  const dashboardUrl = pick(data, "dashboardUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("Your request to change the email address on your account was not approved."),
+    detailTable(detailRow("Current email", currentEmail) + detailRow("Requested email", deniedEmail)),
+    paragraph("You can continue using your current email address. If you still need to update it, request a new change from your profile."),
+  ].join("");
+  return finish("Email change not approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
+}
+
 function renderPhoneChangeRequested(data: Record<string, string>): RenderedEmail {
   const firstName = pick(data, "firstName", "there");
   const pendingPhone = pick(data, "pendingPhone", "your new number");
@@ -451,6 +492,19 @@ function renderPhoneChangeApproved(data: Record<string, string>): RenderedEmail 
     paragraph("Your account is active again."),
   ].join("");
   return finish("Phone change approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
+}
+
+function renderPhoneChangeDenied(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const deniedPhone = pick(data, "deniedPhone", "the requested number");
+  const dashboardUrl = pick(data, "dashboardUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("Your request to update your phone / WhatsApp number was not approved."),
+    detailTable(detailRow("Requested number", deniedPhone)),
+    paragraph("Your current number on file stays in place. If you still need to update it, request a new change from your profile."),
+  ].join("");
+  return finish("Phone change not approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
 }
 
 function renderSurveyInvitation(data: Record<string, string>): RenderedEmail {
@@ -648,8 +702,10 @@ const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => Rende
   "panelist-on-hold": renderPanelistOnHold,
   "email-change-requested": renderEmailChangeRequested,
   "email-change-approved": renderEmailChangeApproved,
+  "email-change-denied": renderEmailChangeDenied,
   "phone-change-requested": renderPhoneChangeRequested,
   "phone-change-approved": renderPhoneChangeApproved,
+  "phone-change-denied": renderPhoneChangeDenied,
   "survey-invitation": renderSurveyInvitation,
   "survey-reminder": renderSurveyReminder,
   "survey-completed": renderSurveyCompleted,

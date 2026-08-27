@@ -230,30 +230,127 @@ export async function supabaseLoadSurveyAssignments(): Promise<PanelistSurveyRec
   return (data ?? []).map((row) => assignmentRowToRecord(row as Record<string, unknown>));
 }
 
+export async function supabaseLoadSurveyAssignmentsForEmail(email: string): Promise<PanelistSurveyRecord[]> {
+  const { data, error } = await db()
+    .from("survey_assignments")
+    .select("*")
+    .eq("panelist_email", normalizePanelistEmail(email));
+  throwIfError(error);
+  return (data ?? []).map((row) => assignmentRowToRecord(row as Record<string, unknown>));
+}
+
+export async function supabaseAssignmentExistsForCampaign(campaignId: string): Promise<boolean> {
+  const { data, error } = await db()
+    .from("survey_assignments")
+    .select("id")
+    .eq("campaign_id", campaignId)
+    .limit(1)
+    .maybeSingle();
+  throwIfError(error);
+  return Boolean(data);
+}
+
+async function lookupDbAssignmentId(campaignId: string, email: string): Promise<string> {
+  const normalized = normalizePanelistEmail(email);
+  const { data, error } = await db()
+    .from("survey_assignments")
+    .select("id")
+    .eq("campaign_id", campaignId)
+    .eq("panelist_email", normalized)
+    .maybeSingle();
+  throwIfError(error);
+  return data?.id ? String(data.id) : resolveDbAssignmentId(campaignId, normalized);
+}
+
+function assignmentRecordToRow(record: PanelistSurveyRecord): Record<string, unknown> {
+  const email = normalizePanelistEmail(record.panelistEmail ?? "");
+  return {
+    id: resolveDbAssignmentId(record.id, email),
+    campaign_id: record.id,
+    panelist_email: email,
+    title: record.title,
+    description: "",
+    category: record.category,
+    status: record.status,
+    survey_url: record.surveyUrl ?? "",
+    survey_definition_id: record.surveyDefinitionId || null,
+    delivery_type: record.deliveryType ?? "external",
+    points: record.points,
+    assigned_date: record.assignedDate || null,
+    complete_by_date: record.completeByDate || null,
+    delivery_method: "",
+    progress_percent: Math.min(100, Math.max(0, Math.round(record.progressPercent ?? 0))),
+    completed_date: record.completedDate || null,
+    updated_at: new Date().toISOString(),
+  };
+}
+
 export async function supabaseSaveSurveyAssignments(records: PanelistSurveyRecord[]): Promise<void> {
   if (!records.length) return;
-  const rows = records.map((record) => {
-    const email = normalizePanelistEmail(record.panelistEmail ?? "");
-    return {
-      id: resolveDbAssignmentId(record.id, email),
-      campaign_id: record.id,
-      panelist_email: email,
-      title: record.title,
-      description: "",
-      category: record.category,
-      status: record.status,
-      survey_url: record.surveyUrl ?? "",
-      survey_definition_id: record.surveyDefinitionId || null,
-      delivery_type: record.deliveryType ?? "external",
-      points: record.points,
-      assigned_date: record.assignedDate || null,
-      complete_by_date: record.completeByDate || null,
-      delivery_method: "",
-      updated_at: new Date().toISOString(),
-    };
-  });
-  const { error } = await db().from("survey_assignments").upsert(rows, { onConflict: "id" });
+  const { error } = await db()
+    .from("survey_assignments")
+    .upsert(records.map(assignmentRecordToRow), {
+      onConflict: "campaign_id,panelist_email",
+      ignoreDuplicates: true,
+    });
   throwIfError(error);
+}
+
+/** Insert only missing assignments so existing progress/completions are never overwritten. */
+export async function supabaseInsertNewSurveyAssignments(records: PanelistSurveyRecord[]): Promise<void> {
+  if (!records.length) return;
+  const { error } = await db()
+    .from("survey_assignments")
+    .upsert(records.map(assignmentRecordToRow), {
+      onConflict: "campaign_id,panelist_email",
+      ignoreDuplicates: true,
+    });
+  throwIfError(error);
+}
+
+export async function supabaseUpdateSurveyAssignmentProgress(
+  campaignId: string,
+  panelistEmail: string,
+  patch: {
+    progressPercent: number;
+    status: PanelistSurveyRecord["status"];
+    completedDate: string | null;
+  }
+): Promise<void> {
+  const email = normalizePanelistEmail(panelistEmail);
+  const now = new Date().toISOString();
+  const payload: Record<string, unknown> = {
+    progress_percent: Math.min(100, Math.max(0, Math.round(patch.progressPercent))),
+    status: patch.status,
+    completed_date: patch.completedDate || null,
+    updated_at: now,
+  };
+
+  let query = db()
+    .from("survey_assignments")
+    .update(payload)
+    .eq("campaign_id", campaignId)
+    .eq("panelist_email", email);
+  if (patch.status !== "completed") {
+    query = query.neq("status", "completed");
+  }
+  const { error } = await query;
+  throwIfError(error);
+}
+
+export async function supabaseLoadSurveyResponse(
+  campaignId: string,
+  panelistEmail: string
+): Promise<SurveyResponseRecord | null> {
+  const email = normalizePanelistEmail(panelistEmail);
+  const assignmentId = await lookupDbAssignmentId(campaignId, email);
+  const { data, error } = await db()
+    .from("survey_responses")
+    .select("*")
+    .eq("assignment_id", assignmentId)
+    .maybeSingle();
+  throwIfError(error);
+  return data ? surveyResponseRowToRecord(data as Record<string, unknown>) : null;
 }
 
 export async function supabaseLoadSurveyDefinitions(): Promise<SurveyDefinition[]> {
@@ -282,19 +379,90 @@ export async function supabaseLoadSurveyResponses(): Promise<SurveyResponseRecor
   return (data ?? []).map((row) => surveyResponseRowToRecord(row as Record<string, unknown>));
 }
 
+export async function supabaseLoadSurveyResponsesForEmail(email: string): Promise<SurveyResponseRecord[]> {
+  const { data, error } = await db()
+    .from("survey_responses")
+    .select("*")
+    .eq("panelist_email", normalizePanelistEmail(email));
+  throwIfError(error);
+  return (data ?? []).map((row) => surveyResponseRowToRecord(row as Record<string, unknown>));
+}
+
 export async function supabaseUpsertSurveyResponse(response: SurveyResponseRecord): Promise<void> {
   const email = normalizePanelistEmail(response.panelistEmail);
+  const assignmentId = await lookupDbAssignmentId(response.assignmentId, email);
   const { error } = await db().from("survey_responses").upsert(
     {
-      assignment_id: resolveDbAssignmentId(response.assignmentId, email),
+      assignment_id: assignmentId,
       panelist_email: email,
       survey_definition_id: response.surveyDefinitionId || null,
       answers: response.answers,
-      submitted_at: response.submittedAt || new Date().toISOString(),
+      started_at: response.startedAt || null,
+      updated_at: response.updatedAt || new Date().toISOString(),
+      submitted_at: response.submittedAt || null,
     },
     { onConflict: "assignment_id" }
   );
   throwIfError(error);
+}
+
+export async function supabaseRecordSurveyCompletionPoints(input: {
+  panelistEmail: string;
+  campaignId: string;
+  points: number;
+  title: string;
+}): Promise<void> {
+  if (input.points <= 0) return;
+  const email = normalizePanelistEmail(input.panelistEmail);
+  const referenceId = await lookupDbAssignmentId(input.campaignId, email);
+
+  const { data: existing, error: existingError } = await db()
+    .from("point_transactions")
+    .select("id")
+    .eq("reference_type", "survey_assignment")
+    .eq("reference_id", referenceId)
+    .eq("kind", "survey_completion")
+    .maybeSingle();
+  throwIfError(existingError);
+  if (existing) return;
+
+  const { data: panelist, error: panelistError } = await db()
+    .from("panelists")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+  throwIfError(panelistError);
+  if (!panelist?.id) return;
+
+  const { error } = await db().from("point_transactions").insert({
+    panelist_id: panelist.id,
+    kind: "survey_completion",
+    points: input.points,
+    reference_type: "survey_assignment",
+    reference_id: referenceId,
+    description: `Completed survey: ${input.title}`,
+  });
+  if (error?.code === "23505") return;
+  throwIfError(error);
+}
+
+export async function supabaseSumSurveyCompletionPoints(email: string): Promise<number> {
+  const normalized = normalizePanelistEmail(email);
+  const { data: panelist, error: panelistError } = await db()
+    .from("panelists")
+    .select("id")
+    .eq("email", normalized)
+    .maybeSingle();
+  throwIfError(panelistError);
+  if (!panelist?.id) return 0;
+
+  const { data, error } = await db()
+    .from("point_transactions")
+    .select("points")
+    .eq("panelist_id", panelist.id)
+    .eq("kind", "survey_completion");
+  throwIfError(error);
+  return (data ?? []).reduce((sum, row) => sum + (Number(row.points) || 0), 0);
 }
 
 export async function supabaseLoadCampaigns(): Promise<CampaignRecord[]> {
@@ -329,6 +497,7 @@ export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Prom
     target_custom: campaign.targeting,
     created_at: campaign.createdAt,
     launched_at: campaign.launchedAt || null,
+    cover_image_path: campaign.coverImageFile ?? "",
     updated_at: new Date().toISOString(),
   }));
   const { error } = await db().from("campaigns").upsert(rows, { onConflict: "id" });

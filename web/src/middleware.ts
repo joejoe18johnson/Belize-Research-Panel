@@ -10,9 +10,26 @@ import {
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot-password", "/admin/reset-password"]);
 const PUBLIC_CLIENT_PATHS = new Set(["/client/login"]);
+const PANELIST_SESSION_COOKIE = "brp_session";
+
+function withPathnameHeader(request: NextRequest): Headers {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-brp-pathname", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  return requestHeaders;
+}
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
+
+  if (pathname.startsWith("/dashboard")) {
+    const token = request.cookies.get(PANELIST_SESSION_COOKIE)?.value;
+    if (!token) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("next", `${pathname}${search}`);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next({ request: { headers: withPathnameHeader(request) } });
+  }
 
   if (pathname.startsWith("/admin")) {
     if (PUBLIC_ADMIN_PATHS.has(pathname)) {
@@ -63,5 +80,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/client/:path*"],
+  matcher: ["/admin/:path*", "/client/:path*", "/dashboard/:path*"],
 };

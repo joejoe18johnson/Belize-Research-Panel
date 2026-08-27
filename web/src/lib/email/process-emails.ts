@@ -152,6 +152,25 @@ export async function sendEmailChangeApprovedEmail(input: {
   });
 }
 
+export async function sendEmailChangeDeniedEmail(input: {
+  to: string;
+  firstName: string;
+  currentEmail: string;
+  deniedEmail: string;
+  origin: string;
+}): Promise<void> {
+  await sendTemplateEmail({
+    templateId: "email-change-denied",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      currentEmail: input.currentEmail,
+      deniedEmail: input.deniedEmail,
+      dashboardUrl: originDashboard(input.origin),
+    },
+  });
+}
+
 export async function sendPhoneChangeRequestedEmail(input: {
   to: string;
   firstName: string;
@@ -181,6 +200,23 @@ export async function sendPhoneChangeApprovedEmail(input: {
     data: {
       firstName: panelistFirstName(input.firstName),
       newPhone: input.newPhone,
+      dashboardUrl: originDashboard(input.origin),
+    },
+  });
+}
+
+export async function sendPhoneChangeDeniedEmail(input: {
+  to: string;
+  firstName: string;
+  deniedPhone: string;
+  origin: string;
+}): Promise<void> {
+  await sendTemplateEmail({
+    templateId: "phone-change-denied",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      deniedPhone: input.deniedPhone,
       dashboardUrl: originDashboard(input.origin),
     },
   });

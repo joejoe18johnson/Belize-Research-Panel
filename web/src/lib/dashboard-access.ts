@@ -1,6 +1,8 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SessionAccount } from "./auth-types";
 import { getSessionAccount } from "./auth";
+import { safeAppNextPath } from "./login-redirect";
 import {
   buildDashboardNotifications,
   countUnreadNotifications,
@@ -32,10 +34,20 @@ export interface DashboardContext {
   notifications: DashboardNotification[];
 }
 
+async function loginRedirectTarget(): Promise<string> {
+  try {
+    const headerStore = await headers();
+    const path = headerStore.get("x-brp-pathname") ?? "";
+    return `/login?next=${encodeURIComponent(safeAppNextPath(path, "/dashboard"))}`;
+  } catch {
+    return "/login?next=/dashboard";
+  }
+}
+
 export async function requireRegisteredPanelistSession(): Promise<SessionAccount> {
   const account = await getSessionAccount();
   if (!account) {
-    redirect("/login?next=/dashboard");
+    redirect(await loginRedirectTarget());
   }
   if (!account.emailVerified) {
     redirect(`/signup/check-email?email=${encodeURIComponent(account.email)}&next=/register`);

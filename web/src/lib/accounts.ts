@@ -407,6 +407,31 @@ export async function getPendingEmailForApproval(accountEmail: string): Promise<
   return cleanText(account.pending_email).toLowerCase();
 }
 
+export async function denyAccountEmailChange(accountEmail: string): Promise<{
+  account: AccountRecord;
+  deniedEmail: string;
+} | null> {
+  const account = await findAccountByEmail(accountEmail);
+  if (!account || !hasPendingEmailChange(account)) return null;
+
+  const deniedEmail = cleanText(account.pending_email).toLowerCase();
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) return null;
+
+  let updated: AccountRecord = {
+    ...accounts[index],
+    pending_email: "",
+    email_change_token: "",
+    email_change_sent_at: "",
+    email_change_requested_at: "",
+  };
+  updated = applyHoldSync(updated);
+  accounts[index] = updated;
+  await saveAccountsRaw(accounts);
+  return { account: updated, deniedEmail };
+}
+
 export async function requestAccountEmailChange(
   accountId: string,
   newEmailRaw: string
@@ -504,6 +529,29 @@ export async function getPendingPhoneForApproval(accountEmail: string): Promise<
   const account = await findAccountByEmail(accountEmail);
   if (!account || !hasPendingPhoneChange(account)) return null;
   return cleanText(account.pending_phone_whatsapp);
+}
+
+export async function denyAccountPhoneChange(accountEmail: string): Promise<{
+  account: AccountRecord;
+  deniedPhone: string;
+} | null> {
+  const account = await findAccountByEmail(accountEmail);
+  if (!account || !hasPendingPhoneChange(account)) return null;
+
+  const deniedPhone = cleanText(account.pending_phone_whatsapp);
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === account.id);
+  if (index < 0) return null;
+
+  let updated: AccountRecord = {
+    ...accounts[index],
+    pending_phone_whatsapp: "",
+    phone_change_requested_at: "",
+  };
+  updated = applyHoldSync(updated);
+  accounts[index] = updated;
+  await saveAccountsRaw(accounts);
+  return { account: updated, deniedPhone };
 }
 
 export async function putAccountOnHoldForFraudReview(email: string): Promise<boolean> {

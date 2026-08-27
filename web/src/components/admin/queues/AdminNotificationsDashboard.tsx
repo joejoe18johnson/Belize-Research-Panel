@@ -17,6 +17,7 @@ function matchesNotificationType(row: NotificationQueueRow, typeFilter: string |
   const normalized = typeFilter.trim().toLowerCase();
   if (normalized === "phone") return row.type === "Phone change";
   if (normalized === "email") return row.type === "Email change";
+  if (normalized === "duplicate") return row.type === "Duplicate review";
   if (normalized === "verification") return row.type === "Email verification";
   if (normalized === "panelist" || normalized === "review" || normalized === "under-review") {
     return row.type === "Panelist verification";
@@ -39,7 +40,7 @@ export function AdminNotificationsDashboard({
   const searchParams = useSearchParams();
   const typeFilter = searchParams.get("type");
   const [search, setSearch] = useState("");
-  const [approvingKey, setApprovingKey] = useState("");
+  const [actingKey, setActingKey] = useState("");
   const [message, setMessage] = useState("");
   const unreadSet = useMemo(() => new Set(unreadIds), [unreadIds]);
 
@@ -61,6 +62,7 @@ export function AdminNotificationsDashboard({
 
   const emailChanges = rows.filter((row) => row.type === "Email change").length;
   const phoneChanges = rows.filter((row) => row.type === "Phone change").length;
+  const duplicateReviews = rows.filter((row) => row.type === "Duplicate review").length;
   const emailVerification = rows.filter((row) => row.type === "Email verification").length;
   const panelistVerification = rows.filter((row) => row.type === "Panelist verification").length;
   const newCount = rows.filter((row) => unreadSet.has(row.id)).length;
@@ -75,19 +77,37 @@ export function AdminNotificationsDashboard({
     router.refresh();
   };
 
-  const approveChange = async (row: NotificationQueueRow) => {
-    const key = row.id;
-    setApprovingKey(key);
+  const decideChange = async (row: NotificationQueueRow, decision: "approve" | "deny") => {
+    const key = `${row.id}:${decision}`;
+    setActingKey(key);
     setMessage("");
 
     const endpoint =
       row.type === "Email change"
-        ? "/api/admin/approve-email-change"
+        ? decision === "approve"
+          ? "/api/admin/approve-email-change"
+          : "/api/admin/deny-email-change"
         : row.type === "Phone change"
-          ? "/api/admin/approve-phone-change"
-          : null;
+          ? decision === "approve"
+            ? "/api/admin/approve-phone-change"
+            : "/api/admin/deny-phone-change"
+          : row.type === "Duplicate review" && decision === "approve"
+            ? "/api/admin/release-fraud-review"
+            : null;
 
     if (!endpoint) return;
+
+    if (decision === "deny") {
+      const confirmed = window.confirm(
+        row.type === "Email change"
+          ? `Deny the email change for ${row.email}? They will keep their current email and the account will be reactivated if nothing else is pending.`
+          : `Deny the phone change for ${row.email}? They will keep their current number and the account will be reactivated if nothing else is pending.`
+      );
+      if (!confirmed) {
+        setActingKey("");
+        return;
+      }
+    }
 
     try {
       const res = await fetch(endpoint, {
@@ -97,15 +117,23 @@ export function AdminNotificationsDashboard({
       });
       const data = (await res.json()) as { message?: string };
       if (!res.ok) {
-        setMessage(data.message ?? "Approval failed.");
+        setMessage(data.message ?? (decision === "approve" ? "Approval failed." : "Could not deny this request."));
         return;
       }
-      setMessage(`${row.type} approved for ${row.email}.`);
+      setMessage(
+        decision === "approve"
+          ? `${row.type} approved for ${row.email}.`
+          : `${row.type} denied for ${row.email}.`
+      );
       router.refresh();
     } catch {
-      setMessage("Network error while approving change.");
+      setMessage(
+        decision === "approve"
+          ? "Network error while approving change."
+          : "Network error while denying change."
+      );
     } finally {
-      setApprovingKey("");
+      setActingKey("");
     }
   };
 
@@ -114,7 +142,7 @@ export function AdminNotificationsDashboard({
       <PageIntro
         eyebrow="Admin action queue"
         title="Notifications"
-        description="Contact change approvals, signup email confirmation, and new panelists waiting for administrator verification."
+        description="Contact change approvals and denials, duplicate-review holds, signup email confirmation, and new panelists waiting for administrator verification."
         action={<AdminMarkReadButton scope="notifications" />}
       />
 
@@ -123,7 +151,9 @@ export function AdminNotificationsDashboard({
           Showing{" "}
           {typeFilter === "phone"
             ? "phone change"
-            : typeFilter === "panelist" || typeFilter === "review"
+            : typeFilter === "duplicate"
+              ? "duplicate review"
+              : typeFilter === "panelist" || typeFilter === "review"
               ? "panelist verification"
               : typeFilter}{" "}
           notifications.{" "}
@@ -141,7 +171,7 @@ export function AdminNotificationsDashboard({
 
       <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
         <MetricCard label="Total pending" value={rows.length} href="/admin/notifications" active={!typeFilter} />
         <MetricCard
           label="Email changes"
@@ -154,6 +184,12 @@ export function AdminNotificationsDashboard({
           value={phoneChanges}
           href="/admin/notifications?type=phone"
           active={typeFilter === "phone"}
+        />
+        <MetricCard
+          label="Duplicate review"
+          value={duplicateReviews}
+          href="/admin/notifications?type=duplicate"
+          active={typeFilter === "duplicate"}
         />
         <MetricCard
           label="Email verification"
@@ -216,7 +252,8 @@ export function AdminNotificationsDashboard({
                 <tbody>
                   {pagination.paginatedRows.map((row) => {
                   const actionKey = row.id;
-                  const canApprove = row.type === "Email change" || row.type === "Phone change";
+                  const canDecideContact = row.type === "Email change" || row.type === "Phone change";
+                  const canReleaseHold = row.type === "Duplicate review";
                   const isNew = unreadSet.has(row.id);
                   const guide = notificationQueueGuideFor(row.type);
                   return (
@@ -241,14 +278,34 @@ export function AdminNotificationsDashboard({
                       <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.requestedAt}</td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          {canApprove ? (
+                          {canDecideContact ? (
+                            <>
+                              <button
+                                type="button"
+                                disabled={Boolean(actingKey)}
+                                onClick={() => decideChange(row, "approve")}
+                                className="rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+                              >
+                                {actingKey === `${row.id}:approve` ? "Approving…" : "Approve"}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={Boolean(actingKey)}
+                                onClick={() => decideChange(row, "deny")}
+                                className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-60"
+                              >
+                                {actingKey === `${row.id}:deny` ? "Denying…" : "Deny"}
+                              </button>
+                            </>
+                          ) : null}
+                          {canReleaseHold ? (
                             <button
                               type="button"
-                              disabled={approvingKey === actionKey}
-                              onClick={() => approveChange(row)}
+                              disabled={Boolean(actingKey)}
+                              onClick={() => decideChange(row, "approve")}
                               className="rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
                             >
-                              {approvingKey === actionKey ? "Approving…" : "Approve"}
+                              {actingKey === `${row.id}:approve` ? "Releasing…" : "Release hold"}
                             </button>
                           ) : null}
                           <Link

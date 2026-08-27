@@ -233,7 +233,14 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
 
 export function assignmentRowToRecord(row: Record<string, unknown>): PanelistSurveyRecord {
   const status = cleanText(String(row.status)) as PanelistSurveyRecord["status"];
-  const progressPercent = status === "completed" ? 100 : status === "in_progress" ? 50 : 0;
+  const storedProgress = Number(row.progress_percent);
+  const progressPercent = Number.isFinite(storedProgress)
+    ? Math.min(100, Math.max(0, Math.round(storedProgress)))
+    : status === "completed"
+      ? 100
+      : status === "in_progress"
+        ? 50
+        : 0;
 
   return {
     id: cleanText(String(row.campaign_id)),
@@ -243,8 +250,10 @@ export function assignmentRowToRecord(row: Record<string, unknown>): PanelistSur
     completeByDate: dateOnlyOrEmpty(row.complete_by_date as string),
     points: Number(row.points) || 0,
     status,
-    progressPercent,
-    completedDate: status === "completed" ? dateOnlyOrEmpty(row.updated_at as string) : null,
+    progressPercent: status === "completed" ? 100 : progressPercent,
+    completedDate:
+      dateOnlyOrEmpty(row.completed_date as string) ||
+      (status === "completed" ? dateOnlyOrEmpty(row.updated_at as string) || null : null),
     surveyUrl: cleanText(String(row.survey_url ?? "")) || null,
     surveyDefinitionId: cleanText(String(row.survey_definition_id ?? "")) || null,
     deliveryType: row.delivery_type as PanelistSurveyRecord["deliveryType"],
@@ -254,14 +263,17 @@ export function assignmentRowToRecord(row: Record<string, unknown>): PanelistSur
 
 export function surveyResponseRowToRecord(row: Record<string, unknown>): SurveyResponseRecord {
   const campaignId = cleanText(String(row.assignment_id)).split("::")[0] || String(row.assignment_id);
+  const submittedAt = row.submitted_at ? isoOrEmpty(row.submitted_at as string) : "";
+  const startedAt = isoOrEmpty(row.started_at as string) || submittedAt;
+  const updatedAt = isoOrEmpty(row.updated_at as string) || submittedAt || startedAt;
   return {
     assignmentId: campaignId,
     surveyDefinitionId: cleanText(String(row.survey_definition_id ?? "")),
     panelistEmail: normalizePanelistEmail(String(row.panelist_email)),
     answers: (row.answers as Record<string, SurveyAnswerValue>) ?? {},
-    startedAt: isoOrEmpty(row.submitted_at as string),
-    updatedAt: isoOrEmpty(row.submitted_at as string),
-    submittedAt: isoOrEmpty(row.submitted_at as string),
+    startedAt,
+    updatedAt,
+    submittedAt: submittedAt || null,
   };
 }
 
@@ -326,6 +338,7 @@ export function campaignRowToRecord(row: Record<string, unknown>): CampaignRecor
     },
     createdAt: isoOrEmpty(row.created_at as string),
     launchedAt: isoOrEmpty(row.launched_at as string),
+    coverImageFile: cleanText(String(row.cover_image_path ?? "")),
   };
 }
 

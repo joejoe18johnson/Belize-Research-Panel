@@ -5,7 +5,8 @@ import type { CreateCampaignInput, CampaignRecord } from "./campaign-targeting";
 import { resolveCampaignAudience } from "./campaign-targeting";
 import { findPanelistGroupById } from "./panelist-groups";
 import { findSurveyDefinitionById } from "./survey-definitions";
-import { loadSurveyRecordsFromFile, saveSurveyRecordsToFile } from "./panelist-surveys-store";
+import { saveNewSurveyAssignments } from "./panelist-surveys-store";
+import type { PanelistSurveyRecord } from "./panelist-surveys-types";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
 
@@ -96,7 +97,6 @@ export async function createAndLaunchCampaign(
   if (audience.length === 0) throw new Error("No panelists match the selected targeting.");
 
   const campaigns = await loadCampaignRecords();
-  const assignments = await loadSurveyRecordsFromFile();
 
   const baseId = `campaign-${slugify(title) || "survey"}-${Date.now().toString(36)}`;
   const id = campaigns.some((campaign) => campaign.id === baseId)
@@ -119,29 +119,27 @@ export async function createAndLaunchCampaign(
     deliveryMethod: cleanText(input.deliveryMethod) || (deliveryType === "internal" ? "On-site survey" : "External Survey Link"),
     targeting,
     clientId: cleanText(input.clientId ?? "") || undefined,
+    coverImageFile: cleanText(input.coverImageFile ?? ""),
     createdAt: now,
     launchedAt: now,
   };
 
-  const existingKeys = new Set(
-    assignments.map((record) => `${record.id}:${cleanText(record.panelistEmail).toLowerCase()}`)
-  );
-
+  const seenEmails = new Set<string>();
   let assignedCount = 0;
   let skippedCount = 0;
   const assignedPanelists: PanelistRow[] = [];
-  const nextAssignments = [...assignments];
+  const createdAssignments: PanelistSurveyRecord[] = [];
 
   for (const panelist of audience) {
     const email = cleanText(panelist.email).toLowerCase();
     if (!email) continue;
-    const key = `${id}:${email}`;
-    if (existingKeys.has(key)) {
+    if (seenEmails.has(email)) {
       skippedCount += 1;
       continue;
     }
+    seenEmails.add(email);
 
-    nextAssignments.push({
+    createdAssignments.push({
       id,
       title: campaign.title,
       category: campaign.category,
@@ -156,20 +154,38 @@ export async function createAndLaunchCampaign(
       deliveryType,
       panelistEmail: email,
     });
-    existingKeys.add(key);
     assignedPanelists.push(panelist);
     assignedCount += 1;
   }
 
   if (assignedCount === 0) {
-    throw new Error("All targeted panelists already have this campaign assigned.");
+    throw new Error("No panelists could be assigned to this campaign.");
   }
 
   campaigns.push(campaign);
   await saveCampaignRecords(campaigns);
-  await saveSurveyRecordsToFile(nextAssignments);
+  await saveNewSurveyAssignments(createdAssignments);
 
   return { campaign, assignedCount, skippedCount, assignedPanelists };
+}
+
+export async function findCampaignById(campaignId: string): Promise<CampaignRecord | null> {
+  const id = cleanText(campaignId);
+  if (!id) return null;
+  const campaigns = await loadCampaignRecords();
+  return campaigns.find((campaign) => campaign.id === id) ?? null;
+}
+
+export async function updateCampaignCoverImage(
+  campaignId: string,
+  coverImageFile: string
+): Promise<CampaignRecord | null> {
+  const campaigns = await loadCampaignRecords();
+  const index = campaigns.findIndex((campaign) => campaign.id === campaignId);
+  if (index < 0) return null;
+  campaigns[index] = { ...campaigns[index], coverImageFile: cleanText(coverImageFile) };
+  await saveCampaignRecords(campaigns);
+  return campaigns[index];
 }
 
 export type {

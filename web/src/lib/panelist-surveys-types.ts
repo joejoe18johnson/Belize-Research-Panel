@@ -15,6 +15,7 @@ export interface PanelistSurveyRecord {
   surveyDefinitionId?: string | null;
   deliveryType?: "internal" | "external";
   panelistEmail?: string;
+  coverImageFile?: string;
 }
 
 export interface PanelistSurvey extends PanelistSurveyRecord {

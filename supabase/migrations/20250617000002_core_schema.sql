@@ -269,6 +269,7 @@ CREATE TABLE campaigns (
   target_custom jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   launched_at timestamptz,
+  cover_image_path text NOT NULL DEFAULT '',
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -298,6 +299,8 @@ CREATE TABLE survey_assignments (
   assigned_date date,
   complete_by_date date,
   delivery_method text NOT NULL DEFAULT '',
+  progress_percent integer NOT NULL DEFAULT 0 CHECK (progress_percent >= 0 AND progress_percent <= 100),
+  completed_date date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (campaign_id, panelist_email),
@@ -322,7 +325,9 @@ CREATE TABLE survey_responses (
   panelist_email citext NOT NULL,
   survey_definition_id text REFERENCES survey_definitions(id) ON DELETE SET NULL,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
-  submitted_at timestamptz NOT NULL DEFAULT now(),
+  started_at timestamptz,
+  updated_at timestamptz,
+  submitted_at timestamptz,
   CONSTRAINT survey_responses_panelist_fk
     FOREIGN KEY (panelist_email) REFERENCES panelists(email) ON DELETE CASCADE
 );
@@ -378,6 +383,9 @@ CREATE TABLE point_transactions (
 
 CREATE INDEX point_transactions_panelist_id_idx ON point_transactions (panelist_id, created_at DESC);
 CREATE INDEX point_transactions_reference_idx ON point_transactions (reference_type, reference_id);
+CREATE UNIQUE INDEX point_transactions_survey_completion_uniq
+  ON point_transactions (reference_type, reference_id)
+  WHERE kind = 'survey_completion' AND reference_type = 'survey_assignment';
 
 CREATE TABLE redemption_requests (
   id text PRIMARY KEY,

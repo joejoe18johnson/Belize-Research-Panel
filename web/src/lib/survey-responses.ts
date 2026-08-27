@@ -6,8 +6,10 @@ import {
   type SurveyAnswerValue,
 } from "./survey-types";
 import { findSurveyDefinitionById } from "./survey-definitions";
-import { loadSurveyRecordsFromFile, saveSurveyRecordsToFile } from "./panelist-surveys-store";
+import { updateSurveyAssignmentProgress } from "./panelist-surveys-store";
+import { findAssignmentForAccount } from "./survey-assignment-lookup";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
+import { assertCanPersistData, useSupabase } from "./supabase/data-source";
 import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "survey-responses.json");
@@ -37,21 +39,22 @@ async function loadSurveyResponsesRaw(): Promise<SurveyResponseRecord[]> {
   }
 }
 
-async function saveSurveyResponsesRaw(records: SurveyResponseRecord[]): Promise<void> {
-  const { useSupabase } = await import("./supabase/data-source");
+async function saveSurveyResponse(record: SurveyResponseRecord): Promise<void> {
+  assertCanPersistData();
   if (useSupabase()) {
     const { supabaseUpsertSurveyResponse } = await import("./supabase/repos");
-    for (const record of records) {
-      await supabaseUpsertSurveyResponse(record);
-    }
+    await supabaseUpsertSurveyResponse(record);
     return;
   }
+  const records = await loadSurveyResponsesRaw();
+  const email = cleanText(record.panelistEmail).toLowerCase();
+  const index = records.findIndex(
+    (item) => item.assignmentId === record.assignmentId && cleanText(item.panelistEmail).toLowerCase() === email
+  );
+  if (index >= 0) records[index] = record;
+  else records.push(record);
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2), "utf-8");
-}
-
-function responseKey(assignmentId: string, panelistEmail: string): string {
-  return `${assignmentId}:${cleanText(panelistEmail).toLowerCase()}`;
 }
 
 export async function getSurveyResponse(
@@ -59,6 +62,10 @@ export async function getSurveyResponse(
   panelistEmail: string
 ): Promise<SurveyResponseRecord | null> {
   const email = cleanText(panelistEmail).toLowerCase();
+  if (useSupabase()) {
+    const { supabaseLoadSurveyResponse } = await import("./supabase/repos");
+    return supabaseLoadSurveyResponse(assignmentId, email);
+  }
   const records = await loadSurveyResponsesRaw();
   return (
     records.find(
@@ -72,36 +79,18 @@ async function findAssignment(
   assignmentId: string,
   panelistEmail: string
 ): Promise<PanelistSurveyRecord | null> {
-  const email = cleanText(panelistEmail).toLowerCase();
-  const assignments = await loadSurveyRecordsFromFile();
-  return (
-    assignments.find(
-      (record) => record.id === assignmentId && cleanText(record.panelistEmail ?? "").toLowerCase() === email
-    ) ?? null
-  );
+  return findAssignmentForAccount(assignmentId, panelistEmail);
 }
 
-async function updateAssignmentProgress(
-  assignmentId: string,
-  panelistEmail: string,
-  progressPercent: number,
-  status: PanelistSurveyRecord["status"],
-  completedDate: string | null
-): Promise<void> {
-  const email = cleanText(panelistEmail).toLowerCase();
-  const assignments = await loadSurveyRecordsFromFile();
-  const index = assignments.findIndex(
-    (record) => record.id === assignmentId && cleanText(record.panelistEmail ?? "").toLowerCase() === email
-  );
-  if (index < 0) return;
-
-  assignments[index] = {
-    ...assignments[index],
-    progressPercent,
-    status,
-    completedDate,
-  };
-  await saveSurveyRecordsToFile(assignments);
+async function recordCompletionPoints(assignment: PanelistSurveyRecord, panelistEmail: string): Promise<void> {
+  if (!useSupabase() || assignment.points <= 0) return;
+  const { supabaseRecordSurveyCompletionPoints } = await import("./supabase/repos");
+  await supabaseRecordSurveyCompletionPoints({
+    panelistEmail,
+    campaignId: assignment.id,
+    points: assignment.points,
+    title: assignment.title,
+  });
 }
 
 export async function saveSurveyProgress(input: {
@@ -112,21 +101,18 @@ export async function saveSurveyProgress(input: {
   const assignment = await findAssignment(input.assignmentId, input.panelistEmail);
   if (!assignment) throw new Error("Survey assignment not found.");
   if (!assignment.surveyDefinitionId) throw new Error("This assignment does not use an on-site survey.");
-  if (assignment.status === "completed") throw new Error("This survey has already been submitted.");
+
+  const email = cleanText(input.panelistEmail).toLowerCase();
+  const existing = await getSurveyResponse(input.assignmentId, email);
+  if (assignment.status === "completed") {
+    throw new Error("This survey has already been submitted.");
+  }
 
   const definition = await findSurveyDefinitionById(assignment.surveyDefinitionId);
   if (!definition) throw new Error("Survey definition not found.");
 
   const now = new Date().toISOString();
-  const email = cleanText(input.panelistEmail).toLowerCase();
-  const records = await loadSurveyResponsesRaw();
-  const index = records.findIndex(
-    (record) =>
-      record.assignmentId === input.assignmentId && cleanText(record.panelistEmail).toLowerCase() === email
-  );
-
   const progressPercent = calculateSurveyProgress(definition.questions, input.answers);
-  const existing = index >= 0 ? records[index] : null;
   const response: SurveyResponseRecord = {
     assignmentId: input.assignmentId,
     surveyDefinitionId: assignment.surveyDefinitionId,
@@ -137,17 +123,12 @@ export async function saveSurveyProgress(input: {
     submittedAt: null,
   };
 
-  if (index >= 0) records[index] = response;
-  else records.push(response);
-
-  await saveSurveyResponsesRaw(records);
-  await updateAssignmentProgress(
-    input.assignmentId,
-    email,
+  await saveSurveyResponse(response);
+  await updateSurveyAssignmentProgress(input.assignmentId, email, {
     progressPercent,
-    progressPercent > 0 ? "in_progress" : "available",
-    null
-  );
+    status: progressPercent > 0 ? "in_progress" : "available",
+    completedDate: null,
+  });
 
   return { response, progressPercent };
 }
@@ -160,7 +141,12 @@ export async function submitSurveyResponse(input: {
   const assignment = await findAssignment(input.assignmentId, input.panelistEmail);
   if (!assignment) throw new Error("Survey assignment not found.");
   if (!assignment.surveyDefinitionId) throw new Error("This assignment does not use an on-site survey.");
-  if (assignment.status === "completed") throw new Error("This survey has already been submitted.");
+
+  const email = cleanText(input.panelistEmail).toLowerCase();
+  const existing = await getSurveyResponse(input.assignmentId, email);
+  if (assignment.status === "completed") {
+    throw new Error("This survey has already been submitted.");
+  }
 
   const definition = await findSurveyDefinitionById(assignment.surveyDefinitionId);
   if (!definition) throw new Error("Survey definition not found.");
@@ -169,28 +155,23 @@ export async function submitSurveyResponse(input: {
   if (errors.length > 0) throw new Error(errors[0]);
 
   const now = new Date().toISOString();
-  const email = cleanText(input.panelistEmail).toLowerCase();
-  const records = await loadSurveyResponsesRaw();
-  const index = records.findIndex(
-    (record) =>
-      record.assignmentId === input.assignmentId && cleanText(record.panelistEmail).toLowerCase() === email
-  );
-
   const response: SurveyResponseRecord = {
     assignmentId: input.assignmentId,
     surveyDefinitionId: assignment.surveyDefinitionId,
     panelistEmail: email,
     answers: input.answers,
-    startedAt: index >= 0 ? records[index].startedAt : now,
+    startedAt: existing?.startedAt ?? now,
     updatedAt: now,
     submittedAt: now,
   };
 
-  if (index >= 0) records[index] = response;
-  else records.push(response);
-
-  await saveSurveyResponsesRaw(records);
-  await updateAssignmentProgress(input.assignmentId, email, 100, "completed", now.slice(0, 10));
+  await saveSurveyResponse(response);
+  await updateSurveyAssignmentProgress(input.assignmentId, email, {
+    progressPercent: 100,
+    status: "completed",
+    completedDate: now.slice(0, 10),
+  });
+  await recordCompletionPoints(assignment, email);
 
   return { response, points: assignment.points };
 }
@@ -203,4 +184,15 @@ export async function loadSurveyResponsesForDefinition(surveyDefinitionId: strin
 export async function loadSurveyResponsesForCampaign(campaignId: string): Promise<SurveyResponseRecord[]> {
   const records = await loadSurveyResponsesRaw();
   return records.filter((record) => record.assignmentId === campaignId);
+}
+
+export async function loadSurveyResponsesForEmail(email: string): Promise<SurveyResponseRecord[]> {
+  const normalized = cleanText(email).toLowerCase();
+  if (!normalized) return [];
+  if (useSupabase()) {
+    const { supabaseLoadSurveyResponsesForEmail } = await import("./supabase/repos");
+    return supabaseLoadSurveyResponsesForEmail(normalized);
+  }
+  const records = await loadSurveyResponsesRaw();
+  return records.filter((record) => cleanText(record.panelistEmail).toLowerCase() === normalized);
 }

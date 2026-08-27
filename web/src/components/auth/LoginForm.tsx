@@ -73,7 +73,7 @@ export function LoginForm({
         return;
       }
 
-      window.location.assign(data.account.panelistRegistered ? "/dashboard" : nextPath);
+      window.location.assign(data.account.panelistRegistered ? nextPath : "/register");
     } catch {
       setErrors({ submit: "Network error. Please try again." });
     } finally {
@@ -123,7 +123,7 @@ export function LoginForm({
         return;
       }
 
-      window.location.assign(data.account.panelistRegistered ? "/dashboard" : nextPath);
+      window.location.assign(data.account.panelistRegistered ? nextPath : "/register");
     } catch {
       setErrors({ submit: "Network error. Please try again." });
     } finally {
