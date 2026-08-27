@@ -14,13 +14,21 @@ export const metadata = {
   title: "Surveys | Belize Research Panel",
 };
 
-export default async function DashboardSurveysPage() {
+export default async function DashboardSurveysPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; submitted?: string; points?: string; title?: string }>;
+}) {
   const account = await requireRegisteredPanelistSession();
+  const params = await searchParams;
   const { inbox, completed } = await getPanelistSurveys(account.email);
   const readState = await loadNotificationReadState(account.email);
   const invitationNotifications = buildSurveyInvitationNotifications(inbox, readState);
   const newSurveyIds = getUnreadSurveyInvitationIds(invitationNotifications);
   const surveysLocked = account.accountStatus === "on_hold";
+  const initialTab = params.tab === "completed" ? "completed" : "inbox";
+  const submittedPoints = Number(params.points);
+  const submittedTitle = params.title?.trim() || undefined;
 
   const section = dashboardSectionByHref("/dashboard/surveys");
   const SectionIcon = section?.icon;
@@ -43,6 +51,10 @@ export default async function DashboardSurveysPage() {
         newSurveyIds={newSurveyIds}
         surveysLocked={surveysLocked}
         holdReason={account.holdReason}
+        initialTab={initialTab}
+        justSubmitted={params.submitted === "1"}
+        submittedPoints={Number.isFinite(submittedPoints) ? submittedPoints : undefined}
+        submittedTitle={submittedTitle}
       />
     </>
   );

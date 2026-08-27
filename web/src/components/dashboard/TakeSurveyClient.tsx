@@ -127,15 +127,14 @@ export function TakeSurveyClient({
       }
 
       if (submit) {
-        setDone(true);
         const earned = data.points ?? assignment.points;
-        const balance = data.rewards?.availablePoints;
-        setMessage(
-          balance !== undefined
-            ? `Survey submitted. +${earned} points earned. Your available balance is now ${balance.toLocaleString()} points.`
-            : `Survey submitted. +${earned} points earned.`
-        );
-        router.refresh();
+        const params = new URLSearchParams({
+          tab: "completed",
+          submitted: "1",
+          points: String(earned),
+        });
+        if (assignment.title) params.set("title", assignment.title);
+        router.push(`/dashboard/surveys?${params.toString()}`);
         return;
       }
 

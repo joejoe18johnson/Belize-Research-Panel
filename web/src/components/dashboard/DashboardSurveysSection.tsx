@@ -33,19 +33,36 @@ export function DashboardSurveysSection({
   newSurveyIds = new Set<string>(),
   surveysLocked = false,
   holdReason = "",
+  initialTab = "inbox",
+  justSubmitted = false,
+  submittedPoints,
+  submittedTitle,
 }: {
   inbox: PanelistSurvey[];
   completed: PanelistSurvey[];
   newSurveyIds?: Set<string>;
   surveysLocked?: boolean;
   holdReason?: AccountHoldReason;
+  initialTab?: SurveyTab;
+  justSubmitted?: boolean;
+  submittedPoints?: number;
+  submittedTitle?: string;
 }) {
-  const [tab, setTab] = useState<SurveyTab>("inbox");
+  const [tab, setTab] = useState<SurveyTab>(initialTab);
   const [layout, setLayout] = useViewLayout("dashboard-surveys");
   const surveys = tab === "inbox" ? inbox : completed;
 
   return (
     <div className="space-y-6">
+      {justSubmitted ? (
+        <DashboardAlert tone="success" title="Thank you — your responses have been recorded">
+          {submittedTitle
+            ? `${submittedTitle} is now in Completed surveys.`
+            : "This survey is now in Completed surveys."}{" "}
+          {submittedPoints !== undefined ? `+${submittedPoints} points earned.` : null}
+        </DashboardAlert>
+      ) : null}
+
       {surveysLocked ? (
         <DashboardAlert tone="info" title="Surveys unavailable — account on hold">
           {formatHeadingCase(holdMessage(holdReason))}{" "}
