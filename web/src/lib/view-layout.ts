@@ -29,8 +29,7 @@ export function storeViewLayout(scope: string, layout: ViewLayout): void {
 }
 
 export function defaultViewLayoutForViewport(): ViewLayout {
-  if (typeof window === "undefined") return "cards";
-  return window.matchMedia("(max-width: 639px)").matches ? "list" : "cards";
+  return "list";
 }
 
 export function viewLayoutItemClass(layout: ViewLayout): string {

@@ -9,7 +9,7 @@ import {
   storeViewLayout,
 } from "@/lib/view-layout";
 
-export function useViewLayout(scope: string, preferredDefault: ViewLayout = "cards") {
+export function useViewLayout(scope: string, preferredDefault: ViewLayout = "list") {
   const [layout, setLayoutState] = useState<ViewLayout>(preferredDefault);
 
   useEffect(() => {

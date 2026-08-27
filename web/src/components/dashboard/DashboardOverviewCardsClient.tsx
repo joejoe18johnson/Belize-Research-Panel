@@ -3,7 +3,7 @@
 import {
   BellIcon,
   ShieldCheckIcon,
-  StarIcon,
+  PointsCoinsIcon,
   UserCircleIcon,
 } from "./DashboardIcons";
 import { QuickLinkCard, StatCard } from "./DashboardShell";
@@ -67,7 +67,7 @@ export function DashboardOverviewStats({
       value: String(totalPoints),
       hint: `${totalPointsToDate} earned to date · ${totalPoints} available`,
       tone: rewardsVerified ? ("success" as const) : ("default" as const),
-      icon: <StarIcon className="h-5 w-5" />,
+      icon: <PointsCoinsIcon className="h-5 w-5" />,
     },
     {
       key: "notifications",

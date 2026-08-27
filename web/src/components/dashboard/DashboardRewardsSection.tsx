@@ -5,7 +5,7 @@ import { getReservedPoints, pointsToBz, formatBz } from "@/lib/reward-redemption
 import type { RewardSettings } from "@/lib/reward-settings";
 import { redemptionRateLabel } from "@/lib/reward-settings";
 import { formatHeadingCase } from "@/lib/sentence-case";
-import { GiftIcon, StarIcon } from "./DashboardIcons";
+import { PointsCoinsIcon } from "./DashboardIcons";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 import { DevPointsEditor } from "./DevPointsEditor";
 import { RedemptionOptionsCatalog } from "./RedemptionOptionsCatalog";
@@ -60,8 +60,8 @@ export function DashboardRewardsSection({
                   </p>
                 ) : null}
               </div>
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-                <StarIcon className="h-6 w-6" />
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+                <PointsCoinsIcon variant="hero" className="h-8 w-8" />
               </span>
             </div>
           </div>
@@ -162,8 +162,8 @@ export function DashboardRewardsSection({
 
         <DashboardCard>
           <div className="flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
-              <GiftIcon className="h-4 w-4" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+              <PointsCoinsIcon className="h-5 w-5" />
             </span>
             <SectionHeading as="h3">How points are earned</SectionHeading>
           </div>

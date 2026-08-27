@@ -3,7 +3,7 @@ import {
   BanknotesIcon,
   BellIcon,
   ClipboardIcon,
-  GiftIcon,
+  PointsCoinsIcon,
   HomeIcon,
   ShieldCheckIcon,
   UserCircleIcon,
@@ -70,7 +70,7 @@ export const DASHBOARD_QUICK_SECTIONS: DashboardSectionMeta[] = [
     label: "Rewards",
     description: "Points and redemption info",
     shortLabel: "Rewards",
-    icon: GiftIcon,
+    icon: PointsCoinsIcon,
   },
 ];
 

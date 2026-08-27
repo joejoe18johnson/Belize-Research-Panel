@@ -72,6 +72,87 @@ export function GiftIcon({ className }: { className?: string }) {
   );
 }
 
+/** Professional gold coin stacks used for reward points. */
+export function PointsCoinsIcon({
+  className = "h-5 w-5",
+  variant = "badge",
+}: {
+  className?: string;
+  variant?: "badge" | "hero";
+}) {
+  if (variant === "hero") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 48 48" fill="none" className={className}>
+        {[6, 5, 4, 3, 2, 1, 0].map((step) => {
+          const cy = 28 - step * 2.15;
+          return <CoinDisc key={`back-${step}`} cx={17.5} cy={cy} rx={9} ry={3.35} thick={2.15} />;
+        })}
+        {[3, 2, 1, 0].map((step) => {
+          const cy = 32.5 - step * 2.15;
+          return <CoinDisc key={`front-${step}`} cx={31.5} cy={cy} rx={9} ry={3.35} thick={2.15} />;
+        })}
+        <text
+          x="17.5"
+          y="16.4"
+          textAnchor="middle"
+          fill="#C48412"
+          fontSize="7.5"
+          fontWeight="700"
+          fontFamily="ui-sans-serif, system-ui, sans-serif"
+        >
+          P
+        </text>
+        <text
+          x="31.5"
+          y="27.9"
+          textAnchor="middle"
+          fill="#C48412"
+          fontSize="7.5"
+          fontWeight="700"
+          fontFamily="ui-sans-serif, system-ui, sans-serif"
+        >
+          P
+        </text>
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className}>
+      <ellipse cx="13.4" cy="16.6" rx="6.1" ry="3.05" fill="#E8B63A" stroke="#9A5B12" strokeWidth="1.15" />
+      <ellipse cx="12" cy="12.2" rx="6.1" ry="3.05" fill="#F0C44A" stroke="#9A5B12" strokeWidth="1.15" />
+      <ellipse cx="10.6" cy="7.8" rx="6.1" ry="3.05" fill="#F6D25C" stroke="#9A5B12" strokeWidth="1.15" />
+    </svg>
+  );
+}
+
+function CoinDisc({
+  cx,
+  cy,
+  rx,
+  ry,
+  thick,
+}: {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  thick: number;
+}) {
+  const left = cx - rx;
+  const right = cx + rx;
+  return (
+    <g>
+      <path
+        d={`M${left} ${cy} V${cy + thick} A${rx} ${ry} 0 0 0 ${right} ${cy + thick} V${cy} A${rx} ${ry} 0 0 1 ${left} ${cy}`}
+        fill="#E39B16"
+      />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#F5C51A" stroke="#D4A017" strokeWidth="0.6" />
+      <ellipse cx={cx} cy={cy} rx={rx * 0.7} ry={ry * 0.52} fill="none" stroke="#E8B423" strokeWidth="0.7" />
+    </g>
+  );
+}
+
 export function CheckCircleIcon({ className }: { className?: string }) {
   return (
     <IconBase className={className}>

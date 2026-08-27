@@ -163,7 +163,7 @@ function SurveyNewBadge({ compact = false }: { compact?: boolean }) {
 export function SurveyCard({
   survey,
   locked = false,
-  layout = "cards",
+  layout = "list",
   isNew = false,
 }: {
   survey: PanelistSurvey;

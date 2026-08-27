@@ -218,7 +218,7 @@ export function StatCard({
   hint,
   tone = "default",
   icon,
-  layout = "cards",
+  layout = "list",
 }: {
   label: string;
   value: string;
@@ -312,7 +312,7 @@ export function QuickLinkCard({
   label,
   description,
   icon,
-  layout = "cards",
+  layout = "list",
   variant = "horizontal",
 }: {
   href: string;
