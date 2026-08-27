@@ -243,7 +243,6 @@ export function AdminShell({
               : "hidden lg:flex"
           }`}
         >
-          <div className="h-1 shrink-0 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400 lg:hidden" aria-hidden />
           {navContent}
         </aside>
 

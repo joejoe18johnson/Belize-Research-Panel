@@ -36,7 +36,6 @@ export function DashboardShell({
   return (
     <div className={`${dashboardShellClass} w-full max-w-full overflow-x-clip`}>
       <header className={`${dashboardHeaderClass} w-full max-w-full overflow-x-clip`}>
-        <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`${CONTENT_CLASS} py-2.5 sm:py-3`}>
           <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
             <BrpLogoLink href="/dashboard" variant="light" className="min-w-0 shrink" logoClassName="sm:text-base" />

@@ -24,7 +24,6 @@ export function AuthPageShell({
   return (
     <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
       <header className={portalStickyHeaderClass}>
-        <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className={`mx-auto ${AUTH_CONTENT_MAX}`}>
           <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">
             <BrpLogoLink href="/" variant="light" />

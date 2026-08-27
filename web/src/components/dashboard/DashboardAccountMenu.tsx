@@ -131,7 +131,6 @@ export function DashboardAccountMenu({
                 aria-labelledby={`${menuId}-title`}
                 className="safe-top absolute inset-y-0 right-0 flex w-[min(100vw-1.5rem,22rem)] flex-col overflow-hidden border-l border-teal-100 bg-white shadow-2xl shadow-teal-950/20 dark:border-teal-900 dark:bg-zinc-900"
               >
-                <div className="h-1 shrink-0 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
                 <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-4">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-teal-700 dark:text-teal-300">

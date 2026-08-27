@@ -22,7 +22,6 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
   return (
     <div className="min-h-screen min-w-0 bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_12rem,#09090b_100%)]">
       <header className={`${portalStickyHeaderClass} shadow-sm`}>
-        <div className="h-1 bg-gradient-to-r from-teal-600 via-teal-700 to-teal-900" aria-hidden />
         <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <div className="min-w-0">
             <BrpLogoLink href="/client" variant="light" logoClassName="sm:text-base" />
