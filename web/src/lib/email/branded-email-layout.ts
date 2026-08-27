@@ -21,6 +21,11 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+export function quotedMessage(text: string): string {
+  const escaped = escapeHtml(text).replace(/\n/g, "<br />");
+  return `<div style="margin:0 0 20px;padding:16px 18px;background:#f4f4f5;border-left:4px solid ${BRAND.teal[700]};border-radius:8px;font-size:15px;line-height:1.65;color:#18181b;">${escaped}</div>`;
+}
+
 export function paragraph(text: string): string {
   return `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#3f3f46;">${escapeHtml(text)}</p>`;
 }

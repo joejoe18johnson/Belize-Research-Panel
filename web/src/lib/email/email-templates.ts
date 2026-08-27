@@ -5,6 +5,7 @@ import {
   htmlToPlainText,
   mutedParagraph,
   paragraph,
+  quotedMessage,
 } from "./branded-email-layout";
 
 export type EmailTemplateCategory =
@@ -37,7 +38,8 @@ export type EmailTemplateId =
   | "staff-welcome"
   | "staff-password-reset"
   | "support-request-received"
-  | "support-inbox-notification";
+  | "support-inbox-notification"
+  | "support-reply";
 
 export interface EmailTemplateMeta {
   id: EmailTemplateId;
@@ -223,6 +225,13 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     category: "staff",
     trigger: "When a support request is submitted",
   },
+  {
+    id: "support-reply",
+    name: "Support reply",
+    description: "Sends an administrator’s reply to the panelist’s email address.",
+    category: "account",
+    trigger: "When an administrator replies from the support inbox",
+  },
 ];
 
 export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, string>> = {
@@ -353,6 +362,14 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
     referenceId: "SUP-8F2A1C",
     messagePreview: "I submitted a redemption last week and wanted to check the status.",
     adminInboxUrl: "https://panel.example.com/admin/support-inbox",
+  },
+  "support-reply": {
+    firstName: "Maria",
+    topicLabel: "Email, phone, or profile changes",
+    referenceId: "SUP-8F2A1C",
+    replyBody:
+      "You can change your phone number from Dashboard → Profile. Submit a change request and we will review it before the new number is saved.",
+    helpUrl: "https://panel.example.com/help",
   },
 };
 
@@ -694,6 +711,26 @@ function renderSupportInboxNotification(data: Record<string, string>): RenderedE
   return finish(`Support request: ${topicLabel}`, bodyHtml, { label: "Open support inbox", href: adminInboxUrl });
 }
 
+function renderSupportReply(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const topicLabel = pick(data, "topicLabel", "your enquiry");
+  const referenceId = pick(data, "referenceId", "—");
+  const replyBody = pick(data, "replyBody", "");
+  const helpUrl = pick(data, "helpUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph("The Belize Research Panel support team has replied to your help request."),
+    detailTable(detailRow("Topic", topicLabel) + detailRow("Reference", referenceId)),
+    quotedMessage(replyBody || "Please sign in to the help centre if you need further assistance."),
+    paragraph("If you still need help, sign in and send another message from Help & contact."),
+    mutedParagraph("Please do not share your password or photo ID in email replies."),
+  ].join("");
+  return finish("A reply from Belize Research Panel support", bodyHtml, {
+    label: "Visit help centre",
+    href: helpUrl,
+  });
+}
+
 const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => RenderedEmail> = {
   "signup-verify-email": renderSignupVerifyEmail,
   "password-reset": renderPasswordResetEmail,
@@ -718,6 +755,7 @@ const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => Rende
   "staff-password-reset": renderStaffPasswordResetEmail,
   "support-request-received": renderSupportRequestReceived,
   "support-inbox-notification": renderSupportInboxNotification,
+  "support-reply": renderSupportReply,
 };
 
 export function isEmailTemplateId(value: string): value is EmailTemplateId {

@@ -45,6 +45,7 @@ export default async function HelpPage() {
         faq={SUPPORT_FAQ}
         supportEmail={getPublicSupportInboxEmail()}
         privacyEmail={getPublicPrivacyContactEmail()}
+        signedIn={Boolean(session)}
         defaultName={defaultName}
         defaultEmail={defaultEmail}
       />

@@ -3,27 +3,26 @@ import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendSupportContactEmails } from "@/lib/email/process-emails";
 import { createSupportMessage } from "@/lib/support-messages";
 import { getSupportInboxEmail, isSupportTopicId } from "@/lib/support-contact";
-import { cleanText, validEmail } from "@/lib/validation";
+import { cleanText } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getSessionAccount();
+    if (!session) {
+      return NextResponse.json({ message: "Please sign in to contact support." }, { status: 401 });
+    }
+
     const body = (await request.json()) as {
-      name?: string;
-      email?: string;
       topic?: string;
       message?: string;
     };
 
-    const name = cleanText(body.name ?? "");
-    const email = cleanText(body.email ?? "").toLowerCase();
+    const name = `${session.firstName} ${session.lastName}`.trim() || session.email;
+    const email = session.email.trim().toLowerCase();
     const topic = cleanText(body.topic ?? "");
     const message = cleanText(body.message ?? "");
 
     const errors: Record<string, string> = {};
-    if (!name) errors.name = "Your name is required.";
-    if (!email) errors.email = "Email address is required.";
-    else if (!validEmail(email)) errors.email = "Please enter a valid email address.";
     if (!topic) errors.topic = "Please select a topic.";
     else if (!isSupportTopicId(topic)) errors.topic = "Please select a valid topic.";
     if (!message) errors.message = "Please describe how we can help.";
@@ -38,11 +37,11 @@ export async function POST(request: NextRequest) {
       email,
       topic,
       message,
-      panelistEmail: session?.email,
-      accountId: session?.id,
+      panelistEmail: session.email,
+      accountId: session.id,
     });
 
-    void sendSupportContactEmails({
+    await sendSupportContactEmails({
       origin: resolveRequestOrigin(request),
       record: {
         id: record.id,
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       referenceId: record.id,
-      message: "Your message has been sent. We will respond by email within 1–2 business days.",
+      message: `Your message has been sent. We will reply to ${record.email} within 1–2 business days.`,
     });
   } catch (error) {
     console.error("[support] contact form failed", error);

@@ -435,6 +435,29 @@ export async function sendSupportContactEmails(input: {
   ]);
 }
 
+export async function sendSupportReplyEmail(input: {
+  origin: string;
+  to: string;
+  firstName: string;
+  topicLabel: string;
+  requestId: string;
+  replyBody: string;
+}): Promise<{ sent: boolean; error?: string }> {
+  const result = await sendTemplateEmail({
+    templateId: "support-reply",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      topicLabel: input.topicLabel,
+      referenceId: supportReferenceId(input.requestId),
+      replyBody: input.replyBody,
+      helpUrl: originDashboard(input.origin, "/help"),
+    },
+    context: "support-reply",
+  });
+  return { sent: result.sent, error: result.error };
+}
+
 export async function sendCampaignInvitationEmails(input: {
   origin: string;
   campaignTitle: string;

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { PageIntro, AdminTableScroll, adminNewItemRowClass, adminResponsiveTableClass, AdminTableRow, AdminTableTd } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SupportMessageRecord } from "@/lib/support-messages";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -28,6 +29,9 @@ export function AdminSupportInboxClient({
   const [messages, setMessages] = useState(initialMessages);
   const [filter, setFilter] = useState<"all" | "new" | "read">("all");
   const [markingId, setMarkingId] = useState("");
+  const [replyBody, setReplyBody] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
+  const [replyNotice, setReplyNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [selectedId, setSelectedId] = useState(initialMessages[0]?.id ?? "");
 
   const filtered = useMemo(() => {
@@ -39,6 +43,11 @@ export function AdminSupportInboxClient({
   const pagination = useTablePagination(filtered, 20);
   const pageRows = pagination.paginatedRows;
   const selected = messages.find((message) => message.id === selectedId) ?? pageRows[0] ?? null;
+  const selectedReplies = selected?.replies ?? [];
+
+  const updateMessage = (next: SupportMessageRecord) => {
+    setMessages((current) => current.map((message) => (message.id === next.id ? next : message)));
+  };
 
   const markRead = async (id: string) => {
     setMarkingId(id);
@@ -46,17 +55,62 @@ export function AdminSupportInboxClient({
       const res = await fetch("/api/admin/support-messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, action: "read" }),
       });
       const data = (await res.json()) as { ok?: boolean; message?: SupportMessageRecord };
-      if (res.ok && data.message) {
-        setMessages((current) =>
-          current.map((message) => (message.id === id ? data.message! : message))
-        );
-      }
+      if (res.ok && data.message) updateMessage(data.message);
       router.refresh();
     } finally {
       setMarkingId("");
+    }
+  };
+
+  const sendReply = async (id: string) => {
+    const body = replyBody.trim();
+    if (body.length < 10) {
+      setReplyNotice({ tone: "error", text: "Please write a slightly longer reply (at least 10 characters)." });
+      return;
+    }
+
+    setReplyBusy(true);
+    setReplyNotice(null);
+    try {
+      const res = await fetch("/api/admin/support-messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "reply", reply: body }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        message?: SupportMessageRecord | string;
+        warning?: string;
+      };
+      if (!res.ok) {
+        setReplyNotice({
+          tone: "error",
+          text: typeof data.message === "string" ? data.message : "Could not send the reply.",
+        });
+        return;
+      }
+      const updated = data.message && typeof data.message === "object" ? data.message : undefined;
+      if (updated) {
+        updateMessage(updated);
+        setSelectedId(updated.id);
+      }
+      setReplyBody("");
+      if (data.warning) {
+        setReplyNotice({ tone: "error", text: data.warning });
+      } else {
+        setReplyNotice({
+          tone: "success",
+          text: updated ? `Reply emailed to ${updated.email}.` : "Reply sent.",
+        });
+      }
+      router.refresh();
+    } catch {
+      setReplyNotice({ tone: "error", text: "Network error while sending the reply." });
+    } finally {
+      setReplyBusy(false);
     }
   };
 
@@ -67,7 +121,7 @@ export function AdminSupportInboxClient({
       <PageIntro
         eyebrow="Admin console"
         title="Support inbox"
-        description="Help requests submitted from the public help page. Messages are also emailed to the configured support inbox."
+        description="Help requests from signed-in panelists. Reply here to send a branded email to the panelist’s account address."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -80,7 +134,7 @@ export function AdminSupportInboxClient({
           <p className="mt-1 text-2xl font-bold text-amber-700 dark:text-amber-300">{newCount}</p>
         </div>
         <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Public page</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Help page</p>
           <a href="/help" className="mt-1 inline-block text-sm font-semibold text-teal-700 hover:underline dark:text-teal-300">
             /help
           </a>
@@ -126,15 +180,18 @@ export function AdminSupportInboxClient({
                 ) : (
                   pageRows.map((row) => {
                     const active = selected?.id === row.id;
+                    const replied = (row.replies?.length ?? 0) > 0;
                     return (
                       <AdminTableRow
                         key={row.id}
                         className={`cursor-pointer ${active ? "bg-teal-50 dark:bg-teal-950/30" : adminNewItemRowClass(row.status === "new")}`}
-                        onClick={() => setSelectedId(row.id)}
+                        onClick={() => {
+                          setSelectedId(row.id);
+                          setReplyBody("");
+                          setReplyNotice(null);
+                        }}
                       >
-                        <AdminTableTd label="Received">
-                          {formatTimestamp(row.createdAt)}
-                        </AdminTableTd>
+                        <AdminTableTd label="Received">{formatTimestamp(row.createdAt)}</AdminTableTd>
                         <AdminTableTd label="From">
                           <div className="font-medium text-zinc-900 dark:text-zinc-100">{row.name}</div>
                           <div className="break-all text-xs text-zinc-500 dark:text-zinc-400">{row.email}</div>
@@ -145,10 +202,12 @@ export function AdminSupportInboxClient({
                             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
                               row.status === "new"
                                 ? "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
-                                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                                : replied
+                                  ? "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-200"
+                                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
                             }`}
                           >
-                            {row.status === "new" ? "Unread" : "Read"}
+                            {row.status === "new" ? "Unread" : replied ? "Replied" : "Read"}
                           </span>
                         </AdminTableTd>
                       </AdminTableRow>
@@ -176,12 +235,7 @@ export function AdminSupportInboxClient({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{selected.name}</h2>
-                  <a
-                    href={`mailto:${selected.email}`}
-                    className="text-sm font-medium text-teal-700 hover:underline dark:text-teal-300"
-                  >
-                    {selected.email}
-                  </a>
+                  <p className="text-sm font-medium text-teal-700 dark:text-teal-300">{selected.email}</p>
                 </div>
                 {selected.status === "new" ? (
                   <button
@@ -204,14 +258,6 @@ export function AdminSupportInboxClient({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Received</dt>
                   <dd className="mt-1 text-zinc-800 dark:text-zinc-200">{formatTimestamp(selected.createdAt)}</dd>
                 </div>
-                {selected.panelistEmail ? (
-                  <div>
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                      Signed-in panelist
-                    </dt>
-                    <dd className="mt-1 text-zinc-800 dark:text-zinc-200">{selected.panelistEmail}</dd>
-                  </div>
-                ) : null}
               </dl>
 
               <div>
@@ -220,6 +266,62 @@ export function AdminSupportInboxClient({
                   {selected.message}
                 </p>
               </div>
+
+              {selectedReplies.length > 0 ? (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    Replies sent
+                  </h3>
+                  {selectedReplies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 dark:border-teal-900/50 dark:bg-teal-950/20"
+                    >
+                      <p className="text-xs font-semibold text-teal-800 dark:text-teal-200">
+                        {reply.sentBy} · {formatTimestamp(reply.sentAt)}
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">
+                        {reply.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              <form
+                className="space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void sendReply(selected.id);
+                }}
+              >
+                <label htmlFor="support-reply" className="block text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Reply by email
+                </label>
+                <textarea
+                  id="support-reply"
+                  value={replyBody}
+                  onChange={(event) => {
+                    setReplyBody(event.target.value);
+                    setReplyNotice(null);
+                  }}
+                  rows={5}
+                  className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+                  placeholder={`Write a reply. This branded email will be sent to ${selected.email}.`}
+                />
+                {replyNotice ? (
+                  <BrandedAlert tone={replyNotice.tone} compact showIcon>
+                    {replyNotice.text}
+                  </BrandedAlert>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={replyBusy}
+                  className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+                >
+                  {replyBusy ? "Sending reply…" : "Send reply email"}
+                </button>
+              </form>
             </div>
           ) : (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">Select a message to read the full details.</p>

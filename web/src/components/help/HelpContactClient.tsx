@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Field, TextInput } from "@/components/registration/form-ui";
+import { Field } from "@/components/registration/form-ui";
 import { SiteSelect } from "@/components/shared/SiteSelect";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SUPPORT_TOPICS, type SupportFaqItem } from "@/lib/support-contact";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 import type { FieldErrors } from "@/lib/validation";
-import { validEmail } from "@/lib/validation";
 
 function FaqList({ items }: { items: SupportFaqItem[] }) {
   return (
@@ -37,17 +36,17 @@ export function HelpContactClient({
   faq,
   supportEmail,
   privacyEmail,
+  signedIn = false,
   defaultName = "",
   defaultEmail = "",
 }: {
   faq: SupportFaqItem[];
   supportEmail: string;
   privacyEmail: string;
+  signedIn?: boolean;
   defaultName?: string;
   defaultEmail?: string;
 }) {
-  const [name, setName] = useState(defaultName);
-  const [email, setEmail] = useState(defaultEmail);
   const [topic, setTopic] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -57,13 +56,11 @@ export function HelpContactClient({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!signedIn) return;
     setSubmitting(true);
     setErrors({});
 
     const nextErrors: FieldErrors = {};
-    if (!name.trim()) nextErrors.name = "Your name is required.";
-    if (!email.trim()) nextErrors.email = "Email address is required.";
-    else if (!validEmail(email.trim())) nextErrors.email = "Please enter a valid email address.";
     if (!topic) nextErrors.topic = "Please select a topic.";
     if (!message.trim()) nextErrors.message = "Please describe how we can help.";
     else if (message.trim().length < 20) {
@@ -80,7 +77,7 @@ export function HelpContactClient({
       const res = await fetch("/api/support/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, topic, message }),
+        body: JSON.stringify({ topic, message }),
       });
       const data = (await res.json()) as { ok?: boolean; message?: string; errors?: FieldErrors };
 
@@ -121,22 +118,29 @@ export function HelpContactClient({
             {formatHeadingCase("Contact support")}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Send us a message and our team will reply within{" "}
+            Signed-in panelists can send a message and our team will reply by branded email within{" "}
             <strong className="font-semibold text-zinc-800 dark:text-zinc-200">1–2 business days</strong>.
           </p>
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            {supportEmail ? (
-              <>
-                Email{" "}
-                <a href={`mailto:${supportEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
-                  {supportEmail}
-                </a>{" "}
-                directly, or use the form below.
-              </>
-            ) : (
-              "Use the form below and our team will follow up by email."
-            )}
-          </p>
+          {signedIn && defaultEmail ? (
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              Replies are sent to <span className="font-medium text-zinc-800 dark:text-zinc-200">{defaultEmail}</span>
+              {supportEmail ? (
+                <>
+                  . You can also email{" "}
+                  <a href={`mailto:${supportEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+                    {supportEmail}
+                  </a>
+                  .
+                </>
+              ) : (
+                "."
+              )}
+            </p>
+          ) : (
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              Sign in to send a message. We reply to the email on your account.
+            </p>
+          )}
 
           {submitted ? (
             <div className="mt-5">
@@ -151,28 +155,25 @@ export function HelpContactClient({
                 Send another message
               </button>
             </div>
+          ) : !signedIn ? (
+            <div className="mt-5 space-y-3">
+              <BrandedAlert tone="info" title="Sign in to contact support" compact showIcon>
+                Contact support is available to signed-in panelists so we can reply to the email on your account.
+              </BrandedAlert>
+              <Link
+                href="/login?next=/help"
+                className="flex min-h-11 w-full items-center justify-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
+              >
+                {formatSiteCase("Sign in to send a message")}
+              </Link>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-5 space-y-4" noValidate>
-              <Field label="Your name" required error={errors.name} id="support-name">
-                <TextInput
-                  id="support-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  error={errors.name}
-                  autoComplete="name"
-                />
-              </Field>
-
-              <Field label="Email address" required error={errors.email} id="support-email">
-                <TextInput
-                  id="support-email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  error={errors.email}
-                  autoComplete="email"
-                />
-              </Field>
+              {defaultName ? (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Sending as <span className="font-medium text-zinc-800 dark:text-zinc-200">{defaultName}</span>
+                </p>
+              ) : null}
 
               <Field label="Topic" required error={errors.topic} id="support-topic">
                 <SiteSelect
