@@ -82,17 +82,18 @@ function PayoutProcessDialog({
   row,
   busyAction,
   message,
+  messageTone,
   onClose,
   onProcess,
 }: {
   row: PayoutQueueRow;
   busyAction: PayoutProcessAction | "";
   message: string;
+  messageTone: "success" | "error";
   onClose: () => void;
   onProcess: (action: PayoutProcessAction) => void;
 }) {
-  const canStart = row.status === "pending";
-  const canComplete = row.status === "approved";
+  const canComplete = row.status === "pending" || row.status === "approved";
   const canReject = row.status === "pending" || row.status === "approved";
   const readOnly = row.status === "fulfilled" || row.status === "rejected";
 
@@ -154,35 +155,21 @@ function PayoutProcessDialog({
 
         {message ? (
           <div className="mt-4">
-            <BrandedAlert
-              tone={message.toLowerCase().includes("failed") || message.toLowerCase().includes("could not") ? "error" : "success"}
-              compact
-              showIcon
-            >
+            <BrandedAlert tone={messageTone} compact showIcon>
               {message}
             </BrandedAlert>
           </div>
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
-          {canStart ? (
-            <button
-              type="button"
-              disabled={Boolean(busyAction)}
-              onClick={() => onProcess("start")}
-              className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
-            >
-              {busyAction === "start" ? "Completing request…" : "Complete Request"}
-            </button>
-          ) : null}
           {canComplete ? (
             <button
               type="button"
               disabled={Boolean(busyAction)}
               onClick={() => onProcess("complete")}
-              className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
+              className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
             >
-              {busyAction === "complete" ? "Completing…" : "Mark complete"}
+              {busyAction === "complete" ? "Completing request…" : "Complete request"}
             </button>
           ) : null}
           {canReject ? (
@@ -245,6 +232,7 @@ export function AdminPayoutQueueSection({
   const [activeRow, setActiveRow] = useState<PayoutQueueRow | null>(null);
   const [busyAction, setBusyAction] = useState<PayoutProcessAction | "">("");
   const [dialogMessage, setDialogMessage] = useState("");
+  const [dialogTone, setDialogTone] = useState<"success" | "error">("success");
   const unreadSet = useMemo(() => new Set(unreadPayoutIds), [unreadPayoutIds]);
 
   const statusFiltered = useMemo(() => {
@@ -295,16 +283,19 @@ export function AdminPayoutQueueSection({
       });
       const data = (await res.json()) as { message?: string };
       if (!res.ok) {
+        setDialogTone("error");
         setDialogMessage(data.message ?? "Could not update payout request.");
         return;
       }
 
       const actionLabel =
         action === "start" ? "Processing started" : action === "complete" ? "Payout marked complete" : "Request declined";
+      setDialogTone("success");
       setDialogMessage(`${actionLabel}. The panelist has been notified.`);
       router.refresh();
       setActiveRow(null);
     } catch {
+      setDialogTone("error");
       setDialogMessage("Network error while updating payout request.");
     } finally {
       setBusyAction("");
@@ -489,6 +480,7 @@ export function AdminPayoutQueueSection({
                         type="button"
                         onClick={() => {
                           setDialogMessage("");
+                          setDialogTone("success");
                           setActiveRow(row);
                           if (row.status === "pending") {
                             void markPayoutRead(row.id);
@@ -521,6 +513,7 @@ export function AdminPayoutQueueSection({
           row={activeRow}
           busyAction={busyAction}
           message={dialogMessage}
+          messageTone={dialogTone}
           onClose={() => {
             if (!busyAction) setActiveRow(null);
           }}

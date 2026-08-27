@@ -32,6 +32,24 @@ function normalizeEmail(email: string): string {
   return cleanText(email).toLowerCase();
 }
 
+function payoutIdsMatch(storedId: string, requestedId: string): boolean {
+  const stored = cleanText(storedId);
+  const requested = cleanText(requestedId);
+  if (!stored || !requested) return false;
+  if (stored === requested) return true;
+  const compactStored = stored.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  const compactRequested = requested.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  if (compactStored === compactRequested) return true;
+  return compactRequested.length >= 6 && compactStored.endsWith(compactRequested);
+}
+
+function findRequestInList(
+  requests: RedemptionRequest[],
+  requestId: string
+): RedemptionRequest | undefined {
+  return requests.find((entry) => payoutIdsMatch(entry.id, requestId));
+}
+
 export async function loadRedemptionRequests(email: string): Promise<RedemptionRequest[]> {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
@@ -111,13 +129,13 @@ export async function findRedemptionRequestById(
   if (useSupabase()) {
     const { supabaseLoadAllRedemptionRequests } = await import("./supabase/repos");
     const all = await supabaseLoadAllRedemptionRequests();
-    const request = all.find((entry) => entry.id === id);
+    const request = findRequestInList(all, id);
     return request ? { email: request.email, request } : null;
   }
 
   const store = await loadStore();
   for (const [email, requests] of Object.entries(store)) {
-    const request = requests.find((entry) => entry.id === id);
+    const request = findRequestInList(requests, id);
     if (request) return { email, request };
   }
   return null;
@@ -133,13 +151,11 @@ export async function updateRedemptionRequestStatus(
   const id = cleanText(requestId);
   if (!key || !id) return null;
 
-  const store = await loadStore();
-  const current = store[key] ?? [];
-  const index = current.findIndex((request) => request.id === id);
-  if (index === -1) return null;
+  const located = await findRedemptionRequestById(id);
+  if (!located || normalizeEmail(located.email) !== key) return null;
 
   const updated: RedemptionRequest = {
-    ...current[index],
+    ...located.request,
     status,
     updatedAt: new Date().toISOString(),
     ...(options.processedBy ? { processedBy: options.processedBy } : {}),
@@ -152,6 +168,10 @@ export async function updateRedemptionRequestStatus(
     return updated;
   }
 
+  const store = await loadStore();
+  const current = store[key] ?? [];
+  const index = current.findIndex((request) => payoutIdsMatch(request.id, updated.id));
+  if (index === -1) return null;
   current[index] = updated;
   store[key] = current;
   await saveStore(store);
@@ -166,7 +186,7 @@ const ACTION_STATUS: Record<PayoutProcessAction, RedemptionRequestStatus> = {
 };
 
 const ALLOWED_TRANSITIONS: Record<RedemptionRequestStatus, PayoutProcessAction[]> = {
-  pending: ["start", "reject"],
+  pending: ["start", "complete", "reject"],
   approved: ["complete", "reject"],
   fulfilled: [],
   rejected: [],
