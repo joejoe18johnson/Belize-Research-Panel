@@ -15,10 +15,13 @@ function LogoutIcon({ className = "h-5 w-5" }: { className?: string }) {
 export function LogoutButton({
   className = "",
   compact = false,
+  showIcon = false,
 }: {
   className?: string;
   /** Icon-only control for cramped mobile toolbars. */
   compact?: boolean;
+  /** Show the logout icon beside the label. */
+  showIcon?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -44,7 +47,14 @@ export function LogoutButton({
       title={formatSiteCase(label)}
       className={className}
     >
-      {compact ? <LogoutIcon className="h-5 w-5 shrink-0" /> : loading ? formatSiteCase("Logging out…") : formatSiteCase("Log out")}
+      {compact ? (
+        <LogoutIcon className="h-5 w-5 shrink-0" />
+      ) : (
+        <>
+          {showIcon ? <LogoutIcon className="h-5 w-5 shrink-0" /> : null}
+          {loading ? formatSiteCase("Logging out…") : formatSiteCase("Log out")}
+        </>
+      )}
     </button>
   );
 }

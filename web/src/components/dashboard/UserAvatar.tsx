@@ -9,10 +9,12 @@ export function UserAvatar({
   firstName,
   email,
   size = "md",
+  className = "",
 }: {
   firstName: string;
   email: string;
   size?: "sm" | "md" | "lg";
+  className?: string;
 }) {
   const initial = avatarInitial(firstName, email);
   const sizeClass =
@@ -24,7 +26,7 @@ export function UserAvatar({
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center rounded-full bg-teal-600 font-semibold text-white ${sizeClass}`}
+      className={`flex shrink-0 items-center justify-center rounded-full bg-teal-600 font-semibold text-white ${sizeClass} ${className}`.trim()}
       title={firstName.trim() || email}
       aria-hidden="true"
     >

@@ -7,13 +7,13 @@ import { appContentFrameClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DASHBOARD_NAV_SECTIONS } from "./dashboard-sections";
 
-const NAV_BADGE_KEYS: Partial<Record<string, keyof DashboardNavBadges>> = {
+export const DASHBOARD_NAV_BADGE_KEYS: Partial<Record<string, keyof DashboardNavBadges>> = {
   "/dashboard/surveys": "newSurveys",
   "/dashboard/notifications": "unreadNotifications",
   "/dashboard/verification": "verificationAttention",
 };
 
-function isActive(pathname: string, href: string, exact?: boolean): boolean {
+export function isDashboardNavActive(pathname: string, href: string, exact?: boolean): boolean {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -29,8 +29,8 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
       <div className={`nav-scroll overflow-x-auto overscroll-x-contain ${appContentFrameClass}`}>
         <div className="flex w-max min-w-full items-center justify-start gap-1.5 py-2.5 sm:mx-auto sm:w-full sm:justify-center sm:gap-2 sm:py-3">
           {DASHBOARD_NAV_SECTIONS.map((item) => {
-            const active = isActive(pathname, item.href, item.exact);
-            const badgeKey = NAV_BADGE_KEYS[item.href];
+            const active = isDashboardNavActive(pathname, item.href, item.exact);
+            const badgeKey = DASHBOARD_NAV_BADGE_KEYS[item.href];
             const badgeCount = badgeKey ? badges[badgeKey] : 0;
             const Icon = item.icon;
             const displayLabel = item.shortLabel ?? item.label;

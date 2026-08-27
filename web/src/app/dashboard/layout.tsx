@@ -24,6 +24,7 @@ export default async function DashboardLayout({
     <DashboardShell
       email={account.email}
       firstName={account.firstName}
+      lastName={account.lastName}
       badges={badges}
       verificationStatus={verificationStatus}
     >

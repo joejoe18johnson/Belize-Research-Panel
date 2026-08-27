@@ -3,32 +3,32 @@ import type { ReactNode } from "react";
 import type { ViewLayout } from "@/lib/view-layout";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { LogoutButton } from "@/components/auth/LogoutButton";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
 import { dashboardCardClass, dashboardHeaderClass, dashboardShellClass } from "@/lib/brand";
 import { appContentFrameClass, MEDIUM_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
+import { DashboardAccountMenu } from "./DashboardAccountMenu";
 import { DashboardNav } from "./DashboardNav";
 import { AccountNotVerifiedBanner } from "./AccountNotVerifiedBanner";
 import { isAccountVerified } from "./VerifiedCheckBadge";
 import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
-import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
-import { UserAvatar } from "./UserAvatar";
 
 const CONTENT_CLASS = appContentFrameClass;
 
 export function DashboardShell({
   email,
   firstName,
+  lastName,
   badges,
   verificationStatus,
   children,
 }: {
   email: string;
   firstName: string;
+  lastName: string;
   badges: DashboardNavBadges;
   verificationStatus?: string;
   children: ReactNode;
@@ -43,28 +43,13 @@ export function DashboardShell({
             <div className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1.5">
               <PointsBalanceLink availablePoints={badges.availablePoints} />
               <NotificationBellLink unreadCount={badges.unreadNotifications} />
-              <Link
-                href="/dashboard/profile"
-                className="flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:h-11 sm:w-11 md:w-auto md:min-w-0 md:gap-2.5 md:px-1"
-                aria-label="View profile"
-              >
-                <UserAvatar firstName={firstName} email={email} />
-                <div className="hidden min-w-0 md:block">
-                  {firstName.trim() ? (
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{firstName}</p>
-                  ) : null}
-                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{email}</p>
-                </div>
-              </Link>
-              <LogoutButton
-                compact
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:hidden"
+              <DashboardAccountMenu
+                email={email}
+                firstName={firstName}
+                lastName={lastName}
+                badges={badges}
               />
-              <LogoutButton className="hidden min-h-11 shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-900 shadow-sm transition hover:border-teal-300 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950 sm:flex" />
             </div>
-          </div>
-          <div className="mt-2 border-t border-teal-50 pt-2 dark:border-teal-900/40">
-            <ThemeMenuToggle variant="light" />
           </div>
         </div>
         <DashboardNav badges={badges} />
