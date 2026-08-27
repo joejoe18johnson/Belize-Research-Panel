@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAccount } from "@/lib/accounts";
 import { buildVerificationUrl, resolveRequestOrigin, setSessionCookie } from "@/lib/auth";
-import { sendSignupVerifyEmail } from "@/lib/email/process-emails";
+import { sendSignupAdminNotificationEmail, sendSignupVerifyEmail } from "@/lib/email/process-emails";
 import type { SignupFormData } from "@/lib/auth-types";
 import { isSignupEligible, validateSignupForm } from "@/lib/signup-validation";
 
@@ -64,8 +64,17 @@ export async function POST(request: NextRequest) {
       console.error("Signup session cookie failed:", error);
     }
 
+    const origin = resolveRequestOrigin(request);
+    const fullName = `${result.account.first_name} ${result.account.last_name}`.trim();
+    void sendSignupAdminNotificationEmail({
+      name: fullName,
+      email: result.account.email,
+      origin,
+    }).catch((error) => {
+      console.error("Signup admin notification failed:", error);
+    });
+
     try {
-      const origin = resolveRequestOrigin(request);
       verifyUrl = buildVerificationUrl(result.verificationToken, origin);
       const delivery = await sendSignupVerifyEmail({
         to: result.account.email,

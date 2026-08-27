@@ -1,6 +1,7 @@
 import type { EmailTemplateId } from "./email-templates";
 import { renderEmailTemplate } from "./email-templates";
 import { sendTransactionalEmail } from "./send-transactional-email";
+import { getSignupNotifyEmail, shouldSendSignupAdminNotification } from "@/lib/signup-notify";
 
 export async function sendTemplateEmail(input: {
   templateId: EmailTemplateId;
@@ -53,6 +54,25 @@ export async function sendSignupVerifyEmail(input: {
       firstName: panelistFirstName(input.firstName),
       verifyUrl: input.verifyUrl,
     },
+  });
+}
+
+export async function sendSignupAdminNotificationEmail(input: {
+  name: string;
+  email: string;
+  origin: string;
+}): Promise<void> {
+  if (!shouldSendSignupAdminNotification(input.email)) return;
+
+  await sendTemplateEmail({
+    templateId: "signup-admin-notification",
+    to: getSignupNotifyEmail(),
+    data: {
+      name: input.name.trim() || "Unknown name",
+      email: input.email.trim().toLowerCase(),
+      adminUrl: originDashboard(input.origin, "/admin/notifications"),
+    },
+    context: "signup-admin-notification",
   });
 }
 

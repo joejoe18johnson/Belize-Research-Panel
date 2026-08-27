@@ -17,6 +17,7 @@ export type EmailTemplateCategory =
 
 export type EmailTemplateId =
   | "signup-verify-email"
+  | "signup-admin-notification"
   | "password-reset"
   | "registration-submitted"
   | "panelist-verified"
@@ -69,6 +70,13 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     name: "Verify email address",
     description: "Sent after signup with a link to confirm the panelist email.",
     category: "account",
+    trigger: "When a panelist creates an account",
+  },
+  {
+    id: "signup-admin-notification",
+    name: "New signup notification",
+    description: "Alerts the operator when a new user creates an account with name and email.",
+    category: "staff",
     trigger: "When a panelist creates an account",
   },
   {
@@ -239,6 +247,11 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
     firstName: "Maria",
     verifyUrl: "https://panel.example.com/verify-email?token=sample-token",
   },
+  "signup-admin-notification": {
+    name: "Maria Lopez",
+    email: "maria@example.com",
+    adminUrl: "https://panel.example.com/admin/notifications",
+  },
   "password-reset": {
     firstName: "Maria",
     resetUrl: "https://panel.example.com/reset-password?token=sample-token",
@@ -396,6 +409,18 @@ function renderSignupVerifyEmail(data: Record<string, string>): RenderedEmail {
     mutedParagraph("This link expires after 24 hours. If you did not create an account, you can ignore this message."),
   ].join("");
   return finish("Verify your email address", bodyHtml, { label: "Verify email", href: verifyUrl });
+}
+
+function renderSignupAdminNotification(data: Record<string, string>): RenderedEmail {
+  const name = pick(data, "name", "Unknown name");
+  const email = pick(data, "email", "unknown@email");
+  const adminUrl = pick(data, "adminUrl", "#");
+  const bodyHtml = [
+    paragraph("A new user signed up for the Belize Research Panel."),
+    detailTable(detailRow("Name", name) + detailRow("Email", email)),
+    mutedParagraph("This is an operator alert for tracking new signups. The applicant still needs to verify their email and complete panel registration."),
+  ].join("");
+  return finish(`New signup: ${name}`, bodyHtml, { label: "Open admin notifications", href: adminUrl });
 }
 
 function renderPasswordResetEmail(data: Record<string, string>): RenderedEmail {
@@ -733,6 +758,7 @@ function renderSupportReply(data: Record<string, string>): RenderedEmail {
 
 const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => RenderedEmail> = {
   "signup-verify-email": renderSignupVerifyEmail,
+  "signup-admin-notification": renderSignupAdminNotification,
   "password-reset": renderPasswordResetEmail,
   "registration-submitted": renderRegistrationSubmitted,
   "panelist-verified": renderPanelistVerified,
