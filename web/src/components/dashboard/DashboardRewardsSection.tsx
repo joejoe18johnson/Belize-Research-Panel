@@ -11,10 +11,10 @@ import { DevPointsEditor } from "./DevPointsEditor";
 import { RedemptionOptionsCatalog } from "./RedemptionOptionsCatalog";
 import { RewardsHistory } from "./RewardsHistory";
 
-const STATIC_REWARD_RULES = [
-  { label: "Survey completed", points: "100 points" },
-  { label: "In-depth interview completed", points: "250 points" },
-  { label: "Focus group participation", points: "300 points" },
+const PARTICIPATION_REWARD_ACTIVITIES = [
+  "Survey completed",
+  "In-depth interview completed",
+  "Focus group participation",
 ] as const;
 
 export function DashboardRewardsSection({
@@ -38,7 +38,10 @@ export function DashboardRewardsSection({
   const rewardRules = [
     { label: "Registration completed", points: `${rewardSettings.registrationRewardPoints} points` },
     { label: "Verified account", points: `${rewardSettings.verificationRewardPoints} points` },
-    ...STATIC_REWARD_RULES,
+    ...PARTICIPATION_REWARD_ACTIVITIES.map((label) => ({
+      label,
+      points: "Varies by study",
+    })),
   ];
 
   return (
@@ -167,6 +170,10 @@ export function DashboardRewardsSection({
             </span>
             <SectionHeading as="h3">How points are earned</SectionHeading>
           </div>
+          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+            Surveys, interviews, and focus groups carry points toward your rewards. The amount is shown on each
+            invitation and can change from study to study.
+          </p>
           <ul className="mt-4 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300">
             {rewardRules.map((rule) => (
               <li
@@ -174,7 +181,9 @@ export function DashboardRewardsSection({
                 className="flex justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0"
               >
                 <span>{formatHeadingCase(rule.label)}</span>
-                <span className="shrink-0 font-medium text-zinc-900 dark:text-zinc-100">{rule.points}</span>
+                <span className="max-w-[14rem] shrink-0 text-right font-medium text-zinc-900 dark:text-zinc-100">
+                  {rule.points}
+                </span>
               </li>
             ))}
           </ul>

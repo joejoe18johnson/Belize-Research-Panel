@@ -150,9 +150,7 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
         bullets: [
           "Registration completed: 25 points",
           "Verified account: 50 points",
-          "Survey completed: 100 points",
-          "In-depth interview completed: 250 points",
-          "Focus group participation: 300 points",
+          "Surveys, in-depth interviews, and focus groups carry points toward rewards (amount set per invitation)",
           "Special high-priority study: custom reward (manual assignment)",
         ],
       },
