@@ -7,9 +7,6 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { adminAuthCardClassName, adminAuthInputClassName } from "@/components/admin/AdminAuthShell";
-import { RoleTestAccountsReference } from "@/components/admin/RoleTestAccountsReference";
-import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
-import { STAFF_DEMO_PASSWORD } from "@/lib/demo-staff-users";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
@@ -18,13 +15,6 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const showReference = isDemoAccountsEnabled();
-
-  const fillStaffLogin = (staffEmail: string) => {
-    setEmail(staffEmail);
-    setPassword(STAFF_DEMO_PASSWORD);
-    setError("");
-  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -123,8 +113,6 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
               </Link>
             </p>
           </div>
-
-          {showReference ? <RoleTestAccountsReference onSelectStaff={fillStaffLogin} compact /> : null}
         </div>
       </main>
     </div>

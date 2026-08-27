@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
-import { CLIENT_DEMO_PASSWORD } from "@/lib/demo-clients";
-import { isDemoAccountsEnabled } from "@/lib/demo-accounts";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function ClientLoginForm() {
@@ -16,7 +14,6 @@ export function ClientLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const showDemo = isDemoAccountsEnabled();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -111,28 +108,6 @@ export function ClientLoginForm() {
                 {submitting ? "Signing in…" : "View my campaigns"}
               </button>
             </form>
-            {showDemo ? (
-              <div className="mt-6 rounded-xl border border-teal-100 bg-teal-50/60 p-4 text-sm dark:border-teal-900/60 dark:bg-teal-950/40">
-                <p className="font-semibold text-teal-900 dark:text-teal-100">Demo client account</p>
-                <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-                  <span className="font-medium">Email:</span> client.tourism@belizepanel.test
-                </p>
-                <p className="text-zinc-600 dark:text-zinc-400">
-                  <span className="font-medium">Password:</span> {CLIENT_DEMO_PASSWORD}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("client.tourism@belizepanel.test");
-                    setPassword(CLIENT_DEMO_PASSWORD);
-                    setError("");
-                  }}
-                  className="mt-3 text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-300"
-                >
-                  Use demo credentials
-                </button>
-              </div>
-            ) : null}
           </div>
         </div>
       </main>
