@@ -4,7 +4,13 @@ import type { ViewLayout } from "@/lib/view-layout";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
-import { dashboardCardClass, dashboardHeaderClass, dashboardShellClass } from "@/lib/brand";
+import { LogoutButton } from "@/components/auth/LogoutButton";
+import {
+  dashboardCardClass,
+  dashboardHeaderClass,
+  dashboardSecondaryButtonClass,
+  dashboardShellClass,
+} from "@/lib/brand";
 import { appContentFrameClass, MEDIUM_CONTENT_MAX } from "@/lib/layout-widths";
 import { formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
 import { DashboardAccountMenu } from "./DashboardAccountMenu";
@@ -47,6 +53,10 @@ export function DashboardShell({
                 firstName={firstName}
                 lastName={lastName}
                 badges={badges}
+              />
+              <LogoutButton
+                showIcon
+                className={`${dashboardSecondaryButtonClass} hidden min-h-10 gap-1.5 px-3 md:inline-flex lg:min-h-11 lg:px-4`}
               />
             </div>
           </div>

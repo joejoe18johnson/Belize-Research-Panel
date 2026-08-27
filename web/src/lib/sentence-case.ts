@@ -27,31 +27,48 @@ const MINOR_WORDS = new Set([
   "with",
 ]);
 
+const LEADING_WRAP = `"'“”‘’([{`;
+const TRAILING_WRAP = `.,!?;:"'“”‘’)]}`;
+
+function splitAffixes(word: string): { lead: string; core: string; trail: string } {
+  let start = 0;
+  let end = word.length;
+  while (start < end && LEADING_WRAP.includes(word[start] ?? "")) start += 1;
+  while (end > start && TRAILING_WRAP.includes(word[end - 1] ?? "")) end -= 1;
+  return {
+    lead: word.slice(0, start),
+    core: word.slice(start, end),
+    trail: word.slice(end),
+  };
+}
+
 function shouldPreserveWord(word: string): boolean {
   if (/^[A-Z]{2,}$/.test(word)) return true;
   if (/[0-9$@/()—–-]/.test(word)) return true;
   return false;
 }
 
-function capitalizeWord(word: string): string {
+function capitalizeCore(word: string): string {
   if (!word) return word;
   if (shouldPreserveWord(word)) return word;
 
   if (word.includes("'")) {
     const [head, ...tail] = word.split("'");
-    return [capitalizeWord(head), ...tail.map((part) => part.toLowerCase())].join("'");
+    return [capitalizeCore(head), ...tail.map((part) => part.toLowerCase())].join("'");
   }
 
   if (word.includes("-")) {
-    return word.split("-").map((part) => capitalizeWord(part)).join("-");
+    return word.split("-").map((part) => capitalizeCore(part)).join("-");
   }
 
-  const stripped = word.replace(/[.,!?;:]+$/, "");
-  const suffix = word.slice(stripped.length);
-  if (!stripped) return word;
-  if (shouldPreserveWord(stripped)) return word;
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
 
-  return stripped.charAt(0).toUpperCase() + stripped.slice(1).toLowerCase() + suffix;
+function capitalizeWord(word: string): string {
+  if (!word) return word;
+  const { lead, core, trail } = splitAffixes(word);
+  if (!core) return word;
+  return lead + capitalizeCore(core) + trail;
 }
 
 /** Headings and labels: title case (keep acronyms, codes, and minor words mid-phrase lowercase). */
@@ -64,11 +81,13 @@ export function formatHeadingCase(value: string): string {
 
   return words
     .map((word, index) => {
-      if (shouldPreserveWord(word)) return word;
+      const { lead, core, trail } = splitAffixes(word);
+      if (!core) return word;
+      if (shouldPreserveWord(core)) return word;
 
-      const lower = word.toLowerCase().replace(/[.,!?;:]+$/, "");
+      const lower = core.toLowerCase();
       if (index > 0 && index < lastIndex && MINOR_WORDS.has(lower)) {
-        return word.toLowerCase();
+        return lead + lower + trail;
       }
 
       return capitalizeWord(word);

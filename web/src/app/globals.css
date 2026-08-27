@@ -39,6 +39,20 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Clickable links and controls use the hand cursor (Tailwind reset leaves buttons as default). */
+a[href],
+button:not(:disabled),
+[role="button"]:not(:disabled):not([aria-disabled="true"]),
+[role="link"],
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Safe area for notched phones + breathing room below viewport top */
 .safe-top {
   padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
