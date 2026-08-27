@@ -13,22 +13,22 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--no-audit --no-fund"
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
-  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
-  ENABLE_DEMO_ACCOUNTS = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "false"
+  ENABLE_DEMO_ACCOUNTS = "false"
 
 [context.production.environment]
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
-  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
-  ENABLE_DEMO_ACCOUNTS = "true"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "false"
+  ENABLE_DEMO_ACCOUNTS = "false"
 
 [context.deploy-preview.environment]
-  ENABLE_DEMO_ACCOUNTS = "true"
-  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_DEMO_ACCOUNTS = "false"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "false"
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
 
 [context.branch-deploy.environment]
-  ENABLE_DEMO_ACCOUNTS = "true"
-  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "true"
+  ENABLE_DEMO_ACCOUNTS = "false"
+  NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "false"
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
 
 [dev]
