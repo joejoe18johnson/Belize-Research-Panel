@@ -12,6 +12,7 @@ import {
   AdminTableTd,
   AdminTableTh,
   IconMetricCard,
+  MetricCard,
   PageIntro,
 } from "@/components/admin/shared/AdminUi";
 import type {
@@ -60,6 +61,75 @@ export function AdminDashboardClient({
         description="Overview of all platform data — panel health, verification queues, and payout activity."
       />
 
+      <section
+        className={`rounded-2xl border p-5 shadow-sm sm:p-6 ${
+          metrics.pendingEmailChanges +
+            metrics.pendingPhoneChanges +
+            metrics.fraudReviewHold +
+            metrics.unverifiedAccounts +
+            metrics.pending +
+            metrics.pendingPayouts >
+          0
+            ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200 dark:border-amber-600 dark:bg-amber-950/40 dark:ring-amber-900/80"
+            : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+        }`}
+      >
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
+              {formatHeadingCase("Needs action")}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              Pending contact changes, verification, and payouts. Open a card to go straight to the queue.
+            </p>
+          </div>
+          <Link
+            href={ADMIN_DASHBOARD_LINKS.notifications}
+            className="inline-flex min-h-10 items-center rounded-xl bg-amber-700 px-4 text-sm font-semibold text-white hover:bg-amber-800"
+          >
+            Open notifications →
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+          <MetricCard
+            label="Email changes"
+            value={metrics.pendingEmailChanges}
+            href={ADMIN_DASHBOARD_LINKS.emailChanges}
+            highlightPending
+          />
+          <MetricCard
+            label="Phone changes"
+            value={metrics.pendingPhoneChanges}
+            href={ADMIN_DASHBOARD_LINKS.phoneChanges}
+            highlightPending
+          />
+          <MetricCard
+            label="Duplicate review"
+            value={metrics.fraudReviewHold}
+            href="/admin/notifications?type=duplicate"
+            highlightPending
+          />
+          <MetricCard
+            label="Email verification"
+            value={metrics.unverifiedAccounts}
+            href="/admin/notifications?type=verification"
+            highlightPending
+          />
+          <MetricCard
+            label="Panelist verification"
+            value={metrics.pending}
+            href={ADMIN_DASHBOARD_LINKS.underReviewPending}
+            highlightPending
+          />
+          <MetricCard
+            label="Pending payouts"
+            value={metrics.pendingPayouts}
+            href={ADMIN_DASHBOARD_LINKS.payouts}
+            highlightPending
+          />
+        </div>
+      </section>
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard
           href={ADMIN_DASHBOARD_LINKS.panelists}
@@ -84,13 +154,18 @@ export function AdminDashboardClient({
           }
         />
         <IconMetricCard
-          href={ADMIN_DASHBOARD_LINKS.underReview}
-          label="Under review"
-          value={metrics.underReviewTotal}
+          href={ADMIN_DASHBOARD_LINKS.notifications}
+          label="Notifications"
+          value={
+            metrics.pendingEmailChanges +
+            metrics.pendingPhoneChanges +
+            metrics.fraudReviewHold +
+            metrics.unverifiedAccounts
+          }
           tone="amber"
           icon={
             <DashboardIcon>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
             </DashboardIcon>
           }
         />

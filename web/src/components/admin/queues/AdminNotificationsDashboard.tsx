@@ -9,8 +9,16 @@ import { TablePagination, useTablePagination } from "@/components/admin/shared/T
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { AdminAlertGuide } from "@/components/admin/queues/AdminAlertGuide";
 import type { NotificationQueueRow } from "@/lib/admin-dashboard-metrics";
-import { notificationQueueGuideFor, type AdminAlertScope } from "@/lib/admin-notification-guide";
+import { type AdminAlertScope } from "@/lib/admin-notification-guide";
 import { formatHeadingCase } from "@/lib/sentence-case";
+
+const NOTIFICATION_TYPE_PRIORITY: Record<NotificationQueueRow["type"], number> = {
+  "Email change": 0,
+  "Phone change": 1,
+  "Duplicate review": 2,
+  "Panelist verification": 3,
+  "Email verification": 4,
+};
 
 function matchesNotificationType(row: NotificationQueueRow, typeFilter: string | null): boolean {
   if (!typeFilter) return true;
@@ -52,7 +60,7 @@ export function AdminNotificationsDashboard({
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return visibleRows.filter((row) => {
+    const matches = visibleRows.filter((row) => {
       if (!matchesNotificationType(row, typeFilter)) return false;
       if (!query) return true;
       return (
@@ -62,7 +70,16 @@ export function AdminNotificationsDashboard({
         row.detail.toLowerCase().includes(query)
       );
     });
-  }, [visibleRows, search, typeFilter]);
+    return [...matches].sort((left, right) => {
+      const leftNew = unreadSet.has(left.id) ? 0 : 1;
+      const rightNew = unreadSet.has(right.id) ? 0 : 1;
+      if (leftNew !== rightNew) return leftNew - rightNew;
+      const typeDelta =
+        (NOTIFICATION_TYPE_PRIORITY[left.type] ?? 99) - (NOTIFICATION_TYPE_PRIORITY[right.type] ?? 99);
+      if (typeDelta !== 0) return typeDelta;
+      return right.requestedAt.localeCompare(left.requestedAt);
+    });
+  }, [visibleRows, search, typeFilter, unreadSet]);
 
   const pagination = useTablePagination(filtered);
 
@@ -197,6 +214,52 @@ export function AdminNotificationsDashboard({
         </BrandedAlert>
       ) : null}
 
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <MetricCard
+          label="Total pending"
+          value={visibleRows.length}
+          href="/admin/notifications"
+          active={!typeFilter}
+          highlightPending
+        />
+        <MetricCard
+          label="Email changes"
+          value={emailChanges}
+          href="/admin/notifications?type=email"
+          active={typeFilter === "email"}
+          highlightPending
+        />
+        <MetricCard
+          label="Phone changes"
+          value={phoneChanges}
+          href="/admin/notifications?type=phone"
+          active={typeFilter === "phone"}
+          highlightPending
+        />
+        <MetricCard
+          label="Duplicate review"
+          value={duplicateReviews}
+          href="/admin/notifications?type=duplicate"
+          active={typeFilter === "duplicate"}
+          highlightPending
+        />
+        <MetricCard
+          label="Email verification"
+          value={emailVerification}
+          href="/admin/notifications?type=verification"
+          active={typeFilter === "verification"}
+          highlightPending
+        />
+        <MetricCard
+          label="Panelist verification"
+          value={panelistVerification}
+          hint="Also on Under Review"
+          href="/admin/notifications?type=panelist"
+          active={typeFilter === "panelist" || typeFilter === "review"}
+          highlightPending
+        />
+      </div>
+
       {typeFilter ? (
         <BrandedAlert tone="info" compact showIcon>
           Showing{" "}
@@ -215,49 +278,18 @@ export function AdminNotificationsDashboard({
       ) : null}
 
       {newCount > 0 ? (
-        <BrandedAlert tone="success" compact showIcon>
-          {newCount} new notification{newCount === 1 ? "" : "s"} highlighted in green below.
+        <BrandedAlert tone="warning" title={`${newCount} item${newCount === 1 ? "" : "s"} need action`} showIcon>
+          Unread email changes, phone changes, and other queue items are listed first below, highlighted in amber.
         </BrandedAlert>
       ) : null}
 
-      <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <MetricCard label="Total pending" value={visibleRows.length} href="/admin/notifications" active={!typeFilter} />
-        <MetricCard
-          label="Email changes"
-          value={emailChanges}
-          href="/admin/notifications?type=email"
-          active={typeFilter === "email"}
-        />
-        <MetricCard
-          label="Phone changes"
-          value={phoneChanges}
-          href="/admin/notifications?type=phone"
-          active={typeFilter === "phone"}
-        />
-        <MetricCard
-          label="Duplicate review"
-          value={duplicateReviews}
-          href="/admin/notifications?type=duplicate"
-          active={typeFilter === "duplicate"}
-        />
-        <MetricCard
-          label="Email verification"
-          value={emailVerification}
-          href="/admin/notifications?type=verification"
-          active={typeFilter === "verification"}
-        />
-        <MetricCard
-          label="Panelist verification"
-          value={panelistVerification}
-          hint="Also on Under Review"
-          href="/admin/notifications?type=panelist"
-          active={typeFilter === "panelist" || typeFilter === "review"}
-        />
-      </div>
-
-      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
+      <section
+        className={`rounded-2xl border bg-white p-5 shadow-sm dark:bg-zinc-900 sm:p-6 ${
+          newCount > 0
+            ? "border-amber-400 ring-2 ring-amber-200 dark:border-amber-600 dark:ring-amber-900/80"
+            : "border-zinc-200 dark:border-zinc-800"
+        }`}
+      >
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Notification queue")}</h2>
@@ -281,15 +313,13 @@ export function AdminNotificationsDashboard({
         ) : (
           <>
             <div className="mt-4 table-scroll rounded-xl border border-zinc-100 dark:border-zinc-800">
-              <table className="min-w-[1100px] text-left text-sm">
+              <table className="min-w-[860px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Detail</th>
-                    <th className="px-4 py-3">Where shown</th>
-                    <th className="px-4 py-3">Marked read</th>
                     <th className="px-4 py-3">Requested</th>
                     <th className="px-4 py-3">Actions</th>
                   </tr>
@@ -300,7 +330,6 @@ export function AdminNotificationsDashboard({
                   const canDecideContact = row.type === "Email change" || row.type === "Phone change";
                   const canReleaseHold = row.type === "Duplicate review";
                   const isNew = unreadSet.has(row.id);
-                  const guide = notificationQueueGuideFor(row.type);
                   return (
                     <tr
                       key={actionKey}
@@ -315,11 +344,6 @@ export function AdminNotificationsDashboard({
                       <td className="px-4 py-2.5">{row.name}</td>
                       <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{row.email}</td>
                       <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.detail}</td>
-                      <td className="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400">
-                        <p>{guide.whereShown}</p>
-                        <p className="mt-1 text-zinc-500 dark:text-zinc-500">{guide.navBadge}</p>
-                      </td>
-                      <td className="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400">{guide.markedReadWhen}</td>
                       <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.requestedAt}</td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap items-center gap-2">
@@ -395,6 +419,8 @@ export function AdminNotificationsDashboard({
           </>
         )}
       </section>
+
+      <AdminAlertGuide scopeCounts={scopeCounts} demoLoopEnabled={demoLoopEnabled} />
     </div>
   );
 }

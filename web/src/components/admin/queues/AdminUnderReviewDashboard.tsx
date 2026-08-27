@@ -63,15 +63,22 @@ export function AdminUnderReviewDashboard({
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return queueFiltered;
-    return queueFiltered.filter(
-      (row) =>
-        row.name.toLowerCase().includes(query) ||
-        row.email.toLowerCase().includes(query) ||
-        row.verificationStatus.toLowerCase().includes(query) ||
-        row.reasons.some((reason) => reason.toLowerCase().includes(query))
-    );
-  }, [queueFiltered, search]);
+    const matches = !query
+      ? queueFiltered
+      : queueFiltered.filter(
+          (row) =>
+            row.name.toLowerCase().includes(query) ||
+            row.email.toLowerCase().includes(query) ||
+            row.verificationStatus.toLowerCase().includes(query) ||
+            row.reasons.some((reason) => reason.toLowerCase().includes(query))
+        );
+    return [...matches].sort((left, right) => {
+      const leftNew = unreadSet.has(left.email.toLowerCase()) ? 0 : 1;
+      const rightNew = unreadSet.has(right.email.toLowerCase()) ? 0 : 1;
+      if (leftNew !== rightNew) return leftNew - rightNew;
+      return right.registrationDate.localeCompare(left.registrationDate);
+    });
+  }, [queueFiltered, search, unreadSet]);
 
   const pagination = useTablePagination(filtered);
 
@@ -151,8 +158,8 @@ export function AdminUnderReviewDashboard({
       ) : null}
 
       {newCount > 0 ? (
-        <BrandedAlert tone="success" compact showIcon>
-          {newCount} new panelist{newCount === 1 ? "" : "s"} awaiting verification, highlighted in green below. Also listed in{" "}
+        <BrandedAlert tone="warning" title={`${newCount} panelist${newCount === 1 ? "" : "s"} need action`} showIcon>
+          New verification items are listed first below, highlighted in amber. Also listed in{" "}
           <Link href="/admin/notifications?type=panelist" className="font-semibold underline">
             Notifications
           </Link>
@@ -167,18 +174,21 @@ export function AdminUnderReviewDashboard({
           hint="Unread verification"
           href={queueHref("pending")}
           active={queueFilter === "pending"}
+          highlightPending
         />
         <MetricCard
           label="Total in queue"
           value={rows.length}
           href="/admin/under-review#under-review-queue"
           active={!queueFilter && !requirementFilter}
+          highlightPending
         />
         <MetricCard
           label="Pending verification"
           value={pendingVerification}
           href={queueHref("pending")}
           active={queueFilter === "pending"}
+          highlightPending
         />
         <MetricCard
           label="Requirements incomplete"
@@ -186,6 +196,7 @@ export function AdminUnderReviewDashboard({
           hint="Email, phone, or ID"
           href={queueHref("incomplete")}
           active={queueFilter === "incomplete"}
+          highlightPending
         />
         <MetricCard
           label="Flagged"
@@ -193,18 +204,24 @@ export function AdminUnderReviewDashboard({
           hint="Possible duplicate"
           href={ADMIN_DASHBOARD_LINKS.panelistsFlagged}
           active={false}
+          highlightPending
         />
         <MetricCard
           label="Accounts on hold"
           value={onHold}
           href={queueHref("on_hold")}
           active={queueFilter === "on_hold"}
+          highlightPending
         />
       </div>
 
       <section
         id="under-review-queue"
-        className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
+        className={`overflow-hidden rounded-2xl border bg-white p-5 shadow-sm dark:bg-zinc-900 sm:p-6 ${
+          newCount > 0
+            ? "border-amber-400 ring-2 ring-amber-200 dark:border-amber-600 dark:ring-amber-900/80"
+            : "border-zinc-200 dark:border-zinc-800"
+        }`}
       >
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>

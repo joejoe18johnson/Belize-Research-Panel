@@ -5,6 +5,8 @@ export const ADMIN_DASHBOARD_LINKS = {
   panelists: "/admin/panelists",
   panelistsFlagged: "/admin/panelists?tab=flagged",
   verified: "/admin/panelists?verification=Verified",
+  notifications: "/admin/notifications",
+  emailChanges: "/admin/notifications?type=email",
   underReview: "/admin/under-review",
   underReviewPending: "/admin/under-review?queue=pending",
   underReviewIncomplete: "/admin/under-review?queue=incomplete",

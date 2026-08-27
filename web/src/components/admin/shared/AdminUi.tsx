@@ -74,26 +74,43 @@ export function MetricCard({
   hint,
   href,
   active = false,
+  highlightPending = false,
 }: {
   label: string;
   value: number | string;
   hint?: string;
   href?: string;
   active?: boolean;
+  highlightPending?: boolean;
 }) {
-  const className = `block rounded-2xl border bg-white dark:bg-zinc-900 p-4 shadow-sm transition ${
+  const numeric = typeof value === "number" ? value : Number.parseInt(String(value), 10);
+  const needsAction = highlightPending && Number.isFinite(numeric) && numeric > 0;
+  const className = `block rounded-2xl border p-4 shadow-sm transition ${
     active
-      ? "border-teal-600 ring-2 ring-teal-200 dark:ring-teal-800"
-      : href
-        ? "border-teal-100 dark:border-teal-900/60 hover:border-teal-300 hover:shadow-md dark:hover:border-teal-700"
-        : "border-teal-100 dark:border-teal-900/60"
+      ? "border-teal-600 bg-white ring-2 ring-teal-200 dark:bg-zinc-900 dark:ring-teal-800"
+      : needsAction
+        ? "border-amber-400 bg-amber-50 shadow-amber-950/10 hover:border-amber-500 hover:shadow-md dark:border-amber-700 dark:bg-amber-950/40 dark:hover:border-amber-500"
+        : href
+          ? "border-teal-100 bg-white hover:border-teal-300 hover:shadow-md dark:border-teal-900/60 dark:bg-zinc-900 dark:hover:border-teal-700"
+          : "border-teal-100 bg-white dark:border-teal-900/60 dark:bg-zinc-900"
   }`;
 
   const content = (
     <>
-      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(label)}</p>
-      <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950 dark:text-teal-100">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{hint}</p> : null}
+      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{formatAdminLabel(label)}</p>
+      <p
+        className={`mt-2 text-3xl font-bold tabular-nums ${
+          needsAction ? "text-amber-950 dark:text-amber-50" : "text-teal-950 dark:text-teal-100"
+        }`}
+      >
+        {value}
+      </p>
+      {hint ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{hint}</p> : null}
+      {needsAction ? (
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+          Needs action
+        </p>
+      ) : null}
     </>
   );
 
@@ -402,10 +419,10 @@ export function adminNewItemRowClass(isNew: boolean, base = ""): string {
   return [base, adminNewRowHighlightClass].filter(Boolean).join(" ");
 }
 
-export function AdminNewBadge({ label = "New" }: { label?: string }) {
+export function AdminNewBadge({ label = "Needs action" }: { label?: string }) {
   return (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white">
-      {formatAdminLabel(label)}
+    <span className="inline-flex shrink-0 items-center rounded-full bg-amber-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+      {label}
     </span>
   );
 }

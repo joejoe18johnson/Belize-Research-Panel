@@ -7,7 +7,7 @@ export const adminTableHeadRowClass =
   "border-b border-zinc-100 bg-zinc-50/80 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-400";
 
 export const adminNewRowHighlightClass =
-  "bg-emerald-50 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100/70 dark:bg-emerald-950/40 dark:ring-emerald-800 dark:hover:bg-emerald-900/50";
+  "bg-amber-50 ring-1 ring-inset ring-amber-300 hover:bg-amber-100/80 dark:bg-amber-950/45 dark:ring-amber-700 dark:hover:bg-amber-900/50";
 
 export const cardHoverTealClass = "hover:bg-teal-50/50 dark:hover:bg-teal-950/40";
 

@@ -242,17 +242,27 @@ export function AdminPayoutQueueSection({
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return statusFiltered;
-    return statusFiltered.filter(
-      (row) =>
-        row.email.toLowerCase().includes(query) ||
-        row.optionLabel.toLowerCase().includes(query) ||
-        row.shortId.toLowerCase().includes(query) ||
-        row.status.toLowerCase().includes(query) ||
-        row.paymentTitle.toLowerCase().includes(query) ||
-        (row.processedBy ?? "").toLowerCase().includes(query)
-    );
-  }, [statusFiltered, search]);
+    const matches = !query
+      ? statusFiltered
+      : statusFiltered.filter(
+          (row) =>
+            row.email.toLowerCase().includes(query) ||
+            row.optionLabel.toLowerCase().includes(query) ||
+            row.shortId.toLowerCase().includes(query) ||
+            row.status.toLowerCase().includes(query) ||
+            row.paymentTitle.toLowerCase().includes(query) ||
+            (row.processedBy ?? "").toLowerCase().includes(query)
+        );
+    if (mode === "history") return matches;
+    return [...matches].sort((left, right) => {
+      const leftNew = left.status === "pending" && unreadSet.has(left.id) ? 0 : 1;
+      const rightNew = right.status === "pending" && unreadSet.has(right.id) ? 0 : 1;
+      if (leftNew !== rightNew) return leftNew - rightNew;
+      const leftPending = left.status === "pending" ? 0 : 1;
+      const rightPending = right.status === "pending" ? 0 : 1;
+      return leftPending - rightPending;
+    });
+  }, [statusFiltered, search, unreadSet, mode]);
 
   const pagination = useTablePagination(filtered);
   const newCount = rows.filter((row) => row.status === "pending").length;
@@ -369,8 +379,8 @@ export function AdminPayoutQueueSection({
 
       {unreadNewCount > 0 ? (
         <div className="mt-4">
-          <BrandedAlert tone="success" compact showIcon>
-            {unreadNewCount} new payout request{unreadNewCount === 1 ? "" : "s"} highlighted in green below.
+          <BrandedAlert tone="warning" compact showIcon>
+            {unreadNewCount} new payout request{unreadNewCount === 1 ? "" : "s"} listed first below, highlighted in amber.
           </BrandedAlert>
         </div>
       ) : null}

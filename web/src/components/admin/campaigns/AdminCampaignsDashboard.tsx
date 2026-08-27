@@ -30,14 +30,20 @@ export function AdminCampaignsDashboard({
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return summaries;
-    return summaries.filter(
-      (row) =>
-        row.title.toLowerCase().includes(query) ||
-        row.category.toLowerCase().includes(query) ||
-        row.targetingLabel.toLowerCase().includes(query)
-    );
-  }, [summaries, search]);
+    const matches = !query
+      ? summaries
+      : summaries.filter(
+          (row) =>
+            row.title.toLowerCase().includes(query) ||
+            row.category.toLowerCase().includes(query) ||
+            row.targetingLabel.toLowerCase().includes(query)
+        );
+    return [...matches].sort((left, right) => {
+      const leftNew = isCampaignAdminNotifiable(left) && unreadSet.has(left.id) ? 0 : 1;
+      const rightNew = isCampaignAdminNotifiable(right) && unreadSet.has(right.id) ? 0 : 1;
+      return leftNew - rightNew;
+    });
+  }, [summaries, search, unreadSet]);
 
   const pagination = useTablePagination(filtered);
 
@@ -99,11 +105,12 @@ export function AdminCampaignsDashboard({
       </div>
 
       {newCompletedCount > 0 ? (
-        <BrandedAlert tone="success" showIcon>
+        <BrandedAlert tone="warning" showIcon>
           <p>
             <span className="font-semibold">{newCompletedCount}</span>{" "}
-            {newCompletedCount === 1 ? "newly completed campaign" : "newly completed campaigns"} highlighted in green
-            below. Open <span className="font-semibold">View results</span> to review and clear the notification.
+            {newCompletedCount === 1 ? "newly completed campaign" : "newly completed campaigns"} listed first below,
+            highlighted in amber. Open <span className="font-semibold">View results</span> to review and clear the
+            notification.
           </p>
         </BrandedAlert>
       ) : null}

@@ -13,6 +13,7 @@ import {
   type AdminModule,
 } from "@/lib/admin-modules";
 import { AdminFooter } from "@/components/admin/AdminFooter";
+import { AdminNeedsAttentionBanner } from "@/components/admin/AdminNeedsAttentionBanner";
 import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { AdminNavIcon } from "@/components/admin/AdminNavIcons";
 import type { AdminNavBadges } from "@/lib/admin-nav-badges";
@@ -270,6 +271,7 @@ export function AdminShell({
               </div>
             </div>
           </header>
+          <AdminNeedsAttentionBanner badges={navBadges} />
           <main ref={mainRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-6 sm:py-8">
             {children}
           </main>

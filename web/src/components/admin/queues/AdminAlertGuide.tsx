@@ -14,13 +14,20 @@ export function AdminAlertGuide({
   demoLoopEnabled?: boolean;
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+    <details className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+      <summary className="cursor-pointer list-none text-sm font-semibold text-teal-950 dark:text-teal-100 [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center justify-between gap-3">
+          <span>{formatHeadingCase("How admin alerts work")}</span>
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Show details</span>
+        </span>
+      </summary>
+      <section className="mt-5 border-t border-zinc-100 pt-5 dark:border-zinc-800">
       <div className="max-w-3xl">
         <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
           {formatHeadingCase("Where admin alerts appear")}
         </h2>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Admin alerts use four related queues. Unread items show a green highlight in their queue and
+          Admin alerts use four related queues. Unread items show an amber highlight in their queue and
           increment the matching sidebar badge. Panelist verification appears on both Notifications and Under Review.
         </p>
         {demoLoopEnabled ? (
@@ -75,7 +82,7 @@ export function AdminAlertGuide({
           {formatHeadingCase("Notification queue item types")}
         </h3>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-          Rows in the table below follow these rules. Green rows are unread in the notifications scope.
+          Rows in the table below follow these rules. Amber rows are unread in the notifications scope.
         </p>
         <div className="mt-3 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
           <table className="min-w-[720px] text-left text-xs">
@@ -108,6 +115,7 @@ export function AdminAlertGuide({
           </table>
         </div>
       </div>
-    </section>
+      </section>
+    </details>
   );
 }
