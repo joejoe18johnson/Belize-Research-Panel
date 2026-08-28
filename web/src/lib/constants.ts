@@ -46,6 +46,17 @@ export const OTHER_CONTACT_PLATFORM_OPTIONS = raw.OTHER_CONTACT_PLATFORM_OPTIONS
 export const SEX_OPTIONS = raw.SEX_OPTIONS as string[];
 export const EDUCATION_LEVELS = raw.EDUCATION_LEVELS as string[];
 export const ETHNICITY_OPTIONS = raw.ETHNICITY_OPTIONS as string[];
+export const HOUSEHOLD_HEAD_SELF = "I am the head of my household";
+export const HOUSEHOLD_HEAD_OTHER = "Other";
+export const HOUSEHOLD_HEAD_OPTIONS = [HOUSEHOLD_HEAD_SELF, HOUSEHOLD_HEAD_OTHER] as const;
+export const HOUSEHOLD_DEFINITION =
+  "A household is a person or group of persons living in the same dwelling and sharing food and other living arrangements.";
+export const MAX_HOUSEHOLD_SIZE = 50;
+
+export function isHeadOfHousehold(relationship: string): boolean {
+  return relationship === HOUSEHOLD_HEAD_SELF;
+}
+
 export const POLITICAL_INTERESTS = raw.POLITICAL_INTERESTS as string[];
 export const MARKET_INTERESTS = raw.MARKET_INTERESTS as string[];
 export const CIVIC_INTERESTS = raw.CIVIC_INTERESTS as string[];
@@ -86,6 +97,8 @@ export const PANELIST_COLUMNS = [
   "sex",
   "education",
   "ethnicity",
+  "household_head_relationship",
+  "household_size",
   "political_interests",
   "market_interests",
   "civic_interests",

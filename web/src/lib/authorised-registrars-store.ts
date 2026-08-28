@@ -7,6 +7,7 @@ import {
   isAuthorisedCodeUsed,
   isValidAuthorisedCode,
   normalizeAuthorisedCode,
+  parseAuthorisedRegistration,
   type AuthorisedRegistrar,
   type AuthorisedRegistrarStore,
 } from "./authorised-registrars";
@@ -82,22 +83,63 @@ async function writeJsonFileBestEffort(store: AuthorisedRegistrarStore): Promise
 
 export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
   const { useSupabase } = await import("./supabase/data-source");
+  let store: AuthorisedRegistrarStore;
   if (useSupabase()) {
     const { supabaseLoadAuthorisedRegistrars, supabaseSaveAuthorisedRegistrars } = await import(
       "./supabase/repos"
     );
     const remote = await supabaseLoadAuthorisedRegistrars();
-    if (remote !== null) return normalizeStore(remote);
-
-    const seeded = await readJsonFile();
-    try {
-      await supabaseSaveAuthorisedRegistrars(seeded);
-    } catch (error) {
-      console.error("Could not persist authorised registrars to Supabase:", error);
+    if (remote !== null) {
+      store = normalizeStore(remote);
+    } else {
+      store = await readJsonFile();
+      try {
+        await supabaseSaveAuthorisedRegistrars(store);
+      } catch (error) {
+        console.error("Could not persist authorised registrars to Supabase:", error);
+      }
     }
-    return seeded;
+  } else {
+    store = await readJsonFile();
   }
-  return readJsonFile();
+  return markCodesUsedByExistingPanelists(store);
+}
+
+async function markCodesUsedByExistingPanelists(
+  store: AuthorisedRegistrarStore
+): Promise<AuthorisedRegistrarStore> {
+  if (!store.registrars.some((row) => !isAuthorisedCodeUsed(row))) return store;
+
+  const { loadPanelists } = await import("./panelists");
+  const panelists = await loadPanelists();
+  const usedByCode = new Map<string, string>();
+  for (const panelist of panelists) {
+    const parsed = parseAuthorisedRegistration(panelist);
+    const code = normalizeAuthorisedCode(parsed.code);
+    if (!code || usedByCode.has(code)) continue;
+    usedByCode.set(code, cleanText(panelist.email).toLowerCase());
+  }
+  if (usedByCode.size === 0) return store;
+
+  let changed = false;
+  const next = store.registrars.map((registrar) => {
+    if (isAuthorisedCodeUsed(registrar)) return registrar;
+    const usedByEmail = usedByCode.get(normalizeAuthorisedCode(registrar.code));
+    if (!usedByEmail) return registrar;
+    changed = true;
+    return {
+      ...registrar,
+      usedAt: new Date().toISOString(),
+      usedByEmail,
+    };
+  });
+  if (!changed) return store;
+  try {
+    return await saveAuthorisedRegistrars({ registrars: next });
+  } catch (error) {
+    console.error("Could not mark used authorisation codes:", error);
+    return { registrars: next };
+  }
 }
 
 export async function saveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<AuthorisedRegistrarStore> {

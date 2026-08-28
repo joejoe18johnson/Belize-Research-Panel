@@ -66,6 +66,8 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "sex",
     "education",
     "ethnicity",
+    "householdHeadRelationship",
+    "householdSize",
     "placeOfResidence",
     "countryIfAbroad",
     "usDiasporaRegion",

@@ -168,7 +168,7 @@ export function ProfileEditForm({
       >
         <SectionHeading as="h3">Biographical details</SectionHeading>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-          Name, date of birth, sex, and ethnicity cannot be changed online. You may update your education level if it
+          Name, date of birth, sex, ethnicity, and household details cannot be changed online. You may update your education level if it
           changes.
         </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -192,6 +192,18 @@ export function ProfileEditForm({
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Ethnicity</dt>
             <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.ethnicity}</dd>
           </div>
+          {profile.householdHeadRelationship && profile.householdHeadRelationship !== "Not provided" ? (
+            <div>
+              <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Relationship to head of household</dt>
+              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.householdHeadRelationship}</dd>
+            </div>
+          ) : null}
+          {profile.householdSize && profile.householdSize !== "Not provided" ? (
+            <div>
+              <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Household size</dt>
+              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.householdSize}</dd>
+            </div>
+          ) : null}
         </dl>
         <div className="mt-5">
           <Field label="Highest level of education" required error={errors.education} id="education">

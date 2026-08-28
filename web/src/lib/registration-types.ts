@@ -13,6 +13,8 @@ export interface RegistrationFormData {
   sex: string;
   education: string;
   ethnicity: string;
+  householdHeadRelationship: string;
+  householdSize: string;
   placeOfResidence: string;
   cityTownVillage: string;
   cityTownVillageOther: string;
@@ -61,6 +63,8 @@ export const initialRegistrationForm: RegistrationFormData = {
   sex: "",
   education: "",
   ethnicity: "",
+  householdHeadRelationship: "",
+  householdSize: "",
   placeOfResidence: "",
   cityTownVillage: "",
   cityTownVillageOther: "",

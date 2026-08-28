@@ -19,6 +19,8 @@ export interface PanelistDashboardProfile {
   sex: string;
   education: string;
   ethnicity: string;
+  householdHeadRelationship: string;
+  householdSize: string;
   citizenshipStatus: string;
   commonwealthCountry: string;
   votingStatus: string;
@@ -124,6 +126,8 @@ export function panelistRowToDashboardProfile(row: PanelistRow): PanelistDashboa
     sex: displayValue(row.sex),
     education: displayValue(row.education),
     ethnicity: displayValue(row.ethnicity),
+    householdHeadRelationship: displayValue(row.household_head_relationship),
+    householdSize: displayValue(row.household_size),
     citizenshipStatus: displayValue(row.citizenship_status),
     commonwealthCountry: displayValue(row.commonwealth_country, ""),
     votingStatus: displayValue(row.voting_status, "Not applicable"),

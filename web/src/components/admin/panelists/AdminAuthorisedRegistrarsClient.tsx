@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminStatusPill, MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
@@ -34,7 +34,7 @@ function registrarStatus(row: AuthorisedRegistrar): {
     const who = row.usedByEmail;
     return {
       label: "Used",
-      tone: "warning",
+      tone: "neutral",
       detail: [when, who].filter(Boolean).join(" · "),
     };
   }
@@ -59,6 +59,10 @@ export function AdminAuthorisedRegistrarsClient({
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState("");
   const [copiedId, setCopiedId] = useState("");
+
+  useEffect(() => {
+    setRegistrars(initialRegistrars);
+  }, [initialRegistrars]);
 
   const unusedCount = useMemo(
     () => registrars.filter((row) => row.active && !isAuthorisedCodeUsed(row)).length,
@@ -278,22 +282,42 @@ export function AdminAuthorisedRegistrarsClient({
               <tbody>
                 {registrars.map((row) => {
                   const status = registrarStatus(row);
+                  const used = isAuthorisedCodeUsed(row);
                   const copied = copiedId === row.id;
                   return (
-                    <tr key={row.id} className="border-t border-zinc-100 dark:border-zinc-800">
-                      <td className="px-5 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.name}</td>
+                    <tr
+                      key={row.id}
+                      className={`border-t border-zinc-100 dark:border-zinc-800 ${
+                        used ? "bg-zinc-50 text-zinc-400 dark:bg-zinc-950/60 dark:text-zinc-500" : ""
+                      }`}
+                    >
+                      <td
+                        className={`px-5 py-3 font-medium ${
+                          used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100"
+                        }`}
+                      >
+                        {row.name}
+                      </td>
                       <td className="px-5 py-3">
                         <button
                           type="button"
                           onClick={() => void copyCode(row.code, row.id)}
-                          className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 font-mono tracking-widest text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
-                          title={copied ? "Copied" : "Copy code"}
-                          aria-label={copied ? `Copied ${row.code}` : `Copy code ${row.code}`}
+                          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 font-mono tracking-widest ${
+                            used
+                              ? "text-zinc-400 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
+                              : "text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                          }`}
+                          title={copied ? "Copied" : used ? "Used code" : "Copy code"}
+                          aria-label={
+                            copied ? `Copied ${row.code}` : used ? `Used code ${row.code}` : `Copy code ${row.code}`
+                          }
                         >
-                          <span className="[font-variant-numeric:slashed-zero]">{row.code}</span>
+                          <span className={`[font-variant-numeric:slashed-zero] ${used ? "line-through" : ""}`}>
+                            {row.code}
+                          </span>
                           {copied ? <CopiedIcon /> : <CopyIcon />}
-                          <span className="font-sans text-xs font-semibold tracking-normal text-teal-700 dark:text-teal-300">
-                            {copied ? "Copied" : <span className="sr-only">Copy</span>}
+                          <span className="font-sans text-xs font-semibold tracking-normal text-zinc-500">
+                            {copied ? "Copied" : used ? "Used" : <span className="sr-only">Copy</span>}
                           </span>
                         </button>
                       </td>
@@ -305,8 +329,10 @@ export function AdminAuthorisedRegistrarsClient({
                           ) : null}
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-zinc-600 dark:text-zinc-400">{row.notes || "—"}</td>
-                      <td className="px-5 py-3 text-zinc-600 dark:text-zinc-400">
+                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-600 dark:text-zinc-400"}`}>
+                        {row.notes || "—"}
+                      </td>
+                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-600 dark:text-zinc-400"}`}>
                         {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "—"}
                         {row.createdBy ? ` · ${row.createdBy}` : ""}
                       </td>
@@ -314,9 +340,9 @@ export function AdminAuthorisedRegistrarsClient({
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
-                            disabled={busyId === row.id}
+                            disabled={busyId === row.id || used}
                             onClick={() => setActive(row.id, !row.active)}
-                            className="cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                            className="cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-800"
                           >
                             {row.active ? "Deactivate" : "Reactivate"}
                           </button>

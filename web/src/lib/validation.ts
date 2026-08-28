@@ -5,7 +5,10 @@ import {
   COMMONWEALTH_COUNTRIES,
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
+  HOUSEHOLD_HEAD_OPTIONS,
+  MAX_HOUSEHOLD_SIZE,
   hasRegisteredCtvQuestion,
+  isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
@@ -408,6 +411,23 @@ export function validateRegistrationForm(
   if (!data.sex) errors.sex = "Sex is required.";
   if (!data.education) errors.education = "Education level is required.";
   if (!data.ethnicity) errors.ethnicity = "Ethnicity is required.";
+  if (!data.householdHeadRelationship) {
+    errors.householdHeadRelationship = "Please indicate your relationship to the head of your household.";
+  } else if (!(HOUSEHOLD_HEAD_OPTIONS as readonly string[]).includes(data.householdHeadRelationship)) {
+    errors.householdHeadRelationship = "Please select a valid household relationship.";
+  } else if (isHeadOfHousehold(data.householdHeadRelationship)) {
+    const sizeText = cleanText(data.householdSize);
+    if (!/^\d+$/.test(sizeText)) {
+      errors.householdSize = "Enter the number of people in your household, including yourself.";
+    } else {
+      const size = Number(sizeText);
+      if (size < 1) {
+        errors.householdSize = "Household size must include at least yourself.";
+      } else if (size > MAX_HOUSEHOLD_SIZE) {
+        errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
+      }
+    }
+  }
   if (!data.placeOfResidence) errors.placeOfResidence = errors.placeOfResidence ?? "Residence selection is required.";
 
   if (data.placeOfResidence === "Abroad") {

@@ -29,6 +29,11 @@ import {
   COUNTRIES,
   EDUCATION_LEVELS,
   ETHNICITY_OPTIONS,
+  HOUSEHOLD_DEFINITION,
+  HOUSEHOLD_HEAD_OPTIONS,
+  HOUSEHOLD_HEAD_SELF,
+  MAX_HOUSEHOLD_SIZE,
+  isHeadOfHousehold,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
@@ -197,9 +202,18 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           next.photoIdFile = null;
         }
       }
+      if (key === "householdHeadRelationship" && value !== HOUSEHOLD_HEAD_SELF) {
+        next.householdSize = "";
+      }
       return next;
     });
-    setErrors((prev) => clearFieldError(prev, String(key)));
+    setErrors((prev) => {
+      let nextErrors = clearFieldError(prev, String(key));
+      if (key === "householdHeadRelationship" && value !== HOUSEHOLD_HEAD_SELF) {
+        nextErrors = clearFieldError(nextErrors, "householdSize");
+      }
+      return nextErrors;
+    });
   }, []);
 
   const touch = (key: string) => setTouched((prev) => ({ ...prev, [key]: true }));
@@ -265,6 +279,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Sex", form.sex],
       ["Highest education", form.education],
       ["Ethnicity", form.ethnicity],
+      ["Relationship to head of household", form.householdHeadRelationship],
+      [
+        "Household size",
+        isHeadOfHousehold(form.householdHeadRelationship) ? form.householdSize : "Not applicable",
+      ],
       ["Current residence", form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence],
       ["District", form.placeOfResidence === "Abroad" ? "" : form.placeOfResidence],
       [
@@ -803,6 +822,54 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 {ETHNICITY_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{HOUSEHOLD_DEFINITION}</p>
+            <Field
+              label="What is your relationship to the head of your household?"
+              required
+              error={fieldError("householdHeadRelationship")}
+              id="householdHeadRelationship"
+            >
+              <div id="householdHeadRelationship" className="flex flex-col gap-3" role="radiogroup">
+                {HOUSEHOLD_HEAD_OPTIONS.map((option) => (
+                  <label key={option} className={choiceBoxLabelClass}>
+                    <input
+                      type="radio"
+                      name="householdHeadRelationship"
+                      checked={form.householdHeadRelationship === option}
+                      onChange={() => {
+                        update("householdHeadRelationship", option);
+                        touch("householdHeadRelationship");
+                      }}
+                      onBlur={() => touchAndValidate("householdHeadRelationship")}
+                      className={siteRadioClass}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </Field>
+            {isHeadOfHousehold(form.householdHeadRelationship) ? (
+              <Field
+                label="Including yourself, how many persons live in your household?"
+                required
+                hint="Count everyone regardless of their age."
+                error={fieldError("householdSize")}
+                id="householdSize"
+              >
+                <TextInput
+                  id="householdSize"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={MAX_HOUSEHOLD_SIZE}
+                  step={1}
+                  value={form.householdSize}
+                  onChange={(e) => update("householdSize", e.target.value)}
+                  onBlur={() => touchAndValidate("householdSize")}
+                  error={fieldError("householdSize")}
+                />
+              </Field>
+            ) : null}
           </FormSection>
 
           <FormSection step={6} title="Residence details">

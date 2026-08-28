@@ -118,8 +118,8 @@ export function DashboardProfileView({
         <DashboardCard>
           <ProfileCardHeader title="Personal details" onEdit={() => onEditSection("personal")} />
           <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-            Name, date of birth, sex, and ethnicity cannot be changed online. Education can be updated when you edit
-            your profile.
+            Name, date of birth, sex, ethnicity, and household details cannot be changed online. Education can be
+            updated when you edit your profile.
           </p>
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">
             <ProfileField label="First name" value={profile.firstName} />
@@ -128,6 +128,8 @@ export function DashboardProfileView({
             <ProfileField label="Sex" value={profile.sex} />
             <ProfileField label="Education" value={profile.education} />
             <ProfileField label="Ethnicity" value={profile.ethnicity} />
+            <ProfileField label="Relationship to head of household" value={profile.householdHeadRelationship} />
+            <ProfileField label="Household size" value={profile.householdSize} />
           </dl>
         </DashboardCard>
 
