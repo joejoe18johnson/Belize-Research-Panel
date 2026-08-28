@@ -349,7 +349,9 @@ export function campaignRowToRecord(row: Record<string, unknown>): CampaignRecor
     },
     createdAt: isoOrEmpty(row.created_at as string),
     launchedAt: isoOrEmpty(row.launched_at as string),
-    coverImageFile: cleanText(String(row.cover_image_path ?? "")),
+    coverImageFile:
+      cleanText(String(row.cover_image_path ?? "")) ||
+      cleanText(String(targetCustom.cover_image_path ?? "")),
   };
 }
 

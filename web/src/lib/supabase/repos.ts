@@ -697,34 +697,46 @@ export async function supabaseLoadCampaigns(): Promise<CampaignRecord[]> {
 
 export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Promise<void> {
   if (!campaigns.length) return;
-  const rows = campaigns.map((campaign) => ({
-    id: campaign.id,
-    title: campaign.title,
-    description: campaign.description,
-    category: campaign.category,
-    status: campaign.status,
-    survey_url: campaign.surveyUrl,
-    survey_definition_id: campaign.surveyDefinitionId || null,
-    delivery_type: campaign.deliveryType,
-    points: campaign.points,
-    assigned_date: campaign.assignedDate || null,
-    complete_by_date: campaign.completeByDate || null,
-    delivery_method: campaign.deliveryMethod,
-    client_id: campaign.clientId || null,
-    target_mode: campaign.targeting.mode,
-    target_emails: campaign.targeting.emails ?? [],
-    target_districts: campaign.targeting.districts ?? [],
-    target_constituencies: campaign.targeting.constituencies ?? [],
-    target_constituency: campaign.targeting.constituency || null,
-    target_panelist_group_id: campaign.targeting.groupId || null,
-    target_market_interests: [],
-    target_custom: campaign.targeting,
-    created_at: campaign.createdAt,
-    launched_at: campaign.launchedAt || null,
-    cover_image_path: campaign.coverImageFile ?? "",
-    updated_at: new Date().toISOString(),
-  }));
+  const rows = campaigns.map((campaign) => {
+    const coverImagePath = campaign.coverImageFile ?? "";
+    return {
+      id: campaign.id,
+      title: campaign.title,
+      description: campaign.description,
+      category: campaign.category,
+      status: campaign.status,
+      survey_url: campaign.surveyUrl,
+      survey_definition_id: campaign.surveyDefinitionId || null,
+      delivery_type: campaign.deliveryType,
+      points: campaign.points,
+      assigned_date: campaign.assignedDate || null,
+      complete_by_date: campaign.completeByDate || null,
+      delivery_method: campaign.deliveryMethod,
+      client_id: campaign.clientId || null,
+      target_mode: campaign.targeting.mode,
+      target_emails: campaign.targeting.emails ?? [],
+      target_districts: campaign.targeting.districts ?? [],
+      target_constituencies: campaign.targeting.constituencies ?? [],
+      target_constituency: campaign.targeting.constituency || null,
+      target_panelist_group_id: campaign.targeting.groupId || null,
+      target_market_interests: [],
+      target_custom: {
+        ...campaign.targeting,
+        cover_image_path: coverImagePath,
+      },
+      created_at: campaign.createdAt,
+      launched_at: campaign.launchedAt || null,
+      cover_image_path: coverImagePath,
+      updated_at: new Date().toISOString(),
+    };
+  });
   const { error } = await db().from("campaigns").upsert(rows, { onConflict: "id" });
+  if (isMissingColumnError(error, "cover_image_path")) {
+    const fallbackRows = rows.map(({ cover_image_path: _unused, ...rest }) => rest);
+    const retry = await db().from("campaigns").upsert(fallbackRows, { onConflict: "id" });
+    throwIfError(retry.error);
+    return;
+  }
   throwIfError(error);
 }
 
