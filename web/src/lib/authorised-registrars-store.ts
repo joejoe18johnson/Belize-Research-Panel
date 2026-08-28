@@ -4,6 +4,7 @@ import path from "path";
 import {
   AUTHORISED_CODE_LENGTH,
   findRegistrarByCode,
+  isAuthorisedCodeUsed,
   isValidAuthorisedCode,
   normalizeAuthorisedCode,
   type AuthorisedRegistrar,
@@ -40,6 +41,8 @@ function normalizeStore(raw: Partial<AuthorisedRegistrarStore> | null | undefine
         active: item.active !== false,
         createdAt: cleanText(item.createdAt) || new Date().toISOString(),
         createdBy: cleanText(item.createdBy),
+        usedAt: cleanText(item.usedAt),
+        usedByEmail: cleanText(item.usedByEmail).toLowerCase(),
       }))
       .filter((item) => item.name && item.code),
   };
@@ -88,7 +91,39 @@ export async function saveAuthorisedRegistrars(store: AuthorisedRegistrarStore):
 
 export async function findActiveAuthorisedRegistrar(code: string): Promise<AuthorisedRegistrar | null> {
   const store = await loadAuthorisedRegistrars();
-  return findRegistrarByCode(store.registrars, code, { activeOnly: true });
+  return findRegistrarByCode(store.registrars, code, { activeOnly: true, unusedOnly: true });
+}
+
+export type AuthorisedCodeLookup =
+  | { status: "valid"; registrar: AuthorisedRegistrar }
+  | { status: "used"; registrar: AuthorisedRegistrar }
+  | { status: "inactive"; registrar: AuthorisedRegistrar }
+  | { status: "unknown" };
+
+export async function lookupAuthorisedCode(code: string): Promise<AuthorisedCodeLookup> {
+  const store = await loadAuthorisedRegistrars();
+  const registrar = findRegistrarByCode(store.registrars, code);
+  if (!registrar) return { status: "unknown" };
+  if (isAuthorisedCodeUsed(registrar)) return { status: "used", registrar };
+  if (!registrar.active) return { status: "inactive", registrar };
+  return { status: "valid", registrar };
+}
+
+export async function markAuthorisedCodeUsed(code: string, usedByEmail: string): Promise<AuthorisedRegistrar | null> {
+  const store = await loadAuthorisedRegistrars();
+  const match = findRegistrarByCode(store.registrars, code, { activeOnly: true, unusedOnly: true });
+  if (!match) return null;
+  const next = store.registrars.map((registrar) =>
+    registrar.id === match.id
+      ? {
+          ...registrar,
+          usedAt: new Date().toISOString(),
+          usedByEmail: cleanText(usedByEmail).toLowerCase(),
+        }
+      : registrar
+  );
+  await saveAuthorisedRegistrars({ registrars: next });
+  return next.find((registrar) => registrar.id === match.id) ?? null;
 }
 
 export async function createAuthorisedRegistrar(input: {
@@ -122,6 +157,8 @@ export async function createAuthorisedRegistrar(input: {
     active: true,
     createdAt: new Date().toISOString(),
     createdBy: cleanText(input.createdBy),
+    usedAt: "",
+    usedByEmail: "",
   };
 
   await saveAuthorisedRegistrars({ registrars: [...store.registrars, registrar] });

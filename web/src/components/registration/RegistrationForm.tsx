@@ -617,7 +617,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   Get in touch by email or call / WhatsApp so an authorised person can be assigned to you.
                 </li>
                 <li>Present a valid photo ID in person to the authorised person assigned to you.</li>
-                <li>They check the ID and give you their authorisation code.</li>
+                <li>They check the ID and give you an unused authorisation code. Each code can be used only once.</li>
                 <li>Enter that code below, then continue the rest of this form.</li>
                 <li>Admin will see the code and who authorised this registration. There will be no ID file to review.</li>
               </ol>
@@ -645,7 +645,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <Field
                 label="Authorised verification code"
                 required
-                hint="This is a 6-character code of uppercase letters and numbers from the authorised person. Random codes are not accepted."
+                hint="This is a 6-character code of uppercase letters and numbers from the authorised person. Each code can be used only once. Random codes are not accepted."
                 error={fieldError("authorisedVerificationCode")}
                 id="authorisedVerificationCode"
               >

@@ -919,6 +919,8 @@ function registrarToRow(registrar: AuthorisedRegistrar): Record<string, unknown>
     active: registrar.active,
     created_at: registrar.createdAt,
     created_by: registrar.createdBy,
+    used_at: registrar.usedAt || null,
+    used_by_email: registrar.usedByEmail || null,
   };
 }
 
@@ -931,6 +933,8 @@ function rowToRegistrar(row: Record<string, unknown>): AuthorisedRegistrar {
     active: row.active !== false,
     createdAt: cleanText(String(row.created_at ?? "")),
     createdBy: cleanText(String(row.created_by ?? "")),
+    usedAt: cleanText(String(row.used_at ?? "")),
+    usedByEmail: cleanText(String(row.used_by_email ?? "")).toLowerCase(),
   };
 }
 
@@ -950,5 +954,11 @@ export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistra
   throwIfError(deleteError);
   if (!rows.length) return;
   const { error } = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(rows);
+  if (isMissingColumnError(error, "used_at") || isMissingColumnError(error, "used_by_email")) {
+    const slimRows = rows.map(({ used_at: _usedAt, used_by_email: _usedByEmail, ...rest }) => rest);
+    const retry = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(slimRows);
+    throwIfError(retry.error);
+    return;
+  }
   throwIfError(error);
 }

@@ -8,6 +8,8 @@ export interface AuthorisedRegistrar {
   active: boolean;
   createdAt: string;
   createdBy: string;
+  usedAt: string;
+  usedByEmail: string;
 }
 
 export interface AuthorisedRegistrarStore {
@@ -73,16 +75,21 @@ export function formatAuthorisedByLabel(panelist: {
   return "Authorised registration";
 }
 
+export function isAuthorisedCodeUsed(registrar: AuthorisedRegistrar): boolean {
+  return Boolean(cleanText(registrar.usedAt) || cleanText(registrar.usedByEmail));
+}
+
 export function findRegistrarByCode(
   registrars: AuthorisedRegistrar[],
   code: string,
-  options: { activeOnly?: boolean } = {}
+  options: { activeOnly?: boolean; unusedOnly?: boolean } = {}
 ): AuthorisedRegistrar | null {
   const normalized = normalizeAuthorisedCode(code);
   if (!normalized) return null;
   return (
     registrars.find((registrar) => {
       if (options.activeOnly && !registrar.active) return false;
+      if (options.unusedOnly && isAuthorisedCodeUsed(registrar)) return false;
       return normalizeAuthorisedCode(registrar.code) === normalized;
     }) ?? null
   );

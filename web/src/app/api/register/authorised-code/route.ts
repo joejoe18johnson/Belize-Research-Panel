@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionAccount } from "@/lib/auth";
-import { findActiveAuthorisedRegistrar } from "@/lib/authorised-registrars-store";
+import { lookupAuthorisedCode } from "@/lib/authorised-registrars-store";
 import { cleanText } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -16,8 +16,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "Please enter the authorised verification code." }, { status: 400 });
     }
 
-    const registrar = await findActiveAuthorisedRegistrar(code);
-    if (!registrar) {
+    const lookup = await lookupAuthorisedCode(code);
+    if (lookup.status === "used") {
+      return NextResponse.json({
+        ok: false,
+        valid: false,
+        message: "This authorisation code has already been used. Ask for a new unused code.",
+      });
+    }
+    if (lookup.status === "inactive") {
+      return NextResponse.json({
+        ok: false,
+        valid: false,
+        message: "This authorisation code is no longer active. Ask for a new unused code.",
+      });
+    }
+    if (lookup.status !== "valid") {
       return NextResponse.json({
         ok: false,
         valid: false,
@@ -25,7 +39,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, valid: true, registrarName: registrar.name });
+    return NextResponse.json({ ok: true, valid: true, registrarName: lookup.registrar.name });
   } catch {
     return NextResponse.json({ ok: false, message: "Could not check that code. Please try again." }, { status: 500 });
   }

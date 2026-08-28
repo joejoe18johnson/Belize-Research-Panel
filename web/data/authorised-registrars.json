@@ -7,7 +7,9 @@
       "notes": "Orange Walk, Field Supervisor",
       "active": true,
       "createdAt": "2026-08-28T01:42:12.080Z",
-      "createdBy": "Super Admin"
+      "createdBy": "Super Admin",
+      "usedAt": "",
+      "usedByEmail": ""
     }
   ]
 }

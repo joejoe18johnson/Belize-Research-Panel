@@ -136,7 +136,14 @@ export function getPhaseFieldKeys(phaseIndex: number): readonly string[] {
 function collectPhaseErrors(
   phaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; authorisedCodeValid?: boolean } = {}
+  options: {
+    usernameTaken?: boolean;
+    accountBacked?: boolean;
+    accountEmail?: string;
+    authorisedCodeValid?: boolean;
+    authorisedCodeUsed?: boolean;
+    authorisedCodeInactive?: boolean;
+  } = {}
 ): FieldErrors {
   const allErrors = validateRegistrationForm(input.form, options);
   const keys = new Set(getPhaseFieldKeys(phaseIndex));
@@ -191,7 +198,14 @@ function collectPhaseErrors(
 export function validateRegistrationPhase(
   phaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; authorisedCodeValid?: boolean } = {}
+  options: {
+    usernameTaken?: boolean;
+    accountBacked?: boolean;
+    accountEmail?: string;
+    authorisedCodeValid?: boolean;
+    authorisedCodeUsed?: boolean;
+    authorisedCodeInactive?: boolean;
+  } = {}
 ): FieldErrors {
   return collectPhaseErrors(phaseIndex, input, options);
 }
@@ -199,7 +213,15 @@ export function validateRegistrationPhase(
 export function validatePhasesThrough(
   throughPhaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; extraErrors?: FieldErrors; authorisedCodeValid?: boolean } = {}
+  options: {
+    usernameTaken?: boolean;
+    accountBacked?: boolean;
+    accountEmail?: string;
+    extraErrors?: FieldErrors;
+    authorisedCodeValid?: boolean;
+    authorisedCodeUsed?: boolean;
+    authorisedCodeInactive?: boolean;
+  } = {}
 ): { errors: FieldErrors; firstErrorPhase: number | null } {
   const merged: FieldErrors = { ...(options.extraErrors ?? {}) };
   let firstErrorPhase: number | null = null;

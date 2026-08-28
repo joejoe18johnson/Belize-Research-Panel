@@ -5,7 +5,7 @@ import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
 import type { RegistrationMode } from "@/lib/constants";
-import { findActiveAuthorisedRegistrar } from "@/lib/authorised-registrars-store";
+import { lookupAuthorisedCode, markAuthorisedCodeUsed } from "@/lib/authorised-registrars-store";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -101,15 +101,18 @@ export async function POST(request: NextRequest) {
     const rows = await loadPanelists();
     const { hardDuplicate } = duplicateCheck(rows, data);
 
-    const authorisedRegistrar =
+    const authorisedLookup =
       data.registrationMode === "Registration by authorised person"
-        ? await findActiveAuthorisedRegistrar(data.authorisedVerificationCode)
-        : null;
+        ? await lookupAuthorisedCode(data.authorisedVerificationCode)
+        : { status: "unknown" as const };
+    const authorisedRegistrar = authorisedLookup.status === "valid" ? authorisedLookup.registrar : null;
 
     const errors = validateRegistrationForm(data, {
       hardDuplicate,
       accountBacked: true,
       accountEmail: session.email,
+      authorisedCodeUsed: authorisedLookup.status === "used",
+      authorisedCodeInactive: authorisedLookup.status === "inactive",
       authorisedCodeValid:
         data.registrationMode === "Registration by authorised person" ? Boolean(authorisedRegistrar) : undefined,
     });
@@ -132,6 +135,9 @@ export async function POST(request: NextRequest) {
         : undefined
     );
     await markAccountPanelistRegistered(session.id);
+    if (authorisedRegistrar) {
+      await markAuthorisedCodeUsed(authorisedRegistrar.code, session.email);
+    }
 
     void sendRegistrationSubmittedEmail({
       to: session.email,
