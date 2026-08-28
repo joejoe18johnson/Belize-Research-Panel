@@ -79,6 +79,7 @@ export function AdminPanelistsClient({
   initialTab,
   photoUploadUsernames,
   residenceUploadUsernames,
+  liveDatabase = false,
 }: {
   rows: PanelistRow[];
   requirementByEmail: Record<
@@ -96,6 +97,7 @@ export function AdminPanelistsClient({
   initialTab?: "all" | "duplicates" | "flagged";
   photoUploadUsernames: Set<string>;
   residenceUploadUsernames: Set<string>;
+  liveDatabase?: boolean;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
@@ -425,6 +427,18 @@ export function AdminPanelistsClient({
           Browse, filter, edit, flag, and delete panelist records. Use row actions on each record.
         </p>
       </div>
+
+      {liveDatabase ? (
+        <BrandedAlert tone="info" compact showIcon>
+          This list is loaded live from the database. A delete in Supabase will disappear here after you refresh.
+        </BrandedAlert>
+      ) : (
+        <BrandedAlert tone="warning" showIcon>
+          This admin list is using local files, not the live Supabase database. Deletes you make in Supabase will not
+          show here, and this list can still block registration. Add the Supabase keys to web/.env.local and restart
+          the app so admin and the live site stay in sync.
+        </BrandedAlert>
+      )}
 
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Filters")}</h2>

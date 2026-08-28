@@ -192,8 +192,8 @@ export async function updatePanelistAdminFields(
 export async function savePanelists(rows: PanelistRow[]): Promise<void> {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
-    const { supabaseUpsertPanelists } = await import("./supabase/repos");
-    await supabaseUpsertPanelists(rows);
+    const { supabaseSyncPanelists } = await import("./supabase/repos");
+    await supabaseSyncPanelists(rows);
     return;
   }
   await fs.mkdir(DATA_DIR, { recursive: true });

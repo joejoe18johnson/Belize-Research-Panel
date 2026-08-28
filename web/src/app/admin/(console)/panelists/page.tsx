@@ -9,7 +9,11 @@ import {
 } from "@/lib/panelist-requirement-context";
 import { assessPanelistRequirements } from "@/lib/panelist-requirements";
 import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
+import { useSupabase } from "@/lib/supabase/data-source";
 import { cleanText } from "@/lib/validation";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata = {
   title: "Panelists | Admin | Belize Research Panel",
@@ -68,6 +72,7 @@ export default async function AdminPanelistsPage({
       initialVerification={params.verification}
       photoUploadUsernames={photoUploadUsernames}
       residenceUploadUsernames={residenceUploadUsernames}
+      liveDatabase={useSupabase()}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),
         district: getUniqueFilterValues(rows, "district"),

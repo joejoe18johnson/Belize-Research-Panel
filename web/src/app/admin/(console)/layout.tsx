@@ -8,6 +8,9 @@ import { buildAdminNavBadges } from "@/lib/admin-nav-badges";
 import { loadAdminReadState } from "@/lib/admin-read-state";
 import { loadSurveyRecordsFromFile } from "@/lib/panelist-surveys-store";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminConsoleLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAdminSession();
   await restoreAdminDemoNotificationFixtures();

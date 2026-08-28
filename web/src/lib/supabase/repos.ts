@@ -292,6 +292,27 @@ export async function supabaseUpsertPanelists(rows: PanelistRow[], options?: { a
   throwIfError(error);
 }
 
+export async function supabaseSyncPanelists(rows: PanelistRow[]): Promise<void> {
+  const { data: existing, error: listError } = await db().from("panelists").select("email");
+  throwIfError(listError);
+
+  const keep = new Set(
+    rows.map((row) => normalizePanelistEmail(row.email)).filter(Boolean)
+  );
+  const extras = (existing ?? [])
+    .map((row) => normalizePanelistEmail(String(row.email ?? "")))
+    .filter((email) => email && !keep.has(email));
+
+  if (extras.length) {
+    const { error: deleteError } = await db().from("panelists").delete().in("email", extras);
+    throwIfError(deleteError);
+  }
+
+  if (rows.length) {
+    await supabaseUpsertPanelists(rows);
+  }
+}
+
 export async function supabaseUploadPanelistFile(
   accountId: string,
   kind: "photo_id" | "residence_proof",

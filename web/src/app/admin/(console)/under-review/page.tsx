@@ -6,6 +6,9 @@ import { unreadPanelistVerificationEmails } from "@/lib/admin-nav-badges";
 import { loadAdminReadState } from "@/lib/admin-read-state";
 import { loadPanelistPhotoUploadUsernames } from "@/lib/panelist-requirement-context";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Under Review | Admin",
 };

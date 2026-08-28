@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/lib/admin-panelist-actions";
 import { isAdminSessionActive } from "@/lib/admin-auth";
@@ -197,6 +198,9 @@ export async function DELETE(
   if (!deleted) {
     return NextResponse.json({ ok: false, message: "User record not found." }, { status: 404 });
   }
+
+  revalidatePath("/admin/panelists");
+  revalidatePath("/admin/under-review");
 
   return NextResponse.json({
     ok: true,
