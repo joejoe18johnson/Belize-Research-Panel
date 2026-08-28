@@ -536,8 +536,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <FormSection step={1} title="How we will verify you" id="photo-id-section">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Choose how your identity will be confirmed before you fill in the rest of the form. Authorised
-            verification is for people who will present a photo ID in person to a trusted registrar and may not
-            happen on the same day.
+            verification is for people who will present a photo ID in person and may not happen on the same day.
           </p>
           <div className="space-y-3">
             <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
@@ -597,11 +596,27 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           ) : (
             <>
               <Alert variant="info">
-                Use this option if you will present a photo ID in person to an authorised person (for example a
-                trusted relative or friend who has been given a code). You will not upload an ID image.
+                <p>
+                  Use this option if you will present a photo ID in person to an authorised person. You will not upload
+                  an ID image.
+                </p>
+                <p className="mt-2">
+                  Email{" "}
+                  <a className="font-medium underline" href="mailto:gjavilez@yahoo.com">
+                    gjavilez@yahoo.com
+                  </a>{" "}
+                  or call / WhatsApp{" "}
+                  <a className="font-medium underline" href="https://wa.me/5016636164">
+                    +501 663-6164
+                  </a>{" "}
+                  so someone can be assigned to verify you.
+                </p>
               </Alert>
               <ol className="list-decimal space-y-2 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-                <li>Present a valid photo ID in person to the authorised person.</li>
+                <li>
+                  Get in touch by email or call / WhatsApp so an authorised person can be assigned to you.
+                </li>
+                <li>Present a valid photo ID in person to the authorised person assigned to you.</li>
                 <li>They check the ID and give you their authorisation code.</li>
                 <li>Enter that code below, then continue the rest of this form.</li>
                 <li>Admin will see the code and who authorised this registration. There will be no ID file to review.</li>
