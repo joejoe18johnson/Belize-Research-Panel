@@ -36,8 +36,8 @@ export function CampaignCoverField({
     <div className="sm:col-span-2">
       <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Cover image (optional)</label>
       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-        Shown on the panelist survey inbox card. Include any logo or branding in this image. Wide images work best ·
-        PNG, JPG, or WebP · max 5 MB. If you skip this, the category banner is used.
+        Shown on the panelist survey inbox card. Include any logo or sponsor mark in this image · PNG, JPG, or WebP ·
+        max 5 MB. If you skip this, the category banner is used.
       </p>
       <div className="mt-3 grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
         <div>

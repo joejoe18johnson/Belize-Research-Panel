@@ -2,7 +2,6 @@ import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import {
   surveyBrandingAssetUrl,
   surveyHasCover,
-  surveyHasLogo,
 } from "@/lib/survey-branding-shared";
 import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import type { SurveyDefinition } from "@/lib/survey-types";
@@ -14,7 +13,6 @@ export function SurveyBrandingHeader({
   companyIntro,
   category,
   surveyId,
-  logoPreviewUrl,
   coverPreviewUrl,
   definition,
   variant = "full",
@@ -24,19 +22,13 @@ export function SurveyBrandingHeader({
   companyIntro?: string;
   category: SurveyCategory;
   surveyId?: string;
-  logoPreviewUrl?: string | null;
   coverPreviewUrl?: string | null;
-  definition?: Pick<SurveyDefinition, "companyLogoFile" | "coverImageFile">;
+  definition?: Pick<SurveyDefinition, "coverImageFile">;
   variant?: "full" | "compact";
 }) {
   const compact = variant === "compact";
   const style = getSurveyCategoryStyle(category);
-  const hasLogo = Boolean(logoPreviewUrl) || (definition ? surveyHasLogo(definition) : false);
-  const hasCover = Boolean(coverPreviewUrl) || (definition ? surveyHasCover(definition) : false);
 
-  const resolvedLogoUrl =
-    logoPreviewUrl ??
-    (surveyId && definition && surveyHasLogo(definition) ? surveyBrandingAssetUrl(surveyId, "logo") : null);
   const resolvedCoverUrl =
     coverPreviewUrl ??
     (surveyId && definition && surveyHasCover(definition) ? surveyBrandingAssetUrl(surveyId, "cover") : null);
@@ -71,21 +63,6 @@ export function SurveyBrandingHeader({
             </span>
           </div>
         )}
-
-        {hasLogo && resolvedLogoUrl ? (
-          <div
-            className={`absolute rounded-lg border border-white/40 bg-white/95 shadow-lg ${
-              compact ? "bottom-2 left-2 p-1" : "bottom-4 left-4 rounded-xl p-2"
-            }`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={resolvedLogoUrl}
-              alt="Company logo"
-              className={`object-contain ${compact ? "max-h-7 max-w-[4.5rem]" : "max-h-12 max-w-[10rem]"}`}
-            />
-          </div>
-        ) : null}
       </div>
 
       <div className={compact ? "space-y-1.5 p-3" : "space-y-3 p-5 sm:p-6"}>

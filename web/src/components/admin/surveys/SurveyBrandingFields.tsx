@@ -24,35 +24,21 @@ export function SurveyBrandingFields({
   onCompanyIntroChange: (value: string) => void;
   onBrandingChange: (state: SurveyBrandingUploadState) => void;
 }) {
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [removeLogo, setRemoveLogo] = useState(false);
   const [removeCover, setRemoveCover] = useState(false);
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
 
-  const hasSavedLogo = Boolean(initialSurvey?.companyLogoFile) && !removeLogo && !logoFile;
   const hasSavedCover = Boolean(initialSurvey?.coverImageFile) && !removeCover && !coverFile;
 
   const publishBrandingState = (next: Partial<SurveyBrandingUploadState>) => {
     onBrandingChange({
-      logoFile,
+      logoFile: null,
       coverFile,
-      removeLogo,
+      removeLogo: false,
       removeCover,
       ...next,
     });
   };
-
-  useEffect(() => {
-    if (!logoFile) {
-      setLogoPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(logoFile);
-    setLogoPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [logoFile]);
 
   useEffect(() => {
     if (!coverFile) {
@@ -67,7 +53,6 @@ export function SurveyBrandingFields({
   const previewDefinition = initialSurvey
     ? {
         ...initialSurvey,
-        companyLogoFile: removeLogo ? "" : initialSurvey.companyLogoFile,
         coverImageFile: removeCover ? "" : initialSurvey.coverImageFile,
       }
     : undefined;
@@ -76,8 +61,8 @@ export function SurveyBrandingFields({
     <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
       <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Company branding</h2>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-        Add a sponsor logo, company introduction, and optional cover image. If no cover is uploaded, the default
-        category banner is used.
+        Add a company introduction and optional cover image. Put any sponsor logo directly on the cover image. If no
+        cover is uploaded, the default category banner is used.
       </p>
 
       <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
@@ -93,37 +78,7 @@ export function SurveyBrandingFields({
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Company logo</label>
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                setLogoFile(file);
-                const nextRemoveLogo = file ? false : removeLogo;
-                if (file) setRemoveLogo(false);
-                publishBrandingState({ logoFile: file, removeLogo: nextRemoveLogo });
-              }}
-              className="mt-1.5 block w-full text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-teal-800 dark:text-teal-200"
-            />
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">PNG, JPG, or WebP · max 2 MB</p>
-            {hasSavedLogo || logoFile ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setLogoFile(null);
-                  setRemoveLogo(true);
-                  publishBrandingState({ logoFile: null, removeLogo: true });
-                }}
-                className="mt-2 text-xs font-semibold text-red-600 hover:text-red-800"
-              >
-                Remove logo
-              </button>
-            ) : null}
-          </div>
-
-          <div>
+          <div className="sm:col-span-2">
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Cover image (optional)</label>
             <input
               type="file"
@@ -165,7 +120,6 @@ export function SurveyBrandingFields({
               category={category}
               surveyId={surveyId}
               definition={previewDefinition}
-              logoPreviewUrl={logoPreviewUrl}
               coverPreviewUrl={coverPreviewUrl}
             />
           </div>

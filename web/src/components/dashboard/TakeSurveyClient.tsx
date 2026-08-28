@@ -15,8 +15,8 @@ import {
   type SurveyValidationIssue,
 } from "@/lib/survey-types";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
-import { formatHeadingCase } from "@/lib/sentence-case";
 import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
+import { formatHeadingCase } from "@/lib/sentence-case";
 import {
   clearSurveyDraft,
   loadSurveyDraft,
