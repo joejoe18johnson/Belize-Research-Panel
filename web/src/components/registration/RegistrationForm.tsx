@@ -39,6 +39,7 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
+  isUnitedStatesCountry,
   needsVoterRegistrationQuestion,
   CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
@@ -183,9 +184,17 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         next.otherContactPlatformCustom = "";
       }
       if (key === "countryIfAbroad" && typeof value === "string") {
+        next.usDiasporaRegion = "";
         const suggestedCode = phoneCountryCodeForCountry(value);
         if (suggestedCode && !next.phoneLocalNumber.trim()) {
           next.phoneCountryCode = suggestedCode;
+        }
+      }
+      if (key === "registrationMode") {
+        if (value === "Self-registration") {
+          next.authorisedVerificationCode = "";
+        } else {
+          next.photoIdFile = null;
         }
       }
       return next;
@@ -215,7 +224,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       proofOfBelizeResidenceType: "",
       proofOfBelizeResidenceFile: null,
     }));
-    setActivePhaseIndex(0);
     setErrors((prev) =>
       clearFieldError(
         clearFieldError(clearFieldError(prev, "citizenshipStatus"), "votingStatus"),
@@ -226,7 +234,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
   const eligibleCitizenship = isEligibleCitizenship(form.citizenshipStatus);
   const citizenshipIneligible =
-    activePhaseIndex === 0 && Boolean(form.citizenshipStatus) && !eligibleCitizenship;
+    activePhaseIndex === 1 && Boolean(form.citizenshipStatus) && !eligibleCitizenship;
   const needsCommonwealthCountry =
     form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
@@ -259,8 +267,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Ethnicity", form.ethnicity],
       ["Current residence", form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence],
       ["District", form.placeOfResidence === "Abroad" ? "" : form.placeOfResidence],
-      ["City / town / village", form.placeOfResidence === "Abroad" ? form.cityTownVillage : form.cityTownVillage === "Other" ? form.cityTownVillageOther : form.cityTownVillage],
+      [
+        "City / town / village",
+        form.placeOfResidence === "Abroad"
+          ? ""
+          : form.cityTownVillage === "Other"
+            ? form.cityTownVillageOther
+            : form.cityTownVillage,
+      ],
       ["Country if abroad", form.countryIfAbroad],
+      ["Region of country", form.placeOfResidence === "Abroad" ? form.usDiasporaRegion : ""],
       ["Constituency registered to vote", form.constituency],
       ["Registered CTV area", form.registeredCtvArea],
       ["Market research interests", form.marketInterests.join(", ")],
@@ -357,7 +373,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
   const currentPhaseErrors = validateRegistrationPhase(activePhaseIndex, progressInput, validationOptions);
   const showPhaseValidationAlert =
-    phaseAttempted && (Object.keys(currentPhaseErrors).length > 0 || Boolean(errors.contact && activePhaseIndex === 3));
+    phaseAttempted && (Object.keys(currentPhaseErrors).length > 0 || Boolean(errors.contact && activePhaseIndex === 4));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -438,6 +454,33 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       return;
     }
 
+    if (
+      activePhaseIndex === 0 &&
+      form.registrationMode === "Registration by authorised person"
+    ) {
+      try {
+        const res = await fetch("/api/register/authorised-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: form.authorisedVerificationCode }),
+        });
+        const data = (await res.json()) as { ok?: boolean; valid?: boolean; message?: string };
+        if (!data.valid) {
+          const message =
+            data.message ?? "This authorisation code is not recognised. Ask the authorised person for a current code.";
+          const codeErrors = { authorisedVerificationCode: message };
+          setErrors((prev) => ({ ...prev, ...codeErrors }));
+          revealFirstError(codeErrors);
+          return;
+        }
+      } catch {
+        const codeErrors = { authorisedVerificationCode: "Could not check that code. Please try again." };
+        setErrors((prev) => ({ ...prev, ...codeErrors }));
+        revealFirstError(codeErrors);
+        return;
+      }
+    }
+
     setErrors((prev) => {
       const next = { ...prev };
       for (const key of keysToTouch) delete next[key];
@@ -490,6 +533,122 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </Alert>
       ) : null}
       {activePhaseIndex === 0 ? (
+        <FormSection step={1} title="How we will verify you" id="photo-id-section">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Choose how your identity will be confirmed before you fill in the rest of the form. Authorised
+            verification is for people who will present a photo ID in person to a trusted registrar and may not
+            happen on the same day.
+          </p>
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
+            <div className="flex flex-wrap gap-4">
+              {(["Self-registration", "Registration by authorised person"] as const).map((mode) => (
+                <label key={mode} className={choiceBoxLabelClass}>
+                  <input
+                    type="radio"
+                    name="registrationMode"
+                    checked={form.registrationMode === mode}
+                    onChange={() => update("registrationMode", mode)}
+                    className={siteRadioClass}
+                  />
+                  {mode}
+                </label>
+              ))}
+            </div>
+          </div>
+          {form.registrationMode === "Self-registration" ? (
+            <>
+              <Alert variant="info">
+                Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do
+                not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long
+                as your name, photograph, and eligibility details remain visible.
+              </Alert>
+              <FieldGroup columns={2}>
+                <Field label="Photo ID type" required error={fieldError("photoIdType")} id="photoIdType">
+                  <SelectInput
+                    id="photoIdType"
+                    value={form.photoIdType}
+                    onChange={(e) => update("photoIdType", e.target.value)}
+                    onBlur={() => touchAndValidate("photoIdType")}
+                    error={fieldError("photoIdType")}
+                  >
+                    <option value="">Select photo ID type</option>
+                    {PHOTO_ID_TYPES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </SelectInput>
+                </Field>
+                <Field label="Upload photo ID image or PDF" required error={fieldError("photoIdFile")}>
+                  <FileInput
+                    id="photoIdFile"
+                    accept=".png,.jpg,.jpeg,.pdf"
+                    onChange={(file) => {
+                      update("photoIdFile", file);
+                      touch("photoIdFile");
+                      validateField("photoIdFile", file);
+                    }}
+                    error={fieldError("photoIdFile")}
+                  />
+                </Field>
+              </FieldGroup>
+            </>
+          ) : (
+            <>
+              <Alert variant="info">
+                Use this option if you will present a photo ID in person to an authorised person (for example a
+                trusted relative or friend who has been given a code). You will not upload an ID image.
+              </Alert>
+              <ol className="list-decimal space-y-2 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                <li>Present a valid photo ID in person to the authorised person.</li>
+                <li>They check the ID and give you their authorisation code.</li>
+                <li>Enter that code below, then continue the rest of this form.</li>
+                <li>Admin will see the code and who authorised this registration. There will be no ID file to review.</li>
+              </ol>
+              <Field
+                label="Type of photo ID shown in person"
+                required
+                error={fieldError("photoIdType")}
+                id="photoIdType"
+              >
+                <SelectInput
+                  id="photoIdType"
+                  value={form.photoIdType}
+                  onChange={(e) => update("photoIdType", e.target.value)}
+                  onBlur={() => touchAndValidate("photoIdType")}
+                  error={fieldError("photoIdType")}
+                >
+                  <option value="">Select photo ID type</option>
+                  {PHOTO_ID_TYPES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </SelectInput>
+              </Field>
+              <Field
+                label="Authorised verification code"
+                required
+                hint="Ask the authorised person for the code assigned to them. Random codes are not accepted."
+                error={fieldError("authorisedVerificationCode")}
+                id="authorisedVerificationCode"
+              >
+                <TextInput
+                  id="authorisedVerificationCode"
+                  value={form.authorisedVerificationCode}
+                  onChange={(e) => update("authorisedVerificationCode", e.target.value)}
+                  onBlur={() => touchAndValidate("authorisedVerificationCode")}
+                  placeholder="Enter the authorised person's code"
+                  error={fieldError("authorisedVerificationCode")}
+                />
+              </Field>
+            </>
+          )}
+        </FormSection>
+      ) : null}
+
+      {activePhaseIndex === 1 ? (
         <>
       <div id="citizenship-section">
         <FormSection step={1} title="Citizenship / residency">
@@ -555,7 +714,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             error={fieldError("dob")}
           />
         </div>
-      </FormSection>
+        </FormSection>
       ) : null}
 
       {needsVoterQuestion && !citizenshipIneligible ? (
@@ -570,10 +729,25 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </FormSection>
         </div>
       ) : null}
+
+      {form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" && !citizenshipIneligible ? (
+        <FormSection step={4} title="Proof of Belize residence">
+          <Alert variant="warning">Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.</Alert>
+          <Field label="Proof of residence in Belize" required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">
+            <SelectInput id="proofOfBelizeResidenceType" value={form.proofOfBelizeResidenceType} onChange={(e) => update("proofOfBelizeResidenceType", e.target.value)} onBlur={() => touchAndValidate("proofOfBelizeResidenceType")} error={fieldError("proofOfBelizeResidenceType")}>
+              <option value="">Select proof type</option>
+              {COMMONWEALTH_RESIDENCE_PROOF_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
+            </SelectInput>
+          </Field>
+          <Field label="Upload proof of Belize residence" required error={fieldError("proofOfBelizeResidenceFile")}>
+            <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
+          </Field>
+        </FormSection>
+      ) : null}
         </>
       ) : null}
 
-      {activePhaseIndex === 1 ? (
+      {activePhaseIndex === 2 ? (
         <>
           <FormSection step={4} title="Name">
             <Alert variant="info">
@@ -632,22 +806,29 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                     {COUNTRIES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
-                <Field label="Current city / town / village" required error={fieldError("cityTownVillage")} id="cityTownVillage">
-                  <TextInput
-                    id="cityTownVillage"
-                    value={form.cityTownVillage}
-                    onChange={(e) => update("cityTownVillage", e.target.value)}
-                    onBlur={() => touchAndValidate("cityTownVillage")}
-                    error={fieldError("cityTownVillage")}
-                    autoComplete="address-level2"
-                  />
-                </Field>
-                {["United States", "USA", "United States of America"].includes(form.countryIfAbroad) ? (
-                  <Field label="US region" required error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
+                {isUnitedStatesCountry(form.countryIfAbroad) ? (
+                  <Field label="Region of country" required hint="US Census regions." error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
                     <SelectInput id="usDiasporaRegion" value={form.usDiasporaRegion} onChange={(e) => update("usDiasporaRegion", e.target.value)} onBlur={() => touchAndValidate("usDiasporaRegion")} error={fieldError("usDiasporaRegion")}>
                       <option value="">Select US region</option>
                       {US_DIASPORA_REGIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </SelectInput>
+                  </Field>
+                ) : form.countryIfAbroad ? (
+                  <Field
+                    label="Region of country"
+                    required
+                    hint="City or town is not required. A region such as a province, state, or area of the country is enough."
+                    error={fieldError("usDiasporaRegion")}
+                    id="usDiasporaRegion"
+                  >
+                    <TextInput
+                      id="usDiasporaRegion"
+                      value={form.usDiasporaRegion}
+                      onChange={(e) => update("usDiasporaRegion", e.target.value)}
+                      onBlur={() => touchAndValidate("usDiasporaRegion")}
+                      error={fieldError("usDiasporaRegion")}
+                      placeholder="Province, state, or region"
+                    />
                   </Field>
                 ) : null}
               </div>
@@ -690,7 +871,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </>
       ) : null}
 
-      {activePhaseIndex === 2 ? (
+      {activePhaseIndex === 3 ? (
         <>
           {form.placeOfResidence !== "Abroad" ? (
             <FormSection step={8} title="Market research interests">
@@ -702,12 +883,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </Field>
             </FormSection>
           ) : (
-            <Alert variant="info">Persons living abroad may receive diaspora-focused research where applicable. Market research interests are collected for residents in Belize.</Alert>
+            <FormSection step={8} title="Market research interests">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Market research interests are collected for people living in Belize. You can continue to contact details.
+              </p>
+            </FormSection>
           )}
         </>
       ) : null}
 
-      {activePhaseIndex === 3 ? (
+      {activePhaseIndex === 4 ? (
         <>
           <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Please enter contact details carefully. At least two contact methods are encouraged so we can still reach you if one channel changes, is inactive, or fails during fieldwork.</p>
@@ -774,8 +959,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
             <Field
               label="Street address / physical contact address"
-              required
-              hint="Required for panel verification and fieldwork correspondence."
+              required={contactCount < 2}
+              hint={
+                contactCount < 2
+                  ? "Required because fewer than two other contact methods were provided."
+                  : "Optional when you have already given at least two ways to contact you."
+              }
               error={fieldError("streetAddress")}
               id="streetAddress"
             >
@@ -802,64 +991,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <p><strong>Street address:</strong> {form.streetAddress || "Not provided"}</p>
             </div>
             <CheckboxField id="contactDetailsConfirmed" label="I confirm that the contact information shown above is correct. *" checked={form.contactDetailsConfirmed} onChange={(checked) => { update("contactDetailsConfirmed", checked); touch("contactDetailsConfirmed"); validateField("contactDetailsConfirmed", checked); }} error={fieldError("contactDetailsConfirmed")} />
-          </FormSection>
-        </>
-      ) : null}
-
-      {activePhaseIndex === 4 ? (
-        <>
-          <FormSection step={13} title="Photo identification" id="photo-id-section">
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
-              <div className="flex flex-wrap gap-4">
-                {(["Self-registration", "Registration by authorised person"] as const).map((mode) => (
-                  <label key={mode} className={choiceBoxLabelClass}>
-                    <input
-                      type="radio"
-                      name="registrationMode"
-                      checked={form.registrationMode === mode}
-                      onChange={() => update("registrationMode", mode)}
-                      className={siteRadioClass}
-                    />
-                    {mode}
-                  </label>
-                ))}
-              </div>
-            </div>
-            <FieldGroup columns={2}>
-              <Field label="Photo ID type" required error={fieldError("photoIdType")} id="photoIdType">
-                <SelectInput id="photoIdType" value={form.photoIdType} onChange={(e) => update("photoIdType", e.target.value)} onBlur={() => touchAndValidate("photoIdType")} error={fieldError("photoIdType")}>
-                  <option value="">Select photo ID type</option>
-                  {PHOTO_ID_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </SelectInput>
-              </Field>
-              <Field label={form.registrationMode === "Self-registration" ? "Upload photo ID image or PDF" : "Upload photo ID image or PDF — optional for authorised registration"} required={form.registrationMode === "Self-registration"} error={fieldError("photoIdFile")}>
-                <FileInput id="photoIdFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("photoIdFile", file); touch("photoIdFile"); validateField("photoIdFile", file); }} error={fieldError("photoIdFile")} optional={form.registrationMode === "Registration by authorised person"} />
-              </Field>
-            </FieldGroup>
-            <Alert variant="info">Photo identification is used only to verify your identity and eligibility. We do not keep or store ID images or copies in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.</Alert>
-            {form.registrationMode === "Registration by authorised person" ? (
-              <>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Authorised registration mode allows photo upload to be bypassed when an authorised verification or QR process has been used.</p>
-                <Field label="Authorised verification code" required error={fieldError("authorisedVerificationCode")} id="authorisedVerificationCode">
-                  <TextInput id="authorisedVerificationCode" value={form.authorisedVerificationCode} onChange={(e) => update("authorisedVerificationCode", e.target.value)} onBlur={() => touchAndValidate("authorisedVerificationCode")} placeholder="Enter authorised verification / QR code" error={fieldError("authorisedVerificationCode")} />
-                </Field>
-              </>
-            ) : null}
-            {form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" ? (
-              <>
-                <Alert variant="warning">Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.</Alert>
-                <Field label="Proof of residence in Belize" required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">
-                  <SelectInput id="proofOfBelizeResidenceType" value={form.proofOfBelizeResidenceType} onChange={(e) => update("proofOfBelizeResidenceType", e.target.value)} onBlur={() => touchAndValidate("proofOfBelizeResidenceType")} error={fieldError("proofOfBelizeResidenceType")}>
-                    <option value="">Select proof type</option>
-                    {COMMONWEALTH_RESIDENCE_PROOF_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </SelectInput>
-                </Field>
-                <Field label="Upload proof of Belize residence" required error={fieldError("proofOfBelizeResidenceFile")}>
-                  <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
-                </Field>
-              </>
-            ) : null}
           </FormSection>
         </>
       ) : null}

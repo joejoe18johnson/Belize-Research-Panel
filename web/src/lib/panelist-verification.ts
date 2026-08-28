@@ -3,6 +3,7 @@ import type { PanelistRow } from "./panelists";
 import { panelistHasUpload } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
 import { isPanelistVerified } from "./verification-status";
+import { parseAuthorisedRegistration } from "./authorised-registrars";
 import { cleanText } from "./validation";
 
 export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing";
@@ -60,7 +61,7 @@ export async function buildVerificationCenterSummary(
   const photoIdType = cleanText(panelist.photo_id_type);
   const isCommonwealthInBelize =
     cleanText(panelist.citizenship_status) === "Citizen of a Commonwealth country living in Belize";
-  const authorisedRegistration = cleanText(panelist.notes).toLowerCase().includes("authorised registration");
+  const authorisedRegistration = parseAuthorisedRegistration(panelist);
 
   const [hasPhotoUpload, hasResidenceUpload] = await Promise.all([
     panelistHasUpload(username, "photo-id"),
@@ -70,7 +71,7 @@ export async function buildVerificationCenterSummary(
   const phonePending = Boolean(account.pendingPhone?.trim());
   const phoneOnFile = Boolean(phone);
   const photoDeclared = Boolean(photoIdType);
-  const photoOnFile = photoDeclared || authorisedRegistration;
+  const photoOnFile = photoDeclared || authorisedRegistration.isAuthorised;
   const residenceOnFile = hasResidenceUpload;
 
   const items: VerificationItem[] = [
@@ -95,8 +96,12 @@ export async function buildVerificationCenterSummary(
       ),
       valueLabel: formatHeadingCase("Submitted"),
       valueOnFile: photoOnFile
-        ? authorisedRegistration
-          ? formatHeadingCase("Authorised registration — ID review in progress; documents are not stored in our files")
+        ? authorisedRegistration.isAuthorised
+          ? formatHeadingCase(
+              authorisedRegistration.registrarName
+                ? `Authorised registration — ID checked in person by ${authorisedRegistration.registrarName} (code ${authorisedRegistration.code}). No ID file on record.`
+                : `Authorised registration — ID checked in person (code ${authorisedRegistration.code || "on file"}). No ID file on record.`
+            )
           : hasPhotoUpload
             ? `${photoIdType} — ${formatHeadingCase("used for verification only; not stored in our files")}`
             : `${photoIdType} — ${formatHeadingCase("type declared; document not stored in our files")}`

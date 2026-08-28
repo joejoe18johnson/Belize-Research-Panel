@@ -17,6 +17,7 @@ import {
 } from "./validation";
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
+import { authorisedRegistrationNotes } from "./authorised-registrars";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PANELISTS_FILE = path.join(DATA_DIR, "panelists.csv");
@@ -330,7 +331,8 @@ export async function registerPanelist(
     passwordHash: string;
     accountEmail: string;
     accountId?: string;
-  }
+  },
+  authorisedBy?: { code: string; name: string }
 ): Promise<{ verificationStatus: string }> {
   const rows = await loadPanelists();
   const registeredVoter = isRegisteredVoter(data.citizenshipStatus, data.votingStatus);
@@ -344,7 +346,11 @@ export async function registerPanelist(
         : "Not registered to vote in Belize";
 
   const cityFinal =
-    data.cityTownVillage === "Other" ? data.cityTownVillageOther : data.cityTownVillage;
+    data.placeOfResidence === "Abroad"
+      ? cleanText(data.usDiasporaRegion)
+      : data.cityTownVillage === "Other"
+        ? data.cityTownVillageOther
+        : data.cityTownVillage;
   const otherPlatform =
     data.otherContactPlatform === "Other"
       ? data.otherContactPlatformCustom
@@ -415,7 +421,8 @@ export async function registerPanelist(
     place_of_residence: data.placeOfResidence,
     district: data.placeOfResidence === "Abroad" ? "" : data.placeOfResidence,
     city_town_village: cleanText(cityFinal),
-    country_if_abroad: data.countryIfAbroad,
+    country_if_abroad: data.placeOfResidence === "Abroad" ? data.countryIfAbroad : "",
+    residence_region: data.placeOfResidence === "Abroad" ? cleanText(data.usDiasporaRegion) : "",
     constituency: registeredVoter ? data.constituency : "",
     registered_ctv_area: registeredVoter ? cleanText(data.registeredCtvArea) : "",
     sex: data.sex,
@@ -434,6 +441,8 @@ export async function registerPanelist(
     street_address: cleanText(data.streetAddress),
     photo_id_type: data.photoIdType,
     photo_id_last4: "",
+    authorised_verification_code: authorisedBy?.code ?? "",
+    authorised_registrar_name: authorisedBy?.name ?? "",
     username: cleanText(username),
     password_salt: salt,
     password_hash: hash,
@@ -442,8 +451,8 @@ export async function registerPanelist(
     consent_contact: String(data.consentContact),
     consent_privacy: String(data.consentPrivacy),
     status: "Active",
-    notes: data.registrationMode === "Registration by authorised person"
-      ? `Authorised registration; code: ${cleanText(data.authorisedVerificationCode)}`
+    notes: authorisedBy
+      ? authorisedRegistrationNotes(authorisedBy.code, authorisedBy.name)
       : "",
   };
 
@@ -487,7 +496,7 @@ export async function updatePanelistProfile(
 
   const cityFinal =
     data.placeOfResidence === "Abroad"
-      ? cleanText(data.cityTownVillage)
+      ? cleanText(data.usDiasporaRegion)
       : data.cityTownVillage === "Other"
         ? data.cityTownVillageOther
         : data.cityTownVillage;
@@ -510,6 +519,7 @@ export async function updatePanelistProfile(
     district: data.placeOfResidence === "Abroad" ? "" : data.placeOfResidence,
     city_town_village: cleanText(cityFinal),
     country_if_abroad: data.placeOfResidence === "Abroad" ? cleanText(data.countryIfAbroad) : "",
+    residence_region: data.placeOfResidence === "Abroad" ? cleanText(data.usDiasporaRegion) : "",
     phone_whatsapp: existing.phone_whatsapp,
     facebook: normalizeContactHandle(data.facebook),
     instagram: normalizeContactHandle(data.instagram),

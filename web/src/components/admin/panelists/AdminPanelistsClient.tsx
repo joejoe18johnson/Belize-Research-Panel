@@ -14,6 +14,7 @@ import {
   panelistDisplayLabel,
   type AdminPanelistPublicRow,
 } from "@/lib/admin-panelists";
+import { formatAuthorisedByLabel, parseAuthorisedRegistration } from "@/lib/authorised-registrars";
 import { BELIZE_DISTRICTS, CITY_TOWN_VILLAGE, getConstituencyOptions } from "@/lib/constants";
 import type { PanelistRow } from "@/lib/panelists";
 import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
@@ -643,6 +644,8 @@ export function AdminPanelistsClient({
           error={error}
           message={message}
           photoIdType={cleanText(editingRow.photo_id_type)}
+          authorisedCode={parseAuthorisedRegistration(editingRow).code}
+          authorisedBy={parseAuthorisedRegistration(editingRow).registrarName}
           panelistEmail={editingRow.email}
           requirementContext={requirementReviewContext}
           onRequirementDecision={applyRequirementDecision}
@@ -679,6 +682,8 @@ function PanelistEditModal({
   error,
   message,
   photoIdType,
+  authorisedCode,
+  authorisedBy,
   panelistEmail,
   requirementContext,
   onRequirementDecision,
@@ -695,6 +700,8 @@ function PanelistEditModal({
   error: string;
   message: string;
   photoIdType: string;
+  authorisedCode: string;
+  authorisedBy: string;
   panelistEmail: string;
   requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean };
   onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false") => void;
@@ -709,6 +716,8 @@ function PanelistEditModal({
     phone_whatsapp: editState.phone_whatsapp,
     photo_id_type: photoIdType,
     notes: editState.notes,
+    authorised_verification_code: authorisedCode,
+    authorised_registrar_name: authorisedBy,
   };
 
   const onFile = {
@@ -795,6 +804,22 @@ function PanelistEditModal({
             </p>
           ) : null}
         </div>
+        {authorisedCode || authorisedBy ? (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
+            <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+              {formatHeadingCase("Authorised registration")}
+            </p>
+            <p className="mt-1 text-sm text-amber-900 dark:text-amber-200">
+              No photo ID file is on record. The ID was checked in person.
+            </p>
+            <p className="mt-2 text-sm text-amber-950 dark:text-amber-100">
+              Authorised by: <strong>{authorisedBy || "Name not stored"}</strong>
+            </p>
+            <p className="mt-1 font-mono text-sm tracking-wide text-amber-950 dark:text-amber-100">
+              Code: {authorisedCode || "Not stored"}
+            </p>
+          </div>
+        ) : null}
         <div className="grid gap-4 md:grid-cols-2">
           <FieldSelect
             label="Verification status"
@@ -954,12 +979,13 @@ function DataTable({
             </th>
           ))}
           <th className="whitespace-nowrap px-3 py-2 font-semibold">Email · Phone · ID</th>
+          <th className="whitespace-nowrap px-3 py-2 font-semibold">Authorised by</th>
         </tr>
       </thead>
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length + (actions ? 2 : 1)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
+            <td colSpan={columns.length + (actions ? 3 : 2)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
               No records on this page.
             </td>
           </tr>
@@ -997,6 +1023,13 @@ function DataTable({
                   ) : (
                     "—"
                   )}
+                </td>
+                <td data-label="Authorised by" className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                  {formatAuthorisedByLabel({
+                    notes: row.notes,
+                    authorised_verification_code: row.authorised_verification_code,
+                    authorised_registrar_name: row.authorised_registrar_name,
+                  }) || "—"}
                 </td>
               </tr>
             );

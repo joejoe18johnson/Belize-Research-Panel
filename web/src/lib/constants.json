@@ -710,12 +710,9 @@
     "Utility bill"
   ],
   "US_DIASPORA_REGIONS": [
-    "US \u2013 Florida",
-    "US \u2013 Midwest",
-    "US \u2013 Northeast",
-    "US \u2013 South",
-    "US \u2013 Texas",
-    "US \u2013 West",
-    "US \u2013 Other / Not sure"
+    "Northeast",
+    "Midwest",
+    "South",
+    "West"
   ]
 }

@@ -11,6 +11,7 @@ import type { ClientUserRecord } from "../client-users";
 import type { NotificationReadState } from "../notification-state";
 import type { AdminReadState } from "../admin-read-state";
 import type { SupportMessageRecord } from "../support-messages";
+import type { AuthorisedRegistrarStore } from "../authorised-registrars";
 import { normalizeRewardSettings } from "../reward-settings";
 import { cleanText } from "../validation";
 import { getSupabaseAdmin } from "./server";
@@ -892,5 +893,29 @@ export async function supabaseSaveAdminReadState(state: AdminReadState): Promise
   }
   if (!rows.length) return;
   const { error } = await db().from("admin_read_states").insert(rows);
+  throwIfError(error);
+}
+
+const AUTHORISED_REGISTRARS_STORAGE_PATH = "_config/authorised-registrars.json";
+
+export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
+  const { data, error } = await db().storage.from("panelist-documents").download(AUTHORISED_REGISTRARS_STORAGE_PATH);
+  if (error || !data) return { registrars: [] };
+  try {
+    const parsed = JSON.parse(await data.text()) as Partial<AuthorisedRegistrarStore>;
+    return { registrars: Array.isArray(parsed.registrars) ? parsed.registrars : [] };
+  } catch {
+    return { registrars: [] };
+  }
+}
+
+export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
+  const payload = Buffer.from(JSON.stringify(store, null, 2), "utf-8");
+  const { error } = await db()
+    .storage.from("panelist-documents")
+    .upload(AUTHORISED_REGISTRARS_STORAGE_PATH, payload, {
+      contentType: "application/json",
+      upsert: true,
+    });
   throwIfError(error);
 }

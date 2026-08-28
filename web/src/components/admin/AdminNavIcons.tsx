@@ -22,6 +22,12 @@ const ICONS: Record<string, ReactNode> = {
       <path strokeLinecap="round" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
     </IconBase>
   ),
+  "authorised-registrars": (
+    <IconBase>
+      <path strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+      <path strokeLinecap="round" d="M9 12l2 2 4-4" />
+    </IconBase>
+  ),
   "admin-dashboard": (
     <IconBase>
       <rect x="3" y="3" width="7" height="7" rx="1" />

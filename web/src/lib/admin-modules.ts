@@ -117,6 +117,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "authorised-registrars",
+    label: "Authorised Registrars",
+    kind: "page",
+    href: "/admin/authorised-registrars",
+    section: "panelists",
+    status: "working",
+  },
+  {
     slug: "panelist-groups",
     label: "Groups",
     kind: "page",

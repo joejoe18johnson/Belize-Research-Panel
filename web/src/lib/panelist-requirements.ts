@@ -2,6 +2,7 @@ import type { AccountRecord } from "./auth-types";
 import { FLAGGED_VERIFICATION_STATUS } from "./admin-panelists";
 import type { PanelistRow } from "./panelists";
 import { isPanelistVerified } from "./verification-status";
+import { parseAuthorisedRegistration } from "./authorised-registrars";
 import { cleanText, validEmail } from "./validation";
 
 export type RequirementKey = "email" | "phone" | "photo_id";
@@ -44,7 +45,7 @@ function phoneDigits(value: string): string {
 
 function photoIdOnFile(panelist: PanelistRow, context: RequirementContext): boolean {
   const photoIdType = cleanText(panelist.photo_id_type);
-  const authorisedRegistration = cleanText(panelist.notes).toLowerCase().includes("authorised registration");
+  const authorisedRegistration = parseAuthorisedRegistration(panelist).isAuthorised;
   return Boolean(photoIdType || authorisedRegistration || context.hasPhotoUpload);
 }
 
@@ -124,7 +125,15 @@ function assessPhotoId(panelist: PanelistRow, context: RequirementContext): Requ
 
   let detail = "Not provided";
   if (onFile) {
-    detail = photoIdType || "Submitted — review in progress";
+    const authorised = parseAuthorisedRegistration(panelist);
+    if (authorised.isAuthorised) {
+      const who = authorised.registrarName
+        ? `${authorised.registrarName} (${authorised.code || "code on file"})`
+        : authorised.code || "code on file";
+      detail = `Authorised registration — no ID file. Authorised by ${who}`;
+    } else {
+      detail = photoIdType || "Submitted — review in progress";
+    }
   }
 
   return {

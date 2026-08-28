@@ -49,6 +49,10 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     cityTownVillage,
     cityTownVillageOther,
     countryIfAbroad: row.country_if_abroad ?? "",
+    usDiasporaRegion:
+      placeOfResidence === "Abroad"
+        ? cleanText(row.residence_region) || cityStored
+        : "",
     politicalInterests: splitInterests(row.political_interests ?? ""),
     marketInterests: splitInterests(row.market_interests ?? ""),
     civicInterests: splitInterests(row.civic_interests ?? ""),

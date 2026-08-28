@@ -59,6 +59,12 @@ export const PHOTO_ID_TYPES = raw.PHOTO_ID_TYPES.filter((t) => {
 }) as string[];
 export const COMMONWEALTH_RESIDENCE_PROOF_TYPES = raw.COMMONWEALTH_RESIDENCE_PROOF_TYPES as string[];
 export const US_DIASPORA_REGIONS = raw.US_DIASPORA_REGIONS as string[];
+
+const UNITED_STATES_COUNTRY_NAMES = new Set(["United States", "USA", "United States of America"]);
+
+export function isUnitedStatesCountry(country: string): boolean {
+  return UNITED_STATES_COUNTRY_NAMES.has(country.trim());
+}
 export const CONSTITUENCY_CTV = raw.CONSTITUENCY_CTV as Record<string, string[]>;
 
 export const PANELIST_COLUMNS = [
@@ -93,6 +99,9 @@ export const PANELIST_COLUMNS = [
   "street_address",
   "photo_id_type",
   "photo_id_last4",
+  "authorised_verification_code",
+  "authorised_registrar_name",
+  "residence_region",
   "username",
   "password_salt",
   "password_hash",

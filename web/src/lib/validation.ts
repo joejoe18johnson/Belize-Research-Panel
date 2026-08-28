@@ -6,8 +6,10 @@ import {
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
   hasRegisteredCtvQuestion,
+  isUnitedStatesCountry,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
+  US_DIASPORA_REGIONS,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
 
@@ -347,6 +349,7 @@ export function validateRegistrationForm(
     hardDuplicate?: boolean;
     accountBacked?: boolean;
     accountEmail?: string;
+    authorisedCodeValid?: boolean;
   } = {}
 ): FieldErrors {
   const errors: FieldErrors = {};
@@ -409,12 +412,14 @@ export function validateRegistrationForm(
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
     }
-    if (!cleanText(data.cityTownVillage)) {
-      errors.cityTownVillage = "Current city / town / village is required.";
-    }
-    const isUsAbroad = ["United States", "USA", "United States of America"].includes(data.countryIfAbroad);
-    if (isUsAbroad && !data.usDiasporaRegion) {
-      errors.usDiasporaRegion = "US region is required.";
+    if (isUnitedStatesCountry(data.countryIfAbroad)) {
+      if (!data.usDiasporaRegion) {
+        errors.usDiasporaRegion = "US region is required.";
+      } else if (!US_DIASPORA_REGIONS.includes(data.usDiasporaRegion)) {
+        errors.usDiasporaRegion = "Please select Northeast, Midwest, South, or West.";
+      }
+    } else if (data.countryIfAbroad && !cleanText(data.usDiasporaRegion)) {
+      errors.usDiasporaRegion = "Region of country is required.";
     }
   } else if (data.placeOfResidence && !data.cityTownVillage) {
     errors.cityTownVillage = "City / Town / Village is required.";
@@ -433,13 +438,11 @@ export function validateRegistrationForm(
     errors.marketInterests = "Please select at least one market research interest.";
   }
 
-  if (contactCount < 2) {
+  if (contactCount < 2 && !cleanText(data.streetAddress)) {
     errors.contact =
-      "Please provide at least two contact methods so we can still reach you if one channel changes, is inactive, or fails during fieldwork.";
-  }
-
-  if (!cleanText(data.streetAddress)) {
-    errors.streetAddress = "Street address is required.";
+      "Please provide at least two contact methods, or a street address if fewer than two other ways to reach you are available.";
+    errors.streetAddress =
+      "Street address is required when you provide fewer than two other ways to contact you.";
   }
 
   if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";
@@ -477,8 +480,13 @@ export function validateRegistrationForm(
   if (data.registrationMode === "Self-registration" && !data.photoIdFile) {
     errors.photoIdFile = "Photo ID upload is required for self-registration.";
   }
-  if (data.registrationMode === "Registration by authorised person" && !cleanText(data.authorisedVerificationCode)) {
-    errors.authorisedVerificationCode = "Please enter the authorised verification code.";
+  if (data.registrationMode === "Registration by authorised person") {
+    if (!cleanText(data.authorisedVerificationCode)) {
+      errors.authorisedVerificationCode = "Please enter the authorised verification code.";
+    } else if (options.authorisedCodeValid === false) {
+      errors.authorisedVerificationCode =
+        "This authorisation code is not recognised. Ask the authorised person for a current code.";
+    }
   }
 
   if (!options.accountBacked) {
@@ -575,8 +583,14 @@ export function validateProfileUpdateForm(
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
     }
-    if (!cleanText(data.cityTownVillage)) {
-      errors.cityTownVillage = "Current city / town / village is required.";
+    if (isUnitedStatesCountry(data.countryIfAbroad)) {
+      if (!data.usDiasporaRegion) {
+        errors.usDiasporaRegion = "US region is required.";
+      } else if (!US_DIASPORA_REGIONS.includes(data.usDiasporaRegion)) {
+        errors.usDiasporaRegion = "Please select Northeast, Midwest, South, or West.";
+      }
+    } else if (data.countryIfAbroad && !cleanText(data.usDiasporaRegion)) {
+      errors.usDiasporaRegion = "Region of country is required.";
     }
   } else if (data.placeOfResidence && !data.cityTownVillage) {
     errors.cityTownVillage = "City / town / village is required.";

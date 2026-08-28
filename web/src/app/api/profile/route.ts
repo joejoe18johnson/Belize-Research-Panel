@@ -32,6 +32,7 @@ function parseProfileUpdateBody(body: unknown): ProfileUpdateFormData | null {
     cityTownVillage: String(data.cityTownVillage ?? ""),
     cityTownVillageOther: String(data.cityTownVillageOther ?? ""),
     countryIfAbroad: String(data.countryIfAbroad ?? ""),
+    usDiasporaRegion: String(data.usDiasporaRegion ?? ""),
     politicalInterests: parseArray(data.politicalInterests),
     marketInterests: parseArray(data.marketInterests),
     civicInterests: parseArray(data.civicInterests),

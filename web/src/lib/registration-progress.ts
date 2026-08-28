@@ -8,6 +8,11 @@ import {
 
 export const REGISTRATION_PHASES = [
   {
+    id: "verification",
+    label: "Verification",
+    description: "How your identity will be confirmed",
+  },
+  {
     id: "eligibility",
     label: "Eligibility",
     description: "Citizenship, age and voter status",
@@ -28,11 +33,6 @@ export const REGISTRATION_PHASES = [
     description: "How we can reach you",
   },
   {
-    id: "verification",
-    label: "Verification",
-    description: "Photo identification and proof of residence",
-  },
-  {
     id: "review",
     label: "Review",
     description: "Consent and submit",
@@ -47,7 +47,19 @@ export interface RegistrationProgressInput {
 }
 
 const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
-  ["citizenshipStatus", "commonwealthCountry", "dob", "votingStatus"],
+  [
+    "photoIdType",
+    "photoIdFile",
+    "authorisedVerificationCode",
+  ],
+  [
+    "citizenshipStatus",
+    "commonwealthCountry",
+    "dob",
+    "votingStatus",
+    "proofOfBelizeResidenceType",
+    "proofOfBelizeResidenceFile",
+  ],
   [
     "firstName",
     "lastName",
@@ -73,21 +85,21 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "streetAddress",
     "contactDetailsConfirmed",
   ],
-  [
-    "photoIdType",
-    "photoIdFile",
-    "authorisedVerificationCode",
-    "proofOfBelizeResidenceType",
-    "proofOfBelizeResidenceFile",
-  ],
   ["consentResearch", "consentContact", "consentPrivacy", "finalReviewConfirmed"],
 ];
+
+const VERIFICATION_PHASE = 0;
+const ELIGIBILITY_PHASE = 1;
+const PROFILE_PHASE = 2;
+const INTERESTS_PHASE = 3;
+const CONTACT_PHASE = 4;
+const REVIEW_PHASE = 5;
 
 export function getPhaseIndexForField(fieldKey: string): number {
   const index = PHASE_ERROR_KEYS.findIndex((keys) => keys.includes(fieldKey));
   if (index >= 0) return index;
-  if (fieldKey === "contact") return 3;
-  if (fieldKey === "submit") return 5;
+  if (fieldKey === "contact") return CONTACT_PHASE;
+  if (fieldKey === "submit") return REVIEW_PHASE;
   return 0;
 }
 
@@ -124,52 +136,45 @@ export function getPhaseFieldKeys(phaseIndex: number): readonly string[] {
 function collectPhaseErrors(
   phaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string } = {}
+  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; authorisedCodeValid?: boolean } = {}
 ): FieldErrors {
   const allErrors = validateRegistrationForm(input.form, options);
   const keys = new Set(getPhaseFieldKeys(phaseIndex));
   const { form } = input;
 
-  if (phaseIndex === 0 && !isEligibleCitizenship(form.citizenshipStatus)) {
+  if (phaseIndex === ELIGIBILITY_PHASE && !isEligibleCitizenship(form.citizenshipStatus)) {
     delete allErrors.votingStatus;
     delete allErrors.commonwealthCountry;
   }
-  if (phaseIndex === 0 && form.citizenshipStatus !== "Citizen of a Commonwealth country living in Belize") {
+  if (phaseIndex === ELIGIBILITY_PHASE && form.citizenshipStatus !== "Citizen of a Commonwealth country living in Belize") {
     delete allErrors.commonwealthCountry;
+    delete allErrors.proofOfBelizeResidenceType;
+    delete allErrors.proofOfBelizeResidenceFile;
   }
-  if (phaseIndex === 1 && !isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
+  if (phaseIndex === PROFILE_PHASE && !isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
     delete allErrors.constituency;
     delete allErrors.registeredCtvArea;
   }
-  if (phaseIndex === 1 && form.placeOfResidence === "Abroad") {
+  if (phaseIndex === PROFILE_PHASE && form.placeOfResidence === "Abroad") {
+    delete allErrors.cityTownVillage;
     delete allErrors.cityTownVillageOther;
   }
-  if (phaseIndex === 1 && form.placeOfResidence && form.placeOfResidence !== "Abroad") {
+  if (phaseIndex === PROFILE_PHASE && form.placeOfResidence && form.placeOfResidence !== "Abroad") {
     delete allErrors.countryIfAbroad;
     delete allErrors.usDiasporaRegion;
   }
-  if (phaseIndex === 1 && form.placeOfResidence !== "Abroad") {
+  if (phaseIndex === PROFILE_PHASE && form.placeOfResidence !== "Abroad") {
     delete allErrors.cityTownVillageOther;
   }
-  if (phaseIndex === 1) {
-    const isUsAbroad = ["United States", "USA", "United States of America"].includes(form.countryIfAbroad);
-    if (form.placeOfResidence !== "Abroad" || !isUsAbroad) {
-      delete allErrors.usDiasporaRegion;
-    }
-  }
-  if (phaseIndex === 2) {
+  if (phaseIndex === INTERESTS_PHASE) {
     if (form.placeOfResidence === "Abroad") {
       delete allErrors.marketInterests;
     }
   }
-  if (phaseIndex === 4 && form.citizenshipStatus !== "Citizen of a Commonwealth country living in Belize") {
-    delete allErrors.proofOfBelizeResidenceType;
-    delete allErrors.proofOfBelizeResidenceFile;
-  }
-  if (phaseIndex === 4 && form.registrationMode !== "Registration by authorised person") {
+  if (phaseIndex === VERIFICATION_PHASE && form.registrationMode !== "Registration by authorised person") {
     delete allErrors.authorisedVerificationCode;
   }
-  if (phaseIndex === 4 && form.registrationMode !== "Self-registration") {
+  if (phaseIndex === VERIFICATION_PHASE && form.registrationMode !== "Self-registration") {
     delete allErrors.photoIdFile;
   }
 
@@ -177,7 +182,7 @@ function collectPhaseErrors(
   for (const key of keys) {
     if (allErrors[key]) phaseErrors[key] = allErrors[key];
   }
-  if (phaseIndex === 3 && allErrors.contact) {
+  if (phaseIndex === CONTACT_PHASE && allErrors.contact) {
     phaseErrors.contact = allErrors.contact;
   }
   return phaseErrors;
@@ -186,7 +191,7 @@ function collectPhaseErrors(
 export function validateRegistrationPhase(
   phaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string } = {}
+  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; authorisedCodeValid?: boolean } = {}
 ): FieldErrors {
   return collectPhaseErrors(phaseIndex, input, options);
 }
@@ -194,7 +199,7 @@ export function validateRegistrationPhase(
 export function validatePhasesThrough(
   throughPhaseIndex: number,
   input: RegistrationProgressInput,
-  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; extraErrors?: FieldErrors } = {}
+  options: { usernameTaken?: boolean; accountBacked?: boolean; accountEmail?: string; extraErrors?: FieldErrors; authorisedCodeValid?: boolean } = {}
 ): { errors: FieldErrors; firstErrorPhase: number | null } {
   const merged: FieldErrors = { ...(options.extraErrors ?? {}) };
   let firstErrorPhase: number | null = null;

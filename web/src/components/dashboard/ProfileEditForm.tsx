@@ -22,13 +22,15 @@ import {
   needsVoterRegistrationQuestion,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
+  US_DIASPORA_REGIONS,
   VOTING_STATUS,
   CITY_TOWN_VILLAGE,
+  isUnitedStatesCountry,
 } from "@/lib/constants";
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { ProfileContactDisplay, ProfileUpdateFormData } from "@/lib/profile-update-types";
-import { isRegisteredVoter, type FieldErrors } from "@/lib/validation";
+import { countContactMethods, isRegisteredVoter, type FieldErrors } from "@/lib/validation";
 import { ProfileContactChangePanel } from "./ProfileContactChangePanel";
 import { SectionHeading } from "./DashboardShell";
 
@@ -76,6 +78,15 @@ export function ProfileEditForm({
     () => getRegisteredCtvOptions(form.constituency),
     [form.constituency]
   );
+  const contactCount = countContactMethods({
+    email: contact.email,
+    phoneCountryCode: contact.phoneCountryCode,
+    phoneLocalNumber: contact.phoneLocalNumber,
+    facebook: form.facebook,
+    instagram: form.instagram,
+    tiktok: form.tiktok,
+    otherContact: form.otherContact,
+  });
 
   const update = <K extends keyof ProfileUpdateFormData>(key: K, value: ProfileUpdateFormData[K]) => {
     setForm((prev) => {
@@ -97,6 +108,10 @@ export function ProfileEditForm({
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
+        next.usDiasporaRegion = "";
+      }
+      if (key === "countryIfAbroad") {
+        next.usDiasporaRegion = "";
       }
       return next;
     });
@@ -354,19 +369,45 @@ export function ProfileEditForm({
                   ))}
                 </SelectInput>
               </Field>
-              <Field
-                label="Current city / town / village"
-                required
-                error={errors.cityTownVillage}
-                id="cityTownVillage"
-              >
-                <TextInput
-                  id="cityTownVillage"
-                  value={form.cityTownVillage}
-                  onChange={(e) => update("cityTownVillage", e.target.value)}
-                  error={errors.cityTownVillage}
-                />
-              </Field>
+              {isUnitedStatesCountry(form.countryIfAbroad) ? (
+                <Field
+                  label="Region of country"
+                  required
+                  hint="US Census regions."
+                  error={errors.usDiasporaRegion}
+                  id="usDiasporaRegion"
+                >
+                  <SelectInput
+                    id="usDiasporaRegion"
+                    value={form.usDiasporaRegion}
+                    onChange={(e) => update("usDiasporaRegion", e.target.value)}
+                    error={errors.usDiasporaRegion}
+                  >
+                    <option value="">Select US region</option>
+                    {US_DIASPORA_REGIONS.map((region) => (
+                      <option key={region} value={region}>
+                        {region}
+                      </option>
+                    ))}
+                  </SelectInput>
+                </Field>
+              ) : form.countryIfAbroad ? (
+                <Field
+                  label="Region of country"
+                  required
+                  hint="City or town is not required. A region such as a province, state, or area of the country is enough."
+                  error={errors.usDiasporaRegion}
+                  id="usDiasporaRegion"
+                >
+                  <TextInput
+                    id="usDiasporaRegion"
+                    value={form.usDiasporaRegion}
+                    onChange={(e) => update("usDiasporaRegion", e.target.value)}
+                    error={errors.usDiasporaRegion}
+                    placeholder="Province, state, or region"
+                  />
+                </Field>
+              ) : null}
             </>
           ) : null}
 
@@ -478,9 +519,14 @@ export function ProfileEditForm({
 
           <Field
             label="Street address / physical contact address"
+            required={contactCount < 2}
             error={errors.streetAddress ?? errors.contact}
             id="streetAddress"
-            hint="Required if you provide fewer than two electronic contact methods."
+            hint={
+              contactCount < 2
+                ? "Required because fewer than two other contact methods were provided."
+                : "Optional when you have already given at least two ways to contact you."
+            }
           >
             <TextArea
               id="streetAddress"

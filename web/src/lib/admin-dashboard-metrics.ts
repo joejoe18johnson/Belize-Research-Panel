@@ -19,6 +19,7 @@ import {
   payoutShortId,
 } from "./admin-payout-display";
 import { adminNotificationId, adminPanelistVerificationId, PANELIST_VERIFICATION_NOTIFICATION_TYPE } from "./admin-read-ids";
+import { parseAuthorisedRegistration } from "./authorised-registrars";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -68,6 +69,8 @@ export interface UnderReviewRow {
   phoneRequirement: RequirementApprovalStatus;
   photoIdRequirement: RequirementApprovalStatus;
   hasAddressDocument: boolean;
+  authorisedBy: string;
+  authorisedCode: string;
 }
 
 export type NotificationQueueType =
@@ -234,6 +237,13 @@ export function buildRecentPanelistRows(
     });
 }
 
+function authorisedReviewFields(panelist?: PanelistRow): { authorisedBy: string; authorisedCode: string } {
+  if (!panelist) return { authorisedBy: "", authorisedCode: "" };
+  const parsed = parseAuthorisedRegistration(panelist);
+  if (!parsed.isAuthorised) return { authorisedBy: "", authorisedCode: "" };
+  return { authorisedBy: parsed.registrarName, authorisedCode: parsed.code };
+}
+
 export function buildUnderReviewRows(
   hub: AdminDataHub,
   photoUploadUsernames: Set<string> = new Set()
@@ -278,6 +288,7 @@ export function buildUnderReviewRows(
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(row.place_of_residence)),
+      ...authorisedReviewFields(row),
     });
   }
 
@@ -301,6 +312,8 @@ export function buildUnderReviewRows(
         phoneRequirement: "missing",
         photoIdRequirement: "missing",
         hasAddressDocument: false,
+        authorisedBy: "",
+        authorisedCode: "",
       });
       continue;
     }
@@ -325,6 +338,7 @@ export function buildUnderReviewRows(
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(panelist.place_of_residence)),
+      ...authorisedReviewFields(panelist),
     });
   }
 

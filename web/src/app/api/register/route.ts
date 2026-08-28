@@ -5,6 +5,7 @@ import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
 import type { RegistrationMode } from "@/lib/constants";
+import { findActiveAuthorisedRegistrar } from "@/lib/authorised-registrars-store";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -100,23 +101,36 @@ export async function POST(request: NextRequest) {
     const rows = await loadPanelists();
     const { hardDuplicate } = duplicateCheck(rows, data);
 
+    const authorisedRegistrar =
+      data.registrationMode === "Registration by authorised person"
+        ? await findActiveAuthorisedRegistrar(data.authorisedVerificationCode)
+        : null;
+
     const errors = validateRegistrationForm(data, {
       hardDuplicate,
       accountBacked: true,
       accountEmail: session.email,
+      authorisedCodeValid:
+        data.registrationMode === "Registration by authorised person" ? Boolean(authorisedRegistrar) : undefined,
     });
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
     const username = deriveAccountUsername(session.email, session.id);
-    const result = await registerPanelist(data, {
-      username,
-      passwordSalt: accountRecord.password_salt,
-      passwordHash: accountRecord.password_hash,
-      accountEmail: session.email,
-      accountId: session.id,
-    });
+    const result = await registerPanelist(
+      data,
+      {
+        username,
+        passwordSalt: accountRecord.password_salt,
+        passwordHash: accountRecord.password_hash,
+        accountEmail: session.email,
+        accountId: session.id,
+      },
+      authorisedRegistrar
+        ? { code: authorisedRegistrar.code, name: authorisedRegistrar.name }
+        : undefined
+    );
     await markAccountPanelistRegistered(session.id);
 
     void sendRegistrationSubmittedEmail({

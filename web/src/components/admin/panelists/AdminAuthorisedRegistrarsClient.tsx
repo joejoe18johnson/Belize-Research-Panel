@@ -1,0 +1,245 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { MetricCard, PageIntro } from "@/components/admin/shared/AdminUi";
+import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import type { AuthorisedRegistrar } from "@/lib/authorised-registrars";
+import { formatHeadingCase } from "@/lib/sentence-case";
+
+export function AdminAuthorisedRegistrarsClient({
+  initialRegistrars,
+}: {
+  initialRegistrars: AuthorisedRegistrar[];
+}) {
+  const router = useRouter();
+  const [registrars, setRegistrars] = useState(initialRegistrars);
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+  const [notes, setNotes] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState("");
+
+  const activeCount = useMemo(() => registrars.filter((row) => row.active).length, [registrars]);
+
+  const refreshFromResponse = (next: AuthorisedRegistrar[]) => {
+    setRegistrars(next);
+    router.refresh();
+  };
+
+  const create = async () => {
+    setSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const res = await fetch("/api/admin/authorised-registrars", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, code, notes }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        registrar?: AuthorisedRegistrar;
+        message?: string;
+      };
+      if (!res.ok || !data.registrar) {
+        setError(data.message ?? "Could not create the authorisation code.");
+        return;
+      }
+      setName("");
+      setCode("");
+      setNotes("");
+      setMessage(`Code ${data.registrar.code} created for ${data.registrar.name}.`);
+      refreshFromResponse([...registrars, data.registrar]);
+    } catch {
+      setError("Network error while creating the code.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const setActive = async (id: string, active: boolean) => {
+    setBusyId(id);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/authorised-registrars", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, active }),
+      });
+      const data = (await res.json()) as { ok?: boolean; registrar?: AuthorisedRegistrar; message?: string };
+      if (!res.ok || !data.registrar) {
+        setError(data.message ?? "Could not update that code.");
+        return;
+      }
+      refreshFromResponse(registrars.map((row) => (row.id === id ? data.registrar! : row)));
+    } catch {
+      setError("Network error while updating that code.");
+    } finally {
+      setBusyId("");
+    }
+  };
+
+  const remove = async (id: string) => {
+    if (!window.confirm("Delete this authorisation code? Existing panelists who used it will still keep the code on their record.")) {
+      return;
+    }
+    setBusyId(id);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/authorised-registrars", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string };
+      if (!res.ok) {
+        setError(data.message ?? "Could not delete that code.");
+        return;
+      }
+      refreshFromResponse(registrars.filter((row) => row.id !== id));
+    } catch {
+      setError("Network error while deleting that code.");
+    } finally {
+      setBusyId("");
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6">
+      <PageIntro
+        eyebrow="Panelists"
+        title={formatHeadingCase("Authorised registrars")}
+        description="Give trusted people a unique code so they can register panelists after checking a photo ID in person. Admin will see the code and whose name it belongs to. Random codes are not accepted."
+      />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <MetricCard label="Active codes" value={activeCount} />
+        <MetricCard label="All codes" value={registrars.length} />
+      </div>
+
+      {error ? (
+        <BrandedAlert tone="error" showIcon>
+          {error}
+        </BrandedAlert>
+      ) : null}
+      {message ? (
+        <BrandedAlert tone="success" showIcon>
+          {message}
+        </BrandedAlert>
+      ) : null}
+
+      <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+        <div>
+          <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
+            {formatHeadingCase("Issue a new code")}
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            The authorised person must see a photo ID in person before giving this code to a new panelist.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm">
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">Authorised person&apos;s name</span>
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+              placeholder="Full name"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">Code (optional)</span>
+            <input
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm uppercase dark:border-zinc-800 dark:bg-zinc-950"
+              placeholder="Leave blank to generate"
+            />
+          </label>
+        </div>
+        <label className="block text-sm">
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">Internal note (optional)</span>
+          <input
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+            placeholder="Relationship, location, or how they will register people"
+          />
+        </label>
+        <button
+          type="button"
+          disabled={saving || !name.trim()}
+          onClick={create}
+          className="inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
+        >
+          {saving ? "Creating…" : "Create authorisation code"}
+        </button>
+      </section>
+
+      <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+          <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
+            {formatHeadingCase("Issued codes")}
+          </h2>
+        </div>
+        {registrars.length === 0 ? (
+          <p className="px-5 py-8 text-sm text-zinc-600 dark:text-zinc-400">
+            No codes yet. Create one for each trusted person who will check IDs in person.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-zinc-50 text-xs font-semibold text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
+                <tr>
+                  <th className="px-5 py-3">Name</th>
+                  <th className="px-5 py-3">Code</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Note</th>
+                  <th className="px-5 py-3">Created</th>
+                  <th className="px-5 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registrars.map((row) => (
+                  <tr key={row.id} className="border-t border-zinc-100 dark:border-zinc-800">
+                    <td className="px-5 py-3 font-medium text-zinc-900 dark:text-zinc-100">{row.name}</td>
+                    <td className="px-5 py-3 font-mono tracking-wide">{row.code}</td>
+                    <td className="px-5 py-3">{row.active ? "Active" : "Inactive"}</td>
+                    <td className="px-5 py-3 text-zinc-600 dark:text-zinc-400">{row.notes || "—"}</td>
+                    <td className="px-5 py-3 text-zinc-600 dark:text-zinc-400">
+                      {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "—"}
+                      {row.createdBy ? ` · ${row.createdBy}` : ""}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={busyId === row.id}
+                          onClick={() => setActive(row.id, !row.active)}
+                          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                        >
+                          {row.active ? "Deactivate" : "Reactivate"}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busyId === row.id}
+                          onClick={() => remove(row.id)}
+                          className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-50 dark:border-red-900 dark:text-red-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

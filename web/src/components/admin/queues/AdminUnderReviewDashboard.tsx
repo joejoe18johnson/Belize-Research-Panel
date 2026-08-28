@@ -70,6 +70,8 @@ export function AdminUnderReviewDashboard({
             row.name.toLowerCase().includes(query) ||
             row.email.toLowerCase().includes(query) ||
             row.verificationStatus.toLowerCase().includes(query) ||
+            row.authorisedBy.toLowerCase().includes(query) ||
+            row.authorisedCode.toLowerCase().includes(query) ||
             row.reasons.some((reason) => reason.toLowerCase().includes(query))
         );
     return [...matches].sort((left, right) => {
@@ -260,6 +262,7 @@ export function AdminUnderReviewDashboard({
                   <AdminTableTh>Name</AdminTableTh>
                   <AdminTableTh>Email</AdminTableTh>
                   <AdminTableTh>Email · Phone · ID</AdminTableTh>
+                  <AdminTableTh>Authorised by</AdminTableTh>
                   <AdminTableTh>Verification</AdminTableTh>
                   <AdminTableTh>Account</AdminTableTh>
                   <AdminTableTh>Reason</AdminTableTh>
@@ -290,6 +293,18 @@ export function AdminUnderReviewDashboard({
                           photoId={row.photoIdRequirement}
                           iconsOnly
                         />
+                      </AdminTableTd>
+                      <AdminTableTd label="Authorised by">
+                        {row.authorisedCode ? (
+                          <div>
+                            <p className="font-medium text-zinc-800 dark:text-zinc-200">
+                              {row.authorisedBy || "Authorised registration"}
+                            </p>
+                            <p className="font-mono text-xs tracking-wide text-zinc-500">{row.authorisedCode}</p>
+                          </div>
+                        ) : (
+                          "—"
+                        )}
                       </AdminTableTd>
                       <AdminTableTd label="Verification">
                         <AdminStatusPill
