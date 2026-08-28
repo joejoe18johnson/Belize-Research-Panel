@@ -87,15 +87,13 @@ export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarSto
       "./supabase/repos"
     );
     const remote = await supabaseLoadAuthorisedRegistrars();
-    if (remote) return normalizeStore(remote);
+    if (remote !== null) return normalizeStore(remote);
 
     const seeded = await readJsonFile();
-    if (seeded.registrars.length > 0) {
-      try {
-        await supabaseSaveAuthorisedRegistrars(seeded);
-      } catch (error) {
-        console.error("Could not persist authorised registrars to Supabase:", error);
-      }
+    try {
+      await supabaseSaveAuthorisedRegistrars(seeded);
+    } catch (error) {
+      console.error("Could not persist authorised registrars to Supabase:", error);
     }
     return seeded;
   }

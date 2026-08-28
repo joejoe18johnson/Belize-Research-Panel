@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const data = parseRegistrationForm(formData);
     const rows = await loadPanelists();
-    const { hardDuplicate } = duplicateCheck(rows, data);
+    const { hardDuplicate } = duplicateCheck(rows, data, "", { ignoreEmails: [session.email] });
 
     const authorisedLookup =
       data.registrationMode === "Registration by authorised person"
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           errors: {
-            submit: "A duplicate registration appears to exist based on email, phone, name + date of birth, or photo ID details.",
+            submit: "A panelist with this email, phone, or name and date of birth is already in the system. If you need to register again, delete that panelist in Admin → Panelists first.",
           },
         },
         { status: 409 }

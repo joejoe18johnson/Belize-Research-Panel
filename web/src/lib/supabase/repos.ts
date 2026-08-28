@@ -321,7 +321,7 @@ export async function supabaseInsertPanelist(
     ...(options?.photoIdPath ? { photo_id_path: options.photoIdPath } : {}),
     ...(options?.residenceProofPath ? { residence_proof_path: options.residenceProofPath } : {}),
   };
-  const { error } = await db().from("panelists").insert(payload);
+  const { error } = await db().from("panelists").upsert(payload, { onConflict: "email" });
   throwIfError(error);
 }
 
@@ -957,8 +957,10 @@ function rowToRegistrar(row: Record<string, unknown>): AuthorisedRegistrar {
 function parseAuthorisedRegistrarsBlob(raw: string): AuthorisedRegistrarStore | null {
   try {
     const parsed = JSON.parse(raw) as Partial<AuthorisedRegistrarStore>;
-    if (!parsed || !Array.isArray(parsed.registrars)) return { registrars: [] };
-    return { registrars: parsed.registrars };
+    if (!parsed || typeof parsed !== "object") return { registrars: [] };
+    return {
+      registrars: Array.isArray(parsed.registrars) ? parsed.registrars : [],
+    };
   } catch {
     return null;
   }
@@ -1001,7 +1003,7 @@ async function loadAuthorisedRegistrarsBlob(): Promise<AuthorisedRegistrarStore 
 
 async function saveAuthorisedRegistrarsBlob(store: AuthorisedRegistrarStore): Promise<void> {
   await ensureAppDataBucket();
-  const body = new TextEncoder().encode(JSON.stringify(store));
+  const body = new TextEncoder().encode(JSON.stringify({ initialized: true, registrars: store.registrars }));
   const upload = async (contentType: string) =>
     db().storage.from(APP_DATA_BUCKET).upload(AUTHORISED_REGISTRARS_BLOB, body, {
       upsert: true,
@@ -1015,42 +1017,56 @@ async function saveAuthorisedRegistrarsBlob(store: AuthorisedRegistrarStore): Pr
   if (error) throw new Error(error.message);
 }
 
-async function saveAuthorisedRegistrarsTable(store: AuthorisedRegistrarStore): Promise<void> {
+async function saveAuthorisedRegistrarsTable(store: AuthorisedRegistrarStore): Promise<boolean> {
   const rows = store.registrars.map(registrarToRow);
   const { error: deleteError } = await db().from(AUTHORISED_REGISTRARS_TABLE).delete().not("id", "is", null);
-  if (isMissingAuthorisedRegistrarsRelation(deleteError)) return;
+  if (isMissingAuthorisedRegistrarsRelation(deleteError)) return false;
   throwIfError(deleteError);
-  if (!rows.length) return;
+  if (!rows.length) return true;
   const { error } = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(rows);
   if (isMissingColumnError(error, "used_at") || isMissingColumnError(error, "used_by_email")) {
     const slimRows = rows.map(({ used_at: _usedAt, used_by_email: _usedByEmail, ...rest }) => rest);
     const retry = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(slimRows);
     throwIfError(retry.error);
-    return;
+    return true;
   }
   throwIfError(error);
+  return true;
 }
 
 export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore | null> {
   const blob = await loadAuthorisedRegistrarsBlob();
-  if (blob) return blob;
+  if (blob !== null) return blob;
 
   const { data, error } = await db().from(AUTHORISED_REGISTRARS_TABLE).select("*").order("created_at");
   if (isMissingAuthorisedRegistrarsRelation(error)) return null;
   throwIfError(error);
-  const registrars = (data ?? []).map((row) => rowToRegistrar(row as Record<string, unknown>));
-  if (registrars.length === 0) return null;
-  return { registrars };
+  return {
+    registrars: (data ?? []).map((row) => rowToRegistrar(row as Record<string, unknown>)),
+  };
 }
 
 export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
-  await saveAuthorisedRegistrarsBlob(store);
+  let blobError: unknown = null;
+  let tableSaved = false;
+
   try {
-    await saveAuthorisedRegistrarsTable(store);
+    await saveAuthorisedRegistrarsBlob(store);
+  } catch (error) {
+    blobError = error;
+    console.error("Supabase authorised registrar file save failed:", error);
+  }
+
+  try {
+    tableSaved = await saveAuthorisedRegistrarsTable(store);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (!message.toLowerCase().includes("authorised_registrars")) {
       console.error("Supabase authorised registrar table save failed:", error);
     }
+  }
+
+  if (blobError && !tableSaved) {
+    throw blobError instanceof Error ? blobError : new Error("Could not save authorisation codes.");
   }
 }

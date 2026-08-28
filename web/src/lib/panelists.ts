@@ -239,10 +239,14 @@ export function ensureUniqueUsername(rows: PanelistRow[], base: string): string 
 export function duplicateCheck(
   rows: PanelistRow[],
   data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "firstName" | "lastName" | "dob" | "photoIdType">,
-  photoIdLast4 = ""
+  photoIdLast4 = "",
+  options: { ignoreEmails?: string[] } = {}
 ): { hardDuplicate: boolean; possibleDuplicate: boolean } {
   let hardDuplicate = false;
   const possibleDuplicate = false;
+  const ignoreEmails = new Set(
+    (options.ignoreEmails ?? []).map((email) => cleanText(email).toLowerCase()).filter(Boolean)
+  );
 
   const emailNorm = cleanText(data.email).toLowerCase();
   const phoneNorm = normalizePhoneForComparison(getFullPhoneNumber(data));
@@ -253,6 +257,7 @@ export function duplicateCheck(
   const idLast4Norm = cleanText(photoIdLast4);
 
   for (const row of rows) {
+    if (ignoreEmails.has(cleanText(row.email).toLowerCase())) continue;
     if (emailNorm && cleanText(row.email).toLowerCase() === emailNorm) hardDuplicate = true;
     if (phoneNorm && normalizePhoneForComparison(row.phone_whatsapp) === phoneNorm) hardDuplicate = true;
     if (
@@ -356,7 +361,9 @@ export async function registerPanelist(
       ? data.otherContactPlatformCustom
       : data.otherContactPlatform;
 
-  const { hardDuplicate, possibleDuplicate } = duplicateCheck(rows, data);
+  const { hardDuplicate, possibleDuplicate } = duplicateCheck(rows, data, "", {
+    ignoreEmails: credentials?.accountEmail ? [credentials.accountEmail] : [],
+  });
   if (hardDuplicate) {
     throw new Error("duplicate");
   }
@@ -456,7 +463,14 @@ export async function registerPanelist(
       : "",
   };
 
-  rows.push(newRow);
+  const existingIndex = rows.findIndex(
+    (row) => cleanText(row.email).toLowerCase() === cleanText(panelistEmail).toLowerCase()
+  );
+  if (existingIndex >= 0) {
+    rows[existingIndex] = { ...rows[existingIndex], ...newRow };
+  } else {
+    rows.push(newRow);
+  }
 
   if (useSupabase()) {
     const { supabaseInsertPanelist } = await import("./supabase/repos");

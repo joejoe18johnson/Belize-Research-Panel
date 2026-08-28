@@ -529,7 +529,8 @@ export function validateRegistrationForm(
   }
 
   if (options.hardDuplicate) {
-    errors.submit = "A duplicate registration appears to exist based on email, phone, name + date of birth, or photo ID details.";
+    errors.submit =
+      "A panelist with this email, phone, or name and date of birth is already in the system. If you need to register again, delete that panelist in Admin → Panelists first.";
   }
 
   void cityFinal;
