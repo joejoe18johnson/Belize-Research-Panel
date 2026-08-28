@@ -71,30 +71,18 @@ export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarSto
 
 export async function saveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<AuthorisedRegistrarStore> {
   const next = normalizeStore(store);
-  const { isProductionDeploy, useSupabase } = await import("./supabase/data-source");
-  let supabaseError: unknown = null;
+  const { useSupabase } = await import("./supabase/data-source");
 
   if (useSupabase()) {
     try {
       const { supabaseSaveAuthorisedRegistrars } = await import("./supabase/repos");
       await supabaseSaveAuthorisedRegistrars(next);
     } catch (error) {
-      supabaseError = error;
       console.error("Supabase authorised registrar save failed:", error);
     }
   }
 
-  try {
-    await writeJsonFile(next);
-  } catch (error) {
-    if (supabaseError) throw supabaseError;
-    throw error;
-  }
-
-  if (supabaseError && isProductionDeploy()) {
-    throw supabaseError;
-  }
-
+  await writeJsonFile(next);
   return next;
 }
 

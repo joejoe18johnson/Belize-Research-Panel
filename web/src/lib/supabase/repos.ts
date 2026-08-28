@@ -11,7 +11,7 @@ import type { ClientUserRecord } from "../client-users";
 import type { NotificationReadState } from "../notification-state";
 import type { AdminReadState } from "../admin-read-state";
 import type { SupportMessageRecord } from "../support-messages";
-import type { AuthorisedRegistrarStore } from "../authorised-registrars";
+import type { AuthorisedRegistrar, AuthorisedRegistrarStore } from "../authorised-registrars";
 import { normalizeRewardSettings } from "../reward-settings";
 import { cleanText } from "../validation";
 import { getSupabaseAdmin } from "./server";
@@ -61,6 +61,18 @@ function isMissingColumnError(error: { message?: string; code?: string } | null,
       message.includes("schema cache") ||
       message.includes("could not find") ||
       message.includes("does not exist"))
+  );
+}
+
+function isMissingRelation(error: { message?: string; code?: string } | null): boolean {
+  if (!error) return false;
+  const message = errorMessage(error);
+  return (
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    message.includes("schema cache") ||
+    message.includes("could not find the table") ||
+    (message.includes("does not exist") && message.includes("authorised_registrars"))
   );
 }
 
@@ -896,26 +908,47 @@ export async function supabaseSaveAdminReadState(state: AdminReadState): Promise
   throwIfError(error);
 }
 
-const AUTHORISED_REGISTRARS_STORAGE_PATH = "admin/authorised-registrars.json";
+const AUTHORISED_REGISTRARS_TABLE = "authorised_registrars";
+
+function registrarToRow(registrar: AuthorisedRegistrar): Record<string, unknown> {
+  return {
+    id: registrar.id,
+    name: registrar.name,
+    code: registrar.code,
+    notes: registrar.notes,
+    active: registrar.active,
+    created_at: registrar.createdAt,
+    created_by: registrar.createdBy,
+  };
+}
+
+function rowToRegistrar(row: Record<string, unknown>): AuthorisedRegistrar {
+  return {
+    id: cleanText(String(row.id ?? "")),
+    name: cleanText(String(row.name ?? "")),
+    code: cleanText(String(row.code ?? "")),
+    notes: cleanText(String(row.notes ?? "")),
+    active: row.active !== false,
+    createdAt: cleanText(String(row.created_at ?? "")),
+    createdBy: cleanText(String(row.created_by ?? "")),
+  };
+}
 
 export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
-  const { data, error } = await db().storage.from("panelist-documents").download(AUTHORISED_REGISTRARS_STORAGE_PATH);
-  if (error || !data) return { registrars: [] };
-  try {
-    const parsed = JSON.parse(await data.text()) as Partial<AuthorisedRegistrarStore>;
-    return { registrars: Array.isArray(parsed.registrars) ? parsed.registrars : [] };
-  } catch {
-    return { registrars: [] };
-  }
+  const { data, error } = await db().from(AUTHORISED_REGISTRARS_TABLE).select("*").order("created_at");
+  if (isMissingRelation(error)) return { registrars: [] };
+  throwIfError(error);
+  return {
+    registrars: (data ?? []).map((row) => rowToRegistrar(row as Record<string, unknown>)),
+  };
 }
 
 export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
-  const payload = new TextEncoder().encode(JSON.stringify(store, null, 2));
-  const { error } = await db()
-    .storage.from("panelist-documents")
-    .upload(AUTHORISED_REGISTRARS_STORAGE_PATH, payload, {
-      contentType: "application/json",
-      upsert: true,
-    });
+  const rows = store.registrars.map(registrarToRow);
+  const { error: deleteError } = await db().from(AUTHORISED_REGISTRARS_TABLE).delete().not("id", "is", null);
+  if (isMissingRelation(deleteError)) return;
+  throwIfError(deleteError);
+  if (!rows.length) return;
+  const { error } = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(rows);
   throwIfError(error);
 }

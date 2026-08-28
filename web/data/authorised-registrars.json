@@ -1,0 +1,13 @@
+{
+  "registrars": [
+    {
+      "id": "99253bea-9a01-49ee-9a29-4072ff35996f",
+      "name": "Mike Sagastumer",
+      "code": "C0A121",
+      "notes": "Orange Walk, Field Supervisor",
+      "active": true,
+      "createdAt": "2026-08-28T01:42:12.080Z",
+      "createdBy": "Super Admin"
+    }
+  ]
+}
