@@ -40,7 +40,7 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
     statusDetail:
       "The Next.js registration at /register implements and extends the Streamlit MVP: phased form, duplicate blocking, photo ID handling, and consent capture.",
     liveInPortal: [
-      { label: "Registration flow", href: "/register", detail: "Self-registration and authorised-person modes with eligibility gates at each phase." },
+      { label: "Registration flow", href: "/register", detail: "Self-registration with photo ID upload and eligibility gates at each phase." },
       { label: "Registration", href: "/register", detail: "Validates fields, blocks hard duplicates, and saves the panelist record." },
       { label: "Username check", detail: "Confirms the chosen username is unique before submit." },
     ],

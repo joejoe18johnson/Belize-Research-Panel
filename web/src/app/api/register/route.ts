@@ -4,8 +4,6 @@ import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
-import type { RegistrationMode } from "@/lib/constants";
-import { lookupAuthorisedCode, markAuthorisedCodeUsed } from "@/lib/authorised-registrars-store";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -24,8 +22,8 @@ function parseJsonArray(value: FormDataEntryValue | null): string[] {
 
 function parseRegistrationForm(formData: FormData): RegistrationFormData {
   return {
-    registrationMode: String(formData.get("registrationMode") ?? "Self-registration") as RegistrationMode,
-    authorisedVerificationCode: String(formData.get("authorisedVerificationCode") ?? ""),
+    registrationMode: "Self-registration",
+    authorisedVerificationCode: "",
     dob: String(formData.get("dob") ?? ""),
     citizenshipStatus: String(formData.get("citizenshipStatus") ?? ""),
     commonwealthCountry: String(formData.get("commonwealthCountry") ?? ""),
@@ -103,43 +101,24 @@ export async function POST(request: NextRequest) {
     const rows = await loadPanelists();
     const { hardDuplicate } = duplicateCheck(rows, data, "", { ignoreEmails: [session.email] });
 
-    const authorisedLookup =
-      data.registrationMode === "Registration by authorised person"
-        ? await lookupAuthorisedCode(data.authorisedVerificationCode)
-        : { status: "unknown" as const };
-    const authorisedRegistrar = authorisedLookup.status === "valid" ? authorisedLookup.registrar : null;
-
     const errors = validateRegistrationForm(data, {
       hardDuplicate,
       accountBacked: true,
       accountEmail: session.email,
-      authorisedCodeUsed: authorisedLookup.status === "used",
-      authorisedCodeInactive: authorisedLookup.status === "inactive",
-      authorisedCodeValid:
-        data.registrationMode === "Registration by authorised person" ? Boolean(authorisedRegistrar) : undefined,
     });
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
     const username = deriveAccountUsername(session.email, session.id);
-    const result = await registerPanelist(
-      data,
-      {
-        username,
-        passwordSalt: accountRecord.password_salt,
-        passwordHash: accountRecord.password_hash,
-        accountEmail: session.email,
-        accountId: session.id,
-      },
-      authorisedRegistrar
-        ? { code: authorisedRegistrar.code, name: authorisedRegistrar.name }
-        : undefined
-    );
+    const result = await registerPanelist(data, {
+      username,
+      passwordSalt: accountRecord.password_salt,
+      passwordHash: accountRecord.password_hash,
+      accountEmail: session.email,
+      accountId: session.id,
+    });
     await markAccountPanelistRegistered(session.id);
-    if (authorisedRegistrar) {
-      await markAuthorisedCodeUsed(authorisedRegistrar.code, session.email);
-    }
 
     void sendRegistrationSubmittedEmail({
       to: session.email,

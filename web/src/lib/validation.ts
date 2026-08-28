@@ -352,9 +352,6 @@ export function validateRegistrationForm(
     hardDuplicate?: boolean;
     accountBacked?: boolean;
     accountEmail?: string;
-    authorisedCodeValid?: boolean;
-    authorisedCodeUsed?: boolean;
-    authorisedCodeInactive?: boolean;
   } = {}
 ): FieldErrors {
   const errors: FieldErrors = {};
@@ -499,25 +496,8 @@ export function validateRegistrationForm(
   }
 
   if (!data.photoIdType) errors.photoIdType = "Photo ID type is required.";
-  if (data.registrationMode === "Self-registration" && !data.photoIdFile) {
-    errors.photoIdFile = "Photo ID upload is required for self-registration.";
-  }
-  if (data.registrationMode === "Registration by authorised person") {
-    const code = cleanText(data.authorisedVerificationCode).toUpperCase().replace(/[^A-Z0-9]/g, "");
-    if (!code) {
-      errors.authorisedVerificationCode = "Please enter the authorised verification code.";
-    } else if (!/^[A-Z0-9]{6}$/.test(code)) {
-      errors.authorisedVerificationCode = "Enter the 6-character code (uppercase letters and numbers).";
-    } else if (options.authorisedCodeUsed) {
-      errors.authorisedVerificationCode =
-        "This authorisation code has already been used. Ask for a new unused code.";
-    } else if (options.authorisedCodeInactive) {
-      errors.authorisedVerificationCode =
-        "This authorisation code is no longer active. Ask for a new unused code.";
-    } else if (options.authorisedCodeValid === false) {
-      errors.authorisedVerificationCode =
-        "This authorisation code is not recognised. Ask the authorised person for a current code.";
-    }
+  if (!data.photoIdFile) {
+    errors.photoIdFile = "Photo ID upload is required.";
   }
 
   if (!options.accountBacked) {

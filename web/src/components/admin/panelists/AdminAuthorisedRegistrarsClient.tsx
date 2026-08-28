@@ -176,7 +176,7 @@ export function AdminAuthorisedRegistrarsClient({
       <PageIntro
         eyebrow="Panelists"
         title={formatHeadingCase("Authorised registrars")}
-        description="Give trusted people a unique code so they can register panelists after checking a photo ID in person. Each code can be used only once. Admin will see the code, whose name it belongs to, and whether it has already been used."
+        description="Codes for in-person registration are kept here for later use. Public signup currently accepts self-registration only, with a photo ID upload. Issued codes cannot be entered on the registration form right now."
       />
 
       <div className="grid gap-3 sm:grid-cols-3">

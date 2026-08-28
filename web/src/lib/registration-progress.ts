@@ -50,7 +50,6 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
   [
     "photoIdType",
     "photoIdFile",
-    "authorisedVerificationCode",
   ],
   [
     "citizenshipStatus",
@@ -90,7 +89,6 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
   ["consentResearch", "consentContact", "consentPrivacy", "finalReviewConfirmed"],
 ];
 
-const VERIFICATION_PHASE = 0;
 const ELIGIBILITY_PHASE = 1;
 const PROFILE_PHASE = 2;
 const INTERESTS_PHASE = 3;
@@ -142,9 +140,6 @@ function collectPhaseErrors(
     usernameTaken?: boolean;
     accountBacked?: boolean;
     accountEmail?: string;
-    authorisedCodeValid?: boolean;
-    authorisedCodeUsed?: boolean;
-    authorisedCodeInactive?: boolean;
   } = {}
 ): FieldErrors {
   const allErrors = validateRegistrationForm(input.form, options);
@@ -180,12 +175,6 @@ function collectPhaseErrors(
       delete allErrors.marketInterests;
     }
   }
-  if (phaseIndex === VERIFICATION_PHASE && form.registrationMode !== "Registration by authorised person") {
-    delete allErrors.authorisedVerificationCode;
-  }
-  if (phaseIndex === VERIFICATION_PHASE && form.registrationMode !== "Self-registration") {
-    delete allErrors.photoIdFile;
-  }
 
   const phaseErrors: FieldErrors = {};
   for (const key of keys) {
@@ -204,9 +193,6 @@ export function validateRegistrationPhase(
     usernameTaken?: boolean;
     accountBacked?: boolean;
     accountEmail?: string;
-    authorisedCodeValid?: boolean;
-    authorisedCodeUsed?: boolean;
-    authorisedCodeInactive?: boolean;
   } = {}
 ): FieldErrors {
   return collectPhaseErrors(phaseIndex, input, options);
@@ -220,9 +206,6 @@ export function validatePhasesThrough(
     accountBacked?: boolean;
     accountEmail?: string;
     extraErrors?: FieldErrors;
-    authorisedCodeValid?: boolean;
-    authorisedCodeUsed?: boolean;
-    authorisedCodeInactive?: boolean;
   } = {}
 ): { errors: FieldErrors; firstErrorPhase: number | null } {
   const merged: FieldErrors = { ...(options.extraErrors ?? {}) };

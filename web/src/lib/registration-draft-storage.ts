@@ -82,6 +82,8 @@ export function mergeDraftIntoForm(
   return {
     ...base,
     ...formFields,
+    registrationMode: "Self-registration",
+    authorisedVerificationCode: "",
     photoIdFile: null,
     proofOfBelizeResidenceFile: null,
   };

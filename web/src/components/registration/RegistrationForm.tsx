@@ -195,13 +195,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           next.phoneCountryCode = suggestedCode;
         }
       }
-      if (key === "registrationMode") {
-        if (value === "Self-registration") {
-          next.authorisedVerificationCode = "";
-        } else {
-          next.photoIdFile = null;
-        }
-      }
       if (key === "householdHeadRelationship" && value !== HOUSEHOLD_HEAD_SELF) {
         next.householdSize = "";
       }
@@ -268,8 +261,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : form.otherContactPlatform;
   const reviewRows = useMemo(
     () => [
-      ["Registration mode", form.registrationMode],
-      ["Authorised verification code", form.authorisedVerificationCode || "Not provided"],
       ["Citizenship / residency status", form.citizenshipStatus],
       ["Commonwealth country of citizenship", form.commonwealthCountry],
       ["Registered to vote in Belize", form.votingStatus || "Not applicable"],
@@ -473,33 +464,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       return;
     }
 
-    if (
-      activePhaseIndex === 0 &&
-      form.registrationMode === "Registration by authorised person"
-    ) {
-      try {
-        const res = await fetch("/api/register/authorised-code", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: form.authorisedVerificationCode }),
-        });
-        const data = (await res.json()) as { ok?: boolean; valid?: boolean; message?: string };
-        if (!data.valid) {
-          const message =
-            data.message ?? "This authorisation code is not recognised. Ask the authorised person for a current code.";
-          const codeErrors = { authorisedVerificationCode: message };
-          setErrors((prev) => ({ ...prev, ...codeErrors }));
-          revealFirstError(codeErrors);
-          return;
-        }
-      } catch {
-        const codeErrors = { authorisedVerificationCode: "Could not check that code. Please try again." };
-        setErrors((prev) => ({ ...prev, ...codeErrors }));
-        revealFirstError(codeErrors);
-        return;
-      }
-    }
-
     setErrors((prev) => {
       const next = { ...prev };
       for (const key of keysToTouch) delete next[key];
@@ -554,134 +518,43 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 0 ? (
         <FormSection step={1} title="How we will verify you" id="photo-id-section">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Self-registration is the default. Upload a government-issued photo ID to verify yourself, then continue
-            the form. Select registration by authorised person only if you will present a photo ID in person.
+            Upload a government-issued photo ID to verify yourself, then continue the form.
           </p>
-          <CheckboxField
-            id="registrationModeAuthorised"
-            label="Registration by authorised person"
-            checked={form.registrationMode === "Registration by authorised person"}
-            onChange={(checked) =>
-              update(
-                "registrationMode",
-                checked ? "Registration by authorised person" : "Self-registration"
-              )
-            }
-          />
-          <p className="-mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-            Select this only if an authorised person will check your photo ID in person and give you a one-time
-            code. You will not upload an ID image.
-          </p>
-          {form.registrationMode === "Self-registration" ? (
-            <>
-              <Alert variant="info">
-                Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do
-                not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long
-                as your name, photograph, and eligibility details remain visible.
-              </Alert>
-              <FieldGroup columns={2}>
-                <Field label="Photo ID type" required error={fieldError("photoIdType")} id="photoIdType">
-                  <SelectInput
-                    id="photoIdType"
-                    value={form.photoIdType}
-                    onChange={(e) => update("photoIdType", e.target.value)}
-                    onBlur={() => touchAndValidate("photoIdType")}
-                    error={fieldError("photoIdType")}
-                  >
-                    <option value="">Select photo ID type</option>
-                    {PHOTO_ID_TYPES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </SelectInput>
-                </Field>
-                <Field label="Upload photo ID image or PDF" required error={fieldError("photoIdFile")}>
-                  <FileInput
-                    id="photoIdFile"
-                    accept=".png,.jpg,.jpeg,.pdf"
-                    onChange={(file) => {
-                      update("photoIdFile", file);
-                      touch("photoIdFile");
-                      validateField("photoIdFile", file);
-                    }}
-                    error={fieldError("photoIdFile")}
-                  />
-                </Field>
-              </FieldGroup>
-            </>
-          ) : (
-            <>
-              <Alert variant="info">
-                <p>
-                  Use this option if you will present a photo ID in person to an authorised person. You will not upload
-                  an ID image.
-                </p>
-                <p className="mt-2">
-                  Email{" "}
-                  <a className="font-medium underline" href="mailto:gjavilez@yahoo.com">
-                    gjavilez@yahoo.com
-                  </a>{" "}
-                  or call / WhatsApp{" "}
-                  <a className="font-medium underline" href="https://wa.me/5016636164">
-                    +501 663-6164
-                  </a>{" "}
-                  so someone can be assigned to verify you.
-                </p>
-              </Alert>
-              <ol className="list-decimal space-y-2 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-                <li>
-                  Get in touch by email or call / WhatsApp so an authorised person can be assigned to you.
-                </li>
-                <li>Present a valid photo ID in person to the authorised person assigned to you.</li>
-                <li>They check the ID and give you an unused authorisation code. Each code can be used only once.</li>
-                <li>Enter that code below, then continue the rest of this form.</li>
-                <li>Admin will see the code and who authorised this registration. There will be no ID file to review.</li>
-              </ol>
-              <Field
-                label="Type of photo ID shown in person"
-                required
-                error={fieldError("photoIdType")}
+          <Alert variant="info">
+            Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do
+            not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long
+            as your name, photograph, and eligibility details remain visible.
+          </Alert>
+          <FieldGroup columns={2}>
+            <Field label="Photo ID type" required error={fieldError("photoIdType")} id="photoIdType">
+              <SelectInput
                 id="photoIdType"
+                value={form.photoIdType}
+                onChange={(e) => update("photoIdType", e.target.value)}
+                onBlur={() => touchAndValidate("photoIdType")}
+                error={fieldError("photoIdType")}
               >
-                <SelectInput
-                  id="photoIdType"
-                  value={form.photoIdType}
-                  onChange={(e) => update("photoIdType", e.target.value)}
-                  onBlur={() => touchAndValidate("photoIdType")}
-                  error={fieldError("photoIdType")}
-                >
-                  <option value="">Select photo ID type</option>
-                  {PHOTO_ID_TYPES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </SelectInput>
-              </Field>
-              <Field
-                label="Authorised verification code"
-                required
-                hint="This is a 6-character code of uppercase letters and numbers from the authorised person. Each code can be used only once. Random codes are not accepted."
-                error={fieldError("authorisedVerificationCode")}
-                id="authorisedVerificationCode"
-              >
-                <TextInput
-                  id="authorisedVerificationCode"
-                  value={form.authorisedVerificationCode}
-                  onChange={(e) =>
-                    update(
-                      "authorisedVerificationCode",
-                      e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6)
-                    )
-                  }
-                  onBlur={() => touchAndValidate("authorisedVerificationCode")}
-                  placeholder="e.g. A7K2M9"
-                  error={fieldError("authorisedVerificationCode")}
-                />
-              </Field>
-            </>
-          )}
+                <option value="">Select photo ID type</option>
+                {PHOTO_ID_TYPES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Upload photo ID image or PDF" required error={fieldError("photoIdFile")}>
+              <FileInput
+                id="photoIdFile"
+                accept=".png,.jpg,.jpeg,.pdf"
+                onChange={(file) => {
+                  update("photoIdFile", file);
+                  touch("photoIdFile");
+                  validateField("photoIdFile", file);
+                }}
+                error={fieldError("photoIdFile")}
+              />
+            </Field>
+          </FieldGroup>
         </FormSection>
       ) : null}
 
