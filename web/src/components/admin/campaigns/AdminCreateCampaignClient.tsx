@@ -23,6 +23,7 @@ import type { CampaignRecord } from "@/lib/campaign-targeting";
 import type { ClientUserRecord } from "@/lib/client-users";
 import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { DEFAULT_SURVEY_BY } from "@/lib/campaign-survey-by";
 import { CampaignLaunchLinks } from "./CampaignLaunchLinks";
 import { CampaignCoverField, uploadCampaignCover } from "./CampaignCoverField";
 
@@ -63,6 +64,7 @@ export function AdminCreateCampaignClient({
   const [emails, setEmails] = useState("");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const [clientId, setClientId] = useState("");
+  const [surveyBy, setSurveyBy] = useState(DEFAULT_SURVEY_BY);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -130,6 +132,7 @@ export function AdminCreateCampaignClient({
           emails,
           groupId,
           clientId,
+          surveyBy,
         }),
       });
       const data = (await res.json()) as {
@@ -212,6 +215,7 @@ export function AdminCreateCampaignClient({
                 setTitle("");
                 setDescription("");
                 setSurveyUrl("");
+                setSurveyBy(DEFAULT_SURVEY_BY);
                 setCoverFile(null);
               }}
               className="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950"
@@ -245,6 +249,22 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                Survey by
+              </label>
+              <input
+                type="text"
+                required
+                value={surveyBy}
+                onChange={(event) => setSurveyBy(event.target.value)}
+                placeholder={DEFAULT_SURVEY_BY}
+                className="mt-1.5 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 px-3 py-2.5 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+              />
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Shown to panelists as “Survey by: …” so they know who is conducting this research.
+              </p>
+            </div>
+            <div className="sm:col-span-2">
               <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Description (optional)</label>
               <textarea
                 rows={2}
@@ -260,7 +280,22 @@ export function AdminCreateCampaignClient({
               </label>
               <SiteSelect
                 value={clientId}
-                onChange={setClientId}
+                onChange={(value) => {
+                  const previousOrg =
+                    clients.find((client) => client.id === clientId)?.organization_name ?? "";
+                  const nextOrg = clients.find((client) => client.id === value)?.organization_name ?? "";
+                  setClientId(value);
+                  setSurveyBy((current) => {
+                    const trimmed = current.trim();
+                    if (!value) {
+                      return !trimmed || trimmed === previousOrg ? DEFAULT_SURVEY_BY : current;
+                    }
+                    if (!trimmed || trimmed === DEFAULT_SURVEY_BY || trimmed === previousOrg) {
+                      return nextOrg || DEFAULT_SURVEY_BY;
+                    }
+                    return current;
+                  });
+                }}
                 options={[
                   { value: "", label: "No client portal access" },
                   ...clients

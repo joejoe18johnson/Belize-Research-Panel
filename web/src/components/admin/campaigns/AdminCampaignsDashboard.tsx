@@ -193,7 +193,10 @@ export function AdminCampaignsDashboard({
                             {row.title}
                             {isNew ? <AdminNewBadge label="Completed" /> : null}
                           </p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(row.category)}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                            {formatAdminLabel(row.category)}
+                            {row.surveyBy ? ` · Survey by ${row.surveyBy}` : ""}
+                          </p>
                         </div>
                       </div>
                     </td>

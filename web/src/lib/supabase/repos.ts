@@ -707,10 +707,11 @@ export async function supabaseLoadCampaigns(): Promise<CampaignRecord[]> {
 
 export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Promise<void> {
   if (!campaigns.length) return;
-  const optionalColumns = ["cover_image_path", "logo_path"] as const;
+  const optionalColumns = ["cover_image_path", "logo_path", "survey_by"] as const;
   const rows = campaigns.map((campaign) => {
     const coverImagePath = campaign.coverImageFile ?? "";
     const logoPath = campaign.logoFile ?? "";
+    const surveyBy = campaign.surveyBy ?? "";
     return {
       id: campaign.id,
       title: campaign.title,
@@ -736,11 +737,13 @@ export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Prom
         ...campaign.targeting,
         cover_image_path: coverImagePath,
         logo_path: logoPath,
+        survey_by: surveyBy,
       },
       created_at: campaign.createdAt,
       launched_at: campaign.launchedAt || null,
       cover_image_path: coverImagePath,
       logo_path: logoPath,
+      survey_by: surveyBy,
       updated_at: new Date().toISOString(),
     };
   });

@@ -271,6 +271,7 @@ CREATE TABLE campaigns (
   launched_at timestamptz,
   cover_image_path text NOT NULL DEFAULT '',
   logo_path text NOT NULL DEFAULT '',
+  survey_by text NOT NULL DEFAULT 'Belize Research Panel',
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 

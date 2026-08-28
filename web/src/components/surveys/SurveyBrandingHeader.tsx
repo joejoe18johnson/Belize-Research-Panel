@@ -6,6 +6,7 @@ import {
 import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import type { SurveyDefinition } from "@/lib/survey-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { SurveyByCredit } from "./SurveyByCredit";
 
 export function SurveyBrandingHeader({
   title,
@@ -14,6 +15,7 @@ export function SurveyBrandingHeader({
   category,
   surveyId,
   coverPreviewUrl,
+  surveyBy,
   definition,
   variant = "full",
 }: {
@@ -23,6 +25,7 @@ export function SurveyBrandingHeader({
   category: SurveyCategory;
   surveyId?: string;
   coverPreviewUrl?: string | null;
+  surveyBy?: string | null;
   definition?: Pick<SurveyDefinition, "coverImageFile">;
   variant?: "full" | "compact";
 }) {
@@ -68,6 +71,9 @@ export function SurveyBrandingHeader({
       <div className={compact ? "space-y-1.5 p-3" : "space-y-3 p-5 sm:p-6"}>
         <div>
           <h1 className={`font-bold text-zinc-900 dark:text-zinc-100 ${compact ? "text-sm leading-snug" : "text-2xl"}`}>{title}</h1>
+          {surveyBy !== undefined ? (
+            <SurveyByCredit name={surveyBy} compact={compact} className={compact ? "mt-0.5" : "mt-1.5"} />
+          ) : null}
           {companyIntro ? (
             <p
               className={`leading-relaxed text-zinc-700 dark:text-zinc-300 ${

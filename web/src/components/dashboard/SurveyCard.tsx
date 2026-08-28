@@ -6,6 +6,7 @@ import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding
 import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, DashboardCardMedia } from "./DashboardShell";
+import { SurveyByCredit } from "@/components/surveys/SurveyByCredit";
 
 const CATEGORY_STYLES = {
   political: getSurveyCategoryStyle("political"),
@@ -191,6 +192,7 @@ export function SurveyCard({
                   <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:text-base">{survey.title}</h3>
                   {isNew ? <SurveyNewBadge compact /> : null}
                 </div>
+                <SurveyByCredit name={survey.surveyBy} compact className="mt-0.5" />
               </div>
               <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
                 +{survey.points} pts
@@ -252,6 +254,7 @@ export function SurveyCard({
             <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{survey.title}</h3>
             {isNew ? <SurveyNewBadge /> : null}
           </div>
+          <SurveyByCredit name={survey.surveyBy} className="mt-1" />
           <dl className="mt-3 grid gap-2 text-sm">
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
               <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Survey date")}</dt>

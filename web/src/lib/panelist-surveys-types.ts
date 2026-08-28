@@ -17,6 +17,7 @@ export interface PanelistSurveyRecord {
   panelistEmail?: string;
   coverImageFile?: string;
   logoFile?: string;
+  surveyBy?: string;
 }
 
 export interface PanelistSurvey extends PanelistSurveyRecord {

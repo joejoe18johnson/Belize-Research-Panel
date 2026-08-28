@@ -38,6 +38,7 @@ export async function findAssignmentForAccount(
     ...record,
     coverImageFile: campaign.coverImageFile || record.coverImageFile || "",
     logoFile: campaign.logoFile || record.logoFile || "",
+    surveyBy: campaign.surveyBy || record.surveyBy || "",
   };
 }
 

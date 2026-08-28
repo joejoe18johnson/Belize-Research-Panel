@@ -10,6 +10,7 @@ import type { CampaignTargeting, CreateCampaignInput } from "@/lib/campaign-targ
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import { loadPanelists } from "@/lib/panelists";
 import { cleanText } from "@/lib/validation";
+import { resolveSurveyBy } from "@/lib/campaign-survey-by";
 
 function parseTargeting(body: Record<string, unknown>): CampaignTargeting {
   const mode = cleanText(String(body.targetMode ?? "all_verified")) as CampaignTargeting["mode"];
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
       deliveryMethod: cleanText(String(body.deliveryMethod ?? "External Survey Link")),
       targeting: parseTargeting(body),
       clientId,
+      surveyBy: resolveSurveyBy(String(body.surveyBy ?? "")),
     };
 
     const panelists = await loadPanelists();

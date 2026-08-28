@@ -43,6 +43,7 @@ export interface CampaignRecord {
   clientId?: string;
   coverImageFile?: string;
   logoFile?: string;
+  surveyBy?: string;
   createdAt: string;
   launchedAt: string;
 }
@@ -62,6 +63,7 @@ export interface CampaignSummary {
   launchedAt: string;
   coverImageFile?: string;
   logoFile?: string;
+  surveyBy?: string;
   assigned: number;
   pending: number;
   opened: number;
@@ -98,6 +100,7 @@ export interface CreateCampaignInput {
   clientId?: string;
   coverImageFile?: string;
   logoFile?: string;
+  surveyBy?: string;
 }
 
 export const CAMPAIGN_TARGET_OPTIONS: { id: CampaignTargetMode; label: string }[] = [
@@ -211,6 +214,7 @@ function inferCampaignFromAssignments(id: string, records: PanelistSurveyRecord[
     targeting: { mode: "all_verified" },
     coverImageFile: "",
     logoFile: "",
+    surveyBy: sample.surveyBy || "",
     createdAt: sample.assignedDate || new Date().toISOString().slice(0, 10),
     launchedAt: sample.assignedDate || new Date().toISOString().slice(0, 10),
   };
@@ -263,6 +267,7 @@ export function buildCampaignSummaries(
         launchedAt: campaign.launchedAt,
         coverImageFile: campaign.coverImageFile || "",
         logoFile: campaign.logoFile || "",
+        surveyBy: campaign.surveyBy || "",
         assigned,
         pending,
         opened,

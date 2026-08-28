@@ -9,6 +9,7 @@ import { saveNewSurveyAssignments } from "./panelist-surveys-store";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
+import { resolveSurveyBy } from "./campaign-survey-by";
 
 const DATA_FILE = path.join(process.cwd(), "data", "campaigns.json");
 
@@ -121,6 +122,7 @@ export async function createAndLaunchCampaign(
     clientId: cleanText(input.clientId ?? "") || undefined,
     coverImageFile: cleanText(input.coverImageFile ?? ""),
     logoFile: cleanText(input.logoFile ?? ""),
+    surveyBy: resolveSurveyBy(input.surveyBy),
     createdAt: now,
     launchedAt: now,
   };
@@ -154,6 +156,7 @@ export async function createAndLaunchCampaign(
       surveyDefinitionId: deliveryType === "internal" ? surveyDefinitionId : null,
       deliveryType,
       panelistEmail: email,
+      surveyBy: campaign.surveyBy,
     });
     assignedPanelists.push(panelist);
     assignedCount += 1;

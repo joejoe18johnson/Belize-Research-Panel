@@ -361,6 +361,7 @@ export function TakeSurveyClient({
         surveyId={definition.id}
         definition={definition}
         coverPreviewUrl={campaignHasCover(assignment) ? campaignCoverAssetUrl(assignment.id) : null}
+        surveyBy={assignment.surveyBy ?? ""}
       />
 
       <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/50 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">

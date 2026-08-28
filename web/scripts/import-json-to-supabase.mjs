@@ -664,6 +664,7 @@ async function importCampaigns(supabase, panelistSurveys) {
       launched_at: parseTimestamp(campaign.launchedAt),
       cover_image_path: cleanText(campaign.coverImageFile || ""),
       logo_path: cleanText(campaign.logoFile || ""),
+      survey_by: cleanText(campaign.surveyBy || "Belize Research Panel"),
       updated_at: campaign.updatedAt ?? campaign.createdAt ?? new Date().toISOString(),
     };
   }
@@ -701,6 +702,7 @@ async function importCampaigns(supabase, panelistSurveys) {
     launched_at: null,
     cover_image_path: "",
     logo_path: "",
+    survey_by: "Belize Research Panel",
     updated_at: new Date().toISOString(),
   }));
 

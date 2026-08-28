@@ -355,6 +355,9 @@ export function campaignRowToRecord(row: Record<string, unknown>): CampaignRecor
     logoFile:
       cleanText(String(row.logo_path ?? "")) ||
       cleanText(String(targetCustom.logo_path ?? "")),
+    surveyBy:
+      cleanText(String(row.survey_by ?? "")) ||
+      cleanText(String(targetCustom.survey_by ?? "")),
   };
 }
 

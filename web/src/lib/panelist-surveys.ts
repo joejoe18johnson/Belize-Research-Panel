@@ -32,12 +32,16 @@ export async function getPanelistSurveys(email: string): Promise<{
   const logosByCampaignId = new Map(
     campaigns.map((campaign) => [campaign.id, campaign.logoFile ?? ""] as const)
   );
+  const surveyByCampaignId = new Map(
+    campaigns.map((campaign) => [campaign.id, campaign.surveyBy ?? ""] as const)
+  );
 
   const surveys = records.map((record) =>
     toPanelistSurvey({
       ...record,
       coverImageFile: coversByCampaignId.get(record.id) || record.coverImageFile || "",
       logoFile: logosByCampaignId.get(record.id) || record.logoFile || "",
+      surveyBy: surveyByCampaignId.get(record.id) || record.surveyBy || "",
     })
   );
 
