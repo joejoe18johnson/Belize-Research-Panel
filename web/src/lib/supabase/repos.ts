@@ -446,6 +446,8 @@ async function lookupDbAssignmentId(campaignId: string, email: string): Promise<
   return data?.id ? String(data.id) : resolveDbAssignmentId(campaignId, normalized);
 }
 
+const ASSIGNMENT_OPTIONAL_COLUMNS = ["progress_percent", "completed_date"] as const;
+
 function assignmentRecordToRow(record: PanelistSurveyRecord): Record<string, unknown> {
   const email = normalizePanelistEmail(record.panelistEmail ?? "");
   return {
@@ -469,27 +471,41 @@ function assignmentRecordToRow(record: PanelistSurveyRecord): Record<string, unk
   };
 }
 
-export async function supabaseSaveSurveyAssignments(records: PanelistSurveyRecord[]): Promise<void> {
-  if (!records.length) return;
-  const { error } = await db()
-    .from("survey_assignments")
-    .upsert(records.map(assignmentRecordToRow), {
+function omitRowKeys(row: Record<string, unknown>, keys: string[]): Record<string, unknown> {
+  const next = { ...row };
+  for (const key of keys) delete next[key];
+  return next;
+}
+
+async function upsertSurveyAssignmentRows(rows: Record<string, unknown>[]): Promise<void> {
+  if (!rows.length) return;
+  let payload = rows;
+  const omitted = new Set<string>();
+  for (let attempt = 0; attempt <= ASSIGNMENT_OPTIONAL_COLUMNS.length; attempt += 1) {
+    const { error } = await db().from("survey_assignments").upsert(payload, {
       onConflict: "campaign_id,panelist_email",
       ignoreDuplicates: true,
     });
-  throwIfError(error);
+    if (!error) return;
+    const missing = ASSIGNMENT_OPTIONAL_COLUMNS.find(
+      (column) => !omitted.has(column) && isMissingColumnError(error, column)
+    );
+    if (!missing) {
+      throwIfError(error);
+      return;
+    }
+    omitted.add(missing);
+    payload = payload.map((row) => omitRowKeys(row, [missing]));
+  }
+}
+
+export async function supabaseSaveSurveyAssignments(records: PanelistSurveyRecord[]): Promise<void> {
+  await upsertSurveyAssignmentRows(records.map(assignmentRecordToRow));
 }
 
 /** Insert only missing assignments so existing progress/completions are never overwritten. */
 export async function supabaseInsertNewSurveyAssignments(records: PanelistSurveyRecord[]): Promise<void> {
-  if (!records.length) return;
-  const { error } = await db()
-    .from("survey_assignments")
-    .upsert(records.map(assignmentRecordToRow), {
-      onConflict: "campaign_id,panelist_email",
-      ignoreDuplicates: true,
-    });
-  throwIfError(error);
+  await upsertSurveyAssignmentRows(records.map(assignmentRecordToRow));
 }
 
 export async function supabaseUpdateSurveyAssignmentProgress(
@@ -510,32 +526,26 @@ export async function supabaseUpdateSurveyAssignmentProgress(
     updated_at: now,
   };
 
-  let query = db()
-    .from("survey_assignments")
-    .update(payload)
-    .eq("campaign_id", campaignId)
-    .eq("panelist_email", email);
-  if (patch.status !== "completed") {
-    query = query.neq("status", "completed");
-  }
-  const { error } = await query;
-  if (
-    error &&
-    (isMissingColumnError(error, "progress_percent") || isMissingColumnError(error, "completed_date"))
-  ) {
-    let fallback = db()
+  for (let attempt = 0; attempt <= ASSIGNMENT_OPTIONAL_COLUMNS.length; attempt += 1) {
+    let query = db()
       .from("survey_assignments")
-      .update({ status: patch.status, updated_at: now })
+      .update(payload)
       .eq("campaign_id", campaignId)
       .eq("panelist_email", email);
     if (patch.status !== "completed") {
-      fallback = fallback.neq("status", "completed");
+      query = query.neq("status", "completed");
     }
-    const { error: fallbackError } = await fallback;
-    throwIfError(fallbackError);
-    return;
+    const { error } = await query;
+    if (!error) return;
+    const missing = ASSIGNMENT_OPTIONAL_COLUMNS.find(
+      (column) => column in payload && isMissingColumnError(error, column)
+    );
+    if (!missing) {
+      throwIfError(error);
+      return;
+    }
+    delete payload[missing];
   }
-  throwIfError(error);
 }
 
 export async function supabaseLoadSurveyResponse(
