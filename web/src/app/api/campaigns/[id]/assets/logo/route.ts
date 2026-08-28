@@ -10,10 +10,10 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   }
 
   const campaign = await findCampaignById(id);
-  const kind: CampaignBrandingAssetKind = "cover";
-  const asset = await loadCampaignBrandingAsset(id, kind, campaign?.coverImageFile ?? "");
+  const kind: CampaignBrandingAssetKind = "logo";
+  const asset = await loadCampaignBrandingAsset(id, kind, campaign?.logoFile ?? "");
   if (!asset) {
-    return NextResponse.json({ ok: false, message: "Cover image not found." }, { status: 404 });
+    return NextResponse.json({ ok: false, message: "Logo not found." }, { status: 404 });
   }
 
   return new NextResponse(new Uint8Array(asset.buffer), {

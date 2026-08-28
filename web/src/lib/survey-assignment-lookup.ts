@@ -25,12 +25,20 @@ export async function findAssignmentForAccount(
   if (!id || !normalizedEmail) return null;
 
   const assignments = await loadSurveyRecordsForEmail(normalizedEmail);
-  return (
-    assignments.find((record) => {
-      const recordId = cleanText(record.id);
+  const record =
+    assignments.find((item) => {
+      const recordId = cleanText(item.id);
       return recordId === id || recordId === cleanText(assignmentId);
-    }) ?? null
-  );
+    }) ?? null;
+  if (!record) return null;
+
+  const campaign = await findCampaignById(record.id);
+  if (!campaign) return record;
+  return {
+    ...record,
+    coverImageFile: campaign.coverImageFile || record.coverImageFile || "",
+    logoFile: campaign.logoFile || record.logoFile || "",
+  };
 }
 
 export async function assignmentExistsForCampaign(campaignId: string): Promise<boolean> {

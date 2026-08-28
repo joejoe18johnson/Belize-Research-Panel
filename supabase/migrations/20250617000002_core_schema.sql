@@ -270,6 +270,7 @@ CREATE TABLE campaigns (
   created_at timestamptz NOT NULL DEFAULT now(),
   launched_at timestamptz,
   cover_image_path text NOT NULL DEFAULT '',
+  logo_path text NOT NULL DEFAULT '',
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 

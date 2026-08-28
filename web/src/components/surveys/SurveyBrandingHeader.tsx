@@ -1,3 +1,4 @@
+import { BrpInitialsMark } from "@/components/BrpLogo";
 import type { SurveyCategory } from "@/lib/panelist-surveys-types";
 import {
   surveyBrandingAssetUrl,
@@ -72,20 +73,22 @@ export function SurveyBrandingHeader({
           </div>
         )}
 
-        {hasLogo && resolvedLogoUrl ? (
-          <div
-            className={`absolute rounded-lg border border-white/40 bg-white/95 shadow-lg ${
-              compact ? "bottom-2 left-2 p-1" : "bottom-4 left-4 rounded-xl p-2"
-            }`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+        <div
+          className={`absolute rounded-lg border border-white/40 bg-white/95 shadow-lg ${
+            compact ? "bottom-2 left-2 p-1" : "bottom-4 left-4 rounded-xl p-2"
+          }`}
+        >
+          {hasLogo && resolvedLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={resolvedLogoUrl}
               alt="Company logo"
               className={`object-contain ${compact ? "max-h-7 max-w-[4.5rem]" : "max-h-12 max-w-[10rem]"}`}
             />
-          </div>
-        ) : null}
+          ) : (
+            <BrpInitialsMark size={compact ? "xs" : "md"} />
+          )}
+        </div>
       </div>
 
       <div className={compact ? "space-y-1.5 p-3" : "space-y-3 p-5 sm:p-6"}>

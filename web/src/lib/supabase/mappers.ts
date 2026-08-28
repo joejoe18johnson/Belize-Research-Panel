@@ -352,6 +352,9 @@ export function campaignRowToRecord(row: Record<string, unknown>): CampaignRecor
     coverImageFile:
       cleanText(String(row.cover_image_path ?? "")) ||
       cleanText(String(targetCustom.cover_image_path ?? "")),
+    logoFile:
+      cleanText(String(row.logo_path ?? "")) ||
+      cleanText(String(targetCustom.logo_path ?? "")),
   };
 }
 

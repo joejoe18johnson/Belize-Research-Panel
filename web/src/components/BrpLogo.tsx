@@ -21,6 +21,31 @@ function logoSrc(variant: BrpLogoVariant): string {
   return variant === "dark" ? LOGO_DARK_BG_SRC : LOGO_LIGHT_BG_SRC;
 }
 
+const INITIALS_SIZE_CLASS = {
+  xs: "h-7 min-w-7 px-1 text-[9px]",
+  sm: "h-8 min-w-8 px-1 text-[10px]",
+  md: "h-10 min-w-10 px-1.5 text-xs",
+  lg: "h-12 min-w-12 px-1.5 text-sm",
+} as const;
+
+/** Default campaign/survey mark when no custom logo is uploaded. */
+export function BrpInitialsMark({
+  size = "md",
+  className = "",
+}: {
+  size?: keyof typeof INITIALS_SIZE_CLASS;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-label="Belize Research Panel"
+      className={`inline-flex items-center justify-center rounded-lg bg-teal-700 font-bold tracking-[0.12em] text-white ${INITIALS_SIZE_CLASS[size]} ${className}`.trim()}
+    >
+      BRP
+    </span>
+  );
+}
+
 export function BrpLogoText({
   variant = "light",
   className = "",

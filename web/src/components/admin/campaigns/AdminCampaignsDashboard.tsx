@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { BrpInitialsMark } from "@/components/BrpLogo";
 import { DonutBreakdown, HorizontalBarChart } from "@/components/admin/analytics/AnalyticsCharts";
 import { MetricCard, PageIntro, AdminNewBadge, adminNewItemRowClass, adminTableRowHoverClass } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { AdminMarkReadButton } from "@/components/admin/shared/AdminMarkReadButton";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { isCampaignAdminNotifiable } from "@/lib/admin-campaign-notifications";
-import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
+import { campaignCoverAssetUrl, campaignHasCover, campaignHasLogo, campaignLogoAssetUrl } from "@/lib/campaign-branding-shared";
 import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
@@ -181,13 +182,25 @@ export function AdminCampaignsDashboard({
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-3">
                         {campaignHasCover(row) ? (
+                          <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded-md">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={campaignCoverAssetUrl(row.id)}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : null}
+                        {campaignHasLogo(row) ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={campaignCoverAssetUrl(row.id)}
+                            src={campaignLogoAssetUrl(row.id)}
                             alt=""
-                            className="h-10 w-16 shrink-0 rounded-md object-cover"
+                            className="h-8 w-8 shrink-0 rounded-md object-contain bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800"
                           />
-                        ) : null}
+                        ) : (
+                          <BrpInitialsMark size="sm" className="shrink-0" />
+                        )}
                         <div className="min-w-0">
                           <p className="inline-flex flex-wrap items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">
                             {row.title}
