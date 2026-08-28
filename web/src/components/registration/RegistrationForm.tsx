@@ -868,6 +868,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               />
               <Field
                 label="Phone / WhatsApp number"
+                required
                 hint="Select your country code, then enter your number without the country code. It will need to be verified before we can use it to contact you."
                 id="phoneLocalNumber"
                 error={fieldError("phoneLocalNumber")}

@@ -465,8 +465,12 @@ export function validateRegistrationForm(
   }
 
   if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";
-  const phoneError = validatePhoneFields(data);
-  if (phoneError) errors.phoneLocalNumber = phoneError;
+  if (!phoneLocalDigits(data.phoneLocalNumber)) {
+    errors.phoneLocalNumber = "Phone / WhatsApp number is required.";
+  } else {
+    const phoneError = validatePhoneFields(data);
+    if (phoneError) errors.phoneLocalNumber = phoneError;
+  }
   if (options.accountBacked && options.accountEmail) {
     if (cleanText(data.email).toLowerCase() !== cleanText(options.accountEmail).toLowerCase()) {
       errors.email = "Contact email must match your account email.";
