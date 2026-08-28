@@ -38,8 +38,18 @@ export async function POST(request: Request) {
     }
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true, registrar: result.registrar });
-  } catch {
-    return NextResponse.json({ ok: false, message: "Could not create the authorisation code." }, { status: 500 });
+  } catch (error) {
+    console.error("Create authorised registrar failed:", error);
+    return NextResponse.json(
+      {
+        ok: false,
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : "Could not create the authorisation code.",
+      },
+      { status: 500 }
+    );
   }
 }
 

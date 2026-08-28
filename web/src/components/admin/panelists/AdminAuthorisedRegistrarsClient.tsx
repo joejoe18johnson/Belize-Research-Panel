@@ -154,10 +154,18 @@ export function AdminAuthorisedRegistrarsClient({
             <span className="font-medium text-zinc-800 dark:text-zinc-200">Code (optional)</span>
             <input
               value={code}
-              onChange={(event) => setCode(event.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm uppercase dark:border-zinc-800 dark:bg-zinc-950"
+              onChange={(event) =>
+                setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))
+              }
+              maxLength={6}
+              autoCapitalize="characters"
+              spellCheck={false}
+              className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm uppercase tracking-widest dark:border-zinc-800 dark:bg-zinc-950"
               placeholder="Leave blank to generate"
             />
+            <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
+              Exactly 6 uppercase letters or numbers, for example A7K2M9. Leave blank to generate one.
+            </span>
           </label>
         </div>
         <label className="block text-sm">

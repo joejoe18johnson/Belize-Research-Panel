@@ -896,7 +896,7 @@ export async function supabaseSaveAdminReadState(state: AdminReadState): Promise
   throwIfError(error);
 }
 
-const AUTHORISED_REGISTRARS_STORAGE_PATH = "_config/authorised-registrars.json";
+const AUTHORISED_REGISTRARS_STORAGE_PATH = "admin/authorised-registrars.json";
 
 export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
   const { data, error } = await db().storage.from("panelist-documents").download(AUTHORISED_REGISTRARS_STORAGE_PATH);
@@ -910,7 +910,7 @@ export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegi
 }
 
 export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
-  const payload = Buffer.from(JSON.stringify(store, null, 2), "utf-8");
+  const payload = new TextEncoder().encode(JSON.stringify(store, null, 2));
   const { error } = await db()
     .storage.from("panelist-documents")
     .upload(AUTHORISED_REGISTRARS_STORAGE_PATH, payload, {

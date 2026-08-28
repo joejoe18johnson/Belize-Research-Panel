@@ -14,8 +14,15 @@ export interface AuthorisedRegistrarStore {
   registrars: AuthorisedRegistrar[];
 }
 
+export const AUTHORISED_CODE_LENGTH = 6;
+export const AUTHORISED_CODE_PATTERN = /^[A-Z0-9]{6}$/;
+
 export function normalizeAuthorisedCode(code: string): string {
-  return cleanText(code).toUpperCase().replace(/\s+/g, "");
+  return cleanText(code).toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+export function isValidAuthorisedCode(code: string): boolean {
+  return AUTHORISED_CODE_PATTERN.test(normalizeAuthorisedCode(code));
 }
 
 export function parseAuthorisedRegistration(panelist: {

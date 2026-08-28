@@ -481,8 +481,11 @@ export function validateRegistrationForm(
     errors.photoIdFile = "Photo ID upload is required for self-registration.";
   }
   if (data.registrationMode === "Registration by authorised person") {
-    if (!cleanText(data.authorisedVerificationCode)) {
+    const code = cleanText(data.authorisedVerificationCode).toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (!code) {
       errors.authorisedVerificationCode = "Please enter the authorised verification code.";
+    } else if (!/^[A-Z0-9]{6}$/.test(code)) {
+      errors.authorisedVerificationCode = "Enter the 6-character code (uppercase letters and numbers).";
     } else if (options.authorisedCodeValid === false) {
       errors.authorisedVerificationCode =
         "This authorisation code is not recognised. Ask the authorised person for a current code.";

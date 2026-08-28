@@ -630,16 +630,21 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <Field
                 label="Authorised verification code"
                 required
-                hint="Ask the authorised person for the code assigned to them. Random codes are not accepted."
+                hint="This is a 6-character code of uppercase letters and numbers from the authorised person. Random codes are not accepted."
                 error={fieldError("authorisedVerificationCode")}
                 id="authorisedVerificationCode"
               >
                 <TextInput
                   id="authorisedVerificationCode"
                   value={form.authorisedVerificationCode}
-                  onChange={(e) => update("authorisedVerificationCode", e.target.value)}
+                  onChange={(e) =>
+                    update(
+                      "authorisedVerificationCode",
+                      e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6)
+                    )
+                  }
                   onBlur={() => touchAndValidate("authorisedVerificationCode")}
-                  placeholder="Enter the authorised person's code"
+                  placeholder="e.g. A7K2M9"
                   error={fieldError("authorisedVerificationCode")}
                 />
               </Field>

@@ -2,7 +2,9 @@ import { randomBytes, randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import {
+  AUTHORISED_CODE_LENGTH,
   findRegistrarByCode,
+  isValidAuthorisedCode,
   normalizeAuthorisedCode,
   type AuthorisedRegistrar,
   type AuthorisedRegistrarStore,
@@ -11,12 +13,12 @@ import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "authorised-registrars.json");
 
-const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 export function generateAuthorisedCode(): string {
-  const bytes = randomBytes(6);
+  const bytes = randomBytes(AUTHORISED_CODE_LENGTH);
   let out = "";
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < AUTHORISED_CODE_LENGTH; i += 1) {
     out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
   }
   return out;
@@ -61,20 +63,38 @@ export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarSto
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
     const { supabaseLoadAuthorisedRegistrars } = await import("./supabase/repos");
-    return normalizeStore(await supabaseLoadAuthorisedRegistrars());
+    const remote = normalizeStore(await supabaseLoadAuthorisedRegistrars());
+    if (remote.registrars.length > 0) return remote;
   }
   return readJsonFile();
 }
 
 export async function saveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<AuthorisedRegistrarStore> {
   const next = normalizeStore(store);
-  const { useSupabase } = await import("./supabase/data-source");
+  const { isProductionDeploy, useSupabase } = await import("./supabase/data-source");
+  let supabaseError: unknown = null;
+
   if (useSupabase()) {
-    const { supabaseSaveAuthorisedRegistrars } = await import("./supabase/repos");
-    await supabaseSaveAuthorisedRegistrars(next);
-    return next;
+    try {
+      const { supabaseSaveAuthorisedRegistrars } = await import("./supabase/repos");
+      await supabaseSaveAuthorisedRegistrars(next);
+    } catch (error) {
+      supabaseError = error;
+      console.error("Supabase authorised registrar save failed:", error);
+    }
   }
-  await writeJsonFile(next);
+
+  try {
+    await writeJsonFile(next);
+  } catch (error) {
+    if (supabaseError) throw supabaseError;
+    throw error;
+  }
+
+  if (supabaseError && isProductionDeploy()) {
+    throw supabaseError;
+  }
+
   return next;
 }
 
@@ -94,7 +114,12 @@ export async function createAuthorisedRegistrar(input: {
 
   let code = normalizeAuthorisedCode(input.code ?? "");
   if (!code) code = generateAuthorisedCode();
-  if (code.length < 4) return { ok: false, message: "Use at least 4 characters for the authorisation code." };
+  if (!isValidAuthorisedCode(code)) {
+    return {
+      ok: false,
+      message: `Authorisation codes must be exactly ${AUTHORISED_CODE_LENGTH} uppercase letters or numbers.`,
+    };
+  }
 
   const store = await loadAuthorisedRegistrars();
   if (findRegistrarByCode(store.registrars, code)) {
