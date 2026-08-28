@@ -26,8 +26,8 @@ function AdminNavNotificationBadge({ count }: { count: number }) {
 
   return (
     <span
-      className="mt-0.5 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white"
-      aria-label={`${count} pending`}
+      className="absolute -top-1 right-1 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold leading-none text-white shadow-sm tabular-nums"
+      aria-label={`${count} items needing action`}
     >
       {label}
     </span>
@@ -189,9 +189,9 @@ export function AdminShell({
                           target={external ? "_blank" : undefined}
                           rel={external ? "noopener noreferrer" : undefined}
                           onClick={() => setMobileNavOpen(false)}
-                          className={`flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-sm transition ${
+                          className={`relative flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-sm transition ${
                             module.parentSlug ? "py-2" : ""
-                          } ${
+                          } ${pendingCount > 0 ? "pr-8" : ""} ${
                             active
                               ? "bg-teal-700 text-white shadow-sm"
                               : "text-teal-50/90 hover:bg-white/10 hover:text-white"

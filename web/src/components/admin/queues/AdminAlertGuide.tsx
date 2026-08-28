@@ -27,8 +27,9 @@ export function AdminAlertGuide({
           {formatHeadingCase("Where admin alerts appear")}
         </h2>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Admin alerts use four related queues. Unread items show an amber highlight in their queue and
-          increment the matching sidebar badge. Panelist verification appears on both Notifications and Under Review.
+          Admin alerts use four related queues. Sidebar badges show how many items still need action, even if
+          someone has already opened the page. Unread rows stay amber until marked read. Panelist verification
+          appears on both Notifications and Under Review.
         </p>
         {demoLoopEnabled ? (
           <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
@@ -40,7 +41,7 @@ export function AdminAlertGuide({
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {ADMIN_ALERT_SCOPE_GUIDES.map((guide) => {
-          const unread = scopeCounts[guide.scope] ?? 0;
+          const openCount = scopeCounts[guide.scope] ?? 0;
           return (
             <article
               key={guide.scope}
@@ -48,9 +49,9 @@ export function AdminAlertGuide({
             >
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{guide.title}</h3>
-                {unread > 0 ? (
-                  <span className="rounded-full bg-teal-700 px-2 py-0.5 text-[11px] font-semibold text-white">
-                    {unread} unread
+                {openCount > 0 ? (
+                  <span className="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+                    {openCount} open
                   </span>
                 ) : (
                   <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">

@@ -83,11 +83,15 @@ function legacyPhotoIdApproved(panelist: PanelistRow): boolean {
 function assessEmail(panelist: PanelistRow, context: RequirementContext): RequirementItem {
   const email = cleanText(panelist.email).toLowerCase();
   const onFile = Boolean(email && validEmail(email));
-  const status = resolveRequirementStatus(
-    onFile,
-    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email),
-    legacyEmailApproved(panelist, context)
-  );
+  const adminDecision = readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email);
+  const status =
+    adminDecision === "false"
+      ? onFile
+        ? "denied"
+        : "missing"
+      : onFile && (adminDecision === "true" || context.emailVerified === true)
+        ? "approved"
+        : resolveRequirementStatus(onFile, adminDecision, legacyEmailApproved(panelist, context));
 
   return {
     key: "email",
@@ -163,9 +167,14 @@ export function allAdminRequirementsApproved(
   panelist: PanelistRow,
   context: RequirementContext = {}
 ): boolean {
-  return (
+  const emailDecision = readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email);
+  const emailApproved =
     requirementOnFile("email", panelist, context) &&
-    readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.email) === "true" &&
+    emailDecision !== "false" &&
+    (emailDecision === "true" || context.emailVerified === true);
+
+  return (
+    emailApproved &&
     requirementOnFile("phone", panelist, context) &&
     readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.phone) === "true" &&
     requirementOnFile("photo_id", panelist, context) &&

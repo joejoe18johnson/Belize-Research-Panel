@@ -1,7 +1,7 @@
 import type { CampaignSummary } from "./campaign-targeting";
 import { isCampaignAdminNotifiable } from "./admin-campaign-notifications";
 import type { AdminDataHub } from "./admin-data-hub";
-import { buildNotificationQueueRows } from "./admin-dashboard-metrics";
+import { buildNotificationQueueRows, buildUnderReviewRows } from "./admin-dashboard-metrics";
 import type { AdminReadState } from "./admin-read-state";
 import {
   adminNotificationId,
@@ -10,38 +10,59 @@ import {
   isAdminPayoutUnread,
   PANELIST_VERIFICATION_NOTIFICATION_TYPE,
 } from "./admin-read-state";
+import { cleanText } from "./validation";
 
 export type AdminNavBadges = Partial<Record<string, number>>;
+
+export interface AdminNavBadgeExtras {
+  photoUploadUsernames?: Set<string>;
+  unreadSupportCount?: number;
+}
+
+function pendingPayoutCount(hub: AdminDataHub): number {
+  return hub.redemptionRequests.filter((request) => request.status === "pending").length;
+}
+
+function fraudReviewHoldCount(hub: AdminDataHub): number {
+  return hub.accounts.filter(
+    (account) =>
+      cleanText(account.account_status) === "on_hold" && account.hold_reason === "fraud_review"
+  ).length;
+}
 
 export function buildAdminNavBadges(
   hub: AdminDataHub,
   readState: AdminReadState,
-  campaignSummaries: CampaignSummary[] = []
+  campaignSummaries: CampaignSummary[] = [],
+  extras: AdminNavBadgeExtras = {}
 ): AdminNavBadges {
   const notificationQueue = buildNotificationQueueRows(hub);
-  const unreadNotifications = notificationQueue.filter((row) =>
-    isAdminNotificationUnread(readState, adminNotificationId(row.type, row.email))
-  );
-  const unreadUnderReview = unreadPanelistVerificationIds(hub, readState, notificationQueue);
-
-  const newPayouts = hub.redemptionRequests.filter(
-    (request) => request.status === "pending" && isAdminPayoutUnread(readState, request.id)
-  );
-
+  const underReviewCount = buildUnderReviewRows(hub, extras.photoUploadUsernames ?? new Set()).length;
+  const pendingPayouts = pendingPayoutCount(hub);
+  const fraudHolds = fraudReviewHoldCount(hub);
   const newCompletedCampaigns = unreadCompletedCampaignIds(campaignSummaries, readState);
+  const unreadSupport = extras.unreadSupportCount ?? 0;
 
   const badges: AdminNavBadges = {};
 
-  if (unreadNotifications.length > 0) {
-    badges.notifications = unreadNotifications.length;
+  if (notificationQueue.length > 0) {
+    badges.notifications = notificationQueue.length;
   }
 
-  if (unreadUnderReview.length > 0) {
-    badges["under-review"] = unreadUnderReview.length;
+  if (underReviewCount > 0) {
+    badges["under-review"] = underReviewCount;
   }
 
-  if (newPayouts.length > 0) {
-    badges.payouts = newPayouts.length;
+  if (pendingPayouts > 0) {
+    badges.payouts = pendingPayouts;
+  }
+
+  if (fraudHolds > 0) {
+    badges["fraud-prevention"] = fraudHolds;
+  }
+
+  if (unreadSupport > 0) {
+    badges["support-inbox"] = unreadSupport;
   }
 
   if (newCompletedCampaigns.length > 0) {

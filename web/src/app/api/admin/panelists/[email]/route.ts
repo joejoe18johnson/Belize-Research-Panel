@@ -90,6 +90,10 @@ export async function PATCH(
     : new Map<string, NonNullable<Awaited<ReturnType<typeof findAccountByEmail>>>>();
   const requirementContext = requirementContextForPanelist(merged, accountsByEmail, photoUploadUsernames);
 
+  if (requirementContext.emailVerified && readAdminRequirementDecision(merged, "email") !== "false") {
+    merged[ADMIN_REQUIREMENT_FIELDS.email] = "true";
+  }
+
   let verificationStatus =
     body.verification_status !== undefined
       ? cleanText(body.verification_status)
@@ -113,7 +117,7 @@ export async function PATCH(
     city_town_village: body.city_town_village,
     constituency: body.constituency,
     notes: body.notes,
-    admin_email_approved: body.admin_email_approved,
+    admin_email_approved: merged[ADMIN_REQUIREMENT_FIELDS.email] || body.admin_email_approved,
     admin_phone_approved: body.admin_phone_approved,
     admin_photo_id_approved: body.admin_photo_id_approved,
   });
@@ -143,6 +147,11 @@ export async function PATCH(
       origin,
     });
   }
+
+  revalidatePath("/admin", "layout");
+  revalidatePath("/admin/panelists");
+  revalidatePath("/admin/under-review");
+  revalidatePath("/admin/notifications");
 
   return NextResponse.json({
     ok: true,
@@ -199,6 +208,7 @@ export async function DELETE(
     return NextResponse.json({ ok: false, message: "User record not found." }, { status: 404 });
   }
 
+  revalidatePath("/admin", "layout");
   revalidatePath("/admin/panelists");
   revalidatePath("/admin/under-review");
 

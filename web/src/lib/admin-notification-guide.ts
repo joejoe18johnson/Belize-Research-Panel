@@ -27,18 +27,18 @@ export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
     navLabel: "Notifications",
     href: "/admin/notifications",
     description:
-      "Pending email changes, phone/WhatsApp changes, signup emails awaiting confirmation, and panelists waiting for administrator verification.",
+      "Pending email changes, phone/WhatsApp changes, signup emails awaiting confirmation, and panelists waiting for administrator verification. The sidebar count is the number of open items.",
     markedReadWhen:
-      "Open record (per row), Approve or Deny (contact changes), Release hold (duplicate review), or Mark all read on this page.",
+      "The sidebar badge stays until each item is resolved. Amber “new” highlights clear when you open a record, approve or deny, or mark all read.",
   },
   {
     scope: "payouts",
     title: "Redemption requests",
     navLabel: "Payouts",
     href: "/admin/payouts",
-    description: "New panelist payout and redemption requests awaiting staff processing.",
+    description: "Panelist payout and redemption requests still waiting to be processed.",
     markedReadWhen:
-      "Process or review a pending row in the payout queue, or Mark all read on the Payouts page.",
+      "The sidebar badge stays until each request is processed. Amber “new” highlights clear when you review a row or mark all read.",
   },
   {
     scope: "campaigns",
@@ -53,9 +53,10 @@ export const ADMIN_ALERT_SCOPE_GUIDES: AdminAlertScopeGuide[] = [
     title: "Panelist verification",
     navLabel: "Under Review",
     href: "/admin/under-review?queue=pending",
-    description: "New panelists whose identity, documents, or follow-up still need an administrator to verify.",
+    description:
+      "Panelists whose identity, documents, duplicate flags, or follow-up still need an administrator to act. The sidebar count is the number of people in this queue, not only unread items.",
     markedReadWhen:
-      "Open record from Notifications or Under Review, or Mark all read on either of those pages.",
+      "The sidebar badge stays until the review is completed. Amber “new” highlights clear when you open a record or mark all read.",
   },
 ];
 

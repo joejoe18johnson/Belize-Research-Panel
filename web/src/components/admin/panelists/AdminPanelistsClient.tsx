@@ -73,6 +73,7 @@ type RowActions = {
 export function AdminPanelistsClient({
   rows,
   requirementByEmail,
+  emailVerifiedByAccount = {},
   filterOptions,
   initialVerification,
   initialEmail,
@@ -86,6 +87,7 @@ export function AdminPanelistsClient({
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
   >;
+  emailVerifiedByAccount?: Record<string, boolean>;
   filterOptions: {
     verification: string[];
     district: string[];
@@ -199,7 +201,10 @@ export function AdminPanelistsClient({
       city_town_village: row.city_town_village ?? "",
       constituency: row.constituency ?? "",
       notes: row.notes ?? "",
-      admin_email_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.email, derived?.email === "approved"),
+      admin_email_approved: readDecision(
+        ADMIN_REQUIREMENT_FIELDS.email,
+        derived?.email === "approved" || emailVerifiedByAccount[emailKey] === true
+      ),
       admin_phone_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.phone, derived?.phone === "approved"),
       admin_photo_id_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.photoId, derived?.photoId === "approved"),
     });
@@ -230,13 +235,15 @@ export function AdminPanelistsClient({
   };
 
   const requirementReviewContext = useMemo(() => {
-    if (!editingRow) return { hasPhotoUpload: false, hasResidenceUpload: false };
+    if (!editingRow) return { hasPhotoUpload: false, hasResidenceUpload: false, emailVerified: false };
     const username = cleanText(editingRow.username);
+    const emailKey = cleanText(editingRow.email).toLowerCase();
     return {
       hasPhotoUpload: username ? photoUploadUsernames.has(username) : false,
       hasResidenceUpload: username ? residenceUploadUsernames.has(username) : false,
+      emailVerified: emailVerifiedByAccount[emailKey] === true,
     };
-  }, [editingRow, photoUploadUsernames, residenceUploadUsernames]);
+  }, [editingRow, photoUploadUsernames, residenceUploadUsernames, emailVerifiedByAccount]);
 
   const applyRequirementDecision = (key: "email" | "phone" | "photoId", decision: "true" | "false") => {
     if (!editState || !editingRow) return;
@@ -717,7 +724,7 @@ function PanelistEditModal({
   authorisedCode: string;
   authorisedBy: string;
   panelistEmail: string;
-  requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean };
+  requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean; emailVerified?: boolean };
   onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false") => void;
   onChange: (state: EditState) => void;
   onClose: () => void;
@@ -740,11 +747,12 @@ function PanelistEditModal({
     photoId: requirementOnFile("photo_id", reviewPanelist, requirementContext),
   };
 
+  const emailSatisfied = editState.admin_email_approved === "true" || requirementContext.emailVerified === true;
   const allVerified =
     onFile.email &&
     onFile.phone &&
     onFile.photoId &&
-    editState.admin_email_approved === "true" &&
+    emailSatisfied &&
     editState.admin_phone_approved === "true" &&
     editState.admin_photo_id_approved === "true";
 
@@ -797,12 +805,13 @@ function PanelistEditModal({
         <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 p-4">
           <p className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Required checks")}</p>
           <p className="mt-1 text-xs text-teal-900/80">
-            Verify or deny each item below. When email, phone, and photo ID are all verified, the panelist becomes fully verified.
+            Email is verified automatically when the panelist confirms it from their inbox. Verify or deny phone
+            and photo ID below. When all three are verified, the panelist becomes fully verified.
           </p>
           <div className="mt-3">
             <RequirementReviewControls
               decisions={{
-                email: editState.admin_email_approved,
+                email: emailSatisfied ? "true" : editState.admin_email_approved,
                 phone: editState.admin_phone_approved,
                 photoId: editState.admin_photo_id_approved,
               }}
@@ -810,6 +819,11 @@ function PanelistEditModal({
               detail={reviewDetail}
               onDecision={onRequirementDecision}
               disabled={saving}
+              itemNotes={{
+                email: requirementContext.emailVerified
+                  ? "Confirmed by the panelist from their inbox. No administrator check is required."
+                  : undefined,
+              }}
             />
           </div>
           {allVerified ? (

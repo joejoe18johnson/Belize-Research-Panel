@@ -63,10 +63,17 @@ export default async function AdminPanelistsPage({
     };
   }
 
+  const emailVerifiedByAccount: Record<string, boolean> = {};
+  for (const account of accounts) {
+    const email = cleanText(account.email).toLowerCase();
+    if (email) emailVerifiedByAccount[email] = account.email_verified === "true";
+  }
+
   return (
     <AdminPanelistsClient
       rows={rows}
       requirementByEmail={requirementByEmail}
+      emailVerifiedByAccount={emailVerifiedByAccount}
       initialEmail={params.email}
       initialTab={initialTab}
       initialVerification={params.verification}

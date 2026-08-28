@@ -456,6 +456,7 @@ export async function registerPanelist(
     password_salt: salt,
     password_hash: hash,
     verification_status: verificationStatus,
+    admin_email_approved: "true",
     consent_research: String(data.consentResearch),
     consent_contact: String(data.consentContact),
     consent_privacy: String(data.consentPrivacy),

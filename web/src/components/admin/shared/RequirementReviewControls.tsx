@@ -122,12 +122,14 @@ export function RequirementReviewControls({
   detail,
   onDecision,
   disabled = false,
+  itemNotes,
 }: {
   decisions: Record<ReviewKey, AdminRequirementDecision>;
   onFile: Record<ReviewKey, boolean>;
   detail: RequirementReviewDetail;
   onDecision: (key: ReviewKey, decision: "true" | "false") => void;
   disabled?: boolean;
+  itemNotes?: Partial<Record<ReviewKey, string>>;
 }) {
   return (
     <div className="grid gap-3 lg:grid-cols-3">
@@ -136,11 +138,14 @@ export function RequirementReviewControls({
         const status = statusFromDecision(onFile[item.key], decision);
         const verified = decision === "true";
         const denied = decision === "false";
+        const note = itemNotes?.[item.key];
+        const emailLocked = item.key === "email" && verified && Boolean(note);
 
         return (
           <div key={item.key} className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-sm">
             <RequirementStatusBadge label={item.label} status={status} />
             <RequirementOnFileDetail itemKey={item.key} detail={detail} onFile={onFile[item.key]} />
+            {note ? <p className="mt-2 text-[11px] leading-snug text-emerald-800 dark:text-emerald-300">{note}</p> : null}
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
@@ -152,7 +157,7 @@ export function RequirementReviewControls({
               </button>
               <button
                 type="button"
-                disabled={disabled || !onFile[item.key] || denied}
+                disabled={disabled || !onFile[item.key] || denied || emailLocked}
                 onClick={() => onDecision(item.key, "false")}
                 className="inline-flex min-h-9 flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
               >

@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       });
 
       revalidatePath("/admin/support-inbox");
+      revalidatePath("/admin", "layout");
       revalidatePath("/help");
 
       if (!emailResult.sent) {
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     revalidatePath("/admin/support-inbox");
+    revalidatePath("/admin", "layout");
     return NextResponse.json({ ok: true, message: updated });
   } catch (error) {
     console.error("[support] admin update failed", error);

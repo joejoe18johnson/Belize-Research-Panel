@@ -7,8 +7,10 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 
 const ATTENTION_ITEMS: Array<{ slug: string; label: string; href: string }> = [
   { slug: "notifications", label: "Notifications", href: "/admin/notifications" },
-  { slug: "under-review", label: "Under Review", href: "/admin/under-review?queue=pending" },
+  { slug: "under-review", label: "Under Review", href: "/admin/under-review" },
   { slug: "payouts", label: "Payouts", href: "/admin/payouts" },
+  { slug: "support-inbox", label: "Support inbox", href: "/admin/support-inbox" },
+  { slug: "fraud-prevention", label: "Fraud prevention", href: "/admin/fraud-prevention" },
   { slug: "campaigns", label: "Completed campaigns", href: "/admin/campaigns" },
 ];
 
@@ -35,7 +37,7 @@ export function AdminNeedsAttentionBanner({ badges }: { badges: AdminNavBadges }
             {total}
           </span>
           <span className="ml-2 font-normal text-amber-900 dark:text-amber-100">
-            New items are waiting in the queues below.
+            Items still need attention in the queues below.
           </span>
         </p>
         <div className="flex flex-wrap gap-2">
