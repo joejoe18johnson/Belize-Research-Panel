@@ -30,6 +30,7 @@ ALTER TABLE panelist_notification_reads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_read_states ENABLE ROW LEVEL SECURITY;
 ALTER TABLE outbound_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE support_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE authorised_registrars ENABLE ROW LEVEL SECURITY;
 
 -- ─── Helper: map auth.users email to panelist ─────────────────────────────────
 
@@ -181,6 +182,10 @@ CREATE POLICY admin_read_states_staff ON admin_read_states
   WITH CHECK (auth_is_staff());
 
 CREATE POLICY outbound_messages_staff ON outbound_messages
+  FOR SELECT TO authenticated
+  USING (auth_is_staff());
+
+CREATE POLICY authorised_registrars_staff_read ON authorised_registrars
   FOR SELECT TO authenticated
   USING (auth_is_staff());
 

@@ -48,6 +48,13 @@ function normalizeStore(raw: Partial<AuthorisedRegistrarStore> | null | undefine
   };
 }
 
+function isReadonlyFsError(error: unknown): boolean {
+  const code =
+    typeof error === "object" && error && "code" in error ? String((error as { code?: string }).code) : "";
+  const message = error instanceof Error ? error.message : String(error);
+  return code === "EROFS" || /EROFS|read-only file system/i.test(message);
+}
+
 async function readJsonFile(): Promise<AuthorisedRegistrarStore> {
   try {
     const content = await fs.readFile(DATA_FILE, "utf-8");
@@ -62,27 +69,52 @@ async function writeJsonFile(store: AuthorisedRegistrarStore): Promise<void> {
   await fs.writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf-8");
 }
 
+async function writeJsonFileBestEffort(store: AuthorisedRegistrarStore): Promise<void> {
+  const { isProductionDeploy } = await import("./supabase/data-source");
+  if (isProductionDeploy()) return;
+  try {
+    await writeJsonFile(store);
+  } catch (error) {
+    if (isReadonlyFsError(error)) return;
+    throw error;
+  }
+}
+
 export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
-    const { supabaseLoadAuthorisedRegistrars } = await import("./supabase/repos");
-    const remote = normalizeStore(await supabaseLoadAuthorisedRegistrars());
-    if (remote.registrars.length > 0) return remote;
+    const { supabaseLoadAuthorisedRegistrars, supabaseSaveAuthorisedRegistrars } = await import(
+      "./supabase/repos"
+    );
+    const remote = await supabaseLoadAuthorisedRegistrars();
+    if (remote) return normalizeStore(remote);
+
+    const seeded = await readJsonFile();
+    if (seeded.registrars.length > 0) {
+      try {
+        await supabaseSaveAuthorisedRegistrars(seeded);
+      } catch (error) {
+        console.error("Could not persist authorised registrars to Supabase:", error);
+      }
+    }
+    return seeded;
   }
   return readJsonFile();
 }
 
 export async function saveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<AuthorisedRegistrarStore> {
   const next = normalizeStore(store);
-  const { useSupabase } = await import("./supabase/data-source");
+  const { useSupabase, isProductionDeploy } = await import("./supabase/data-source");
 
   if (useSupabase()) {
-    try {
-      const { supabaseSaveAuthorisedRegistrars } = await import("./supabase/repos");
-      await supabaseSaveAuthorisedRegistrars(next);
-    } catch (error) {
-      console.error("Supabase authorised registrar save failed:", error);
-    }
+    const { supabaseSaveAuthorisedRegistrars } = await import("./supabase/repos");
+    await supabaseSaveAuthorisedRegistrars(next);
+    await writeJsonFileBestEffort(next);
+    return next;
+  }
+
+  if (isProductionDeploy()) {
+    throw new Error("storage_not_configured");
   }
 
   await writeJsonFile(next);

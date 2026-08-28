@@ -61,6 +61,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 | `migrations/20250617000002_core_schema.sql` | All application tables + `panelist_point_balances` view |
 | `migrations/20250617000003_rls_policies.sql` | Row Level Security + auth helper functions |
 | `migrations/20250617000004_storage.sql` | Storage buckets + object policies |
+| `migrations/20260828000010_authorised_registrars.sql` | Single-use authorised registrar codes + `app-data` bucket |
 | `seed.sql` | Default reward settings + staff role module access |
 
 ## Entity map (JSON → table)
@@ -86,6 +87,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 | `web/data/admin-read-state.json` | `admin_read_states` |
 | `web/data/outbound-messages.json` | `outbound_messages` |
 | `web/data/support-messages.json` | `support_messages` |
+| `web/data/authorised-registrars.json` | `authorised_registrars` |
 
 ## Tables (22)
 
@@ -123,6 +125,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 - **admin_read_states** — admin inbox read markers (notifications, payouts, campaigns)
 - **outbound_messages** — email/WhatsApp outreach log
 - **support_messages** — contact form / support inbox
+- **authorised_registrars** — single-use in-person verification codes
 
 ### View
 - **panelist_point_balances** — computed balance (mirrors `web/src/lib/panelist-points.ts`)

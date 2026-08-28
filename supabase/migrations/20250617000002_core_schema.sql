@@ -466,6 +466,20 @@ CREATE TABLE support_messages (
 CREATE INDEX support_messages_status_idx ON support_messages (status);
 CREATE INDEX support_messages_created_at_idx ON support_messages (created_at DESC);
 
+CREATE TABLE authorised_registrars (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  code text NOT NULL,
+  notes text NOT NULL DEFAULT '',
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  created_by text NOT NULL DEFAULT '',
+  used_at timestamptz,
+  used_by_email citext
+);
+
+CREATE UNIQUE INDEX authorised_registrars_code_idx ON authorised_registrars (code);
+
 -- ─── Helper view: panelist point balance ────────────────────────────────────────
 
 CREATE OR REPLACE VIEW panelist_point_balances AS

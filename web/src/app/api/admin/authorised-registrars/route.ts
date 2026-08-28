@@ -9,6 +9,14 @@ import {
 } from "@/lib/authorised-registrars-store";
 import { cleanText } from "@/lib/validation";
 
+function persistFailureMessage(error: unknown, fallback: string): string {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "storage_not_configured" || /EROFS|read-only file system/i.test(message)) {
+    return "Could not save authorisation codes on the live site. They have to be stored in the database, not a local file.";
+  }
+  return message || fallback;
+}
+
 export async function GET() {
   const session = await getAdminSession();
   if (!session) {
@@ -41,13 +49,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Create authorised registrar failed:", error);
     return NextResponse.json(
-      {
-        ok: false,
-        message:
-          error instanceof Error && error.message
-            ? error.message
-            : "Could not create the authorisation code.",
-      },
+      { ok: false, message: persistFailureMessage(error, "Could not create the authorisation code.") },
       { status: 500 }
     );
   }
@@ -71,8 +73,12 @@ export async function PATCH(request: Request) {
     }
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true, registrar: updated });
-  } catch {
-    return NextResponse.json({ ok: false, message: "Could not update the authorisation code." }, { status: 500 });
+  } catch (error) {
+    console.error("Update authorised registrar failed:", error);
+    return NextResponse.json(
+      { ok: false, message: persistFailureMessage(error, "Could not update the authorisation code.") },
+      { status: 500 }
+    );
   }
 }
 
@@ -94,7 +100,11 @@ export async function DELETE(request: Request) {
     }
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ ok: false, message: "Could not delete the authorisation code." }, { status: 500 });
+  } catch (error) {
+    console.error("Delete authorised registrar failed:", error);
+    return NextResponse.json(
+      { ok: false, message: persistFailureMessage(error, "Could not delete the authorisation code.") },
+      { status: 500 }
+    );
   }
 }

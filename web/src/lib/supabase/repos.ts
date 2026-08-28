@@ -909,6 +909,22 @@ export async function supabaseSaveAdminReadState(state: AdminReadState): Promise
 }
 
 const AUTHORISED_REGISTRARS_TABLE = "authorised_registrars";
+const APP_DATA_BUCKET = "app-data";
+const AUTHORISED_REGISTRARS_BLOB = "authorised-registrars.json";
+
+function isMissingAuthorisedRegistrarsRelation(error: { message?: string; code?: string } | null): boolean {
+  if (!error) return false;
+  const message = errorMessage(error);
+  if (!message.includes("authorised_registrars")) return false;
+  return (
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    error.code === "PGRST204" ||
+    message.includes("schema cache") ||
+    message.includes("could not find") ||
+    message.includes("does not exist")
+  );
+}
 
 function registrarToRow(registrar: AuthorisedRegistrar): Record<string, unknown> {
   return {
@@ -938,19 +954,71 @@ function rowToRegistrar(row: Record<string, unknown>): AuthorisedRegistrar {
   };
 }
 
-export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore> {
-  const { data, error } = await db().from(AUTHORISED_REGISTRARS_TABLE).select("*").order("created_at");
-  if (isMissingRelation(error)) return { registrars: [] };
-  throwIfError(error);
-  return {
-    registrars: (data ?? []).map((row) => rowToRegistrar(row as Record<string, unknown>)),
-  };
+function parseAuthorisedRegistrarsBlob(raw: string): AuthorisedRegistrarStore | null {
+  try {
+    const parsed = JSON.parse(raw) as Partial<AuthorisedRegistrarStore>;
+    if (!parsed || !Array.isArray(parsed.registrars)) return { registrars: [] };
+    return { registrars: parsed.registrars };
+  } catch {
+    return null;
+  }
 }
 
-export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
+function isNotFoundStorageError(error: { message?: string; statusCode?: string | number } | null): boolean {
+  if (!error) return false;
+  const status = String(error.statusCode ?? "");
+  const message = (error.message ?? "").toLowerCase();
+  return status === "404" || message.includes("not found") || message.includes("does not exist");
+}
+
+async function ensureAppDataBucket(): Promise<void> {
+  const { data: buckets, error: listError } = await db().storage.listBuckets();
+  if (listError) throw new Error(listError.message);
+  if ((buckets ?? []).some((bucket) => bucket.id === APP_DATA_BUCKET || bucket.name === APP_DATA_BUCKET)) {
+    return;
+  }
+  const { error } = await db().storage.createBucket(APP_DATA_BUCKET, {
+    public: false,
+    fileSizeLimit: 1024 * 1024,
+    allowedMimeTypes: ["application/json", "text/plain"],
+  });
+  if (error && !error.message.toLowerCase().includes("already exists")) {
+    throw new Error(error.message);
+  }
+}
+
+async function loadAuthorisedRegistrarsBlob(): Promise<AuthorisedRegistrarStore | null> {
+  const { data, error } = await db().storage.from(APP_DATA_BUCKET).download(AUTHORISED_REGISTRARS_BLOB);
+  if (error) {
+    if (isNotFoundStorageError(error)) return null;
+    const message = error.message.toLowerCase();
+    if (message.includes("bucket") && message.includes("not found")) return null;
+    throw new Error(error.message);
+  }
+  if (!data) return null;
+  return parseAuthorisedRegistrarsBlob(await data.text());
+}
+
+async function saveAuthorisedRegistrarsBlob(store: AuthorisedRegistrarStore): Promise<void> {
+  await ensureAppDataBucket();
+  const body = new TextEncoder().encode(JSON.stringify(store));
+  const upload = async (contentType: string) =>
+    db().storage.from(APP_DATA_BUCKET).upload(AUTHORISED_REGISTRARS_BLOB, body, {
+      upsert: true,
+      contentType,
+    });
+
+  let { error } = await upload("application/json");
+  if (error && /mime|not supported/i.test(error.message)) {
+    ({ error } = await upload("text/plain"));
+  }
+  if (error) throw new Error(error.message);
+}
+
+async function saveAuthorisedRegistrarsTable(store: AuthorisedRegistrarStore): Promise<void> {
   const rows = store.registrars.map(registrarToRow);
   const { error: deleteError } = await db().from(AUTHORISED_REGISTRARS_TABLE).delete().not("id", "is", null);
-  if (isMissingRelation(deleteError)) return;
+  if (isMissingAuthorisedRegistrarsRelation(deleteError)) return;
   throwIfError(deleteError);
   if (!rows.length) return;
   const { error } = await db().from(AUTHORISED_REGISTRARS_TABLE).insert(rows);
@@ -961,4 +1029,28 @@ export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistra
     return;
   }
   throwIfError(error);
+}
+
+export async function supabaseLoadAuthorisedRegistrars(): Promise<AuthorisedRegistrarStore | null> {
+  const blob = await loadAuthorisedRegistrarsBlob();
+  if (blob) return blob;
+
+  const { data, error } = await db().from(AUTHORISED_REGISTRARS_TABLE).select("*").order("created_at");
+  if (isMissingAuthorisedRegistrarsRelation(error)) return null;
+  throwIfError(error);
+  const registrars = (data ?? []).map((row) => rowToRegistrar(row as Record<string, unknown>));
+  if (registrars.length === 0) return null;
+  return { registrars };
+}
+
+export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistrarStore): Promise<void> {
+  await saveAuthorisedRegistrarsBlob(store);
+  try {
+    await saveAuthorisedRegistrarsTable(store);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!message.toLowerCase().includes("authorised_registrars")) {
+      console.error("Supabase authorised registrar table save failed:", error);
+    }
+  }
 }

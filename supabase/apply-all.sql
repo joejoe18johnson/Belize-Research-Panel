@@ -549,6 +549,20 @@ CREATE TABLE support_messages (
 CREATE INDEX support_messages_status_idx ON support_messages (status);
 CREATE INDEX support_messages_created_at_idx ON support_messages (created_at DESC);
 
+CREATE TABLE authorised_registrars (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  code text NOT NULL,
+  notes text NOT NULL DEFAULT '',
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  created_by text NOT NULL DEFAULT '',
+  used_at timestamptz,
+  used_by_email citext
+);
+
+CREATE UNIQUE INDEX authorised_registrars_code_idx ON authorised_registrars (code);
+
 -- ─── Helper view: panelist point balance ────────────────────────────────────────
 
 CREATE OR REPLACE VIEW panelist_point_balances AS
@@ -634,6 +648,7 @@ ALTER TABLE panelist_notification_reads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_read_states ENABLE ROW LEVEL SECURITY;
 ALTER TABLE outbound_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE support_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE authorised_registrars ENABLE ROW LEVEL SECURITY;
 
 -- ─── Helper: map auth.users email to panelist ─────────────────────────────────
 
@@ -785,6 +800,10 @@ CREATE POLICY admin_read_states_staff ON admin_read_states
   WITH CHECK (auth_is_staff());
 
 CREATE POLICY outbound_messages_staff ON outbound_messages
+  FOR SELECT TO authenticated
+  USING (auth_is_staff());
+
+CREATE POLICY authorised_registrars_staff_read ON authorised_registrars
   FOR SELECT TO authenticated
   USING (auth_is_staff());
 

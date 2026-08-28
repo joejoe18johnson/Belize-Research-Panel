@@ -535,26 +535,24 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 0 ? (
         <FormSection step={1} title="How we will verify you" id="photo-id-section">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Choose how your identity will be confirmed before you fill in the rest of the form. Authorised
-            verification is for people who will present a photo ID in person and may not happen on the same day.
+            Self-registration is the default. Upload a government-issued photo ID to verify yourself, then continue
+            the form. Select registration by authorised person only if you will present a photo ID in person.
           </p>
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Registration mode</p>
-            <div className="flex flex-wrap gap-4">
-              {(["Self-registration", "Registration by authorised person"] as const).map((mode) => (
-                <label key={mode} className={choiceBoxLabelClass}>
-                  <input
-                    type="radio"
-                    name="registrationMode"
-                    checked={form.registrationMode === mode}
-                    onChange={() => update("registrationMode", mode)}
-                    className={siteRadioClass}
-                  />
-                  {mode}
-                </label>
-              ))}
-            </div>
-          </div>
+          <CheckboxField
+            id="registrationModeAuthorised"
+            label="Registration by authorised person"
+            checked={form.registrationMode === "Registration by authorised person"}
+            onChange={(checked) =>
+              update(
+                "registrationMode",
+                checked ? "Registration by authorised person" : "Self-registration"
+              )
+            }
+          />
+          <p className="-mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+            Select this only if an authorised person will check your photo ID in person and give you a one-time
+            code. You will not upload an ID image.
+          </p>
           {form.registrationMode === "Self-registration" ? (
             <>
               <Alert variant="info">
