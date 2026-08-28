@@ -663,7 +663,6 @@ async function importCampaigns(supabase, panelistSurveys) {
       created_at: campaign.createdAt ?? new Date().toISOString(),
       launched_at: parseTimestamp(campaign.launchedAt),
       cover_image_path: cleanText(campaign.coverImageFile || ""),
-      logo_path: cleanText(campaign.logoFile || ""),
       updated_at: campaign.updatedAt ?? campaign.createdAt ?? new Date().toISOString(),
     };
   }
@@ -700,7 +699,6 @@ async function importCampaigns(supabase, panelistSurveys) {
     created_at: new Date().toISOString(),
     launched_at: null,
     cover_image_path: "",
-    logo_path: "",
     updated_at: new Date().toISOString(),
   }));
 

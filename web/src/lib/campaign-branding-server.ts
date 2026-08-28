@@ -5,9 +5,6 @@ import { useSupabase } from "./supabase/data-source";
 const UPLOADS_ROOT = path.join(/* turbopackIgnore: true */ process.cwd(), "data", "uploads", "campaigns");
 const STORAGE_BUCKET = "survey-assets";
 export const CAMPAIGN_COVER_BASENAME = "cover-image";
-export const CAMPAIGN_LOGO_BASENAME = "company-logo";
-
-export type CampaignBrandingAssetKind = "logo" | "cover";
 
 const ALLOWED_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
@@ -18,13 +15,11 @@ const CONTENT_TYPES: Record<string, string> = {
   ".webp": "image/webp",
 };
 
-export interface CampaignBrandingAsset {
+export interface CampaignCoverAsset {
   buffer: Buffer;
   filename: string;
   contentType: string;
 }
-
-export type CampaignCoverAsset = CampaignBrandingAsset;
 
 function campaignDir(campaignId: string): string {
   return path.join(UPLOADS_ROOT, campaignId);
@@ -32,10 +27,6 @@ function campaignDir(campaignId: string): string {
 
 function storageFolder(campaignId: string): string {
   return `campaigns/${campaignId}`;
-}
-
-function basenameForKind(kind: CampaignBrandingAssetKind): string {
-  return kind === "logo" ? CAMPAIGN_LOGO_BASENAME : CAMPAIGN_COVER_BASENAME;
 }
 
 function normalizeExtension(filename: string): string {
@@ -47,15 +38,11 @@ function contentTypeFor(filename: string): string {
   return CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? "application/octet-stream";
 }
 
-async function findLocalAsset(
-  campaignId: string,
-  kind: CampaignBrandingAssetKind
-): Promise<{ absolutePath: string; filename: string } | null> {
+async function findLocalCover(campaignId: string): Promise<{ absolutePath: string; filename: string } | null> {
   const dir = campaignDir(campaignId);
-  const prefix = basenameForKind(kind);
   try {
     const entries = await fs.readdir(dir);
-    const match = entries.find((entry) => entry.startsWith(`${prefix}.`));
+    const match = entries.find((entry) => entry.startsWith(`${CAMPAIGN_COVER_BASENAME}.`));
     if (!match) return null;
     return { absolutePath: path.join(dir, match), filename: match };
   } catch {
@@ -63,15 +50,13 @@ async function findLocalAsset(
   }
 }
 
-export async function saveCampaignBrandingAsset(
+export async function saveCampaignCoverAsset(
   campaignId: string,
-  kind: CampaignBrandingAssetKind,
   buffer: Buffer,
   originalFilename: string
 ): Promise<string> {
   const ext = normalizeExtension(originalFilename);
-  const filename = `${basenameForKind(kind)}${ext}`;
-  const prefix = basenameForKind(kind);
+  const filename = `${CAMPAIGN_COVER_BASENAME}${ext}`;
 
   if (useSupabase()) {
     const { getSupabaseAdmin } = await import("./supabase/server");
@@ -79,7 +64,7 @@ export async function saveCampaignBrandingAsset(
     const folder = storageFolder(campaignId);
     const { data: existing } = await db.storage.from(STORAGE_BUCKET).list(folder);
     const stale = (existing ?? [])
-      .filter((item) => item.name.startsWith(`${prefix}.`) && item.name !== filename)
+      .filter((item) => item.name.startsWith(`${CAMPAIGN_COVER_BASENAME}.`) && item.name !== filename)
       .map((item) => `${folder}/${item.name}`);
     if (stale.length) {
       await db.storage.from(STORAGE_BUCKET).remove(stale);
@@ -97,25 +82,21 @@ export async function saveCampaignBrandingAsset(
   const entries = await fs.readdir(dir).catch(() => [] as string[]);
   await Promise.all(
     entries
-      .filter((entry) => entry.startsWith(`${prefix}.`))
+      .filter((entry) => entry.startsWith(`${CAMPAIGN_COVER_BASENAME}.`))
       .map((entry) => fs.unlink(path.join(dir, entry)).catch(() => undefined))
   );
   await fs.writeFile(path.join(dir, filename), buffer);
   return filename;
 }
 
-export async function removeCampaignBrandingAsset(
-  campaignId: string,
-  kind: CampaignBrandingAssetKind
-): Promise<void> {
-  const prefix = basenameForKind(kind);
+export async function removeCampaignCoverAsset(campaignId: string): Promise<void> {
   if (useSupabase()) {
     const { getSupabaseAdmin } = await import("./supabase/server");
     const db = getSupabaseAdmin();
     const folder = storageFolder(campaignId);
     const { data: existing } = await db.storage.from(STORAGE_BUCKET).list(folder);
     const paths = (existing ?? [])
-      .filter((item) => item.name.startsWith(`${prefix}.`))
+      .filter((item) => item.name.startsWith(`${CAMPAIGN_COVER_BASENAME}.`))
       .map((item) => `${folder}/${item.name}`);
     if (paths.length) {
       await db.storage.from(STORAGE_BUCKET).remove(paths);
@@ -123,17 +104,15 @@ export async function removeCampaignBrandingAsset(
     return;
   }
 
-  const asset = await findLocalAsset(campaignId, kind);
+  const asset = await findLocalCover(campaignId);
   if (!asset) return;
   await fs.unlink(asset.absolutePath).catch(() => undefined);
 }
 
-export async function loadCampaignBrandingAsset(
+export async function loadCampaignCoverAsset(
   campaignId: string,
-  kind: CampaignBrandingAssetKind,
   storedFilename = ""
-): Promise<CampaignBrandingAsset | null> {
-  const prefix = basenameForKind(kind);
+): Promise<CampaignCoverAsset | null> {
   if (useSupabase()) {
     const { getSupabaseAdmin } = await import("./supabase/server");
     const db = getSupabaseAdmin();
@@ -141,7 +120,7 @@ export async function loadCampaignBrandingAsset(
     let filename = storedFilename;
     if (!filename) {
       const { data: existing } = await db.storage.from(STORAGE_BUCKET).list(folder);
-      filename = (existing ?? []).find((item) => item.name.startsWith(`${prefix}.`))?.name ?? "";
+      filename = (existing ?? []).find((item) => item.name.startsWith(`${CAMPAIGN_COVER_BASENAME}.`))?.name ?? "";
     }
     if (!filename) return null;
     const { data, error } = await db.storage.from(STORAGE_BUCKET).download(`${folder}/${filename}`);
@@ -153,30 +132,11 @@ export async function loadCampaignBrandingAsset(
     };
   }
 
-  const asset = await findLocalAsset(campaignId, kind);
+  const asset = await findLocalCover(campaignId);
   if (!asset) return null;
   return {
     buffer: await fs.readFile(asset.absolutePath),
     filename: asset.filename,
     contentType: contentTypeFor(asset.filename),
   };
-}
-
-export async function saveCampaignCoverAsset(
-  campaignId: string,
-  buffer: Buffer,
-  originalFilename: string
-): Promise<string> {
-  return saveCampaignBrandingAsset(campaignId, "cover", buffer, originalFilename);
-}
-
-export async function removeCampaignCoverAsset(campaignId: string): Promise<void> {
-  return removeCampaignBrandingAsset(campaignId, "cover");
-}
-
-export async function loadCampaignCoverAsset(
-  campaignId: string,
-  storedFilename = ""
-): Promise<CampaignCoverAsset | null> {
-  return loadCampaignBrandingAsset(campaignId, "cover", storedFilename);
 }

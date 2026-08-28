@@ -16,12 +16,7 @@ import {
 } from "@/lib/survey-types";
 import type { PanelistSurveyRecord } from "@/lib/panelist-surveys-types";
 import { formatHeadingCase } from "@/lib/sentence-case";
-import {
-  campaignCoverAssetUrl,
-  campaignHasCover,
-  campaignHasLogo,
-  campaignLogoAssetUrl,
-} from "@/lib/campaign-branding-shared";
+import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
 import {
   clearSurveyDraft,
   loadSurveyDraft,
@@ -365,7 +360,6 @@ export function TakeSurveyClient({
         category={definition.category}
         surveyId={definition.id}
         definition={definition}
-        logoPreviewUrl={campaignHasLogo(assignment) ? campaignLogoAssetUrl(assignment.id) : null}
         coverPreviewUrl={campaignHasCover(assignment) ? campaignCoverAssetUrl(assignment.id) : null}
       />
 

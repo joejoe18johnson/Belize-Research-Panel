@@ -76,8 +76,8 @@ export function SurveyBrandingFields({
     <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
       <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Company branding</h2>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-        Add a sponsor logo, company introduction, and optional cover image. If no logo is uploaded, the BRP initials
-        mark is used. If no cover is uploaded, the default category banner is used.
+        Add a sponsor logo, company introduction, and optional cover image. If no cover is uploaded, the default
+        category banner is used.
       </p>
 
       <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">

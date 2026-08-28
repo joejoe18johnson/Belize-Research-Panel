@@ -707,10 +707,8 @@ export async function supabaseLoadCampaigns(): Promise<CampaignRecord[]> {
 
 export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Promise<void> {
   if (!campaigns.length) return;
-  const optionalColumns = ["cover_image_path", "logo_path"] as const;
   const rows = campaigns.map((campaign) => {
     const coverImagePath = campaign.coverImageFile ?? "";
-    const logoPath = campaign.logoFile ?? "";
     return {
       id: campaign.id,
       title: campaign.title,
@@ -735,30 +733,21 @@ export async function supabaseUpsertCampaigns(campaigns: CampaignRecord[]): Prom
       target_custom: {
         ...campaign.targeting,
         cover_image_path: coverImagePath,
-        logo_path: logoPath,
       },
       created_at: campaign.createdAt,
       launched_at: campaign.launchedAt || null,
       cover_image_path: coverImagePath,
-      logo_path: logoPath,
       updated_at: new Date().toISOString(),
     };
   });
-  let payload: Record<string, unknown>[] = rows;
-  const omitted = new Set<string>();
-  for (let attempt = 0; attempt <= optionalColumns.length; attempt += 1) {
-    const { error } = await db().from("campaigns").upsert(payload, { onConflict: "id" });
-    if (!error) return;
-    const missing = optionalColumns.find(
-      (column) => !omitted.has(column) && isMissingColumnError(error, column)
-    );
-    if (!missing) {
-      throwIfError(error);
-      return;
-    }
-    omitted.add(missing);
-    payload = payload.map((row) => omitRowKeys(row, [missing]));
+  const { error } = await db().from("campaigns").upsert(rows, { onConflict: "id" });
+  if (isMissingColumnError(error, "cover_image_path")) {
+    const fallbackRows = rows.map(({ cover_image_path: _unused, ...rest }) => rest);
+    const retry = await db().from("campaigns").upsert(fallbackRows, { onConflict: "id" });
+    throwIfError(retry.error);
+    return;
   }
+  throwIfError(error);
 }
 
 export async function supabaseLoadAllRedemptionRequests(): Promise<RedemptionRequest[]> {

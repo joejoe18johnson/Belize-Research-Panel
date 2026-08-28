@@ -120,7 +120,6 @@ export async function createAndLaunchCampaign(
     targeting,
     clientId: cleanText(input.clientId ?? "") || undefined,
     coverImageFile: cleanText(input.coverImageFile ?? ""),
-    logoFile: cleanText(input.logoFile ?? ""),
     createdAt: now,
     launchedAt: now,
   };
@@ -177,28 +176,16 @@ export async function findCampaignById(campaignId: string): Promise<CampaignReco
   return campaigns.find((campaign) => campaign.id === id) ?? null;
 }
 
-export async function updateCampaignBranding(
-  campaignId: string,
-  patch: { coverImageFile?: string; logoFile?: string }
-): Promise<CampaignRecord | null> {
-  const campaigns = await loadCampaignRecords();
-  const index = campaigns.findIndex((campaign) => campaign.id === campaignId);
-  if (index < 0) return null;
-  campaigns[index] = {
-    ...campaigns[index],
-    coverImageFile:
-      patch.coverImageFile !== undefined ? cleanText(patch.coverImageFile) : campaigns[index].coverImageFile ?? "",
-    logoFile: patch.logoFile !== undefined ? cleanText(patch.logoFile) : campaigns[index].logoFile ?? "",
-  };
-  await saveCampaignRecords(campaigns);
-  return campaigns[index];
-}
-
 export async function updateCampaignCoverImage(
   campaignId: string,
   coverImageFile: string
 ): Promise<CampaignRecord | null> {
-  return updateCampaignBranding(campaignId, { coverImageFile: cleanText(coverImageFile) });
+  const campaigns = await loadCampaignRecords();
+  const index = campaigns.findIndex((campaign) => campaign.id === campaignId);
+  if (index < 0) return null;
+  campaigns[index] = { ...campaigns[index], coverImageFile: cleanText(coverImageFile) };
+  await saveCampaignRecords(campaigns);
+  return campaigns[index];
 }
 
 export type {

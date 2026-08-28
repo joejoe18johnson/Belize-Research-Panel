@@ -37,7 +37,6 @@ export async function findAssignmentForAccount(
   return {
     ...record,
     coverImageFile: campaign.coverImageFile || record.coverImageFile || "",
-    logoFile: campaign.logoFile || record.logoFile || "",
   };
 }
 

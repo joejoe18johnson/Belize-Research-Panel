@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { canAccessCampaignBranding } from "@/lib/campaign-branding-access";
-import { loadCampaignBrandingAsset, type CampaignBrandingAssetKind } from "@/lib/campaign-branding-server";
+import { loadCampaignCoverAsset } from "@/lib/campaign-branding-server";
 import { findCampaignById } from "@/lib/campaigns";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -10,8 +10,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   }
 
   const campaign = await findCampaignById(id);
-  const kind: CampaignBrandingAssetKind = "cover";
-  const asset = await loadCampaignBrandingAsset(id, kind, campaign?.coverImageFile ?? "");
+  const asset = await loadCampaignCoverAsset(id, campaign?.coverImageFile ?? "");
   if (!asset) {
     return NextResponse.json({ ok: false, message: "Cover image not found." }, { status: 404 });
   }

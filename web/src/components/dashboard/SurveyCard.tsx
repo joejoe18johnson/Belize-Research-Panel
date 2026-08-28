@@ -1,9 +1,8 @@
-import { BrpInitialsMark } from "@/components/BrpLogo";
 import Link from "next/link";
 import type { PanelistSurvey, SurveyCategory } from "@/lib/panelist-surveys-types";
 import { isSurveyOverdue } from "@/lib/panelist-surveys-types";
 import type { ViewLayout } from "@/lib/view-layout";
-import { campaignCoverAssetUrl, campaignHasCover, campaignHasLogo, campaignLogoAssetUrl } from "@/lib/campaign-branding-shared";
+import { campaignCoverAssetUrl, campaignHasCover } from "@/lib/campaign-branding-shared";
 import { getSurveyCategoryStyle } from "@/lib/survey-category-styles";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { DashboardCard, DashboardCardMedia } from "./DashboardShell";
@@ -49,43 +48,14 @@ function SurveyProgressBar({
   );
 }
 
-function CampaignLogoMark({
-  logoUrl,
-  compact = false,
-}: {
-  logoUrl: string | null;
-  compact?: boolean;
-}) {
-  return (
-    <div
-      className={`absolute rounded-md border border-white/40 bg-white/95 shadow-sm ${
-        compact ? "bottom-1 left-1 p-0.5" : "bottom-3 left-3 rounded-lg p-1.5"
-      }`}
-    >
-      {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt=""
-          className={`object-contain ${compact ? "max-h-5 max-w-[2.5rem]" : "max-h-8 max-w-[5.5rem]"}`}
-        />
-      ) : (
-        <BrpInitialsMark size={compact ? "xs" : "sm"} />
-      )}
-    </div>
-  );
-}
-
 function SurveyCategoryBadge({
   category,
   compact = false,
   coverUrl,
-  logoUrl,
 }: {
   category: SurveyCategory;
   compact?: boolean;
   coverUrl?: string | null;
-  logoUrl?: string | null;
 }) {
   const style = CATEGORY_STYLES[category];
 
@@ -99,23 +69,6 @@ function SurveyCategoryBadge({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={coverUrl} alt="" className="h-full w-full object-cover" />
-        <CampaignLogoMark logoUrl={logoUrl ?? null} compact={compact} />
-      </div>
-    );
-  }
-
-  if (compact) {
-    return (
-      <div
-        className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-teal-50 dark:bg-teal-950/60 ring-1 ring-teal-100 dark:ring-teal-900"
-        aria-hidden="true"
-      >
-        {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={logoUrl} alt="" className="max-h-9 max-w-9 object-contain" />
-        ) : (
-          <BrpInitialsMark size="sm" />
-        )}
       </div>
     );
   }
@@ -137,7 +90,6 @@ function SurveyCategoryBadge({
       >
         {style.icon}
       </span>
-      <CampaignLogoMark logoUrl={logoUrl ?? null} compact={compact} />
     </div>
   );
 }
@@ -223,13 +175,12 @@ export function SurveyCard({
   const completed = survey.status === "completed";
   const overdue = isSurveyOverdue(survey);
   const coverUrl = campaignHasCover(survey) ? campaignCoverAssetUrl(survey.id) : null;
-  const logoUrl = campaignHasLogo(survey) ? campaignLogoAssetUrl(survey.id) : null;
 
   if (layout === "list") {
     return (
       <DashboardCard className={`p-4 ${locked ? "opacity-50 grayscale" : ""}`}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <SurveyCategoryBadge category={survey.category} compact coverUrl={coverUrl} logoUrl={logoUrl} />
+          <SurveyCategoryBadge category={survey.category} compact coverUrl={coverUrl} />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
@@ -279,7 +230,6 @@ export function SurveyCard({
                 {style.icon} {formatHeadingCase(style.label)}
               </span>
             </div>
-            <CampaignLogoMark logoUrl={logoUrl} />
           </div>
         ) : (
           <div
@@ -292,7 +242,6 @@ export function SurveyCard({
                 {style.icon} {formatHeadingCase(style.label)}
               </span>
             </div>
-            <CampaignLogoMark logoUrl={logoUrl} />
           </div>
         )}
       </DashboardCardMedia>
