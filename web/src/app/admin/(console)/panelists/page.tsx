@@ -1,5 +1,6 @@
 import { AdminPanelistsClient } from "@/components/admin/panelists/AdminPanelistsClient";
 import { getUniqueFilterValues } from "@/lib/admin-panelists";
+import { adminUnderReviewPath } from "@/lib/admin-dashboard-links";
 import { listAccounts } from "@/lib/accounts";
 import { loadPanelists } from "@/lib/panelists";
 import {
@@ -22,11 +23,22 @@ export const metadata = {
 export default async function AdminPanelistsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ email?: string; verification?: string; tab?: string }>;
+  searchParams: Promise<{
+    email?: string;
+    verification?: string;
+    tab?: string;
+    from?: string;
+    queue?: string;
+    requirement?: string;
+  }>;
 }) {
   const params = await searchParams;
   const initialTab =
     params.tab === "flagged" ? "flagged" : params.tab === "duplicates" ? "duplicates" : undefined;
+  const returnTo =
+    params.from === "under-review"
+      ? adminUnderReviewPath({ queue: params.queue, requirement: params.requirement })
+      : undefined;
   const [rows, accounts, photoUploadUsernames, residenceUploadUsernames] = await Promise.all([
     loadPanelists(),
     listAccounts(),
@@ -77,6 +89,7 @@ export default async function AdminPanelistsPage({
       initialEmail={params.email}
       initialTab={initialTab}
       initialVerification={params.verification}
+      returnTo={returnTo}
       photoUploadUsernames={[...photoUploadUsernames]}
       residenceUploadUsernames={[...residenceUploadUsernames]}
       liveDatabase={useSupabase()}

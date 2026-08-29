@@ -24,6 +24,7 @@ import { isFlaggedPanelist } from "@/lib/admin-panelists";
 import type { UnderReviewRow } from "@/lib/admin-dashboard-metrics";
 import {
   ADMIN_DASHBOARD_LINKS,
+  adminPanelistRecordHref,
   filterUnderReviewRowsByQueue,
   filterUnderReviewRowsByRequirement,
   parseUnderReviewQueueFilter,
@@ -343,7 +344,11 @@ export function AdminUnderReviewDashboard({
                             </a>
                           ) : null}
                           <Link
-                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                            href={adminPanelistRecordHref(row.email, {
+                              from: "under-review",
+                              queue: queueFilter,
+                              requirement: requirementFilter,
+                            })}
                             className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
                             onClick={() => void markUnderReviewRead(row.email)}
                           >

@@ -87,6 +87,7 @@ export function AdminPanelistsClient({
   photoUploadUsernames,
   residenceUploadUsernames,
   liveDatabase = false,
+  returnTo,
 }: {
   rows: PanelistRow[];
   requirementByEmail: Record<
@@ -106,6 +107,7 @@ export function AdminPanelistsClient({
   photoUploadUsernames: UsernameCollection;
   residenceUploadUsernames: UsernameCollection;
   liveDatabase?: boolean;
+  returnTo?: string;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
@@ -238,6 +240,9 @@ export function AdminPanelistsClient({
     setEditState(null);
     setError("");
     setMessage("");
+    if (returnTo) {
+      router.push(returnTo);
+    }
   };
 
   const requirementReviewContext = useMemo(() => {

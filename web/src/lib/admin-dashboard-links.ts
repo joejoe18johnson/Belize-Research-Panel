@@ -102,9 +102,28 @@ export function filterUnderReviewRowsByRequirement<
   });
 }
 
-export const UNDER_REVIEW_FILTER_LABELS: Record<UnderReviewRequirementFilter, string> = {
-  email: "Email verification",
-  phone: "Phone numbers",
-  id: "Identity documents",
-  address: "Address documents",
-};
+export function adminUnderReviewPath(options?: { queue?: string; requirement?: string }): string {
+  const params = new URLSearchParams();
+  const requirement = parseUnderReviewRequirementFilter(options?.requirement);
+  const queue = parseUnderReviewQueueFilter(options?.queue);
+  if (requirement) params.set("requirement", requirement);
+  if (queue) params.set("queue", queue);
+  const query = params.toString();
+  return `/admin/under-review${query ? `?${query}` : ""}`;
+}
+
+export function adminPanelistRecordHref(
+  email: string,
+  options?: { from?: "under-review"; queue?: string | null; requirement?: string | null }
+): string {
+  const params = new URLSearchParams();
+  params.set("email", email);
+  if (options?.from === "under-review") {
+    params.set("from", "under-review");
+    const requirement = parseUnderReviewRequirementFilter(options.requirement ?? undefined);
+    const queue = parseUnderReviewQueueFilter(options.queue ?? undefined);
+    if (requirement) params.set("requirement", requirement);
+    if (queue) params.set("queue", queue);
+  }
+  return `/admin/panelists?${params.toString()}`;
+}
