@@ -38,7 +38,6 @@ import {
   adminPanelistDocumentUrl,
   panelistHasPhotoDocument,
   panelistHasResidenceDocument,
-  panelistShouldOfferPhotoIdView,
   type UsernameCollection,
 } from "@/lib/panelist-document-view";
 
@@ -602,7 +601,6 @@ export function AdminPanelistsClient({
                   columns={TABLE_COLUMNS}
                   actions={rowActions}
                   requirementByEmail={requirementByEmail}
-                  photoUploadUsernames={photoUploadUsernames}
                 />
               </div>
               <TablePagination
@@ -650,7 +648,6 @@ export function AdminPanelistsClient({
               columns={TABLE_COLUMNS}
               actions={rowActions}
               requirementByEmail={requirementByEmail}
-              photoUploadUsernames={photoUploadUsernames}
             />
           </div>
           <TablePagination
@@ -1007,7 +1004,6 @@ function DataTable({
   columns,
   actions,
   requirementByEmail,
-  photoUploadUsernames = [],
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
@@ -1016,7 +1012,6 @@ function DataTable({
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
   >;
-  photoUploadUsernames?: UsernameCollection;
 }) {
   return (
     <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm md:min-w-[1100px]`}>
@@ -1057,9 +1052,7 @@ function DataTable({
                       actions={actions}
                       flagged={isFlagged}
                       photoDocumentUrl={
-                        panelistShouldOfferPhotoIdView(row, photoUploadUsernames)
-                          ? adminPanelistDocumentUrl(row.email, "photo-id")
-                          : undefined
+                        row.email ? adminPanelistDocumentUrl(row.email, "photo-id") : undefined
                       }
                     />
                   </td>
