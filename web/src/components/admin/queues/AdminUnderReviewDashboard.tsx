@@ -70,8 +70,6 @@ export function AdminUnderReviewDashboard({
             row.name.toLowerCase().includes(query) ||
             row.email.toLowerCase().includes(query) ||
             row.verificationStatus.toLowerCase().includes(query) ||
-            row.authorisedBy.toLowerCase().includes(query) ||
-            row.authorisedCode.toLowerCase().includes(query) ||
             row.reasons.some((reason) => reason.toLowerCase().includes(query))
         );
     return [...matches].sort((left, right) => {
@@ -262,7 +260,6 @@ export function AdminUnderReviewDashboard({
                   <AdminTableTh>Name</AdminTableTh>
                   <AdminTableTh>Email</AdminTableTh>
                   <AdminTableTh>Email · Phone · ID</AdminTableTh>
-                  <AdminTableTh>Authorised by</AdminTableTh>
                   <AdminTableTh>Verification</AdminTableTh>
                   <AdminTableTh>Account</AdminTableTh>
                   <AdminTableTh>Reason</AdminTableTh>
@@ -294,18 +291,6 @@ export function AdminUnderReviewDashboard({
                           iconsOnly
                         />
                       </AdminTableTd>
-                      <AdminTableTd label="Authorised by">
-                        {row.authorisedCode ? (
-                          <div>
-                            <p className="font-medium text-zinc-800 dark:text-zinc-200">
-                              {row.authorisedBy || "Authorised registration"}
-                            </p>
-                            <p className="font-mono text-xs tracking-wide text-zinc-500">{row.authorisedCode}</p>
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </AdminTableTd>
                       <AdminTableTd label="Verification">
                         <AdminStatusPill
                           label={row.verificationStatus}
@@ -332,29 +317,17 @@ export function AdminUnderReviewDashboard({
                         <span className="tabular-nums">{row.registrationDate || "—"}</span>
                       </AdminTableTd>
                       <AdminTableTd label="Actions">
-                        <div className="flex flex-col gap-1.5">
-                          {row.photoIdDocumentUrl ? (
-                            <a
-                              href={row.photoIdDocumentUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-semibold text-sky-700 hover:text-sky-900 dark:text-sky-300"
-                            >
-                              View ID
-                            </a>
-                          ) : null}
-                          <Link
-                            href={adminPanelistRecordHref(row.email, {
-                              from: "under-review",
-                              queue: queueFilter,
-                              requirement: requirementFilter,
-                            })}
-                            className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
-                            onClick={() => void markUnderReviewRead(row.email)}
-                          >
-                            Open record
-                          </Link>
-                        </div>
+                        <Link
+                          href={adminPanelistRecordHref(row.email, {
+                            from: "under-review",
+                            queue: queueFilter,
+                            requirement: requirementFilter,
+                          })}
+                          className="inline-flex min-h-9 items-center justify-center rounded-lg bg-teal-700 px-3 text-xs font-semibold text-white hover:bg-teal-800"
+                          onClick={() => void markUnderReviewRead(row.email)}
+                        >
+                          Open record
+                        </Link>
                       </AdminTableTd>
                     </AdminTableRow>
                     );
