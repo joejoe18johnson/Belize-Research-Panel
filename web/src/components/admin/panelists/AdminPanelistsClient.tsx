@@ -766,13 +766,10 @@ function PanelistEditModal({
 
   const documentBase = `/api/admin/panelists/${encodeURIComponent(panelistEmail)}/document`;
   const reviewDetail = {
-    email: editState.email,
+    email: editState.email || panelistEmail,
     phone: editState.phone_whatsapp,
     photoIdType,
-    photoIdDocumentUrl:
-      panelistShouldOfferPhotoIdView(reviewPanelist) || requirementContext.hasPhotoUpload
-        ? `${documentBase}?kind=photo-id`
-        : undefined,
+    photoIdDocumentUrl: `${documentBase}?kind=photo-id`,
     residenceDocumentUrl: requirementContext.hasResidenceUpload
       ? `${documentBase}?kind=residence-proof`
       : undefined,

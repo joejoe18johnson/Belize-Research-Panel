@@ -30,6 +30,13 @@ function statusFromDecision(
   return onFile ? "under_review" : "missing";
 }
 
+function photoIdDocumentHref(detail: RequirementReviewDetail): string {
+  if (detail.photoIdDocumentUrl) return detail.photoIdDocumentUrl;
+  const email = detail.email.trim();
+  if (!email) return "";
+  return `/api/admin/panelists/${encodeURIComponent(email)}/document?kind=photo-id`;
+}
+
 function ViewDocumentLink({ href, label }: { href: string; label: string }) {
   return (
     <a
@@ -90,9 +97,12 @@ function PhotoIdPreview({ url }: { url: string }) {
 
   if (status === "missing" || !preview) {
     return (
-      <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-        ID type declared — no uploaded ID file was found. Ask the panelist to re-upload if needed.
-      </p>
+      <div className="space-y-2">
+        <p className="text-[11px] text-amber-800 dark:text-amber-300">
+          Preview unavailable. Open the ID document to view it.
+        </p>
+        <ViewDocumentLink href={url} label="Open ID document" />
+      </div>
     );
   }
 
@@ -161,6 +171,8 @@ function RequirementOnFileDetail({
     );
   }
 
+  const photoUrl = photoIdDocumentHref(detail);
+
   return (
     <div className="mt-2 space-y-2">
       {detail.photoIdType ? (
@@ -169,12 +181,10 @@ function RequirementOnFileDetail({
           <p className="mt-0.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">{detail.photoIdType}</p>
         </div>
       ) : null}
-      {detail.photoIdDocumentUrl ? (
-        <PhotoIdPreview url={detail.photoIdDocumentUrl} />
+      {photoUrl ? (
+        <PhotoIdPreview url={photoUrl} />
       ) : (
-        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
-          ID type declared — no uploaded document on file.
-        </p>
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-400">No panelist email on this record, so the ID file cannot be loaded.</p>
       )}
       {detail.residenceDocumentUrl ? (
         <ViewDocumentLink href={detail.residenceDocumentUrl} label="View address proof" />

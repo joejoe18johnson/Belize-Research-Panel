@@ -13,7 +13,7 @@ import type { AdminReadState } from "../admin-read-state";
 import type { SupportMessageRecord } from "../support-messages";
 import type { AuthorisedRegistrar, AuthorisedRegistrarStore } from "../authorised-registrars";
 import { normalizeRewardSettings } from "../reward-settings";
-import { cleanText } from "../validation";
+import { cleanText, deriveAccountUsername, deriveUsernameFromEmail } from "../validation";
 import { getSupabaseAdmin } from "./server";
 import { normalizePanelistEmail, resolveDbAssignmentId } from "./assignment-id";
 import {
@@ -316,6 +316,18 @@ export async function supabaseSyncPanelists(rows: PanelistRow[]): Promise<void> 
   }
 }
 
+function contentTypeForUpload(file: File): string {
+  const type = (file.type || "").toLowerCase();
+  if (type === "image/jpg") return "image/jpeg";
+  if (type && type !== "application/octet-stream") return file.type;
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".png")) return "image/png";
+  if (name.endsWith(".webp")) return "image/webp";
+  if (name.endsWith(".pdf")) return "application/pdf";
+  if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+  return "image/jpeg";
+}
+
 export async function supabaseUploadPanelistFile(
   accountId: string,
   kind: "photo_id" | "residence_proof",
@@ -327,7 +339,7 @@ export async function supabaseUploadPanelistFile(
   const { error } = await db()
     .storage.from("panelist-documents")
     .upload(storagePath, buffer, {
-      contentType: file.type || "application/octet-stream",
+      contentType: contentTypeForUpload(file),
       upsert: true,
     });
   throwIfError(error);
@@ -402,21 +414,38 @@ export async function supabaseFindPanelistDocumentPath(
   if (stored && !options?.ignoreStored) return stored;
 
   let accountId = cleanText(panelist.account_id);
-  if (!accountId && panelist.email) {
+  let lookedUpAccountId = "";
+  if (panelist.email) {
     const { data } = await db()
       .from("accounts")
       .select("id")
       .eq("email", normalizePanelistEmail(panelist.email))
       .maybeSingle();
-    accountId = cleanText(String((data as { id?: string } | null)?.id ?? ""));
+    lookedUpAccountId = cleanText(String((data as { id?: string } | null)?.id ?? ""));
+    if (!accountId) accountId = lookedUpAccountId;
   }
 
-  const folders = [...new Set([accountId, cleanText(panelist.id), cleanText(panelist.username)].filter(Boolean))];
+  const emailLocal = deriveUsernameFromEmail(panelist.email) || "";
+  const derivedUsername = lookedUpAccountId || accountId
+    ? deriveAccountUsername(panelist.email, lookedUpAccountId || accountId)
+    : "";
+  const folders = [
+    ...new Set(
+      [accountId, lookedUpAccountId, cleanText(panelist.id), cleanText(panelist.username), derivedUsername, emailLocal].filter(
+        Boolean
+      )
+    ),
+  ];
   for (const folder of folders) {
     const { data } = await db().storage.from("panelist-documents").list(folder, { limit: 100 });
     const match = pickStoredDocument(data ?? [], kind);
     if (match) return `${folder}/${match.name}`;
   }
+
+  const { data: rootItems } = await db().storage.from("panelist-documents").list("", { limit: 100 });
+  const rootMatch = pickStoredDocument(rootItems ?? [], kind);
+  if (rootMatch) return rootMatch.name;
+
   return null;
 }
 
