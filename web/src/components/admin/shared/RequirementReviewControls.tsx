@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import { RequirementStatusBadge } from "./RequirementStatusBadges";
 
@@ -50,6 +51,70 @@ function ViewDocumentLink({ href, label }: { href: string; label: string }) {
         <path d="M6 3.5h5.5V9M11.5 3.5 6 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     </a>
+  );
+}
+
+function PhotoIdPreview({ url }: { url: string }) {
+  const [status, setStatus] = useState<"loading" | "ready" | "missing">("loading");
+  const [preview, setPreview] = useState<{ objectUrl: string; type: string } | null>(null);
+
+  useEffect(() => {
+    let objectUrl = "";
+    let cancelled = false;
+    setStatus("loading");
+    setPreview(null);
+
+    fetch(url, { credentials: "same-origin" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("missing");
+        const type = (response.headers.get("content-type") || "").toLowerCase();
+        const blob = await response.blob();
+        if (cancelled) return;
+        objectUrl = URL.createObjectURL(blob);
+        setPreview({ objectUrl, type });
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("missing");
+      });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [url]);
+
+  if (status === "loading") {
+    return <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Loading uploaded ID…</p>;
+  }
+
+  if (status === "missing" || !preview) {
+    return (
+      <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+        ID type declared — no uploaded ID file was found. Ask the panelist to re-upload if needed.
+      </p>
+    );
+  }
+
+  const isImage = preview.type.startsWith("image/");
+  const isPdf = preview.type.includes("pdf");
+
+  return (
+    <div className="space-y-2">
+      {isImage ? (
+        <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview.objectUrl} alt="Uploaded photo ID" className="max-h-80 w-full object-contain" />
+        </div>
+      ) : isPdf ? (
+        <iframe
+          src={preview.objectUrl}
+          title="Uploaded photo ID"
+          className="h-80 w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100"
+        />
+      ) : null}
+      <ViewDocumentLink href={url} label="Open ID document" />
+    </div>
   );
 }
 
@@ -105,19 +170,11 @@ function RequirementOnFileDetail({
         </div>
       ) : null}
       {detail.photoIdDocumentUrl ? (
-        <div className="space-y-2">
-          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={detail.photoIdDocumentUrl}
-              alt="Uploaded photo ID"
-              className="max-h-80 w-full object-contain"
-            />
-          </div>
-          <ViewDocumentLink href={detail.photoIdDocumentUrl} label="Open ID document" />
-        </div>
+        <PhotoIdPreview url={detail.photoIdDocumentUrl} />
       ) : (
-        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">ID type declared — no uploaded document on file.</p>
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          ID type declared — no uploaded document on file.
+        </p>
       )}
       {detail.residenceDocumentUrl ? (
         <ViewDocumentLink href={detail.residenceDocumentUrl} label="View address proof" />

@@ -33,8 +33,6 @@ import {
 } from "@/lib/admin-dashboard-links";
 import { adminPanelistVerificationId } from "@/lib/admin-read-ids";
 import { formatHeadingCase } from "@/lib/sentence-case";
-import { adminPanelistDocumentUrl } from "@/lib/panelist-documents";
-
 export function AdminUnderReviewDashboard({
   rows,
   unreadEmails = [],
@@ -334,9 +332,9 @@ export function AdminUnderReviewDashboard({
                       </AdminTableTd>
                       <AdminTableTd label="Actions">
                         <div className="flex flex-col gap-1.5">
-                          {row.hasPhotoUpload ? (
+                          {row.photoIdDocumentUrl ? (
                             <a
-                              href={adminPanelistDocumentUrl(row.email, "photo-id")}
+                              href={row.photoIdDocumentUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="font-semibold text-sky-700 hover:text-sky-900 dark:text-sky-300"

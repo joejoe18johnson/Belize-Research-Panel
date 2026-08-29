@@ -77,8 +77,8 @@ export default async function AdminPanelistsPage({
       initialEmail={params.email}
       initialTab={initialTab}
       initialVerification={params.verification}
-      photoUploadUsernames={photoUploadUsernames}
-      residenceUploadUsernames={residenceUploadUsernames}
+      photoUploadUsernames={[...photoUploadUsernames]}
+      residenceUploadUsernames={[...residenceUploadUsernames]}
       liveDatabase={useSupabase()}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),

@@ -13,6 +13,7 @@ import {
   requirementContextFromAccount,
 } from "./panelist-requirements";
 import { requirementContextForPanelist } from "./panelist-requirement-context";
+import { adminPanelistDocumentUrl } from "./panelist-documents";
 import {
   formatAdminPayoutDate,
   formatPayoutPaymentDetails,
@@ -72,6 +73,7 @@ export interface UnderReviewRow {
   authorisedBy: string;
   authorisedCode: string;
   hasPhotoUpload: boolean;
+  photoIdDocumentUrl?: string;
 }
 
 export type NotificationQueueType =
@@ -289,6 +291,10 @@ export function buildUnderReviewRows(
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(row.place_of_residence)),
       hasPhotoUpload: Boolean(context.hasPhotoUpload),
+      photoIdDocumentUrl:
+        context.hasPhotoUpload || Boolean(cleanText(row.photo_id_type))
+          ? adminPanelistDocumentUrl(email, "photo-id")
+          : undefined,
       ...authorisedReviewFields(row),
     });
   }
@@ -314,6 +320,7 @@ export function buildUnderReviewRows(
         photoIdRequirement: "missing",
         hasAddressDocument: false,
         hasPhotoUpload: false,
+        photoIdDocumentUrl: undefined,
         authorisedBy: "",
         authorisedCode: "",
       });
@@ -341,6 +348,10 @@ export function buildUnderReviewRows(
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(panelist.place_of_residence)),
       hasPhotoUpload: Boolean(context.hasPhotoUpload),
+      photoIdDocumentUrl:
+        context.hasPhotoUpload || Boolean(cleanText(panelist.photo_id_type))
+          ? adminPanelistDocumentUrl(email, "photo-id")
+          : undefined,
       ...authorisedReviewFields(panelist),
     });
   }

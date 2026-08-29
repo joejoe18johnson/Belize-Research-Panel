@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
-import { panelistHasPhotoDocument } from "./panelist-documents";
+import { panelistHasPhotoDocument, type UsernameCollection } from "./panelist-documents";
 
 const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -56,7 +56,7 @@ async function loadPanelistUploadUsernamesForPrefix(prefix: string): Promise<Set
 export function requirementContextForPanelist(
   panelist: PanelistRow,
   accountsByEmail: Map<string, { email_verified?: string; pending_phone_whatsapp?: string }>,
-  photoUploadUsernames: Set<string>
+  photoUploadUsernames: UsernameCollection
 ) {
   const email = cleanText(panelist.email).toLowerCase();
   const account = email ? accountsByEmail.get(email) : undefined;

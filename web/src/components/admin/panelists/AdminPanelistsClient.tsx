@@ -38,6 +38,8 @@ import {
   adminPanelistDocumentUrl,
   panelistHasPhotoDocument,
   panelistHasResidenceDocument,
+  panelistShouldOfferPhotoIdView,
+  type UsernameCollection,
 } from "@/lib/panelist-documents";
 
 const TABLE_COLUMNS = [
@@ -102,8 +104,8 @@ export function AdminPanelistsClient({
   initialVerification?: string;
   initialEmail?: string;
   initialTab?: "all" | "duplicates" | "flagged";
-  photoUploadUsernames: Set<string>;
-  residenceUploadUsernames: Set<string>;
+  photoUploadUsernames: UsernameCollection;
+  residenceUploadUsernames: UsernameCollection;
   liveDatabase?: boolean;
 }) {
   const router = useRouter();
@@ -767,7 +769,10 @@ function PanelistEditModal({
     email: editState.email,
     phone: editState.phone_whatsapp,
     photoIdType,
-    photoIdDocumentUrl: requirementContext.hasPhotoUpload ? `${documentBase}?kind=photo-id` : undefined,
+    photoIdDocumentUrl:
+      panelistShouldOfferPhotoIdView(reviewPanelist) || requirementContext.hasPhotoUpload
+        ? `${documentBase}?kind=photo-id`
+        : undefined,
     residenceDocumentUrl: requirementContext.hasResidenceUpload
       ? `${documentBase}?kind=residence-proof`
       : undefined,
@@ -1005,7 +1010,7 @@ function DataTable({
   columns,
   actions,
   requirementByEmail,
-  photoUploadUsernames = new Set(),
+  photoUploadUsernames = [],
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
@@ -1014,7 +1019,7 @@ function DataTable({
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
   >;
-  photoUploadUsernames?: Set<string>;
+  photoUploadUsernames?: UsernameCollection;
 }) {
   return (
     <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm md:min-w-[1100px]`}>
@@ -1055,7 +1060,7 @@ function DataTable({
                       actions={actions}
                       flagged={isFlagged}
                       photoDocumentUrl={
-                        panelistHasPhotoDocument(row, photoUploadUsernames)
+                        panelistShouldOfferPhotoIdView(row, photoUploadUsernames)
                           ? adminPanelistDocumentUrl(row.email, "photo-id")
                           : undefined
                       }

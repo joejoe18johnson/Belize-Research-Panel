@@ -127,6 +127,7 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     : metadataString(meta, "market_interests");
 
   return {
+    ...(cleanText(String(row.id ?? "")) ? { id: cleanText(String(row.id)) } : {}),
     registration_date: dateOnlyOrEmpty(row.registration_date as string),
     first_name: cleanText(String(row.first_name)),
     last_name: cleanText(String(row.last_name)),

@@ -351,7 +351,10 @@ function contentTypeForFilename(filename: string): string {
 }
 
 async function upsertPanelistPayload(payload: Record<string, unknown>): Promise<void> {
-  let row = payload;
+  let row = { ...payload };
+  for (const column of PANELIST_OPTIONAL_COLUMNS) {
+    if (!cleanText(String(row[column] ?? ""))) delete row[column];
+  }
   const omitted = new Set<string>();
   for (let attempt = 0; attempt <= PANELIST_OPTIONAL_COLUMNS.length; attempt += 1) {
     const { error } = await db().from("panelists").upsert(row, { onConflict: "email" });
@@ -368,12 +371,35 @@ async function upsertPanelistPayload(payload: Record<string, unknown>): Promise<
   }
 }
 
+const DOCUMENT_NAME_PREFIXES: Record<"photo_id" | "residence_proof", string[]> = {
+  photo_id: ["photo_id", "photo-id"],
+  residence_proof: ["residence_proof", "residence-proof"],
+};
+
+const DOCUMENT_FILE_PATTERN = /\.(png|jpe?g|webp|gif|pdf|heic|heif|bmp|tif{1,2})$/i;
+
+function isStorageFile(item: { id?: string | null; name?: string }): boolean {
+  return Boolean(item.name) && item.id != null;
+}
+
+function pickStoredDocument(
+  items: Array<{ id?: string | null; name: string; created_at?: string | null }>,
+  kind: "photo_id" | "residence_proof"
+): { name: string } | undefined {
+  const files = items.filter(isStorageFile);
+  const prefixes = DOCUMENT_NAME_PREFIXES[kind];
+  const prefixed = files.filter((item) => prefixes.some((prefix) => item.name.startsWith(prefix)));
+  const pool = prefixed.length ? prefixed : files.filter((item) => DOCUMENT_FILE_PATTERN.test(item.name));
+  return [...pool].sort((a, b) => String(b.created_at ?? b.name).localeCompare(String(a.created_at ?? a.name)))[0];
+}
+
 export async function supabaseFindPanelistDocumentPath(
   panelist: PanelistRow,
-  kind: "photo_id" | "residence_proof"
+  kind: "photo_id" | "residence_proof",
+  options?: { ignoreStored?: boolean }
 ): Promise<string | null> {
   const stored = cleanText(kind === "photo_id" ? panelist.photo_id_path : panelist.residence_proof_path);
-  if (stored) return stored;
+  if (stored && !options?.ignoreStored) return stored;
 
   let accountId = cleanText(panelist.account_id);
   if (!accountId && panelist.email) {
@@ -385,16 +411,26 @@ export async function supabaseFindPanelistDocumentPath(
     accountId = cleanText(String((data as { id?: string } | null)?.id ?? ""));
   }
 
-  const folders = [accountId, cleanText(panelist.username)].filter(Boolean);
-  const prefixes = kind === "photo_id" ? ["photo_id", "photo-id"] : ["residence_proof", "residence-proof"];
+  const folders = [...new Set([accountId, cleanText(panelist.id), cleanText(panelist.username)].filter(Boolean))];
   for (const folder of folders) {
-    const { data } = await db().storage.from("panelist-documents").list(folder);
-    const match = (data ?? [])
-      .filter((item) => prefixes.some((prefix) => item.name.startsWith(prefix)))
-      .sort((a, b) => String(b.created_at ?? b.name).localeCompare(String(a.created_at ?? a.name)))[0];
+    const { data } = await db().storage.from("panelist-documents").list(folder, { limit: 100 });
+    const match = pickStoredDocument(data ?? [], kind);
     if (match) return `${folder}/${match.name}`;
   }
   return null;
+}
+
+export async function supabaseBackfillPanelistDocumentPath(
+  email: string,
+  kind: "photo_id" | "residence_proof",
+  storagePath: string
+): Promise<void> {
+  const path = cleanText(storagePath);
+  const normalized = normalizePanelistEmail(email);
+  if (!path || !normalized) return;
+  const column = kind === "photo_id" ? "photo_id_path" : "residence_proof_path";
+  const { error } = await db().from("panelists").update({ [column]: path }).eq("email", normalized);
+  if (error && isMissingColumnError(error, column)) return;
 }
 
 export async function supabaseDownloadPanelistDocument(
