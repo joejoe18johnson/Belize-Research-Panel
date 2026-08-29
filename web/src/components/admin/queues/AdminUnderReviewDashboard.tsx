@@ -33,6 +33,7 @@ import {
 } from "@/lib/admin-dashboard-links";
 import { adminPanelistVerificationId } from "@/lib/admin-read-ids";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { adminPanelistDocumentUrl } from "@/lib/panelist-documents";
 
 export function AdminUnderReviewDashboard({
   rows,
@@ -332,13 +333,25 @@ export function AdminUnderReviewDashboard({
                         <span className="tabular-nums">{row.registrationDate || "—"}</span>
                       </AdminTableTd>
                       <AdminTableTd label="Actions">
-                        <Link
-                          href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
-                          className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
-                          onClick={() => void markUnderReviewRead(row.email)}
-                        >
-                          Open record
-                        </Link>
+                        <div className="flex flex-col gap-1.5">
+                          {row.hasPhotoUpload ? (
+                            <a
+                              href={adminPanelistDocumentUrl(row.email, "photo-id")}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold text-sky-700 hover:text-sky-900 dark:text-sky-300"
+                            >
+                              View ID
+                            </a>
+                          ) : null}
+                          <Link
+                            href={`/admin/panelists?email=${encodeURIComponent(row.email)}`}
+                            className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
+                            onClick={() => void markUnderReviewRead(row.email)}
+                          >
+                            Open record
+                          </Link>
+                        </div>
                       </AdminTableTd>
                     </AdminTableRow>
                     );

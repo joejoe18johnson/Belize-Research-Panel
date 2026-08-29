@@ -105,7 +105,17 @@ function RequirementOnFileDetail({
         </div>
       ) : null}
       {detail.photoIdDocumentUrl ? (
-        <ViewDocumentLink href={detail.photoIdDocumentUrl} label="View ID document" />
+        <div className="space-y-2">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={detail.photoIdDocumentUrl}
+              alt="Uploaded photo ID"
+              className="max-h-80 w-full object-contain"
+            />
+          </div>
+          <ViewDocumentLink href={detail.photoIdDocumentUrl} label="Open ID document" />
+        </div>
       ) : (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">ID type declared — no uploaded document on file.</p>
       )}

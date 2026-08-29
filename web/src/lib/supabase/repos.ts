@@ -284,12 +284,15 @@ export async function supabaseDeletePanelistStorage(accountId: string): Promise<
 
 export async function supabaseUpsertPanelists(rows: PanelistRow[], options?: { accountId?: string }): Promise<void> {
   if (!rows.length) return;
-  const payload = rows.map((row) => ({
-    ...panelistRecordToRow(row),
-    ...(options?.accountId ? { account_id: options.accountId } : {}),
-  }));
-  const { error } = await db().from("panelists").upsert(payload, { onConflict: "email" });
-  throwIfError(error);
+  for (const row of rows) {
+    await upsertPanelistPayload({
+      ...panelistRecordToRow(row),
+      ...(options?.accountId ? { account_id: options.accountId } : {}),
+      ...(row.account_id ? { account_id: row.account_id } : {}),
+      ...(row.photo_id_path ? { photo_id_path: row.photo_id_path } : {}),
+      ...(row.residence_proof_path ? { residence_proof_path: row.residence_proof_path } : {}),
+    });
+  }
 }
 
 export async function supabaseSyncPanelists(rows: PanelistRow[]): Promise<void> {
@@ -331,19 +334,95 @@ export async function supabaseUploadPanelistFile(
   return storagePath;
 }
 
+const PANELIST_OPTIONAL_COLUMNS = ["photo_id_path", "residence_proof_path", "account_id"] as const;
+
+const DOCUMENT_CONTENT_TYPES: Record<string, string> = {
+  ".pdf": "application/pdf",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+};
+
+function contentTypeForFilename(filename: string): string {
+  const ext = filename.includes(".") ? filename.slice(filename.lastIndexOf(".")).toLowerCase() : "";
+  return DOCUMENT_CONTENT_TYPES[ext] ?? "application/octet-stream";
+}
+
+async function upsertPanelistPayload(payload: Record<string, unknown>): Promise<void> {
+  let row = payload;
+  const omitted = new Set<string>();
+  for (let attempt = 0; attempt <= PANELIST_OPTIONAL_COLUMNS.length; attempt += 1) {
+    const { error } = await db().from("panelists").upsert(row, { onConflict: "email" });
+    if (!error) return;
+    const missing = PANELIST_OPTIONAL_COLUMNS.find(
+      (column) => !omitted.has(column) && isMissingColumnError(error, column)
+    );
+    if (!missing) {
+      throwIfError(error);
+      return;
+    }
+    omitted.add(missing);
+    row = omitRowKeys(row, [missing]);
+  }
+}
+
+export async function supabaseFindPanelistDocumentPath(
+  panelist: PanelistRow,
+  kind: "photo_id" | "residence_proof"
+): Promise<string | null> {
+  const stored = cleanText(kind === "photo_id" ? panelist.photo_id_path : panelist.residence_proof_path);
+  if (stored) return stored;
+
+  let accountId = cleanText(panelist.account_id);
+  if (!accountId && panelist.email) {
+    const { data } = await db()
+      .from("accounts")
+      .select("id")
+      .eq("email", normalizePanelistEmail(panelist.email))
+      .maybeSingle();
+    accountId = cleanText(String((data as { id?: string } | null)?.id ?? ""));
+  }
+
+  const folders = [accountId, cleanText(panelist.username)].filter(Boolean);
+  const prefixes = kind === "photo_id" ? ["photo_id", "photo-id"] : ["residence_proof", "residence-proof"];
+  for (const folder of folders) {
+    const { data } = await db().storage.from("panelist-documents").list(folder);
+    const match = (data ?? [])
+      .filter((item) => prefixes.some((prefix) => item.name.startsWith(prefix)))
+      .sort((a, b) => String(b.created_at ?? b.name).localeCompare(String(a.created_at ?? a.name)))[0];
+    if (match) return `${folder}/${match.name}`;
+  }
+  return null;
+}
+
+export async function supabaseDownloadPanelistDocument(
+  storagePath: string
+): Promise<{ buffer: Buffer; filename: string; contentType: string } | null> {
+  const path = cleanText(storagePath);
+  if (!path) return null;
+  const { data, error } = await db().storage.from("panelist-documents").download(path);
+  if (error || !data) return null;
+  const filename = path.split("/").pop() || "document";
+  return {
+    buffer: Buffer.from(await data.arrayBuffer()),
+    filename,
+    contentType: contentTypeForFilename(filename),
+  };
+}
+
 export async function supabaseInsertPanelist(
   row: PanelistRow,
   accountId?: string,
   options?: { photoIdPath?: string; residenceProofPath?: string }
 ): Promise<void> {
-  const payload = {
+  await upsertPanelistPayload({
     ...panelistRecordToRow(row),
     ...(accountId ? { account_id: accountId } : {}),
     ...(options?.photoIdPath ? { photo_id_path: options.photoIdPath } : {}),
     ...(options?.residenceProofPath ? { residence_proof_path: options.residenceProofPath } : {}),
-  };
-  const { error } = await db().from("panelists").upsert(payload, { onConflict: "email" });
-  throwIfError(error);
+  });
 }
 
 export async function supabaseListStaffUsers(): Promise<StaffUserRecord[]> {

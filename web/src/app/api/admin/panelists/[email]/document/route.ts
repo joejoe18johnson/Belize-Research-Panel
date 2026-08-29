@@ -1,18 +1,14 @@
 import { readFile } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
-import { findPanelistByEmail, findPanelistUpload } from "@/lib/panelists";
+import { findPanelistByEmail } from "@/lib/panelists";
+import { loadPanelistVerificationDocument, type PanelistDocumentKind } from "@/lib/panelist-documents";
 import { cleanText } from "@/lib/validation";
 
-const CONTENT_TYPES: Record<string, string> = {
-  ".pdf": "application/pdf",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".webp": "image/webp",
-  ".gif": "image/gif",
-};
+function parseKind(value: string): PanelistDocumentKind | null {
+  if (value === "photo-id" || value === "residence-proof") return value;
+  return null;
+}
 
 export async function GET(
   request: Request,
@@ -25,9 +21,9 @@ export async function GET(
   const { email } = await context.params;
   const accountEmail = decodeURIComponent(email);
   const { searchParams } = new URL(request.url);
-  const kind = cleanText(searchParams.get("kind")).toLowerCase();
+  const kind = parseKind(cleanText(searchParams.get("kind")).toLowerCase());
 
-  if (kind !== "photo-id" && kind !== "residence-proof") {
+  if (!kind) {
     return NextResponse.json({ ok: false, message: "Invalid document kind." }, { status: 400 });
   }
 
@@ -36,20 +32,15 @@ export async function GET(
     return NextResponse.json({ ok: false, message: "Panelist record not found." }, { status: 404 });
   }
 
-  const username = cleanText(panelist.username);
-  const upload = await findPanelistUpload(username, kind);
-  if (!upload) {
+  const document = await loadPanelistVerificationDocument(panelist, kind);
+  if (!document) {
     return NextResponse.json({ ok: false, message: "Document not found on file." }, { status: 404 });
   }
 
-  const buffer = await readFile(upload.absolutePath);
-  const ext = path.extname(upload.filename).toLowerCase();
-  const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
-
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(document.buffer), {
     headers: {
-      "Content-Type": contentType,
-      "Content-Disposition": `inline; filename="${upload.filename}"`,
+      "Content-Type": document.contentType,
+      "Content-Disposition": `inline; filename="${document.filename}"`,
       "Cache-Control": "private, no-store",
     },
   });

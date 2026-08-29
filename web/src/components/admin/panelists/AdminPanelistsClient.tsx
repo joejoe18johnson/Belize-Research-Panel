@@ -34,6 +34,11 @@ import {
   requirementOnFile,
   verificationStatusFromRequirementApprovals,
 } from "@/lib/panelist-requirements";
+import {
+  adminPanelistDocumentUrl,
+  panelistHasPhotoDocument,
+  panelistHasResidenceDocument,
+} from "@/lib/panelist-documents";
 
 const TABLE_COLUMNS = [
   "registration_date",
@@ -236,11 +241,10 @@ export function AdminPanelistsClient({
 
   const requirementReviewContext = useMemo(() => {
     if (!editingRow) return { hasPhotoUpload: false, hasResidenceUpload: false, emailVerified: false };
-    const username = cleanText(editingRow.username);
     const emailKey = cleanText(editingRow.email).toLowerCase();
     return {
-      hasPhotoUpload: username ? photoUploadUsernames.has(username) : false,
-      hasResidenceUpload: username ? residenceUploadUsernames.has(username) : false,
+      hasPhotoUpload: panelistHasPhotoDocument(editingRow, photoUploadUsernames),
+      hasResidenceUpload: panelistHasResidenceDocument(editingRow, residenceUploadUsernames),
       emailVerified: emailVerifiedByAccount[emailKey] === true,
     };
   }, [editingRow, photoUploadUsernames, residenceUploadUsernames, emailVerifiedByAccount]);
@@ -596,6 +600,7 @@ export function AdminPanelistsClient({
                   columns={TABLE_COLUMNS}
                   actions={rowActions}
                   requirementByEmail={requirementByEmail}
+                  photoUploadUsernames={photoUploadUsernames}
                 />
               </div>
               <TablePagination
@@ -643,6 +648,7 @@ export function AdminPanelistsClient({
               columns={TABLE_COLUMNS}
               actions={rowActions}
               requirementByEmail={requirementByEmail}
+              photoUploadUsernames={photoUploadUsernames}
             />
           </div>
           <TablePagination
@@ -917,10 +923,12 @@ function RowActionButtons({
   email,
   actions,
   flagged,
+  photoDocumentUrl,
 }: {
   email: string;
   actions: RowActions;
   flagged?: boolean;
+  photoDocumentUrl?: string;
 }) {
   const busy = actions.flaggingEmail === email || actions.deletingEmail === email;
 
@@ -929,6 +937,18 @@ function RowActionButtons({
       <IconButton label="Edit record" onClick={() => actions.onEdit(email)} disabled={busy}>
         <EditIcon />
       </IconButton>
+      {photoDocumentUrl ? (
+        <a
+          href={photoDocumentUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View ID document"
+          aria-label="View ID document"
+          className="rounded-lg p-1.5 text-sky-700 transition hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950/40"
+        >
+          <IdDocumentIcon />
+        </a>
+      ) : null}
       <IconButton
         label="Flag as possible duplicate"
         onClick={() => actions.onFlag(email)}
@@ -985,6 +1005,7 @@ function DataTable({
   columns,
   actions,
   requirementByEmail,
+  photoUploadUsernames = new Set(),
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
@@ -993,6 +1014,7 @@ function DataTable({
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
   >;
+  photoUploadUsernames?: Set<string>;
 }) {
   return (
     <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm md:min-w-[1100px]`}>
@@ -1028,7 +1050,16 @@ function DataTable({
               >
                 {actions ? (
                   <td data-label="Actions" className="sticky left-0 z-10 bg-inherit px-2 py-2 md:sticky">
-                    <RowActionButtons email={row.email} actions={actions} flagged={isFlagged} />
+                    <RowActionButtons
+                      email={row.email}
+                      actions={actions}
+                      flagged={isFlagged}
+                      photoDocumentUrl={
+                        panelistHasPhotoDocument(row, photoUploadUsernames)
+                          ? adminPanelistDocumentUrl(row.email, "photo-id")
+                          : undefined
+                      }
+                    />
                   </td>
                 ) : null}
                 {columns.map((column) => (
@@ -1065,6 +1096,16 @@ function DataTable({
         )}
       </tbody>
     </table>
+  );
+}
+
+function IdDocumentIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="12" r="2.2" />
+      <path d="M14 10h5M14 14h5" />
+    </svg>
   );
 }
 

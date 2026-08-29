@@ -160,6 +160,11 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     street_address: metadataString(meta, "street_address"),
     photo_id_type: metadataString(meta, "photo_id_type"),
     photo_id_last4: metadataString(meta, "photo_id_last4"),
+    photo_id_path:
+      cleanText(String(row.photo_id_path ?? "")) || metadataString(meta, "photo_id_path"),
+    residence_proof_path:
+      cleanText(String(row.residence_proof_path ?? "")) || metadataString(meta, "residence_proof_path"),
+    account_id: cleanText(String(row.account_id ?? "")),
     authorised_verification_code: metadataString(meta, "authorised_verification_code"),
     authorised_registrar_name: metadataString(meta, "authorised_registrar_name"),
     residence_region: metadataString(meta, "residence_region"),
@@ -199,6 +204,8 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     street_address: row.street_address ?? "",
     photo_id_type: row.photo_id_type ?? "",
     photo_id_last4: row.photo_id_last4 ?? "",
+    photo_id_path: row.photo_id_path ?? "",
+    residence_proof_path: row.residence_proof_path ?? "",
     authorised_verification_code: row.authorised_verification_code ?? "",
     authorised_registrar_name: row.authorised_registrar_name ?? "",
     residence_region: row.residence_region ?? "",
@@ -239,6 +246,9 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     password_hash: row.password_hash ?? "",
     registration_date: parseFlexibleDateOnly(row.registration_date as string),
     metadata,
+    photo_id_path: row.photo_id_path ?? "",
+    residence_proof_path: row.residence_proof_path ?? "",
+    ...(row.account_id ? { account_id: row.account_id } : {}),
   };
 }
 

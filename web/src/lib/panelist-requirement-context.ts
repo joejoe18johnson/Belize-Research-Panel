@@ -2,15 +2,38 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
+import { panelistHasPhotoDocument } from "./panelist-documents";
 
 const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 
 export async function loadPanelistPhotoUploadUsernames(): Promise<Set<string>> {
-  return loadPanelistUploadUsernamesForPrefix("photo-id-");
+  const usernames = await loadPanelistUploadUsernamesForPrefix("photo-id-");
+  try {
+    const { loadPanelists } = await import("./panelists");
+    for (const row of await loadPanelists()) {
+      if (!cleanText(row.photo_id_path)) continue;
+      const username = cleanText(row.username);
+      if (username) usernames.add(username);
+    }
+  } catch {
+    // Local username set is still usable.
+  }
+  return usernames;
 }
 
 export async function loadPanelistResidenceUploadUsernames(): Promise<Set<string>> {
-  return loadPanelistUploadUsernamesForPrefix("residence-proof-");
+  const usernames = await loadPanelistUploadUsernamesForPrefix("residence-proof-");
+  try {
+    const { loadPanelists } = await import("./panelists");
+    for (const row of await loadPanelists()) {
+      if (!cleanText(row.residence_proof_path)) continue;
+      const username = cleanText(row.username);
+      if (username) usernames.add(username);
+    }
+  } catch {
+    // Local username set is still usable.
+  }
+  return usernames;
 }
 
 async function loadPanelistUploadUsernamesForPrefix(prefix: string): Promise<Set<string>> {
@@ -37,11 +60,10 @@ export function requirementContextForPanelist(
 ) {
   const email = cleanText(panelist.email).toLowerCase();
   const account = email ? accountsByEmail.get(email) : undefined;
-  const username = cleanText(panelist.username);
 
   return {
     emailVerified: account ? account.email_verified === "true" : undefined,
     pendingPhone: Boolean(cleanText(account?.pending_phone_whatsapp)),
-    hasPhotoUpload: username ? photoUploadUsernames.has(username) : false,
+    hasPhotoUpload: panelistHasPhotoDocument(panelist, photoUploadUsernames),
   };
 }

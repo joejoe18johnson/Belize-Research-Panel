@@ -71,6 +71,7 @@ export interface UnderReviewRow {
   hasAddressDocument: boolean;
   authorisedBy: string;
   authorisedCode: string;
+  hasPhotoUpload: boolean;
 }
 
 export type NotificationQueueType =
@@ -220,8 +221,7 @@ export function buildRecentPanelistRows(
       const email = cleanText(row.email).toLowerCase();
       const context = requirementContextForPanelist(row, accountsByEmail, photoUploadUsernames);
       const requirements = assessPanelistRequirements(row, context);
-      const username = cleanText(row.username);
-      const hasIdDoc = Boolean(cleanText(row.photo_id_type) || (username && photoUploadUsernames.has(username)));
+      const hasIdDoc = Boolean(cleanText(row.photo_id_type) || context.hasPhotoUpload);
       const hasAddressDoc = Boolean(cleanText(row.place_of_residence));
 
       return {
@@ -288,6 +288,7 @@ export function buildUnderReviewRows(
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(row.place_of_residence)),
+      hasPhotoUpload: Boolean(context.hasPhotoUpload),
       ...authorisedReviewFields(row),
     });
   }
@@ -312,6 +313,7 @@ export function buildUnderReviewRows(
         phoneRequirement: "missing",
         photoIdRequirement: "missing",
         hasAddressDocument: false,
+        hasPhotoUpload: false,
         authorisedBy: "",
         authorisedCode: "",
       });
@@ -338,6 +340,7 @@ export function buildUnderReviewRows(
       phoneRequirement: requirements.phone,
       photoIdRequirement: requirements.photoId,
       hasAddressDocument: Boolean(cleanText(panelist.place_of_residence)),
+      hasPhotoUpload: Boolean(context.hasPhotoUpload),
       ...authorisedReviewFields(panelist),
     });
   }
