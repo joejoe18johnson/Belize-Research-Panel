@@ -40,7 +40,7 @@ import {
   panelistHasResidenceDocument,
   panelistShouldOfferPhotoIdView,
   type UsernameCollection,
-} from "@/lib/panelist-documents";
+} from "@/lib/panelist-document-view";
 
 const TABLE_COLUMNS = [
   "registration_date",

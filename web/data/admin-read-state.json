@@ -2,6 +2,9 @@
   "notifications": {
     "email verification:sdsds@gmail.com": {
       "readAt": "2026-06-17T05:05:01.308Z"
+    },
+    "panelist verification:joe@gmail.com": {
+      "readAt": "2026-08-29T00:56:08.913Z"
     }
   },
   "payouts": {

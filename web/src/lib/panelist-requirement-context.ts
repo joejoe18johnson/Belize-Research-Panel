@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
-import { panelistHasPhotoDocument, type UsernameCollection } from "./panelist-documents";
+import { panelistHasPhotoDocument, type UsernameCollection } from "./panelist-document-view";
 
 const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 

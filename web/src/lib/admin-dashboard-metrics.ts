@@ -13,7 +13,7 @@ import {
   requirementContextFromAccount,
 } from "./panelist-requirements";
 import { requirementContextForPanelist } from "./panelist-requirement-context";
-import { adminPanelistDocumentUrl } from "./panelist-documents";
+import { adminPanelistDocumentUrl } from "./panelist-document-view";
 import {
   formatAdminPayoutDate,
   formatPayoutPaymentDetails,
