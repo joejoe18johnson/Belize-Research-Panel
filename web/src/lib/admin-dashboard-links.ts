@@ -102,6 +102,13 @@ export function filterUnderReviewRowsByRequirement<
   });
 }
 
+export const UNDER_REVIEW_FILTER_LABELS: Record<UnderReviewRequirementFilter, string> = {
+  email: "Email verification",
+  phone: "Phone numbers",
+  id: "Identity documents",
+  address: "Address documents",
+};
+
 export function adminUnderReviewPath(options?: { queue?: string; requirement?: string }): string {
   const params = new URLSearchParams();
   const requirement = parseUnderReviewRequirementFilter(options?.requirement);
