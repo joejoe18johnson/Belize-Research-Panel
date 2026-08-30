@@ -5,7 +5,7 @@ import { panelistByEmailMap } from "@/lib/admin-data-hub";
 import { buildCampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { buildCampaignResultsCsv, campaignExportFilename } from "@/lib/campaign-results-export";
 import { buildCampaignResultsPdf } from "@/lib/pdf/campaign-results-pdf";
-import { pdfResponse } from "@/lib/pdf/pdf-response";
+import { pdfGenerationErrorResponse, pdfResponse } from "@/lib/pdf/pdf-response";
 import { loadCampaignRecords } from "@/lib/campaigns";
 import { targetingLabel } from "@/lib/campaign-targeting";
 import { loadPanelists } from "@/lib/panelists";
@@ -45,8 +45,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   });
 
   if (format === "pdf") {
-    const bytes = await buildCampaignResultsPdf({ snapshot, audience: "admin" });
-    return pdfResponse(bytes, campaignExportFilename(id, "pdf"), download);
+    try {
+      const bytes = await buildCampaignResultsPdf({ snapshot, audience: "admin" });
+      return pdfResponse(bytes, campaignExportFilename(id, "pdf"), download);
+    } catch (error) {
+      return pdfGenerationErrorResponse(error, "admin campaign results");
+    }
   }
 
   const csv = buildCampaignResultsCsv({

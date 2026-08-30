@@ -33,7 +33,7 @@ export async function buildCampaignResultsPdf(input: {
     { label: "Status", value: campaign.status },
     { label: "Targeting", value: campaign.targetingLabel },
     { label: "Survey instrument", value: snapshot.surveyTitle ?? "—" },
-    { label: "Field period", value: `${campaign.assignedDate} → ${campaign.completeByDate}` },
+    { label: "Field period", value: `${campaign.assignedDate} to ${campaign.completeByDate}` },
     { label: "Reward points", value: String(campaign.points) },
     { label: "Delivery", value: campaign.deliveryType },
   ]);

@@ -3,7 +3,7 @@ import { panelistByEmailMap } from "@/lib/admin-data-hub";
 import { buildCampaignResultsSnapshot } from "@/lib/campaign-results-analytics";
 import { buildCampaignResultsCsv, campaignExportFilename } from "@/lib/campaign-results-export";
 import { buildCampaignResultsPdf } from "@/lib/pdf/campaign-results-pdf";
-import { pdfResponse } from "@/lib/pdf/pdf-response";
+import { pdfGenerationErrorResponse, pdfResponse } from "@/lib/pdf/pdf-response";
 import { getClientSession } from "@/lib/client-auth";
 import { loadClientCampaigns, campaignOwnedByClient } from "@/lib/client-access";
 import { redactCampaignResultsForClient } from "@/lib/client-results-snapshot";
@@ -50,12 +50,16 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   );
 
   if (format === "pdf") {
-    const bytes = await buildCampaignResultsPdf({
-      snapshot,
-      audience: "client",
-      clientName: session.organizationName || session.contactName,
-    });
-    return pdfResponse(bytes, campaignExportFilename(id, "pdf"), download);
+    try {
+      const bytes = await buildCampaignResultsPdf({
+        snapshot,
+        audience: "client",
+        clientName: session.organizationName || session.contactName,
+      });
+      return pdfResponse(bytes, campaignExportFilename(id, "pdf"), download);
+    } catch (error) {
+      return pdfGenerationErrorResponse(error, "client campaign results");
+    }
   }
 
   const csv = buildCampaignResultsCsv({

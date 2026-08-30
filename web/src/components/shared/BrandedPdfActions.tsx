@@ -30,6 +30,7 @@ export function BrandedPdfActions({
       </a>
       <a
         href={downloadHref}
+        download
         className={`inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 ${
           compact ? "px-2.5 py-1.5 text-xs" : "min-h-9 px-3 py-2 text-xs"
         }`}

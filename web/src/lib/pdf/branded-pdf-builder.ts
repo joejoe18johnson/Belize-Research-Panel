@@ -6,6 +6,7 @@ import {
   type RGB,
 } from "pdf-lib";
 import { BRP_PDF_COLORS, BRP_PDF_PAGE } from "./brand-colors";
+import { pdfSafeText } from "./pdf-safe-text";
 
 export interface BrandedPdfMeta {
   documentTitle: string;
@@ -148,24 +149,61 @@ export class BrandedPdfBuilder {
     color: RGB,
     options?: { align?: "left" | "center" | "right"; maxWidth?: number }
   ): void {
+    const safe = pdfSafeText(text);
+    if (!safe) return;
+
     let drawX = x;
     const maxWidth = options?.maxWidth;
-    const width = font.widthOfTextAtSize(text, size);
+    const drawn = maxWidth ? this.clipText(safe, font, size, maxWidth) : safe;
+    const width = font.widthOfTextAtSize(drawn, size);
 
     if (options?.align === "right" && maxWidth) drawX = x + maxWidth - width;
     if (options?.align === "center" && maxWidth) drawX = x + (maxWidth - width) / 2;
 
-    this.page.drawText(text, { x: drawX, y, size, font, color });
+    this.page.drawText(drawn, { x: drawX, y, size, font, color });
+  }
+
+  private clipText(text: string, font: PDFFont, size: number, maxWidth: number): string {
+    if (maxWidth <= 0) return "";
+    if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
+    const ellipsis = "...";
+    let clipped = text;
+    while (clipped.length > 0 && font.widthOfTextAtSize(`${clipped}${ellipsis}`, size) > maxWidth) {
+      clipped = clipped.slice(0, -1);
+    }
+    return clipped ? `${clipped}${ellipsis}` : "";
   }
 
   private wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
-    const words = text.split(/\s+/).filter(Boolean);
+    const words = pdfSafeText(text).split(/\s+/).filter(Boolean);
     if (words.length === 0) return [""];
 
     const lines: string[] = [];
     let line = "";
 
+    const flushLongWord = (word: string) => {
+      if (line) {
+        lines.push(line);
+        line = "";
+      }
+      let chunk = "";
+      for (const char of word) {
+        const next = chunk + char;
+        if (font.widthOfTextAtSize(next, size) <= maxWidth) {
+          chunk = next;
+        } else {
+          if (chunk) lines.push(chunk);
+          chunk = char;
+        }
+      }
+      line = chunk;
+    };
+
     for (const word of words) {
+      if (font.widthOfTextAtSize(word, size) > maxWidth) {
+        flushLongWord(word);
+        continue;
+      }
       const candidate = line ? `${line} ${word}` : word;
       if (font.widthOfTextAtSize(candidate, size) <= maxWidth) {
         line = candidate;
@@ -175,7 +213,7 @@ export class BrandedPdfBuilder {
       }
     }
     if (line) lines.push(line);
-    return lines;
+    return lines.length ? lines : [""];
   }
 
   private ensureSpace(heightNeeded: number): void {
@@ -330,12 +368,7 @@ export class BrandedPdfBuilder {
       });
 
       for (let i = 0; i < headers.length; i += 1) {
-        const cell = row[i] ?? "—";
-        const clipped =
-          this.regular.widthOfTextAtSize(cell, 9) > widths[i] - 12
-            ? `${cell.slice(0, Math.max(0, Math.floor((widths[i] - 12) / 5)))}…`
-            : cell;
-        this.drawText(this.regular, clipped, x + 8, rowTop - 10, 9, BRP_PDF_COLORS.zinc900, {
+        this.drawText(this.regular, row[i] ?? "-", x + 8, rowTop - 10, 9, BRP_PDF_COLORS.zinc900, {
           maxWidth: widths[i] - 12,
         });
         x += widths[i];
@@ -388,6 +421,7 @@ export class BrandedPdfBuilder {
   }
 
   async toBytes(): Promise<Uint8Array> {
-    return this.doc.save();
+    const saved = await this.doc.save();
+    return Uint8Array.from(saved);
   }
 }
