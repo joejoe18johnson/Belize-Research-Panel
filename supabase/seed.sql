@@ -38,7 +38,7 @@ INSERT INTO staff_role_modules (role, modules, description) VALUES
       'survey-templates', 'survey-distribution', 'distribution-engine', 'fieldwork-management',
       'communication-notifications', 'external-data-import', 'advanced-analytics',
       'client-reporting', 'client-project-management', 'financial-revenue', 'data-protection',
-      'backup-recovery', 'system-settings', 'api-integrations', 'deployment-production'
+      'backup-recovery', 'testing', 'system-settings', 'api-integrations', 'deployment-production'
     ],
     'Full access to every admin module, settings, and platform controls.'
   ),

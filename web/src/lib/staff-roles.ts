@@ -101,6 +101,7 @@ const ADMIN_PATH_TO_SLUG: Record<string, string> = {
   "/admin/survey-distribution": "survey-distribution",
   "/admin/analytics": "advanced-analytics",
   "/admin/user-roles": "user-roles",
+  "/admin/testing": "testing",
 };
 
 const ALL_MODULE_SLUGS = new Set(ADMIN_MODULES.map((module) => module.slug));

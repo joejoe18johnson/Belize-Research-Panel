@@ -4,6 +4,7 @@ import { buildVerificationUrl, resolveRequestOrigin, setSessionCookie } from "@/
 import { sendSignupAdminNotificationEmail, sendSignupVerifyEmail } from "@/lib/email/process-emails";
 import type { SignupFormData } from "@/lib/auth-types";
 import { isSignupEligible, validateSignupForm } from "@/lib/signup-validation";
+import { cleanText } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,8 +77,8 @@ export async function POST(request: NextRequest) {
 
     try {
       verifyUrl = buildVerificationUrl(result.verificationToken, origin);
-      const delivery = await sendSignupVerifyEmail({
-        to: result.account.email,
+      const delivery =       await sendSignupVerifyEmail({
+        to: cleanText(body.email).toLowerCase() || result.account.email,
         firstName: result.account.first_name,
         verifyUrl,
       });
@@ -90,7 +91,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      email: result.account.email,
+      email: body.email,
+      accountEmail: result.account.email,
+      testingAlias: result.account.email.toLowerCase() !== cleanText(body.email).toLowerCase(),
       emailSent,
       emailError: emailSent ? undefined : emailError,
       verifyUrl: emailSent ? undefined : verifyUrl,

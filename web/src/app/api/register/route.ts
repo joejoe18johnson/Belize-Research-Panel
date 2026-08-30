@@ -99,7 +99,14 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const data = parseRegistrationForm(formData);
     const rows = await loadPanelists();
-    const { hardDuplicate } = duplicateCheck(rows, data, "", { ignoreEmails: [session.email] });
+    const { loadPlatformTestingSettings } = await import("@/lib/platform-testing-settings-store");
+    const testing = await loadPlatformTestingSettings();
+    const { hardDuplicate } = duplicateCheck(rows, data, "", {
+      ignoreEmails: [session.email],
+      ignoreEmailDuplicates: testing.allowDuplicateEmails,
+      ignorePhoneDuplicates: testing.allowDuplicatePhones,
+      ignoreIdentityDuplicates: testing.allowDuplicateEmails || testing.allowDuplicatePhones,
+    });
 
     const errors = validateRegistrationForm(data, {
       hardDuplicate,

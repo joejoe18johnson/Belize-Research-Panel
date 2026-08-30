@@ -274,12 +274,35 @@ export async function createAccount(input: {
   commonwealthCountry: string;
   dob: string;
 }): Promise<{ account: AccountRecord; verificationToken: string }> {
-  const email = cleanText(input.email).toLowerCase();
-  if (!validEmail(email)) {
+  const requestedEmail = cleanText(input.email).toLowerCase();
+  if (!validEmail(requestedEmail)) {
     throw new Error("invalid_email");
   }
+
+  const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
+  const { testingAliasEmail } = await import("./platform-testing-settings");
+  const testing = await loadPlatformTestingSettings();
+
+  let email = requestedEmail;
   if (await findAccountByEmail(email)) {
-    throw new Error("email_exists");
+    if (!testing.allowDuplicateEmails) {
+      throw new Error("email_exists");
+    }
+    const { loadPanelists } = await import("./panelists");
+    const panelists = await loadPanelists();
+    const taken = async (candidate: string) => {
+      if (await findAccountByEmail(candidate)) return true;
+      return panelists.some((row) => cleanText(row.email).toLowerCase() === candidate);
+    };
+    let aliased = "";
+    for (let attempt = 1; attempt <= 99; attempt += 1) {
+      const candidate = testingAliasEmail(requestedEmail, attempt);
+      if (!(await taken(candidate))) {
+        aliased = candidate;
+        break;
+      }
+    }
+    email = aliased || testingAliasEmail(requestedEmail, Date.now());
   }
 
   const { salt, hash } = hashPassword(input.password);
@@ -471,15 +494,19 @@ export async function requestAccountEmailChange(
     throw new Error("same_email");
   }
 
-  const taken = accounts.find(
-    (row) => row.id !== accountId && cleanText(row.email).toLowerCase() === newEmail
-  );
-  if (taken) throw new Error("email_exists");
+  const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
+  const testing = await loadPlatformTestingSettings();
+  if (!testing.allowDuplicateEmails) {
+    const taken = accounts.find(
+      (row) => row.id !== accountId && cleanText(row.email).toLowerCase() === newEmail
+    );
+    if (taken) throw new Error("email_exists");
 
-  const pendingTaken = accounts.find(
-    (row) => row.id !== accountId && cleanText(row.pending_email).toLowerCase() === newEmail
-  );
-  if (pendingTaken) throw new Error("email_exists");
+    const pendingTaken = accounts.find(
+      (row) => row.id !== accountId && cleanText(row.pending_email).toLowerCase() === newEmail
+    );
+    if (pendingTaken) throw new Error("email_exists");
+  }
 
   let updated: AccountRecord = {
     ...current,
@@ -512,7 +539,12 @@ export async function requestAccountPhoneChange(
 
   const current = accounts[index];
   const panelistRows = await loadPanelists();
-  if (isPhoneDuplicateAmongPanelists(composed, panelistRows, current.email)) {
+  const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
+  const testing = await loadPlatformTestingSettings();
+  if (
+    !testing.allowDuplicatePhones &&
+    isPhoneDuplicateAmongPanelists(composed, panelistRows, current.email)
+  ) {
     throw new Error("phone_exists");
   }
 

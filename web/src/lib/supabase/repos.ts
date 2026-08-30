@@ -13,6 +13,11 @@ import type { AdminReadState } from "../admin-read-state";
 import type { SupportMessageRecord } from "../support-messages";
 import type { AuthorisedRegistrar, AuthorisedRegistrarStore } from "../authorised-registrars";
 import { normalizeRewardSettings } from "../reward-settings";
+import {
+  DEFAULT_PLATFORM_TESTING_SETTINGS,
+  normalizePlatformTestingSettings,
+  type PlatformTestingSettings,
+} from "../platform-testing-settings";
 import { cleanText, deriveAccountUsername, deriveUsernameFromEmail } from "../validation";
 import { getSupabaseAdmin } from "./server";
 import { normalizePanelistEmail, resolveDbAssignmentId } from "./assignment-id";
@@ -72,7 +77,8 @@ function isMissingRelation(error: { message?: string; code?: string } | null): b
     error.code === "PGRST205" ||
     message.includes("schema cache") ||
     message.includes("could not find the table") ||
-    (message.includes("does not exist") && message.includes("authorised_registrars"))
+    (message.includes("does not exist") &&
+      (message.includes("authorised_registrars") || message.includes("platform_settings")))
   );
 }
 
@@ -548,6 +554,57 @@ export async function supabaseSaveRewardSettings(
     updated_by: updatedBy,
     updated_at: next.updatedAt,
   });
+  throwIfError(error);
+  return next;
+}
+
+const PLATFORM_TESTING_STORAGE_PATH = "platform-testing.json";
+
+async function loadPlatformTestingFromStorage(): Promise<PlatformTestingSettings | null> {
+  const { data, error } = await db().storage.from("app-data").download(PLATFORM_TESTING_STORAGE_PATH);
+  if (error || !data) return null;
+  try {
+    const parsed = JSON.parse(await data.text()) as Partial<PlatformTestingSettings>;
+    return normalizePlatformTestingSettings(parsed);
+  } catch {
+    return null;
+  }
+}
+
+async function savePlatformTestingToStorage(settings: PlatformTestingSettings): Promise<boolean> {
+  const { error } = await db()
+    .storage.from("app-data")
+    .upload(PLATFORM_TESTING_STORAGE_PATH, JSON.stringify(settings, null, 2), {
+      contentType: "application/json",
+      upsert: true,
+    });
+  return !error;
+}
+
+export async function supabaseLoadPlatformTestingSettings(): Promise<PlatformTestingSettings> {
+  const { data, error } = await db().from("platform_settings").select("value").eq("id", "testing").maybeSingle();
+  if (!error && data) {
+    return normalizePlatformTestingSettings((data as { value?: Partial<PlatformTestingSettings> }).value);
+  }
+  const fromStorage = await loadPlatformTestingFromStorage();
+  return fromStorage ?? { ...DEFAULT_PLATFORM_TESTING_SETTINGS };
+}
+
+export async function supabaseSavePlatformTestingSettings(
+  settings: PlatformTestingSettings
+): Promise<PlatformTestingSettings> {
+  const next = normalizePlatformTestingSettings(settings);
+  const { error } = await db().from("platform_settings").upsert({
+    id: "testing",
+    value: next,
+    updated_at: next.updatedAt || new Date().toISOString(),
+    updated_by: next.updatedBy || "",
+  });
+  if (!error) return next;
+  if (isMissingRelation(error)) {
+    const saved = await savePlatformTestingToStorage(next);
+    if (saved) return next;
+  }
   throwIfError(error);
   return next;
 }

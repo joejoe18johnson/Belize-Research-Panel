@@ -9,6 +9,8 @@ import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 export default function CheckEmailClient() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
+  const accountEmail = searchParams.get("accountEmail") ?? "";
+  const testingAlias = searchParams.get("testingAlias") === "1";
   const nextPath = searchParams.get("next") ?? "/register";
   const [verifyUrl, setVerifyUrl] = useState(searchParams.get("verifyUrl") ?? "");
   const [emailSent, setEmailSent] = useState(searchParams.get("emailSent") !== "0");
@@ -60,6 +62,12 @@ export default function CheckEmailClient() {
           Open that link to continue. The link expires after 24 hours.
         </p>
         <p>After verification, you can complete your panelist registration profile.</p>
+        {testingAlias && accountEmail ? (
+          <BrandedAlert tone="info" title="Testing signup" showIcon>
+            Duplicate-email testing is on. Mail still arrives at this inbox. If you log out, sign in with{" "}
+            <span className="font-medium">{accountEmail}</span>.
+          </BrandedAlert>
+        ) : null}
 
         {emailSent ? (
           <BrandedAlert tone="info" title="Check your inbox" showIcon>

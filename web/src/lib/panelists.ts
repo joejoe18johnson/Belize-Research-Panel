@@ -240,7 +240,12 @@ export function duplicateCheck(
   rows: PanelistRow[],
   data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "firstName" | "lastName" | "dob" | "photoIdType">,
   photoIdLast4 = "",
-  options: { ignoreEmails?: string[] } = {}
+  options: {
+    ignoreEmails?: string[];
+    ignoreEmailDuplicates?: boolean;
+    ignorePhoneDuplicates?: boolean;
+    ignoreIdentityDuplicates?: boolean;
+  } = {}
 ): { hardDuplicate: boolean; possibleDuplicate: boolean } {
   let hardDuplicate = false;
   const possibleDuplicate = false;
@@ -258,9 +263,14 @@ export function duplicateCheck(
 
   for (const row of rows) {
     if (ignoreEmails.has(cleanText(row.email).toLowerCase())) continue;
-    if (emailNorm && cleanText(row.email).toLowerCase() === emailNorm) hardDuplicate = true;
-    if (phoneNorm && normalizePhoneForComparison(row.phone_whatsapp) === phoneNorm) hardDuplicate = true;
+    if (!options.ignoreEmailDuplicates && emailNorm && cleanText(row.email).toLowerCase() === emailNorm) {
+      hardDuplicate = true;
+    }
+    if (!options.ignorePhoneDuplicates && phoneNorm && normalizePhoneForComparison(row.phone_whatsapp) === phoneNorm) {
+      hardDuplicate = true;
+    }
     if (
+      !options.ignoreIdentityDuplicates &&
       firstNorm &&
       lastNorm &&
       dobNorm &&
@@ -271,6 +281,7 @@ export function duplicateCheck(
       hardDuplicate = true;
     }
     if (
+      !options.ignoreIdentityDuplicates &&
       idTypeNorm &&
       idLast4Norm &&
       cleanText(row.photo_id_type).toLowerCase() === idTypeNorm &&
@@ -361,8 +372,13 @@ export async function registerPanelist(
       ? data.otherContactPlatformCustom
       : data.otherContactPlatform;
 
+  const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
+  const testing = await loadPlatformTestingSettings();
   const { hardDuplicate, possibleDuplicate } = duplicateCheck(rows, data, "", {
     ignoreEmails: credentials?.accountEmail ? [credentials.accountEmail] : [],
+    ignoreEmailDuplicates: testing.allowDuplicateEmails,
+    ignorePhoneDuplicates: testing.allowDuplicatePhones,
+    ignoreIdentityDuplicates: testing.allowDuplicateEmails || testing.allowDuplicatePhones,
   });
   if (hardDuplicate) {
     throw new Error("duplicate");

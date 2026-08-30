@@ -1,5 +1,27 @@
 [
   {
+    "id": "67876ce0-c5b6-445b-b53c-d754226a15d0",
+    "sentAt": "2026-08-29T22:51:45.870Z",
+    "email": "joejoeq8johnson@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              Verify your email address\n\n            \n          \n\n          \n            \n              Hi James,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "failed"
+  },
+  {
+    "id": "38cd6e6e-be99-441b-8f18-445e39adfe31",
+    "sentAt": "2026-08-29T22:51:23.867Z",
+    "email": "johannesjohnsonj@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "New signup: James Duck",
+    "body": "New signup: James Duck\n\n  New signup: James Duck\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              New signup: James Duck\n\n            \n          \n\n          \n            \n              A new user signed up for the Belize Research Panel.\n\n    Name\n    James Duck\n  \n\n    Email\n    joejoeq8johnson@gmail.com\n  \nThis is an operator alert for tracking new signups. The applicant still needs to verify their email and complete panel registration.\n\n              \n        \n          \n            Open admin notifications\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-admin-notification",
+    "deliveryStatus": "failed"
+  },
+  {
     "id": "3f64ae4b-5133-4840-86d2-6fbb00f84adf",
     "sentAt": "2026-08-14T03:05:13.336Z",
     "email": "zxoxo@yahoo.com",

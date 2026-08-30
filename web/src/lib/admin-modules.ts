@@ -277,6 +277,14 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "working",
   },
   {
+    slug: "testing",
+    label: "Testing",
+    kind: "page",
+    href: "/admin/testing",
+    section: "platform",
+    status: "working",
+  },
+  {
     slug: "system-settings",
     label: "System Settings",
     kind: "page",

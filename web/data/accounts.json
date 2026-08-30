@@ -185,5 +185,41 @@
     "dob": "1992-03-15",
     "account_status": "on_hold",
     "hold_reason": "fraud_review"
+  },
+  {
+    "id": "357059a8-4c56-40a8-918a-e3d95468676e",
+    "first_name": "James",
+    "last_name": "Duck",
+    "email": "joejoeq8johnson@gmail.com",
+    "password_salt": "028774dc458b4a33b60799b9acb11ca3",
+    "password_hash": "972440926e9502eccad5afa2920d9d1fff8b52b2f43616867345ea52eab35393",
+    "email_verified": "false",
+    "verification_token": "579b509658114677b213627da280372e",
+    "verification_sent_at": "2026-08-29T22:51:23.203Z",
+    "created_at": "2026-08-29T22:51:23.203Z",
+    "panelist_registered": "false",
+    "citizenship_status": "Citizen of Belize",
+    "commonwealth_country": "",
+    "dob": "2000-01-21",
+    "account_status": "active",
+    "hold_reason": ""
+  },
+  {
+    "id": "c1811f22-8aa1-49b6-9718-f394c5874d29",
+    "first_name": "James",
+    "last_name": "Duck",
+    "email": "joejoeq8johnson+brp@gmail.com",
+    "password_salt": "4f4b274984564b12b8fbe0701db0df28",
+    "password_hash": "9cb76a7cabd1101190664f3ac76713ce60793e1fc0f0ebfb37641ea3a3904c48",
+    "email_verified": "false",
+    "verification_token": "8987dd87831e4eb5ba91859d5468843d",
+    "verification_sent_at": "2026-08-29T22:51:45.350Z",
+    "created_at": "2026-08-29T22:51:45.350Z",
+    "panelist_registered": "false",
+    "citizenship_status": "Citizen of Belize",
+    "commonwealth_country": "",
+    "dob": "2000-01-21",
+    "account_status": "active",
+    "hold_reason": ""
   }
 ]
