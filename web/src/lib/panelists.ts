@@ -82,14 +82,15 @@ export async function loadPanelists(): Promise<PanelistRow[]> {
   }
 }
 
-export async function findPanelistByEmail(email: string): Promise<PanelistRow | null> {
+export async function findPanelistByEmail(email: string, accountId?: string): Promise<PanelistRow | null> {
   const normalized = cleanText(email).toLowerCase();
   if (!normalized) return null;
   const rows = await loadPanelists();
-  return (
-    rows.find((row) => cleanText(row.email).toLowerCase() === normalized) ??
-    null
-  );
+  const matches = rows.filter((row) => cleanText(row.email).toLowerCase() === normalized);
+  if (accountId) {
+    return matches.find((row) => cleanText(row.account_id) === accountId) ?? matches[0] ?? null;
+  }
+  return matches[0] ?? null;
 }
 
 export async function updatePanelistEmail(oldEmail: string, newEmail: string): Promise<boolean> {
@@ -485,9 +486,12 @@ export async function registerPanelist(
       : "",
   };
 
-  const existingIndex = rows.findIndex(
-    (row) => cleanText(row.email).toLowerCase() === cleanText(panelistEmail).toLowerCase()
-  );
+  const existingIndex = rows.findIndex((row) => {
+    if (credentials?.accountId && cleanText(row.account_id)) {
+      return cleanText(row.account_id) === credentials.accountId;
+    }
+    return cleanText(row.email).toLowerCase() === cleanText(panelistEmail).toLowerCase();
+  });
   if (existingIndex >= 0) {
     rows[existingIndex] = { ...rows[existingIndex], ...newRow };
   } else {

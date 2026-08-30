@@ -68,7 +68,7 @@ export async function requireDashboardAccount(): Promise<SessionAccount> {
 
 export async function requireDashboardContext(options: { welcome?: boolean } = {}): Promise<DashboardContext> {
   const account = await requireDashboardAccount();
-  const panelist = await findPanelistByEmail(account.email);
+  const panelist = await findPanelistByEmail(account.email, account.id);
   if (!panelist) {
     redirect("/register");
   }
@@ -88,8 +88,8 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   return { account, profile, rewards, notifications };
 }
 
-export async function getDashboardNavBadges(email: string): Promise<DashboardNavBadges> {
-  const panelist = await findPanelistByEmail(email);
+export async function getDashboardNavBadges(email: string, accountId?: string): Promise<DashboardNavBadges> {
+  const panelist = await findPanelistByEmail(email, accountId);
   if (!panelist) {
     return { unreadNotifications: 0, inboxSurveys: 0, newSurveys: 0, verificationAttention: 0, availablePoints: 0 };
   }

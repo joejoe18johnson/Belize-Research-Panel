@@ -24,7 +24,7 @@ export default async function DashboardProfilePage({
   }
 
   const { emailUpdated } = await searchParams;
-  const badges = await getDashboardNavBadges(account.email);
+  const badges = await getDashboardNavBadges(account.email, account.id);
   const profile = panelistRowToDashboardProfile(panelist);
   const initialForm = profileUpdateFormFromRow(panelist);
   const contact = profileContactFromRow(panelist, account.email);

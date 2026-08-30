@@ -98,7 +98,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE accounts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email citext NOT NULL UNIQUE,
+  email citext NOT NULL,
   first_name text NOT NULL,
   last_name text NOT NULL,
   password_salt text NOT NULL,
@@ -110,6 +110,8 @@ CREATE TABLE accounts (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS accounts_email_idx ON accounts (email);
 
 CREATE TRIGGER accounts_updated_at
   BEFORE UPDATE ON accounts

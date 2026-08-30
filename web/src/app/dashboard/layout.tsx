@@ -14,7 +14,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const account = await requireRegisteredPanelistSession();
-  const badges = await getDashboardNavBadges(account.email);
+  const badges = await getDashboardNavBadges(account.email, account.id);
   const panelist = await findPanelistByEmail(account.email);
   const verificationStatus = panelist
     ? panelistRowToDashboardProfile(panelist).verificationStatus

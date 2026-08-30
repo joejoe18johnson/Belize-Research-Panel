@@ -144,7 +144,7 @@ export async function deleteAccountAndOptOut(
     return { ok: false, error: "Incorrect password." };
   }
 
-  const panelist = await findPanelistByEmail(account.email);
+  const panelist = await findPanelistByEmail(account.email, account.id);
   const username = panelist ? cleanText(panelist.username) : "";
 
   if (panelist) {

@@ -111,7 +111,7 @@ export function AdminTestingSettingsClient({
       <div className="space-y-3">
         <TestingToggle
           label="Allow duplicate emails"
-          description="Lets you create another account with an email that is already in the system. Mail still goes to the same inbox. The new login uses a plus-address (name+brp@yourinbox) so the database can keep emails unique. Registration will also allow that reused email."
+          description="Lets you create another account with an email that already has an account. Sign in with that same email. Each account must use a different password so the site can tell them apart. Registration will also allow that reused email."
           checked={settings.allowDuplicateEmails}
           disabled={Boolean(savingKey)}
           onChange={(value) => void saveToggle("allowDuplicateEmails", value)}

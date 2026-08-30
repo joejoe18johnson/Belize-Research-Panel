@@ -20,14 +20,3 @@ export function normalizePlatformTestingSettings(
     updatedBy: typeof raw?.updatedBy === "string" ? raw.updatedBy : "",
   };
 }
-
-/** Same inbox, unique stored address (Gmail/Outlook plus-addressing). */
-export function testingAliasEmail(email: string, attempt: number): string {
-  const value = email.trim().toLowerCase();
-  const at = value.lastIndexOf("@");
-  if (at < 1 || at === value.length - 1) return value;
-  const local = value.slice(0, at);
-  const domain = value.slice(at + 1);
-  const tag = attempt <= 1 ? "brp" : `brp${attempt}`;
-  return `${local}+${tag}@${domain}`;
-}

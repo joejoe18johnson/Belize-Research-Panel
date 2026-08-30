@@ -43,6 +43,17 @@ export async function POST(request: NextRequest) {
           { status: 409 }
         );
       }
+      if (error instanceof Error && error.message === "password_reused") {
+        return NextResponse.json(
+          {
+            errors: {
+              password:
+                "Another account already uses this email with that password. Choose a different password so you can sign in to this new account.",
+            },
+          },
+          { status: 409 }
+        );
+      }
       if (error instanceof Error && error.message === "storage_not_configured") {
         return NextResponse.json(
           {
@@ -77,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     try {
       verifyUrl = buildVerificationUrl(result.verificationToken, origin);
-      const delivery =       await sendSignupVerifyEmail({
+      const delivery = await sendSignupVerifyEmail({
         to: cleanText(body.email).toLowerCase() || result.account.email,
         firstName: result.account.first_name,
         verifyUrl,
@@ -93,7 +104,6 @@ export async function POST(request: NextRequest) {
       ok: true,
       email: body.email,
       accountEmail: result.account.email,
-      testingAlias: result.account.email.toLowerCase() !== cleanText(body.email).toLowerCase(),
       emailSent,
       emailError: emailSent ? undefined : emailError,
       verifyUrl: emailSent ? undefined : verifyUrl,

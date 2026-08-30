@@ -93,11 +93,20 @@ export async function supabaseListAccounts(): Promise<AccountRecord[]> {
   return (data ?? []).map((row) => accountRowToRecord(row as Record<string, unknown>));
 }
 
-export async function supabaseFindAccountByEmail(email: string): Promise<AccountRecord | null> {
+export async function supabaseFindAccountsByEmail(email: string): Promise<AccountRecord[]> {
   const normalized = cleanText(email).toLowerCase();
-  const { data, error } = await db().from("accounts").select("*").eq("email", normalized).maybeSingle();
+  const { data, error } = await db()
+    .from("accounts")
+    .select("*")
+    .eq("email", normalized)
+    .order("created_at", { ascending: false });
   throwIfError(error);
-  return data ? accountRowToRecord(data as Record<string, unknown>) : null;
+  return (data ?? []).map((row) => accountRowToRecord(row as Record<string, unknown>));
+}
+
+export async function supabaseFindAccountByEmail(email: string): Promise<AccountRecord | null> {
+  const matches = await supabaseFindAccountsByEmail(email);
+  return matches[0] ?? null;
 }
 
 export async function supabaseFindAccountByVerificationToken(token: string): Promise<AccountRecord | null> {
@@ -189,7 +198,13 @@ export async function supabaseRetargetPanelistEmail(oldEmail: string, newEmail: 
   const to = normalizePanelistEmail(newEmail);
   if (!from || !to || from === to) return false;
 
-  const { data: panelist, error: panelistError } = await db().from("panelists").select("*").eq("email", from).maybeSingle();
+  const { data: panelist, error: panelistError } = await db()
+    .from("panelists")
+    .select("*")
+    .eq("email", from)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   throwIfError(panelistError);
   if (!panelist) return false;
 
@@ -375,7 +390,10 @@ async function upsertPanelistPayload(payload: Record<string, unknown>): Promise<
   }
   const omitted = new Set<string>();
   for (let attempt = 0; attempt <= PANELIST_OPTIONAL_COLUMNS.length; attempt += 1) {
-    const { error } = await db().from("panelists").upsert(row, { onConflict: "email" });
+    const accountId = cleanText(String(row.account_id ?? ""));
+    const { error } = await db()
+      .from("panelists")
+      .upsert(row, { onConflict: accountId ? "account_id" : "email" });
     if (!error) return;
     const missing = PANELIST_OPTIONAL_COLUMNS.find(
       (column) => !omitted.has(column) && isMissingColumnError(error, column)
@@ -426,6 +444,8 @@ export async function supabaseFindPanelistDocumentPath(
       .from("accounts")
       .select("id")
       .eq("email", normalizePanelistEmail(panelist.email))
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     lookedUpAccountId = cleanText(String((data as { id?: string } | null)?.id ?? ""));
     if (!accountId) accountId = lookedUpAccountId;

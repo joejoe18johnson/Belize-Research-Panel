@@ -109,7 +109,6 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         ok?: boolean;
         email?: string;
         accountEmail?: string;
-        testingAlias?: boolean;
         emailSent?: boolean;
         emailError?: string;
         verifyUrl?: string;
@@ -128,10 +127,6 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         next: nextPath,
         emailSent: data.emailSent ? "1" : "0",
       });
-      if (data.testingAlias && data.accountEmail) {
-        params.set("testingAlias", "1");
-        params.set("accountEmail", data.accountEmail);
-      }
       if (data.verifyUrl && !data.emailSent) params.set("verifyUrl", data.verifyUrl);
       if (data.emailError && !data.emailSent) params.set("emailError", data.emailError);
       router.push(`/signup/check-email?${params.toString()}`);

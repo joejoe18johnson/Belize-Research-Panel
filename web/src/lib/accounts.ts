@@ -148,15 +148,23 @@ export function getAccountContactHoldState(record: AccountRecord): AccountContac
   };
 }
 
-export async function findAccountByEmail(email: string): Promise<AccountRecord | null> {
+export async function findAccountsByEmail(email: string): Promise<AccountRecord[]> {
   const normalized = cleanText(email).toLowerCase();
+  if (!normalized) return [];
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
-    const { supabaseFindAccountByEmail } = await import("./supabase/repos");
-    return supabaseFindAccountByEmail(normalized);
+    const { supabaseFindAccountsByEmail } = await import("./supabase/repos");
+    return supabaseFindAccountsByEmail(normalized);
   }
   const accounts = await loadAccountsRaw();
-  return accounts.find((account) => cleanText(account.email).toLowerCase() === normalized) ?? null;
+  return accounts
+    .filter((account) => cleanText(account.email).toLowerCase() === normalized)
+    .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+}
+
+export async function findAccountByEmail(email: string): Promise<AccountRecord | null> {
+  const matches = await findAccountsByEmail(email);
+  return matches[0] ?? null;
 }
 
 export async function findAccountById(id: string): Promise<AccountRecord | null> {
@@ -280,30 +288,18 @@ export async function createAccount(input: {
   }
 
   const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
-  const { testingAliasEmail } = await import("./platform-testing-settings");
   const testing = await loadPlatformTestingSettings();
-
-  let email = requestedEmail;
-  if (await findAccountByEmail(email)) {
-    if (!testing.allowDuplicateEmails) {
-      throw new Error("email_exists");
-    }
-    const { loadPanelists } = await import("./panelists");
-    const panelists = await loadPanelists();
-    const taken = async (candidate: string) => {
-      if (await findAccountByEmail(candidate)) return true;
-      return panelists.some((row) => cleanText(row.email).toLowerCase() === candidate);
-    };
-    let aliased = "";
-    for (let attempt = 1; attempt <= 99; attempt += 1) {
-      const candidate = testingAliasEmail(requestedEmail, attempt);
-      if (!(await taken(candidate))) {
-        aliased = candidate;
-        break;
-      }
-    }
-    email = aliased || testingAliasEmail(requestedEmail, Date.now());
+  const existingAccounts = await findAccountsByEmail(requestedEmail);
+  if (existingAccounts.length > 0 && !testing.allowDuplicateEmails) {
+    throw new Error("email_exists");
   }
+  for (const existing of existingAccounts) {
+    const { hash: existingHash } = hashPassword(input.password, existing.password_salt);
+    if (existingHash === existing.password_hash) {
+      throw new Error("password_reused");
+    }
+  }
+  const email = requestedEmail;
 
   const { salt, hash } = hashPassword(input.password);
   const verificationToken = randomUUID().replace(/-/g, "");
@@ -683,11 +679,12 @@ export async function verifyAccountPassword(
   email: string,
   password: string
 ): Promise<AccountRecord | null> {
-  const account = await findAccountByEmail(email);
-  if (!account) return null;
-  const { hash } = hashPassword(password, account.password_salt);
-  if (hash !== account.password_hash) return null;
-  return account;
+  const matches = await findAccountsByEmail(email);
+  for (const account of matches) {
+    const { hash } = hashPassword(password, account.password_salt);
+    if (hash === account.password_hash) return account;
+  }
+  return null;
 }
 
 export function toSessionAccount(account: AccountRecord): SessionAccount {
