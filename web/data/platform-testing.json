@@ -1,6 +1,6 @@
 {
   "allowDuplicateEmails": true,
-  "allowDuplicatePhones": false,
-  "updatedAt": "2026-08-29T22:51:23.190Z",
-  "updatedBy": "local test signup"
+  "allowDuplicatePhones": true,
+  "updatedAt": "2026-08-30T01:01:20.953Z",
+  "updatedBy": "Super Admin"
 }
