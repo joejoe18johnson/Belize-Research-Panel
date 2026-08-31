@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "crypto";
 import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
-import { isHeadOfHousehold, PANELIST_COLUMNS } from "./constants";
+import { PANELIST_COLUMNS } from "./constants";
 import {
   calculateAge,
   cleanText,
@@ -453,7 +453,7 @@ export async function registerPanelist(
     education: data.education,
     ethnicity: data.ethnicity,
     household_head_relationship: data.householdHeadRelationship,
-    household_size: isHeadOfHousehold(data.householdHeadRelationship) ? cleanText(data.householdSize) : "",
+    household_size: cleanText(data.householdSize),
     political_interests: data.politicalInterests.join("; "),
     market_interests: data.marketInterests.join("; "),
     civic_interests: data.civicInterests.join("; "),

@@ -71,6 +71,13 @@ function capitalizeWord(word: string): string {
   return lead + capitalizeCore(core) + trail;
 }
 
+/** Question and form labels: first letter capital, rest kept as written. */
+export function formatSentenceCase(value: string): string {
+  const cleaned = cleanText(value);
+  if (!cleaned) return cleaned;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
 /** Headings and labels: title case (keep acronyms, codes, and minor words mid-phrase lowercase). */
 export function formatHeadingCase(value: string): string {
   const cleaned = cleanText(value);

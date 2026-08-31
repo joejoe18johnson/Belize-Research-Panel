@@ -1,7 +1,7 @@
 "use client";
 
 import { getRegistrationProgress, type RegistrationProgressInput } from "@/lib/registration-progress";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatSentenceCase } from "@/lib/sentence-case";
 
 export function RegistrationProgress({
   activePhaseIndex,
@@ -19,8 +19,8 @@ export function RegistrationProgress({
           <p className="text-xs font-semibold tracking-wide text-teal-700">
             Step {progress.currentIndex + 1} of {progress.totalPhases}
           </p>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(progress.currentPhase.label)}</p>
-          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(progress.currentPhase.description)}</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatSentenceCase(progress.currentPhase.label)}</p>
+          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatSentenceCase(progress.currentPhase.description)}</p>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export function RegistrationProgress({
                     : "text-zinc-400 dark:text-zinc-500"
               }`}
             >
-              {formatHeadingCase(phase.label)}
+              {formatSentenceCase(phase.label)}
             </span>
           </li>
         ))}

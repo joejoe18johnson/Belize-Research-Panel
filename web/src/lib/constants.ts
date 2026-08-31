@@ -46,15 +46,21 @@ export const OTHER_CONTACT_PLATFORM_OPTIONS = raw.OTHER_CONTACT_PLATFORM_OPTIONS
 export const SEX_OPTIONS = raw.SEX_OPTIONS as string[];
 export const EDUCATION_LEVELS = raw.EDUCATION_LEVELS as string[];
 export const ETHNICITY_OPTIONS = raw.ETHNICITY_OPTIONS as string[];
-export const HOUSEHOLD_HEAD_SELF = "I am the head of my household";
-export const HOUSEHOLD_HEAD_OTHER = "Other";
-export const HOUSEHOLD_HEAD_OPTIONS = [HOUSEHOLD_HEAD_SELF, HOUSEHOLD_HEAD_OTHER] as const;
+export const HOUSEHOLD_HEAD_YES = "Yes";
+export const HOUSEHOLD_HEAD_NO = "No";
+export const HOUSEHOLD_HEAD_SELF = HOUSEHOLD_HEAD_YES;
+export const HOUSEHOLD_HEAD_OTHER = HOUSEHOLD_HEAD_NO;
+export const HOUSEHOLD_HEAD_OPTIONS = [HOUSEHOLD_HEAD_YES, HOUSEHOLD_HEAD_NO] as const;
 export const HOUSEHOLD_DEFINITION =
-  "A household is a person or group of persons living in the same dwelling and sharing food and other living arrangements.";
+  "The head of household is the person who is recognised by the household members as the main decision-maker or person primarily responsible for the household.";
 export const MAX_HOUSEHOLD_SIZE = 50;
 
 export function isHeadOfHousehold(relationship: string): boolean {
-  return relationship === HOUSEHOLD_HEAD_SELF;
+  return relationship === HOUSEHOLD_HEAD_YES || relationship === "I am the head of my household";
+}
+
+export function cityTownVillageQuestionLabel(district: string): string {
+  return `City / town / village in “${district}” where you currently live`;
 }
 
 export const POLITICAL_INTERESTS = raw.POLITICAL_INTERESTS as string[];

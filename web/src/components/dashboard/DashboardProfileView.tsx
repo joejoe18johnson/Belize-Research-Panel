@@ -128,7 +128,7 @@ export function DashboardProfileView({
             <ProfileField label="Sex" value={profile.sex} />
             <ProfileField label="Education" value={profile.education} />
             <ProfileField label="Ethnicity" value={profile.ethnicity} />
-            <ProfileField label="Relationship to head of household" value={profile.householdHeadRelationship} />
+            <ProfileField label="Head of household" value={profile.householdHeadRelationship} />
             <ProfileField label="Household size" value={profile.householdSize} />
           </dl>
         </DashboardCard>

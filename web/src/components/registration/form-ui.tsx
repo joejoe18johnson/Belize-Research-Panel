@@ -3,7 +3,7 @@ import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SiteSelectField } from "@/components/shared/SiteSelect";
 import { siteCheckboxClass, siteRadioClass } from "@/lib/site-controls";
 import type { FeedbackTone } from "@/lib/site-alerts";
-import { formatHeadingCase } from "@/lib/sentence-case";
+import { formatSentenceCase } from "@/lib/sentence-case";
 
 export { siteCheckboxClass, siteRadioClass };
 
@@ -35,7 +35,7 @@ export function FormSection({
         <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-teal-700 text-sm text-white">
           {step}
         </span>
-        {formatHeadingCase(title)}
+        {formatSentenceCase(title)}
       </h2>
       <div className="space-y-5">{children}</div>
     </section>
@@ -61,12 +61,12 @@ export function Field({ label, required, error, hint, children, id }: FieldProps
   return (
     <div>
       <label htmlFor={id} className={labelClass}>
-        {formatHeadingCase(label)}
+        {formatSentenceCase(label)}
         {required ? <span className="text-red-600"> *</span> : null}
       </label>
       {children}
-      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
-      {!error && hint ? <p className={hintClass}>{formatHeadingCase(hint)}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatSentenceCase(error)}</p> : null}
+      {!error && hint ? <p className={hintClass}>{formatSentenceCase(hint)}</p> : null}
     </div>
   );
 }
@@ -157,9 +157,9 @@ export function CheckboxField({
           onChange={(e) => onChange(e.target.checked)}
           className={`${siteCheckboxClass} mt-0.5`}
         />
-        <span>{formatHeadingCase(label)}</span>
+        <span>{formatSentenceCase(label)}</span>
       </label>
-      {error ? <p className={`${errorClass} ml-2 mt-1.5`} role="alert">{formatHeadingCase(error)}</p> : null}
+      {error ? <p className={`${errorClass} ml-2 mt-1.5`} role="alert">{formatSentenceCase(error)}</p> : null}
     </div>
   );
 }
@@ -201,11 +201,11 @@ export function MultiSelect({
               onChange={() => toggle(option)}
               className={siteCheckboxClass}
             />
-            <span>{formatHeadingCase(option)}</span>
+            <span>{formatSentenceCase(option)}</span>
           </label>
         ))}
       </div>
-      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatSentenceCase(error)}</p> : null}
     </div>
   );
 }
@@ -246,8 +246,8 @@ export function FileInput({
         onChange={(e) => onChange(e.target.files?.[0] ?? null)}
         className={`block w-full text-sm text-zinc-700 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-800 ${error ? "rounded-lg ring-2 ring-red-500/30" : ""}`}
       />
-      {optional ? <p className={hintClass}>{formatHeadingCase("Optional")}</p> : null}
-      {error ? <p className={errorClass} role="alert">{formatHeadingCase(error)}</p> : null}
+      {optional ? <p className={hintClass}>{formatSentenceCase("Optional")}</p> : null}
+      {error ? <p className={errorClass} role="alert">{formatSentenceCase(error)}</p> : null}
     </div>
   );
 }

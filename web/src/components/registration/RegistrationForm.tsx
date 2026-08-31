@@ -31,9 +31,8 @@ import {
   ETHNICITY_OPTIONS,
   HOUSEHOLD_DEFINITION,
   HOUSEHOLD_HEAD_OPTIONS,
-  HOUSEHOLD_HEAD_SELF,
   MAX_HOUSEHOLD_SIZE,
-  isHeadOfHousehold,
+  cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
@@ -56,12 +55,14 @@ import { phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
   countContactMethods,
   getFullPhoneNumber,
+  streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
 import { formatDobDisplay } from "@/lib/dob";
+import { formatSentenceCase } from "@/lib/sentence-case";
 import {
   getPhaseFieldKeys,
   getFirstPhaseIndexForErrors,
@@ -195,18 +196,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           next.phoneCountryCode = suggestedCode;
         }
       }
-      if (key === "householdHeadRelationship" && value !== HOUSEHOLD_HEAD_SELF) {
-        next.householdSize = "";
-      }
       return next;
     });
-    setErrors((prev) => {
-      let nextErrors = clearFieldError(prev, String(key));
-      if (key === "householdHeadRelationship" && value !== HOUSEHOLD_HEAD_SELF) {
-        nextErrors = clearFieldError(nextErrors, "householdSize");
-      }
-      return nextErrors;
-    });
+    setErrors((prev) => clearFieldError(prev, String(key)));
   }, []);
 
   const touch = (key: string) => setTouched((prev) => ({ ...prev, [key]: true }));
@@ -270,11 +262,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Sex", form.sex],
       ["Highest education", form.education],
       ["Ethnicity", form.ethnicity],
-      ["Relationship to head of household", form.householdHeadRelationship],
-      [
-        "Household size",
-        isHeadOfHousehold(form.householdHeadRelationship) ? form.householdSize : "Not applicable",
-      ],
+      ["Head of household", form.householdHeadRelationship],
+      ["Household size", form.householdSize],
       ["Current residence", form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence],
       ["District", form.placeOfResidence === "Abroad" ? "" : form.placeOfResidence],
       [
@@ -695,9 +684,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 {ETHNICITY_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{HOUSEHOLD_DEFINITION}</p>
+            <p className="mb-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+              {formatSentenceCase(HOUSEHOLD_DEFINITION)}
+            </p>
             <Field
-              label="What is your relationship to the head of your household?"
+              label="Are you the head of your household?"
               required
               error={fieldError("householdHeadRelationship")}
               id="householdHeadRelationship"
@@ -721,28 +712,26 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 ))}
               </div>
             </Field>
-            {isHeadOfHousehold(form.householdHeadRelationship) ? (
-              <Field
-                label="Including yourself, how many persons live in your household?"
-                required
-                hint="Count everyone regardless of their age."
-                error={fieldError("householdSize")}
+            <Field
+              label="Including yourself, how many persons live in your household?"
+              required
+              hint="Count everyone regardless of their age."
+              error={fieldError("householdSize")}
+              id="householdSize"
+            >
+              <TextInput
                 id="householdSize"
-              >
-                <TextInput
-                  id="householdSize"
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={MAX_HOUSEHOLD_SIZE}
-                  step={1}
-                  value={form.householdSize}
-                  onChange={(e) => update("householdSize", e.target.value)}
-                  onBlur={() => touchAndValidate("householdSize")}
-                  error={fieldError("householdSize")}
-                />
-              </Field>
-            ) : null}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={MAX_HOUSEHOLD_SIZE}
+                step={1}
+                value={form.householdSize}
+                onChange={(e) => update("householdSize", e.target.value)}
+                onBlur={() => touchAndValidate("householdSize")}
+                error={fieldError("householdSize")}
+              />
+            </Field>
           </FormSection>
 
           <FormSection step={6} title="Residence details">
@@ -793,14 +782,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
             {form.placeOfResidence && form.placeOfResidence !== "Abroad" ? (
               <>
-                <Field label={`Current city / town / village in ${form.placeOfResidence}`} required error={fieldError("cityTownVillage")} id="cityTownVillage">
+                <Field label={cityTownVillageQuestionLabel(form.placeOfResidence)} required error={fieldError("cityTownVillage")} id="cityTownVillage">
                   <SelectInput id="cityTownVillage" value={form.cityTownVillage} onChange={(e) => update("cityTownVillage", e.target.value)} onBlur={() => touchAndValidate("cityTownVillage")} error={fieldError("cityTownVillage")}>
                     <option value="">Select city, town, or village</option>
                     {cityOptions.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
                 {form.cityTownVillage === "Other" ? (
-                  <Field label={`Specify city / town / village in ${form.placeOfResidence}`} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
+                  <Field label={cityTownVillageQuestionLabel(form.placeOfResidence)} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
                     <TextInput id="cityTownVillageOther" value={form.cityTownVillageOther} onChange={(e) => update("cityTownVillageOther", e.target.value)} onBlur={() => touchAndValidate("cityTownVillageOther")} error={fieldError("cityTownVillageOther")} />
                   </Field>
                 ) : null}
@@ -833,10 +822,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
           {form.placeOfResidence !== "Abroad" ? (
             <FormSection step={8} title="Market research interests">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                Select the product and service topics you are willing to give feedback on.
-              </p>
-              <Field label="Select all that apply" required error={fieldError("marketInterests")}>
+              <Field
+                label="Select the products and services you are interested in and are willing to give feedback on."
+                required
+                error={fieldError("marketInterests")}
+              >
                 <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
               </Field>
             </FormSection>
@@ -853,7 +843,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 4 ? (
         <>
           <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Please enter contact details carefully. At least two contact methods are encouraged so we can still reach you if one channel changes, is inactive, or fails during fieldwork.</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              We need at least two ways to contact you in case one fails. Phone / WhatsApp is optional. If you live
+              in Belize and have fewer than two other contact methods, a street address is required.
+            </p>
             <FieldGroup columns={2}>
               <Field label="Email address" hint="This is your verified account email." error={fieldError("email")} id="email">
                 <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50 dark:bg-zinc-950" error={fieldError("email")} />
@@ -868,8 +861,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               />
               <Field
                 label="Phone / WhatsApp number"
-                required
-                hint="Select your country code, then enter your number without the country code. It will need to be verified before we can use it to contact you."
+                hint="Optional. Select your country code, then enter your number without the country code."
                 id="phoneLocalNumber"
                 error={fieldError("phoneLocalNumber")}
               >
@@ -918,11 +910,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
             <Field
               label="Street address / physical contact address"
-              required={contactCount < 2}
+              required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
               hint={
-                contactCount < 2
-                  ? "Required because fewer than two other contact methods were provided."
-                  : "Optional when you have already given at least two ways to contact you."
+                streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
+                  ? "Required because you live in Belize and have fewer than two other ways to contact you."
+                  : form.placeOfResidence === "Abroad"
+                    ? "Optional. Street address is only required for people living in Belize who have fewer than two other contact methods."
+                    : "Optional when you have already given at least two ways to contact you."
               }
               error={fieldError("streetAddress")}
               id="streetAddress"

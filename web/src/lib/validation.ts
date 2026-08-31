@@ -8,7 +8,6 @@ import {
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   hasRegisteredCtvQuestion,
-  isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
@@ -123,6 +122,22 @@ export function validatePhoneFields(
     return "Phone number is too long. Check the number and country code.";
   }
   return null;
+}
+
+export function livesInBelizeResidence(placeOfResidence: string): boolean {
+  return Boolean(placeOfResidence) && placeOfResidence !== "Abroad";
+}
+
+export function streetAddressRequiredForContacts(placeOfResidence: string, contactCount: number): boolean {
+  return livesInBelizeResidence(placeOfResidence) && contactCount < 2;
+}
+
+function isValidHouseholdHeadAnswer(value: string): boolean {
+  return (
+    (HOUSEHOLD_HEAD_OPTIONS as readonly string[]).includes(value) ||
+    value === "I am the head of my household" ||
+    value === "Other"
+  );
 }
 
 export function countContactMethods(data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "facebook" | "instagram" | "tiktok" | "otherContact">): number {
@@ -409,20 +424,19 @@ export function validateRegistrationForm(
   if (!data.education) errors.education = "Education level is required.";
   if (!data.ethnicity) errors.ethnicity = "Ethnicity is required.";
   if (!data.householdHeadRelationship) {
-    errors.householdHeadRelationship = "Please indicate your relationship to the head of your household.";
-  } else if (!(HOUSEHOLD_HEAD_OPTIONS as readonly string[]).includes(data.householdHeadRelationship)) {
-    errors.householdHeadRelationship = "Please select a valid household relationship.";
-  } else if (isHeadOfHousehold(data.householdHeadRelationship)) {
-    const sizeText = cleanText(data.householdSize);
-    if (!/^\d+$/.test(sizeText)) {
-      errors.householdSize = "Enter the number of people in your household, including yourself.";
-    } else {
-      const size = Number(sizeText);
-      if (size < 1) {
-        errors.householdSize = "Household size must include at least yourself.";
-      } else if (size > MAX_HOUSEHOLD_SIZE) {
-        errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
-      }
+    errors.householdHeadRelationship = "Please indicate whether you are the head of your household.";
+  } else if (!isValidHouseholdHeadAnswer(data.householdHeadRelationship)) {
+    errors.householdHeadRelationship = "Please select yes or no.";
+  }
+  const householdSizeText = cleanText(data.householdSize);
+  if (!/^\d+$/.test(householdSizeText)) {
+    errors.householdSize = "Enter how many persons live in your household, including yourself.";
+  } else {
+    const size = Number(householdSizeText);
+    if (size < 1) {
+      errors.householdSize = "Household size must include at least yourself.";
+    } else if (size > MAX_HOUSEHOLD_SIZE) {
+      errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
     }
   }
   if (!data.placeOfResidence) errors.placeOfResidence = errors.placeOfResidence ?? "Residence selection is required.";
@@ -441,7 +455,7 @@ export function validateRegistrationForm(
       errors.usDiasporaRegion = "Region of country is required.";
     }
   } else if (data.placeOfResidence && !data.cityTownVillage) {
-    errors.cityTownVillage = "City / Town / Village is required.";
+    errors.cityTownVillage = "City / town / village is required.";
   }
   if (data.placeOfResidence !== "Abroad" && data.cityTownVillage === "Other" && !cleanText(data.cityTownVillageOther)) {
     errors.cityTownVillageOther = "Please specify city / town / village.";
@@ -457,17 +471,21 @@ export function validateRegistrationForm(
     errors.marketInterests = "Please select at least one market research interest.";
   }
 
-  if (contactCount < 2 && !cleanText(data.streetAddress)) {
-    errors.contact =
-      "Please provide at least two contact methods, or a street address if fewer than two other ways to reach you are available.";
-    errors.streetAddress =
-      "Street address is required when you provide fewer than two other ways to contact you.";
+  if (contactCount < 2) {
+    if (streetAddressRequiredForContacts(data.placeOfResidence, contactCount)) {
+      if (!cleanText(data.streetAddress)) {
+        errors.contact =
+          "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
+        errors.streetAddress =
+          "Street address is required when you live in Belize and have fewer than two other ways to contact you.";
+      }
+    } else {
+      errors.contact = "Please provide at least two ways to contact you in case one fails.";
+    }
   }
 
   if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";
-  if (!phoneLocalDigits(data.phoneLocalNumber)) {
-    errors.phoneLocalNumber = "Phone / WhatsApp number is required.";
-  } else {
+  if (phoneLocalDigits(data.phoneLocalNumber)) {
     const phoneError = validatePhoneFields(data);
     if (phoneError) errors.phoneLocalNumber = phoneError;
   }
@@ -631,9 +649,17 @@ export function validateProfileUpdateForm(
     errors.marketInterests = "Please select at least one market research interest.";
   }
 
-  if (contactCount < 2 && !cleanText(data.streetAddress)) {
-    errors.contact =
-      "Please provide at least two contact methods, or a street address if no electronic contact is available.";
+  if (contactCount < 2) {
+    if (streetAddressRequiredForContacts(data.placeOfResidence, contactCount)) {
+      if (!cleanText(data.streetAddress)) {
+        errors.contact =
+          "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
+        errors.streetAddress =
+          "Street address is required when you live in Belize and have fewer than two other ways to contact you.";
+      }
+    } else {
+      errors.contact = "Please provide at least two ways to contact you in case one fails.";
+    }
   }
 
   if (otherPlatform === "Second email address" && cleanText(data.otherContact) && !validEmail(data.otherContact)) {

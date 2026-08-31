@@ -20,6 +20,7 @@ import {
   getResidenceOptions,
   hasRegisteredCtvQuestion,
   needsVoterRegistrationQuestion,
+  cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   US_DIASPORA_REGIONS,
@@ -30,7 +31,7 @@ import {
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { ProfileContactDisplay, ProfileUpdateFormData } from "@/lib/profile-update-types";
-import { countContactMethods, isRegisteredVoter, type FieldErrors } from "@/lib/validation";
+import { countContactMethods, isRegisteredVoter, streetAddressRequiredForContacts, type FieldErrors } from "@/lib/validation";
 import { ProfileContactChangePanel } from "./ProfileContactChangePanel";
 import { SectionHeading } from "./DashboardShell";
 
@@ -194,7 +195,7 @@ export function ProfileEditForm({
           </div>
           {profile.householdHeadRelationship && profile.householdHeadRelationship !== "Not provided" ? (
             <div>
-              <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Relationship to head of household</dt>
+              <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Head of household</dt>
               <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.householdHeadRelationship}</dd>
             </div>
           ) : null}
@@ -426,7 +427,7 @@ export function ProfileEditForm({
           {form.placeOfResidence && form.placeOfResidence !== "Abroad" ? (
             <>
               <Field
-                label={`Current city / town / village in ${form.placeOfResidence}`}
+                label={cityTownVillageQuestionLabel(form.placeOfResidence)}
                 required
                 error={errors.cityTownVillage}
                 id="cityTownVillage"
@@ -447,7 +448,7 @@ export function ProfileEditForm({
               </Field>
               {form.cityTownVillage === "Other" ? (
                 <Field
-                  label={`Specify city / town / village in ${form.placeOfResidence}`}
+                  label={cityTownVillageQuestionLabel(form.placeOfResidence)}
                   required
                   error={errors.cityTownVillageOther}
                   id="cityTownVillageOther"
@@ -531,13 +532,15 @@ export function ProfileEditForm({
 
           <Field
             label="Street address / physical contact address"
-            required={contactCount < 2}
+            required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
             error={errors.streetAddress ?? errors.contact}
             id="streetAddress"
             hint={
-              contactCount < 2
-                ? "Required because fewer than two other contact methods were provided."
-                : "Optional when you have already given at least two ways to contact you."
+              streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
+                ? "Required because you live in Belize and have fewer than two other ways to contact you."
+                : form.placeOfResidence === "Abroad"
+                  ? "Optional. Street address is only required for people living in Belize who have fewer than two other contact methods."
+                  : "Optional when you have already given at least two ways to contact you."
             }
           >
             <TextArea
@@ -560,7 +563,11 @@ export function ProfileEditForm({
         </SectionHeading>
         <div className="mt-4 space-y-5">
           {form.placeOfResidence !== "Abroad" ? (
-            <Field label="Market research" required error={errors.marketInterests}>
+            <Field
+              label="Select the products and services you are interested in and are willing to give feedback on."
+              required
+              error={errors.marketInterests}
+            >
               <MultiSelect
                 options={MARKET_INTERESTS}
                 values={form.marketInterests}
