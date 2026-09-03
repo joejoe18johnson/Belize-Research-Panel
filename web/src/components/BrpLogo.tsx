@@ -32,7 +32,7 @@ export function BrpLogoText({
 
   return (
     <span
-      className={`inline-flex max-w-[12.5rem] flex-wrap items-baseline gap-x-1 text-[0.8125rem] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base ${className}`.trim()}
+      className={`inline-flex max-w-[11.5rem] flex-wrap items-baseline gap-x-1 text-[0.8125rem] font-bold leading-tight tracking-tight lg:max-w-none lg:text-base ${className}`.trim()}
       aria-label="Belize Research Panel"
     >
       <span className={isDark ? "text-teal-200" : "text-teal-700 dark:text-teal-300"}>Belize</span>
@@ -122,7 +122,7 @@ export function BrpLogoLink({
   priority?: boolean;
 }) {
   return (
-    <Link href={href} className={`shrink-0 ${className}`.trim()}>
+    <Link href={href} className={`min-w-0 ${className}`.trim()}>
       <span className="inline-flex items-center">
         <BrpLogo
           variant={variant}

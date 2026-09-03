@@ -111,8 +111,8 @@ export function LanguageSwitcher({
 
   const triggerClass =
     variant === "dark"
-      ? "flex h-10 items-center gap-2 rounded-full bg-white/15 px-3 text-white shadow-sm ring-1 ring-white/20 transition hover:bg-white/25"
-      : "flex h-10 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800";
+      ? "flex h-10 items-center gap-1.5 rounded-full bg-white/15 px-2.5 text-white shadow-sm ring-1 ring-white/20 transition hover:bg-white/25 lg:gap-2 lg:px-3"
+      : "flex h-10 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2.5 text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 lg:gap-2 lg:px-3";
 
   return (
     <div ref={rootRef} className="relative">
@@ -125,7 +125,7 @@ export function LanguageSwitcher({
         className={triggerClass}
       >
         <FlagIcon locale={locale} className="h-5 w-5 shrink-0" clipId={triggerClipId} />
-        <span className="text-sm font-medium">{localeDisplayName(locale)}</span>
+        <span className="hidden text-sm font-medium lg:inline">{localeDisplayName(locale)}</span>
         <ChevronIcon open={open} variant={variant} />
       </button>
 

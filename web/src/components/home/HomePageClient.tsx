@@ -43,7 +43,7 @@ function HomeFeatureCard({
     : "mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400";
 
   return (
-    <div className={cardClass}>
+    <div className={`${cardClass} min-w-0`}>
       <h2 className={titleClass}>{title}</h2>
       <p className={bodyClass}>{body}</p>
     </div>
@@ -70,11 +70,11 @@ function HomeRewardPerkCard({
     : "mt-1 text-xs leading-relaxed text-teal-800 dark:text-teal-200";
 
   return (
-    <div className={cardClass}>
+    <div className={`${cardClass} min-w-0`}>
       <p className="text-2xl" aria-hidden>
         {icon}
       </p>
-      <div>
+      <div className="min-w-0 flex-1">
         <h3 className={titleClass}>{title}</h3>
         <p className={bodyClass}>{body}</p>
       </div>
@@ -107,12 +107,12 @@ function HomeHowItWorksStep({
     : "mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400";
 
   return (
-    <div className={cardClass}>
-      <div className="flex items-start gap-4">
+    <div className={`${cardClass} min-w-0`}>
+      <div className="flex min-w-0 items-start gap-4">
         <span className={stepClass} aria-hidden>
           {step}
         </span>
-        <div>
+        <div className="min-w-0 flex-1">
           <h3 className={titleClass}>{title}</h3>
           <p className={bodyClass}>{body}</p>
         </div>
@@ -158,8 +158,8 @@ export function HomePageClient() {
     <div
       className={
         onDarkHero
-          ? "min-h-screen bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white"
-          : "min-h-screen bg-gradient-to-b from-teal-50 via-white to-zinc-50 text-zinc-900"
+          ? "min-h-screen overflow-x-clip bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white"
+          : "min-h-screen overflow-x-clip bg-gradient-to-b from-teal-50 via-white to-zinc-50 text-zinc-900"
       }
     >
       <div
@@ -169,7 +169,7 @@ export function HomePageClient() {
             : "border-teal-100 bg-white/95 dark:border-teal-900/50 dark:bg-zinc-900/95"
         }`}
       >
-        <header className="relative mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
+        <header className="relative mx-auto w-full min-w-0 max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center justify-between gap-2">
           <BrpLogoLink href="/" variant={onDarkHero ? "dark" : "light"} className="min-w-0 shrink" />
 
@@ -180,7 +180,7 @@ export function HomePageClient() {
               variant={onDarkHero ? "dark" : "light"}
             />
 
-            <div className="hidden items-center gap-2 sm:flex sm:gap-3">
+            <div className="hidden items-center gap-2 lg:flex lg:gap-3">
               <ThemeSwitch variant={onDarkHero ? "dark" : "light"} compact />
               <Link href="/login" className={loginLinkClassDesktop}>
                 {t(copy.logIn)}
@@ -196,7 +196,7 @@ export function HomePageClient() {
 
             <button
               type="button"
-              className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-lg sm:hidden ${
+              className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-lg lg:hidden ${
                 onDarkHero
                   ? "border border-white/20 text-teal-100 hover:bg-white/10"
                   : "border border-teal-200 text-teal-800 hover:bg-teal-50 dark:border-teal-700 dark:text-teal-100 dark:hover:bg-teal-900/40"
@@ -222,7 +222,7 @@ export function HomePageClient() {
         {mobileMenuOpen ? (
           <div
             id="home-mobile-menu"
-            className={`mt-3 space-y-2 rounded-2xl border p-3 sm:hidden ${
+            className={`mt-3 space-y-2 rounded-2xl border p-3 lg:hidden ${
               onDarkHero
                 ? "border-white/15 bg-black/30 backdrop-blur-sm"
                 : "border-teal-200 bg-white shadow-sm dark:border-teal-800 dark:bg-zinc-900"
@@ -246,14 +246,14 @@ export function HomePageClient() {
         </header>
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16">
-        <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)]">
-          <div className="max-w-3xl">
+      <main className="mx-auto w-full min-w-0 max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-12 lg:pt-16">
+        <section className="grid min-w-0 items-center gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:gap-12">
+          <div className="min-w-0 max-w-3xl">
             <p
               className={
                 onDarkHero
-                  ? "mb-4 inline-flex rounded-full border border-amber-300/40 bg-amber-400/15 px-4 py-1.5 text-sm font-semibold text-amber-100"
-                  : "mb-4 inline-flex rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-900"
+                  ? "mb-4 inline-block max-w-full rounded-full border border-amber-300/40 bg-amber-400/15 px-3 py-1.5 text-sm font-semibold leading-snug text-amber-100 sm:px-4"
+                  : "mb-4 inline-block max-w-full rounded-full border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-semibold leading-snug text-amber-900 sm:px-4"
               }
             >
               {t(copy.rewardsBadge)}
@@ -261,7 +261,7 @@ export function HomePageClient() {
             <p className={onDarkHero ? "text-sm font-medium text-teal-200" : "text-sm font-medium text-teal-700"}>
               {t(copy.eyebrow)}
             </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t(copy.headline)}</h1>
+            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl xl:text-5xl">{t(copy.headline)}</h1>
             <p
               className={
                 onDarkHero
@@ -271,7 +271,7 @@ export function HomePageClient() {
             >
               {t(copy.description)}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 md:flex-row md:flex-wrap md:gap-4">
               <Link
                 href="/register"
                 className="flex min-h-12 items-center justify-center rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-teal-950 shadow-lg shadow-amber-900/30 hover:bg-amber-300"
@@ -291,15 +291,15 @@ export function HomePageClient() {
             </div>
           </div>
 
-          <div className="mx-auto w-full max-w-md lg:max-w-none lg:justify-self-end">
+          <div className="mx-auto w-full max-w-sm min-w-0 sm:max-w-md xl:max-w-none xl:justify-self-end">
             <Image
               src={PUBLIC_IMAGES.homeHero}
               alt={t(copy.heroImageAlt)}
               width={800}
               height={800}
               priority
-              sizes="(max-width: 1024px) 28rem, 32rem"
-              className="h-auto w-full"
+              sizes="(max-width: 1280px) 24rem, 32rem"
+              className="mx-auto h-auto w-full"
             />
           </div>
         </section>
@@ -323,7 +323,7 @@ export function HomePageClient() {
           >
             {t(copy.howItWorksHeadline)}
           </h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="mt-6 grid min-w-0 gap-4 lg:grid-cols-2">
             {copy.howItWorksSteps.map((step, index) => (
               <HomeHowItWorksStep
                 key={step.title}
@@ -339,12 +339,12 @@ export function HomePageClient() {
         <section
           className={
             onDarkHero
-              ? "mt-12 overflow-hidden rounded-3xl border border-amber-300/30 bg-gradient-to-br from-amber-400/20 via-white/10 to-teal-500/10 p-6 shadow-2xl shadow-black/20 sm:mt-16 sm:p-8"
-              : "mt-12 overflow-hidden rounded-3xl border border-teal-200 bg-white p-6 shadow-lg shadow-teal-950/5 dark:border-teal-800 dark:bg-zinc-900 sm:mt-16 sm:p-8"
+              ? "mt-12 min-w-0 overflow-hidden rounded-3xl border border-amber-300/30 bg-gradient-to-br from-amber-400/20 via-white/10 to-teal-500/10 p-5 shadow-2xl shadow-black/20 sm:mt-16 sm:p-8"
+              : "mt-12 min-w-0 overflow-hidden rounded-3xl border border-teal-200 bg-white p-5 shadow-lg shadow-teal-950/5 dark:border-teal-800 dark:bg-zinc-900 sm:mt-16 sm:p-8"
           }
         >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
+          <div className="flex min-w-0 flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="min-w-0 max-w-2xl">
               <p
                 className={
                   onDarkHero
@@ -383,7 +383,7 @@ export function HomePageClient() {
                 {t(copy.rewardsCta)}
               </Link>
             </div>
-            <div className="flex w-full flex-col gap-3 lg:max-w-xl lg:shrink-0">
+            <div className="flex w-full min-w-0 flex-col gap-3 xl:max-w-xl">
               {copy.rewardPerks.map((perk, index) => (
                 <HomeRewardPerkCard
                   key={perk.title}
@@ -398,7 +398,7 @@ export function HomePageClient() {
         </section>
 
         <section className="mt-14 sm:mt-20">
-          <div className="flex flex-col gap-3">
+          <div className="flex min-w-0 flex-col gap-3">
             {copy.features.map((feature) => (
               <HomeFeatureCard
                 key={feature.title}
