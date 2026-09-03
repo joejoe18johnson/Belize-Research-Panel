@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { portalStickyHeaderClass } from "@/lib/brand";
 import type { ClientSession } from "@/lib/client-session";
@@ -34,7 +34,7 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
               <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{session.contactName}</p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">{session.email}</p>
             </div>
-            <ThemeSwitch compact className="hidden sm:inline-flex" />
+            <ThemeSwitch compact />
             <button
               type="button"
               onClick={logout}
@@ -43,9 +43,6 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
               {formatHeadingCase("Log out")}
             </button>
           </div>
-        </div>
-        <div className="border-t border-teal-50 bg-white px-4 py-2 dark:border-teal-900/40 dark:bg-zinc-900 sm:hidden">
-          <ThemeMenuToggle variant="light" />
         </div>
         <nav className="border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30 dark:border-teal-900/40 dark:from-zinc-900 dark:to-teal-950/20">
           <div className="mx-auto flex max-w-6xl gap-2 px-4 py-2 sm:px-6">

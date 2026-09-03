@@ -145,7 +145,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
             Citizenship / residency status <span className="text-red-600">*</span>
           </p>
           <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{CITIZENSHIP_PANEL_INTRO}</p>
-          <p className="mb-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
+          <p className="mb-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-700 dark:bg-teal-950/80 dark:text-teal-100">
             You will be required to provide proof of your citizenship or residency during panelist registration.
           </p>
           <div className="flex flex-col gap-3">

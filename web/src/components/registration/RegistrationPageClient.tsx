@@ -6,7 +6,7 @@ import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { RegistrationForm } from "@/components/registration/RegistrationForm";
 import { RegistrationLanguageStep } from "@/components/registration/RegistrationLanguageStep";
 import type { RegistrationAccountContext } from "@/components/registration/RegistrationForm";
@@ -67,10 +67,7 @@ export function RegistrationPageClient({
           <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
             <div className="flex items-center justify-between gap-3">
               <BrpLogoLink href="/" variant="light" />
-              <ThemeSwitch compact className="hidden sm:inline-flex" />
-            </div>
-            <div className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800 sm:hidden">
-              <ThemeMenuToggle variant="light" />
+              <ThemeSwitch compact />
             </div>
           </div>
         </header>
@@ -110,11 +107,8 @@ export function RegistrationPageClient({
               </Link>
               <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 md:inline">{account.email}</span>
               <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 sm:px-4" />
-              <ThemeSwitch compact className="hidden sm:inline-flex" />
+              <ThemeSwitch compact />
             </div>
-          </div>
-          <div className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800 sm:hidden">
-            <ThemeMenuToggle variant="light" />
           </div>
         </div>
       </header>
