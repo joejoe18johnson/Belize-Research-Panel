@@ -95,7 +95,7 @@ export function DashboardProfileView({
         </DashboardAlert>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge label={profile.verificationStatus} tone={verificationBadgeTone(profile.verificationStatus)} />
           <StatusBadge label={profile.panelistStatus} tone="info" />

@@ -102,7 +102,7 @@ function NotificationCard({
           {notificationIcon(notification.id)}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(notification.title)}</h3>
@@ -188,7 +188,7 @@ export function DashboardNotificationsClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
         <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           {unreadCount > 0 ? (
             <>

@@ -590,7 +590,7 @@ export function ProfileEditForm({
         </p>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col-reverse gap-3 lg:flex-row lg:flex-wrap">
         <button
           type="submit"
           disabled={submitting}

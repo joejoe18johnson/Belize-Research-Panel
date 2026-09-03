@@ -79,7 +79,7 @@ function RedemptionOptionCard({
 
   const content = (
     <>
-      <div className={`flex gap-3 ${layout === "list" ? "items-center" : "flex-col sm:flex-row sm:flex-wrap sm:items-start sm:justify-between"}`}>
+      <div className={`flex gap-3 ${layout === "list" ? "items-center" : "flex-col lg:flex-row lg:flex-wrap lg:items-start lg:justify-between"}`}>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <RedemptionOptionIcon optionId={option.id} />
@@ -194,7 +194,7 @@ export function RedemptionOptionsCatalog({
 
   return (
     <DashboardCard>
-      <div className="flex flex-col gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+      <div className="flex flex-col gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4 lg:flex-row lg:items-start lg:justify-between lg:gap-3">
         <div className="min-w-0 flex-1">
           <SectionHeading as="h3">Redemption options</SectionHeading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
