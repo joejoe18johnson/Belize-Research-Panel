@@ -143,7 +143,7 @@ export function AdminSurveyDistributionDashboard({
         description="Track live survey assignments across the panel, review delivery status, and preview target groups for the next distribution — aligned with the Streamlit MVP Survey Distribution module."
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total assignments" value={stats.totalAssignments} />
         <MetricCard label="Unique surveys" value={stats.uniqueSurveys} />
         <MetricCard label="Panelists assigned" value={stats.uniquePanelists} />
@@ -197,7 +197,7 @@ export function AdminSurveyDistributionDashboard({
               Overdue only
             </label>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
             <FilterMultiSelect label="Category" options={filterOptions.categories} selected={categories} onChange={setCategories} />
             <FilterMultiSelect label="Status" options={filterOptions.statuses} selected={statuses} onChange={setStatuses} />
             <FilterMultiSelect
@@ -298,7 +298,7 @@ export function AdminSurveyDistributionDashboard({
               panelists and MVP-aligned settings.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <div>
               <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey title</label>
               <input

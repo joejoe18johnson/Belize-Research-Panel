@@ -394,11 +394,11 @@ export function AdminPayoutQueueSection({
       ) : (
         <>
           <div
-            className={`admin-table-scroll mt-4 max-md:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800 ${
-              mode === "history" ? "max-md:max-h-none max-h-[min(70vh,40rem)] overflow-y-auto" : ""
+            className={`admin-table-scroll mt-4 max-lg:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800 ${
+              mode === "history" ? "max-lg:max-h-none max-h-[min(70vh,40rem)] overflow-y-auto" : ""
             }`}
           >
-            <AdminDataTable desktopMinWidthClass={mode === "history" ? "md:min-w-[1180px]" : "md:min-w-[960px]"}>
+            <AdminDataTable desktopMinWidthClass={mode === "history" ? "lg:min-w-[1180px]" : "lg:min-w-[960px]"}>
               <AdminTableHead>
                 <AdminTableTh>Request ID</AdminTableTh>
                 {mode === "history" ? <AdminTableTh>Panelist email</AdminTableTh> : null}

@@ -30,7 +30,7 @@ export function ClientCampaignsDashboard({
         description="Studies commissioned by your organization through the Belize Research Panel. Only campaigns assigned to your account appear here."
       />
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <MetricCard label="Commissioned studies" value={campaigns.length} hint="Campaigns linked to your account" />
         <MetricCard label="Active fieldwork" value={activeCount} hint="Currently in the field" />
         <MetricCard label="Total completions" value={completedTotal} hint="Across all studies" />
@@ -48,8 +48,8 @@ export function ClientCampaignsDashboard({
             No commissioned studies are linked to your account yet. Your Belize Research Panel project manager will assign campaigns when fieldwork opens.
           </p>
         ) : (
-          <div className="admin-table-scroll max-md:overflow-visible table-scroll">
-            <table className={`${adminResponsiveTableClass} w-full text-left text-sm md:min-w-[720px]`}>
+          <div className="admin-table-scroll max-lg:overflow-visible table-scroll">
+            <table className={`${adminResponsiveTableClass} w-full text-left text-sm lg:min-w-[720px]`}>
               <thead>
                 <tr className="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                   <th className="px-5 py-3">Study</th>

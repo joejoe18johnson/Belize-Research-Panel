@@ -40,7 +40,7 @@ export function AdminSurveyLibraryClient({ surveys }: { surveys: SurveyDefinitio
       ) : (
         <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
           <AdminTableScroll>
-          <table className={`${adminResponsiveTableClass} w-full text-left text-sm md:min-w-[720px]`}>
+          <table className={`${adminResponsiveTableClass} w-full text-left text-sm lg:min-w-[720px]`}>
             <thead>
               <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 <th className="px-4 py-3 font-semibold">Title</th>

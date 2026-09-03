@@ -73,13 +73,13 @@ export function DashboardSurveysSection({
       ) : null}
 
       <div
-        className={`flex w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-1 sm:inline-flex sm:w-auto ${surveysLocked ? "opacity-60" : ""}`}
+        className={`flex w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-1 lg:inline-flex lg:w-auto ${surveysLocked ? "opacity-60" : ""}`}
       >
         <button
           type="button"
           onClick={() => setTab("inbox")}
           disabled={surveysLocked}
-          className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition sm:flex-none sm:px-4 ${
+          className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition lg:flex-none lg:px-4 ${
             tab === "inbox"
               ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
               : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
@@ -96,7 +96,7 @@ export function DashboardSurveysSection({
           type="button"
           onClick={() => setTab("completed")}
           disabled={surveysLocked}
-          className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition sm:flex-none sm:px-4 ${
+          className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition lg:flex-none lg:px-4 ${
             tab === "completed"
               ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
               : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
@@ -113,14 +113,14 @@ export function DashboardSurveysSection({
 
       {surveys.length > 0 ? (
         <>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               {surveys.length} {tab === "inbox" ? "survey" : "completed survey"}
               {surveys.length === 1 ? "" : "s"}
             </p>
             <ViewLayoutToggle value={layout} onChange={setLayout} />
           </div>
-          <div className={`${viewLayoutContainerClass(layout, "grid gap-6 sm:grid-cols-2")} ${surveysLocked ? "pointer-events-none" : ""}`}>
+          <div className={`${viewLayoutContainerClass(layout, "grid gap-6 lg:grid-cols-2")} ${surveysLocked ? "pointer-events-none" : ""}`}>
             {surveys.map((survey) => (
               <div key={survey.id} className={viewLayoutItemClass(layout)}>
                 <SurveyCard

@@ -959,7 +959,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={15} title="Review full registration before submitting">
-            <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 md:hidden">
+            <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 lg:hidden">
               {reviewRows.map(([label, value]) => (
                 <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">
                   <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{label}</p>
@@ -967,7 +967,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </div>
               ))}
             </div>
-            <div className="hidden overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800 md:block">
+            <div className="hidden overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800 lg:block">
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50 dark:bg-zinc-950">
                   <tr>

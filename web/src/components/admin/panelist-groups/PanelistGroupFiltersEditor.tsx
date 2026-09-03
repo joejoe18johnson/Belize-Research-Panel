@@ -28,7 +28,7 @@ export function PanelistGroupFiltersEditor({
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
         Save filter rules for this group. Member counts update when panelists match these criteria.
       </p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <FilterMultiSelect
           label="Place of residence"
           options={options.residence}
@@ -96,7 +96,7 @@ export function PanelistGroupFiltersEditor({
           onChange={(value) => update("verificationStatuses", value)}
         />
       </div>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <div>
           <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Age min</label>
           <input

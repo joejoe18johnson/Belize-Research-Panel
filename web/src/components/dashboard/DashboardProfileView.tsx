@@ -121,7 +121,7 @@ export function DashboardProfileView({
             Name, date of birth, sex, ethnicity, and household details cannot be changed online. Education can be
             updated when you edit your profile.
           </p>
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          <dl className="mt-4 grid gap-4 lg:grid-cols-2">
             <ProfileField label="First name" value={profile.firstName} />
             <ProfileField label="Last name(s)" value={profile.lastName} />
             <ProfileField label="Date of birth" value={profile.dob} />
@@ -138,7 +138,7 @@ export function DashboardProfileView({
             title="Citizenship and residence"
             onEdit={() => onEditSection("citizenship")}
           />
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          <dl className="mt-4 grid gap-4 lg:grid-cols-2">
             <ProfileField label="Citizenship / residency status" value={profile.citizenshipStatus} />
             {profile.commonwealthCountry ? (
               <ProfileField label="Commonwealth country of citizenship" value={profile.commonwealthCountry} />
@@ -178,7 +178,7 @@ export function DashboardProfileView({
 
         <DashboardCard>
           <ProfileCardHeader title="Contact details" onEdit={() => onEditSection("contact")} />
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          <dl className="mt-4 grid gap-4 lg:grid-cols-2">
             <ProfileField label="Email address" value={profile.email} />
             <ProfileField label="Phone / WhatsApp" value={profile.phone} />
             <ProfileField label="Facebook" value={profile.facebook} />

@@ -150,7 +150,7 @@ function PayoutList({
         <div
           className={`mt-4 ${viewLayoutContainerClass(
             layout,
-            layout === "list" ? "divide-y divide-zinc-100" : "grid gap-4 sm:grid-cols-2",
+            layout === "list" ? "divide-y divide-zinc-100" : "grid gap-4 lg:grid-cols-2",
           )}`}
         >
           {requests.map((request) => (
@@ -193,7 +193,7 @@ export function DashboardPayoutsSection({ requests }: { requests: RedemptionRequ
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <DashboardCard className="border-amber-200 bg-gradient-to-br from-amber-50/80 to-white">
           <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Pending review")}</p>
           <p className="mt-2 text-3xl font-bold tabular-nums text-amber-900">{pendingCount}</p>

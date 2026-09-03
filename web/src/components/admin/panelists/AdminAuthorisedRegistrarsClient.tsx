@@ -206,7 +206,7 @@ export function AdminAuthorisedRegistrarsClient({
             used once, it cannot be used again.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           <label className="text-sm">
             <span className="font-medium text-zinc-800 dark:text-zinc-200">Authorised person&apos;s name</span>
             <input

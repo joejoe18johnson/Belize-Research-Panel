@@ -188,7 +188,7 @@ function TemplatePreviewPanel({
             {template.id}
           </code>
         </div>
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <dl className="mt-4 grid gap-3 text-sm lg:grid-cols-2">
           <div className="min-w-0">
             <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Trigger</dt>
             <dd className="mt-1 break-all font-mono text-xs text-zinc-700 dark:text-zinc-300">{template.trigger}</dd>

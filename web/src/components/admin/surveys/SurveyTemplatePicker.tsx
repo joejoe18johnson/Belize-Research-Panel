@@ -93,7 +93,7 @@ export function SurveyTemplatePicker({
                   to reuse your standard questions.
                 </p>
               ) : (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                   {customTemplates.map((template) => (
                     <button
                       key={template.id}
@@ -137,7 +137,7 @@ export function SurveyTemplatePicker({
                 No templates in this topic yet.
               </p>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                 {templates.map((template) => (
                   <button
                     key={template.id}

@@ -172,7 +172,7 @@ export function ProfileEditForm({
           Name, date of birth, sex, ethnicity, and household details cannot be changed online. You may update your education level if it
           changes.
         </p>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+        <dl className="mt-4 grid gap-4 lg:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">First name</dt>
             <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.firstName}</dd>

@@ -139,7 +139,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
         </label>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total panelists" value={snapshot.total} />
         <MetricCard label="Verified" value={snapshot.verified} />
         <MetricCard label="Pending" value={snapshot.pending} />
@@ -186,7 +186,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
 
       {tab === "geography" ? (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <MetricCard label="Registered voters" value={snapshot.registeredVoters} hint="In filtered set" />
             <MetricCard
               label="Constituencies represented"
@@ -236,7 +236,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
 
       {tab === "interests" ? (
         <div className="space-y-6">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
             <MetricCard label="Political profiles" value={snapshot.withPoliticalInterests} />
             <MetricCard label="Market profiles" value={snapshot.withMarketInterests} />
             <MetricCard label="Civic profiles" value={snapshot.withCivicInterests} />

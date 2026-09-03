@@ -228,7 +228,7 @@ export const adminTableScrollClass = "table-scroll";
 export const adminResponsiveTableClass = "admin-responsive-table";
 
 export function AdminTableScroll({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`admin-table-scroll max-md:overflow-visible ${className}`.trim()}>{children}</div>;
+  return <div className={`admin-table-scroll max-lg:overflow-visible ${className}`.trim()}>{children}</div>;
 }
 
 export function AdminSectionPanel({
@@ -250,7 +250,7 @@ export function AdminSectionPanel({
           </Link>
         ) : null}
       </div>
-      <div className="admin-table-scroll max-md:overflow-visible">{children}</div>
+      <div className="admin-table-scroll max-lg:overflow-visible">{children}</div>
     </section>
   );
 }
@@ -262,7 +262,7 @@ export function AdminDataTable({
 }: {
   children: ReactNode;
   className?: string;
-  /** e.g. md:min-w-[640px] — horizontal scroll only from md breakpoint */
+  /** e.g. lg:min-w-[640px] — horizontal scroll only from lg breakpoint */
   desktopMinWidthClass?: string;
 }) {
   return (

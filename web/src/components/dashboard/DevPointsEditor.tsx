@@ -81,7 +81,7 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
         ) : null}
       </div>
 
-      <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm">
           <p className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Calculated balance")}</p>
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{calculated} pts</p>

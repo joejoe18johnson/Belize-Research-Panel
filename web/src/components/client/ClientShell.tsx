@@ -20,7 +20,7 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
   };
 
   return (
-    <div className="min-h-screen min-w-0 bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_12rem,#09090b_100%)]">
+    <div className="min-h-screen min-w-0 w-full max-w-full overflow-x-clip bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_12rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_12rem,#09090b_100%)]">
       <header className={`${portalStickyHeaderClass} shadow-sm`}>
         <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <div className="min-w-0">
@@ -30,7 +30,7 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <div className="hidden text-right sm:block">
+            <div className="hidden text-right lg:block">
               <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{session.contactName}</p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">{session.email}</p>
             </div>

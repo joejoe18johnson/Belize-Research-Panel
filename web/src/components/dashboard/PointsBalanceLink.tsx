@@ -15,7 +15,7 @@ export function PointsBalanceLink({ availablePoints }: { availablePoints: number
       <span className="text-sm font-bold tabular-nums leading-none text-amber-950 dark:text-amber-50 sm:text-[0.95rem]">
         {availablePoints.toLocaleString()}
       </span>
-      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-800 dark:text-amber-200 sm:text-xs">
+      <span className="hidden text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-800 dark:text-amber-200 lg:inline sm:text-xs">
         pts
       </span>
     </Link>

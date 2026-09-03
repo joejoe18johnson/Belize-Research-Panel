@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { ThemeSwitch } from "@/components/theme/ThemeToggle";
-import { appContentClass } from "@/lib/layout-widths";
+import { appContentClass, pageRootClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function PolicyPageShell({
@@ -17,17 +17,18 @@ export function PolicyPageShell({
   plainContent?: boolean;
 }) {
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-950">
+    <div className={`${pageRootClass} flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-950`}>
       <header className="safe-top shrink-0 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className={`${appContentClass} px-4 sm:px-6`}>
-          <div className="flex items-center justify-between gap-4 py-4">
-            <BrpLogoLink href="/" variant="light" />
-            <div className="flex items-center gap-2">
+        <div className={`${appContentClass} min-w-0 px-4 sm:px-6`}>
+          <div className="flex min-w-0 items-center justify-between gap-2 py-4 sm:gap-4">
+            <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
+            <div className="flex shrink-0 items-center gap-2">
               <Link
                 href="/"
                 className="text-sm font-semibold text-teal-700 transition hover:text-teal-900 dark:text-teal-300 hover:underline dark:hover:text-teal-100"
               >
-                {formatHeadingCase("Back to home")}
+                <span className="lg:hidden">{formatHeadingCase("Home")}</span>
+                <span className="hidden lg:inline">{formatHeadingCase("Back to home")}</span>
               </Link>
               <ThemeSwitch compact />
             </div>

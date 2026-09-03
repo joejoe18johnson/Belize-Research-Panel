@@ -27,7 +27,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
       aria-label="Dashboard sections"
     >
       <div className={`nav-scroll overflow-x-auto overscroll-x-contain ${appContentFrameClass}`}>
-        <div className="flex w-max min-w-full items-center justify-start gap-1.5 py-2.5 sm:mx-auto sm:w-full sm:justify-center sm:gap-2 sm:py-3">
+        <div className="flex w-max min-w-full items-center justify-start gap-1.5 py-2.5 lg:mx-auto lg:w-full lg:justify-center lg:gap-2 lg:py-3">
           {DASHBOARD_NAV_SECTIONS.map((item) => {
             const active = isDashboardNavActive(pathname, item.href, item.exact);
             const badgeKey = DASHBOARD_NAV_BADGE_KEYS[item.href];

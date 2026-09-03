@@ -167,7 +167,7 @@ export function PanelistGroupFormClient({
         </div>
         <div>
           <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Group type</label>
-          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          <div className="mt-2 grid gap-3 lg:grid-cols-2">
             {(
               [
                 { id: "static" as const, label: "Static list", body: "Choose specific panelists by email." },

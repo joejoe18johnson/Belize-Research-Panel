@@ -30,7 +30,7 @@ export function AdminPayoutsDashboard({
         action={<AdminMarkReadButton scope="payouts" label="Mark new as read" />}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard label="Open requests" value={pending + approved} tone="amber" icon={<MetricClockIcon />} />
         <IconMetricCard label="Pending review" value={pending} tone="blue" icon={<MetricReviewIcon />} />
         <IconMetricCard

@@ -358,7 +358,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         description="Duplicate detection, suspicious email screening, verification breakdowns, and admin quality actions."
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Suspicious emails" value={detail.suspiciousEmails} />
         <MetricCard label="Duplicate emails" value={detail.duplicateEmails} />
         <MetricCard label="Duplicate phones" value={detail.duplicatePhones} />

@@ -36,7 +36,7 @@ export function RegistrationProgress({
         />
       </div>
 
-      <ol className="flex items-center justify-between gap-1 sm:grid sm:grid-cols-6 sm:gap-2" aria-label="Registration steps">
+      <ol className="flex items-center justify-between gap-1 lg:grid lg:grid-cols-6 lg:gap-2" aria-label="Registration steps">
         {progress.phases.map((phase, index) => (
           <li key={phase.id} className="flex flex-col items-center text-center">
             <div
@@ -62,7 +62,7 @@ export function RegistrationProgress({
               )}
             </div>
             <span
-              className={`mt-2 hidden text-[11px] leading-tight font-medium sm:block ${
+              className={`mt-2 hidden text-[11px] leading-tight font-medium lg:block ${
                 phase.status === "current"
                   ? "text-teal-800 dark:text-teal-200"
                   : phase.status === "complete"

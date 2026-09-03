@@ -192,7 +192,7 @@ export function StatGrid({
   stats: { label: string; value: string | number; hint?: string }[];
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
       {stats.map((stat) => (
         <div key={stat.label} className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3">
           <p className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(stat.label)}</p>

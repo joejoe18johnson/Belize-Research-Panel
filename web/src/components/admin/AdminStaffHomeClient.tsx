@@ -60,7 +60,7 @@ export function AdminStaffHomeClient({
             No modules are assigned to this role yet. Ask a Super Admin to update User Roles & Permissions.
           </p>
         ) : (
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {modules.map((module) => (
               <li key={module.slug}>
                 <Link

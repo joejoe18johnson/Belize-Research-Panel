@@ -218,7 +218,7 @@ export function AdminUserRolesClient({
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           New users sign in at the admin login page with their email and password.
         </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <div>
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">First name</label>
             <input
@@ -293,7 +293,7 @@ export function AdminUserRolesClient({
           </p>
         </div>
         <AdminTableScroll>
-        <table className={`${adminResponsiveTableClass} w-full text-left text-sm md:min-w-[900px]`}>
+        <table className={`${adminResponsiveTableClass} w-full text-left text-sm lg:min-w-[900px]`}>
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
               <th className="px-4 py-3">Name</th>

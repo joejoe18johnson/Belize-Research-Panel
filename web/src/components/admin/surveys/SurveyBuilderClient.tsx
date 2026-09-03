@@ -319,7 +319,7 @@ export function SurveyBuilderClient({
         <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">
           {formatHeadingCase(isTemplateMode ? "Template details" : "Survey details")}
         </h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="sm:col-span-2">
             <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Title</label>
             <input
@@ -475,7 +475,7 @@ export function SurveyBuilderClient({
               ) : null}
 
               {question.type === "rating_scale" ? (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-2">
                   <div>
                     <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Scale min</label>
                     <input

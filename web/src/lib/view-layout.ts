@@ -38,7 +38,7 @@ export function viewLayoutItemClass(layout: ViewLayout): string {
 
 export function viewLayoutContainerClass(
   layout: ViewLayout,
-  cardsGridClass = "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+  cardsGridClass = "grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"
 ): string {
   if (layout === "list") return "flex flex-col gap-3";
   return cardsGridClass;

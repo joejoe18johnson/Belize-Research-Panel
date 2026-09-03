@@ -94,8 +94,8 @@ a[aria-disabled="true"] {
   overscroll-behavior-x: contain;
 }
 
-/* Admin tables — card rows on mobile, standard table from md up */
-@media (max-width: 767px) {
+/* Admin tables — card rows on phones and tablets, standard table from lg up */
+@media (max-width: 1023px) {
   .admin-responsive-table {
     display: block;
   }
@@ -174,7 +174,7 @@ a[aria-disabled="true"] {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .admin-table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

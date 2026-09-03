@@ -92,7 +92,7 @@ export function DashboardAccountMenu({
       <button
         ref={triggerRef}
         type="button"
-        className="relative flex h-10 shrink-0 items-center justify-center rounded-xl p-1 transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:h-11 md:w-auto md:min-w-0 md:justify-start md:gap-2.5 md:px-1.5"
+        className="relative flex h-10 shrink-0 items-center justify-center rounded-xl p-1 transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:h-11 lg:w-auto lg:min-w-0 lg:justify-start lg:gap-2.5 lg:px-1.5"
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="dialog"
@@ -105,11 +105,11 @@ export function DashboardAccountMenu({
             email={email}
             className={open ? "ring-teal-600 dark:ring-teal-400" : undefined}
           />
-          <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-teal-800 text-white ring-2 ring-white dark:bg-teal-500 dark:ring-zinc-900 md:hidden">
+          <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-teal-800 text-white ring-2 ring-white dark:bg-teal-500 dark:ring-zinc-900 lg:hidden">
             <MenuIcon />
           </span>
         </span>
-        <div className="hidden min-w-0 max-w-[11rem] text-left lg:max-w-[16rem] md:block">
+        <div className="hidden min-w-0 max-w-[16rem] text-left lg:block">
           <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{displayName}</p>
           <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{email}</p>
         </div>

@@ -90,7 +90,7 @@ export function AdminDashboardClient({
             Open notifications →
           </Link>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-6">
           <MetricCard
             label="Email changes"
             value={metrics.pendingEmailChanges}
@@ -130,7 +130,7 @@ export function AdminDashboardClient({
         </div>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard
           href={ADMIN_DASHBOARD_LINKS.panelists}
           label="Panelists"
@@ -182,7 +182,7 @@ export function AdminDashboardClient({
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <IconMetricCard
           href={ADMIN_DASHBOARD_LINKS.underReview}
           label="Under review"
@@ -232,7 +232,7 @@ export function AdminDashboardClient({
 
       <div className="grid gap-6 xl:grid-cols-2">
         <AdminSectionPanel title="Recent panelists" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
-          <AdminDataTable desktopMinWidthClass="md:min-w-[640px]">
+          <AdminDataTable desktopMinWidthClass="lg:min-w-[640px]">
             <AdminTableHead>
               <AdminTableTh>Name</AdminTableTh>
               <AdminTableTh>Status</AdminTableTh>
@@ -288,7 +288,7 @@ export function AdminDashboardClient({
         </AdminSectionPanel>
 
         <AdminSectionPanel title="Recent users" viewAllHref={ADMIN_DASHBOARD_LINKS.panelists}>
-          <AdminDataTable desktopMinWidthClass="md:min-w-[720px]">
+          <AdminDataTable desktopMinWidthClass="lg:min-w-[720px]">
             <AdminTableHead>
               <AdminTableTh>Name</AdminTableTh>
               <AdminTableTh>Email</AdminTableTh>
@@ -366,7 +366,7 @@ export function AdminDashboardClient({
       </div>
 
       <AdminSectionPanel title="Recent payouts" viewAllHref={ADMIN_DASHBOARD_LINKS.payouts}>
-        <AdminDataTable desktopMinWidthClass="md:min-w-[640px]">
+        <AdminDataTable desktopMinWidthClass="lg:min-w-[640px]">
           <AdminTableHead>
             <AdminTableTh>Request ID</AdminTableTh>
             <AdminTableTh>Payment</AdminTableTh>

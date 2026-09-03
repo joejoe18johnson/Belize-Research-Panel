@@ -18,7 +18,7 @@ import {
   storeHomeLocale,
   type HomeLocale,
 } from "@/lib/home-locale";
-import { appContentClass } from "@/lib/layout-widths";
+import { appContentClass, pageRootClass } from "@/lib/layout-widths";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -62,17 +62,17 @@ export function RegistrationPageClient({
 
   if (!languageConfirmed) {
     return (
-      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
+      <div className={`${pageRootClass} bg-zinc-100 dark:bg-zinc-950`}>
         <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
-          <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
-            <div className="flex items-center justify-between gap-3">
-              <BrpLogoLink href="/" variant="light" />
+          <div className={`${appContentClass} min-w-0 px-3 py-3 sm:px-4 sm:py-4`}>
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
               <ThemeSwitch compact />
             </div>
           </div>
         </header>
-        <main className={`${appContentClass} px-3 py-8 sm:px-4 sm:py-16`}>
-          <div className="mx-auto max-w-xl rounded-2xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-900/50 dark:bg-zinc-900 sm:p-8">
+        <main className={`${appContentClass} min-w-0 px-3 py-8 sm:px-4 sm:py-16`}>
+          <div className="mx-auto w-full max-w-2xl rounded-2xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-900/50 dark:bg-zinc-900 sm:p-8">
             <h1 className="text-xl font-bold text-teal-950 dark:text-teal-100 sm:text-2xl">
               {copy.languageStep.titleBilingual}
             </h1>
@@ -92,20 +92,20 @@ export function RegistrationPageClient({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 overscroll-y-contain">
+    <div className={`${pageRootClass} bg-zinc-100 overscroll-y-contain dark:bg-zinc-950`}>
       <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
-        <div className={`${appContentClass} px-3 py-3 sm:px-4 sm:py-4`}>
+        <div className={`${appContentClass} min-w-0 px-3 py-3 sm:px-4 sm:py-4`}>
           <div className="flex min-w-0 items-center justify-between gap-2">
             <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />
               <Link
                 href="/account/delete"
-                className="hidden text-xs font-medium text-zinc-500 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200 sm:inline"
+                className="hidden text-xs font-medium text-zinc-500 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200 lg:inline"
               >
                 {formatHeadingCase("Delete account")}
               </Link>
-              <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 md:inline">{account.email}</span>
+              <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 lg:inline">{account.email}</span>
               <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 sm:px-4" />
               <ThemeSwitch compact />
             </div>

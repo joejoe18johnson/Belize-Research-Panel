@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 const navButtonClass =
-  "inline-flex min-h-12 w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed sm:w-auto";
+  "inline-flex min-h-12 w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed lg:w-auto";
 
 export function RegistrationPhaseNav({
   activePhaseIndex,
@@ -23,7 +23,7 @@ export function RegistrationPhaseNav({
   onNext: () => void;
 }) {
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+    <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-6 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
       {activePhaseIndex > 0 ? (
         <button
           type="button"
@@ -33,7 +33,7 @@ export function RegistrationPhaseNav({
           Back
         </button>
       ) : (
-        <span className="hidden sm:block" aria-hidden="true" />
+        <span className="hidden lg:block" aria-hidden="true" />
       )}
 
       {showReturnHome ? (

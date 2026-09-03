@@ -5,7 +5,7 @@ import { BrpLogoLink } from "@/components/BrpLogo";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { ThemeSwitch } from "@/components/theme/ThemeToggle";
 import { portalStickyHeaderClass } from "@/lib/brand";
-import { AUTH_CONTENT_MAX } from "@/lib/layout-widths";
+import { AUTH_CONTENT_MAX, pageRootClass } from "@/lib/layout-widths";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
 export function AuthPageShell({
@@ -22,7 +22,7 @@ export function AuthPageShell({
   formatTitle?: boolean;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
+    <div className={`${pageRootClass} flex flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]`}>
       <header className={portalStickyHeaderClass}>
         <div className={`mx-auto ${AUTH_CONTENT_MAX}`}>
           <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">

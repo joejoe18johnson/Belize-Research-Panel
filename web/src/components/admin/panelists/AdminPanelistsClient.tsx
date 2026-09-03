@@ -1019,7 +1019,7 @@ function DataTable({
   >;
 }) {
   return (
-    <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm md:min-w-[1100px]`}>
+    <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm lg:min-w-[1100px]`}>
       <thead>
         <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
           {actions ? (

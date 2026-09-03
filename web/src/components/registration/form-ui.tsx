@@ -44,7 +44,7 @@ export function FormSection({
 
 export function FieldGroup({ children, columns = 1 }: { children: ReactNode; columns?: 1 | 2 }) {
   return (
-    <div className={columns === 2 ? "grid gap-5 md:grid-cols-2" : "space-y-5"}>{children}</div>
+    <div className={columns === 2 ? "grid gap-5 lg:grid-cols-2" : "space-y-5"}>{children}</div>
   );
 }
 
@@ -187,7 +187,7 @@ export function MultiSelect({
 
   return (
     <div id={id}>
-      <div className={`grid gap-3 sm:grid-cols-2 ${error ? "rounded-lg ring-2 ring-red-500/30 p-2" : ""}`}>
+      <div className={`grid gap-3 lg:grid-cols-2 ${error ? "rounded-lg ring-2 ring-red-500/30 p-2" : ""}`}>
         {options.map((option) => (
           <label
             key={option}

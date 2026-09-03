@@ -220,7 +220,7 @@ export function RedemptionOptionsCatalog({
         </div>
       </div>
 
-      <div className={`mt-5 ${viewLayoutContainerClass(layout, "grid gap-4 sm:grid-cols-2")}`}>
+      <div className={`mt-5 ${viewLayoutContainerClass(layout, "grid gap-4 lg:grid-cols-2")}`}>
         {progressItems.map(({ option, eligible, pointsNeeded, progressPercent, minPoints, exampleTiers }) => (
           <div key={option.id} className={viewLayoutItemClass(layout)}>
             <RedemptionOptionCard

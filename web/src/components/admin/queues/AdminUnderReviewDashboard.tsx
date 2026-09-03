@@ -167,7 +167,7 @@ export function AdminUnderReviewDashboard({
         </BrandedAlert>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <MetricCard
           label="New"
           value={newCount}
@@ -254,8 +254,8 @@ export function AdminUnderReviewDashboard({
           </div>
         ) : (
           <>
-            <div className="admin-table-scroll mt-4 max-md:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800">
-              <AdminDataTable desktopMinWidthClass="md:min-w-[960px]">
+            <div className="admin-table-scroll mt-4 max-lg:overflow-visible rounded-xl border border-zinc-100 dark:border-zinc-800">
+              <AdminDataTable desktopMinWidthClass="lg:min-w-[960px]">
                 <AdminTableHead>
                   <AdminTableTh>Name</AdminTableTh>
                   <AdminTableTh>Email</AdminTableTh>

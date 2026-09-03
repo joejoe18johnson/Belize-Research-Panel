@@ -56,7 +56,7 @@ export function DashboardShell({
               />
               <LogoutButton
                 showIcon
-                className={`${dashboardSecondaryButtonClass} hidden min-h-10 gap-1.5 px-3 md:inline-flex lg:min-h-11 lg:px-4`}
+                className={`${dashboardSecondaryButtonClass} hidden min-h-10 gap-1.5 px-3 lg:inline-flex lg:min-h-11 lg:px-4`}
               />
             </div>
           </div>
@@ -89,7 +89,7 @@ export function DashboardPageHeader({
   icon?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-between">
       <div className="min-w-0 flex-1 border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Belize Research Panel</p>
         <div className="mt-1 flex items-start gap-3">
@@ -111,7 +111,7 @@ export function DashboardPageHeader({
         </div>
       </div>
       {action ? (
-        <div className="w-full shrink-0 sm:w-auto [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_button]:w-full sm:[&_a]:inline-flex sm:[&_a]:w-auto sm:[&_button]:w-auto">
+        <div className="w-full shrink-0 lg:w-auto [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_button]:w-full lg:[&_a]:inline-flex lg:[&_a]:w-auto lg:[&_button]:w-auto">
           {action}
         </div>
       ) : null}

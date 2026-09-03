@@ -132,7 +132,7 @@ export function AdminRewardSettingsClient({ initialSettings }: { initialSettings
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Redemption minimum" value={preview.unlockLabel} hint={preview.minimumBz} />
         <MetricCard label="Redemption rate" value={preview.rateLabel} />
         <MetricCard label="Registration reward" value={`${settings.registrationRewardPoints} pts`} />
@@ -154,7 +154,7 @@ export function AdminRewardSettingsClient({ initialSettings }: { initialSettings
             Points awarded automatically when panelists register and when their account is verified.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           <NumberField
             label="Registration reward"
             hint="Awarded when a panelist completes registration."
@@ -183,7 +183,7 @@ export function AdminRewardSettingsClient({ initialSettings }: { initialSettings
             Controls when panelists can redeem and how points convert to Belize dollars on the rewards dashboard.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           <NumberField
             label="Redemption minimum"
             hint="Minimum available balance before any redemption option unlocks."

@@ -16,3 +16,6 @@ export const appContentClass = `mx-auto w-full ${APP_CONTENT_MAX}`;
 export const appContentFrameClass = `mx-auto w-full min-w-0 ${APP_CONTENT_MAX} ${APP_CONTENT_GUTTER}`;
 
 export const authContentClass = `mx-auto w-full ${AUTH_CONTENT_MAX}`;
+
+/** Full-page wrapper that stays inside tablet and phone viewports. */
+export const pageRootClass = "min-h-screen min-w-0 w-full max-w-full overflow-x-clip";

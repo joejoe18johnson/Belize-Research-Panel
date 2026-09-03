@@ -111,7 +111,7 @@ export function AdminDataModuleDashboard({ snapshot }: { snapshot: AdminModuleSn
       <PageIntro eyebrow={snapshot.eyebrow} title={snapshot.title} description={snapshot.description} />
 
       {snapshot.metrics.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
           {snapshot.metrics.map((metric) => (
             <MetricCard key={metric.label} label={metric.label} value={metric.value} hint={metric.hint} />
           ))}

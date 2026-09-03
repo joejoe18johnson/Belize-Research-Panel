@@ -131,7 +131,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
         description="Filter the panel register, calculate required sample sizes, draw a random sample, and export contact lists — ported from the Streamlit MVP Sample Selection module."
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total panelists" value={allRows.length} />
         <MetricCard label="Filtered pool" value={filteredPool.length} />
         <MetricCard label="Generated sample" value={generatedSample.length} hint={generatedSample.length ? "Ready to export" : "Not generated yet"} />
@@ -159,7 +159,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
         <div className="space-y-4">
           <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Panel filters")}</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
               <FilterMultiSelect label="Place of residence" options={options.residence} selected={filters.residence} onChange={(v) => updateFilter("residence", v)} />
               <FilterMultiSelect label="District" options={options.districts} selected={filters.districts} onChange={(v) => updateFilter("districts", v)} />
               <FilterMultiSelect label="City / town / village" options={options.cities} selected={filters.cities} onChange={(v) => updateFilter("cities", v)} />
@@ -171,7 +171,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               <FilterMultiSelect label="Education" options={options.educations} selected={filters.educations} onChange={(v) => updateFilter("educations", v)} />
               <FilterMultiSelect label="Verification" options={options.verificationStatuses} selected={filters.verificationStatuses} onChange={(v) => updateFilter("verificationStatuses", v)} />
             </div>
-            <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               <div>
                 <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age min</label>
                 <input
@@ -208,7 +208,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           <HorizontalBarChart rows={districtBreakdown} title="Filtered pool by district" maxBars={10} />
           <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Draw sample")}</h2>
-            <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               <div>
                 <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sampling method</label>
                 <SiteSelect
@@ -263,7 +263,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
             Uses the same finite population correction as the Streamlit MVP (Cochran formula with p = 0.5).
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
             <div>
               <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Population size (N)</label>
               <input
@@ -311,7 +311,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-2">
             <MetricCard label="Required completes" value={requiredSample} />
             <MetricCard label="Contacts needed" value={contacts} hint={`Assuming ${responseRate}% response rate`} />
           </div>

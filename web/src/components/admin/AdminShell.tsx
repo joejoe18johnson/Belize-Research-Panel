@@ -258,12 +258,12 @@ export function AdminShell({
                   </p>
                   <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                     Signed in as {STAFF_ROLE_LABELS[session.role]}
-                    <span className="hidden sm:inline"> · {session.displayName}</span>
+                    <span className="hidden lg:inline"> · {session.displayName}</span>
                   </p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <div className="hidden text-right md:block">
+                <div className="hidden text-right lg:block">
                   <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{session.displayName}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">{STAFF_ROLE_LABELS[session.role]}</p>
                 </div>
