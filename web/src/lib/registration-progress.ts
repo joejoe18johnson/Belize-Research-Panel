@@ -1,4 +1,5 @@
 import type { RegistrationFormData } from "./registration-types";
+import { isCommonwealthCitizenInBelize } from "./constants";
 import {
   isEligibleCitizenship,
   isRegisteredVoter,
@@ -150,7 +151,7 @@ function collectPhaseErrors(
     delete allErrors.votingStatus;
     delete allErrors.commonwealthCountry;
   }
-  if (phaseIndex === ELIGIBILITY_PHASE && form.citizenshipStatus !== "Citizen of a Commonwealth country living in Belize") {
+  if (phaseIndex === ELIGIBILITY_PHASE && !isCommonwealthCitizenInBelize(form.citizenshipStatus)) {
     delete allErrors.commonwealthCountry;
     delete allErrors.proofOfBelizeResidenceType;
     delete allErrors.proofOfBelizeResidenceFile;

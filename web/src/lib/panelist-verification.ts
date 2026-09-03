@@ -4,6 +4,7 @@ import { panelistHasUpload } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
 import { isPanelistVerified } from "./verification-status";
 import { parseAuthorisedRegistration } from "./authorised-registrars";
+import { isCommonwealthCitizenInBelize } from "./constants";
 import { cleanText } from "./validation";
 
 export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing";
@@ -59,8 +60,7 @@ export async function buildVerificationCenterSummary(
   const username = cleanText(panelist.username);
   const phone = cleanText(panelist.phone_whatsapp);
   const photoIdType = cleanText(panelist.photo_id_type);
-  const isCommonwealthInBelize =
-    cleanText(panelist.citizenship_status) === "Citizen of a Commonwealth country living in Belize";
+  const isCommonwealthInBelize = isCommonwealthCitizenInBelize(cleanText(panelist.citizenship_status));
   const authorisedRegistration = parseAuthorisedRegistration(panelist);
 
   const [hasPhotoUpload, hasResidenceUpload] = await Promise.all([

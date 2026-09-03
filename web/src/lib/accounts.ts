@@ -9,6 +9,7 @@ import type {
   SessionAccount,
 } from "./auth-types";
 import { hashPassword, loadPanelists, updatePanelistCredentialsByEmail } from "./panelists";
+import { isCommonwealthCitizenInBelize } from "./constants";
 import {
   cleanText,
   composePhoneNumber,
@@ -319,7 +320,7 @@ export async function createAccount(input: {
     panelist_registered: "false",
     citizenship_status: cleanText(input.citizenshipStatus),
     commonwealth_country:
-      input.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
+      isCommonwealthCitizenInBelize(input.citizenshipStatus)
         ? cleanText(input.commonwealthCountry)
         : "",
     dob: cleanText(input.dob),

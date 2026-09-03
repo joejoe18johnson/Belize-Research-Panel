@@ -19,6 +19,8 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
+  isCommonwealthCitizenInBelize,
+  mustLiveAbroad,
   needsVoterRegistrationQuestion,
   cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
@@ -67,8 +69,7 @@ export function ProfileEditForm({
 
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
-  const needsCommonwealthCountry =
-    form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";
+  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
 
   const residenceOptions = useMemo(() => getResidenceOptions(form.citizenshipStatus), [form.citizenshipStatus]);
   const cityOptions =
@@ -97,6 +98,11 @@ export function ProfileEditForm({
         next.votingStatus = "";
         next.constituency = "";
         next.registeredCtvArea = "";
+        next.placeOfResidence = mustLiveAbroad(String(value)) ? "Abroad" : "";
+        next.cityTownVillage = "";
+        next.cityTownVillageOther = "";
+        next.countryIfAbroad = "";
+        next.usDiasporaRegion = "";
       }
       if (key === "votingStatus") {
         next.constituency = "";

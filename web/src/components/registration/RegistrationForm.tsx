@@ -43,7 +43,10 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
+  isCommonwealthCitizenInBelize,
   isUnitedStatesCountry,
+  mustLiveAbroad,
+  mustLiveInBelize,
   needsVoterRegistrationQuestion,
   CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
@@ -213,7 +216,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       citizenshipStatus,
       commonwealthCountry: "",
       votingStatus: "",
-      placeOfResidence: "",
+      placeOfResidence: mustLiveAbroad(citizenshipStatus) ? "Abroad" : "",
       cityTownVillage: "",
       cityTownVillageOther: "",
       countryIfAbroad: "",
@@ -234,8 +237,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const eligibleCitizenship = isEligibleCitizenship(form.citizenshipStatus);
   const citizenshipIneligible =
     activePhaseIndex === 1 && Boolean(form.citizenshipStatus) && !eligibleCitizenship;
-  const needsCommonwealthCountry =
-    form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";
+  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
   const progressInput = { form, registeredVoter };
@@ -629,7 +631,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </div>
       ) : null}
 
-      {form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize" && !citizenshipIneligible ? (
+      {needsCommonwealthCountry && !citizenshipIneligible ? (
         <FormSection step={4} title="Proof of Belize residence">
           <Alert variant="warning">Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.</Alert>
           <Field label="Proof of residence in Belize" required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">
@@ -736,7 +738,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
           <FormSection step={6} title="Residence details">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-              Select your current district if you live in Belize, or choose Abroad if you live in another country.
+              {mustLiveAbroad(form.citizenshipStatus)
+                ? "You selected Belizean residing abroad. Tell us the country where you currently live."
+                : mustLiveInBelize(form.citizenshipStatus)
+                  ? "Select the Belize district where you currently live."
+                  : "Select your current district if you live in Belize, or choose Abroad if you live in another country."}
             </p>
             <Field label="Where do you currently live?" required error={fieldError("placeOfResidence")} id="placeOfResidence">
               <SelectInput id="placeOfResidence" value={form.placeOfResidence} onChange={(e) => update("placeOfResidence", e.target.value)} onBlur={() => touchAndValidate("placeOfResidence")} error={fieldError("placeOfResidence")}>

@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "crypto";
 import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
-import { PANELIST_COLUMNS } from "./constants";
+import { PANELIST_COLUMNS, isCommonwealthCitizenInBelize, storedVotingStatus } from "./constants";
 import {
   calculateAge,
   cleanText,
@@ -354,13 +354,7 @@ export async function registerPanelist(
   const rows = await loadPanelists();
   const registeredVoter = isRegisteredVoter(data.citizenshipStatus, data.votingStatus);
   const voterStatus = registeredVoter ? "Registered voter" : "Not applicable";
-  const votingStatus =
-    data.citizenshipStatus === "Citizen of Belize" ||
-    data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
-      ? data.votingStatus
-      : data.citizenshipStatus === "Other resident of Belize"
-        ? "No"
-        : "Not registered to vote in Belize";
+  const votingStatus = storedVotingStatus(data.citizenshipStatus, data.votingStatus);
 
   const cityFinal =
     data.placeOfResidence === "Abroad"
@@ -437,7 +431,7 @@ export async function registerPanelist(
     age: String(calculateAge(data.dob)),
     citizenship_status: data.citizenshipStatus,
     commonwealth_country:
-      data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
+      isCommonwealthCitizenInBelize(data.citizenshipStatus)
         ? cleanText(data.commonwealthCountry)
         : "",
     voting_status: votingStatus,
@@ -526,13 +520,7 @@ export async function updatePanelistProfile(
   const existing = rows[index];
   const registeredVoter = isRegisteredVoter(data.citizenshipStatus, data.votingStatus);
   const voterStatus = registeredVoter ? "Registered voter" : "Not applicable";
-  const votingStatus =
-    data.citizenshipStatus === "Citizen of Belize" ||
-    data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
-      ? data.votingStatus
-      : data.citizenshipStatus === "Other resident of Belize"
-        ? "No"
-        : "Not registered to vote in Belize";
+  const votingStatus = storedVotingStatus(data.citizenshipStatus, data.votingStatus);
 
   const cityFinal =
     data.placeOfResidence === "Abroad"
@@ -548,7 +536,7 @@ export async function updatePanelistProfile(
     education: cleanText(data.education),
     citizenship_status: data.citizenshipStatus,
     commonwealth_country:
-      data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize"
+      isCommonwealthCitizenInBelize(data.citizenshipStatus)
         ? cleanText(data.commonwealthCountry)
         : "",
     voting_status: votingStatus,

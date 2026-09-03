@@ -25,7 +25,7 @@ export const DEMO_REGISTRATION_READY_ACCOUNT: DemoAccountInfo = {
   verificationToken: "",
   passwordSalt: "demo-salt-registration01",
   passwordHash: "aee387288470fd44015b19a9e135a4bd7e5e32fa2d1f179371d9d5c0e355f9f4",
-  citizenshipStatus: "Citizen of Belize",
+  citizenshipStatus: "Belizean residing in Belize",
   dob: "1990-06-15",
 };
 
@@ -40,7 +40,7 @@ export const DEMO_REGISTERED_ACCOUNT: DemoAccountInfo = {
   verificationToken: "",
   passwordSalt: "demo-salt-registered01",
   passwordHash: "7a87a0b0a42b5a666475ad542c5d505c7b9ca7ec90c3fa1ba5f7026b5355c01a",
-  citizenshipStatus: "Citizen of Belize",
+  citizenshipStatus: "Belizean residing in Belize",
   dob: "1998-05-12",
 };
 
@@ -55,7 +55,7 @@ export const DEMO_UNVERIFIED_REGISTERED_ACCOUNT: DemoAccountInfo = {
   verificationToken: "",
   passwordSalt: "demo-salt-unverified01",
   passwordHash: "7627d44973506948359b8bbbba0be4ce7d0696398f90058dc190eb8219ecdbf1",
-  citizenshipStatus: "Citizen of Belize",
+  citizenshipStatus: "Belizean residing in Belize",
   dob: "1995-08-22",
 };
 

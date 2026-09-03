@@ -49,8 +49,8 @@ export const ADMIN_MODULE_CONTENT: Record<string, AdminModuleContent> = {
         title: "Eligibility gates (aligned with MVP)",
         bullets: [
           "Age 18+ required",
-          "Citizenship / residency status with ineligible categories rejected",
-          "Voter registration question for citizens and Commonwealth residents in Belize",
+          "Citizenship / residency status: Belizean in Belize, Belizean abroad, Commonwealth citizen in Belize, other foreigner permanently residing in Belize, or Other",
+          "Voter registration question for Belizeans and Commonwealth citizens residing in Belize",
           "District, constituency, and CTV logic for registered voters",
           "Political interests for registered voters; market and civic interests by residence",
         ],

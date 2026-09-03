@@ -9,7 +9,7 @@ import {
   validateDateOfBirth,
   type FieldErrors,
 } from "./validation";
-import { COMMONWEALTH_COUNTRIES } from "./constants";
+import { COMMONWEALTH_COUNTRIES, isCommonwealthCitizenInBelize } from "./constants";
 import { validateEmailForBotSignup } from "./suspicious-email";
 
 export type { FieldErrors };
@@ -22,7 +22,7 @@ export function validateSignupEligibility(
   const citizenshipError = validateCitizenship(data.citizenshipStatus);
   if (citizenshipError) errors.citizenshipStatus = citizenshipError;
 
-  if (data.citizenshipStatus === "Citizen of a Commonwealth country living in Belize") {
+  if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
     if (!cleanText(data.commonwealthCountry)) {
       errors.commonwealthCountry = "Please select your Commonwealth country of citizenship.";
     } else if (!COMMONWEALTH_COUNTRIES.includes(data.commonwealthCountry)) {

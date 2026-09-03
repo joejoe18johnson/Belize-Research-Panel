@@ -17,7 +17,7 @@ import { PasswordStrengthBar } from "@/components/registration/PasswordStrengthB
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { PasswordMatchStatus } from "@/components/auth/PasswordMatchStatus";
 import type { SignupFormData } from "@/lib/auth-types";
-import { CITIZENSHIP_STATUS, COMMONWEALTH_COUNTRIES, CITIZENSHIP_PANEL_INTRO } from "@/lib/constants";
+import { CITIZENSHIP_STATUS, COMMONWEALTH_COUNTRIES, CITIZENSHIP_PANEL_INTRO, isCommonwealthCitizenInBelize } from "@/lib/constants";
 import { isValidDobString } from "@/lib/dob";
 import {
   isSignupEligible,
@@ -48,8 +48,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
 
   const ageIneligible = isValidDobString(form.dob) && !meetsMinimumAge(form.dob);
-  const needsCommonwealthCountry =
-    form.citizenshipStatus === "Citizen of a Commonwealth country living in Belize";
+  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
 
   const pwdStrength = useMemo(
     () => passwordStrength(form.password, "", form.firstName, form.lastName),
