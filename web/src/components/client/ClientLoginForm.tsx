@@ -41,14 +41,15 @@ export function ClientLoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
+    <div className="flex min-h-screen min-w-0 w-full max-w-full flex-col overflow-x-clip bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]">
       <header className="safe-top shrink-0 border-b border-teal-100 bg-white/95 shadow-sm dark:border-teal-900/50 dark:bg-zinc-900/95">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex items-center justify-between gap-3 py-4">
             <BrpLogoLink href="/" variant="light" />
             <div className="flex items-center gap-2">
               <Link href="/login" className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-300">
-                {formatHeadingCase("Panelist login")}
+                <span className="lg:hidden">{formatHeadingCase("Login")}</span>
+                <span className="hidden lg:inline">{formatHeadingCase("Panelist login")}</span>
               </Link>
               <ThemeSwitch compact />
             </div>
@@ -56,7 +57,7 @@ export function ClientLoginForm() {
         </div>
       </header>
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:px-6">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-lg lg:max-w-xl">
           <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm dark:border-teal-900/50 dark:bg-zinc-900 sm:p-8">
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">{formatHeadingCase("Client portal")}</p>
             <h1 className="mt-2 text-2xl font-bold text-teal-950 dark:text-teal-100">

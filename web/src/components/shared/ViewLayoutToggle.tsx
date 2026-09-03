@@ -83,7 +83,7 @@ export function ViewLayoutToggle({
       role="group"
       aria-label="Choose layout"
     >
-      <span className={`text-xs font-medium ${labelClass} ${compactOnMobile ? "hidden sm:inline" : ""}`}>
+      <span className={`text-xs font-medium ${labelClass} ${compactOnMobile ? "hidden lg:inline" : ""}`}>
         Layout
       </span>
       <div className={`inline-flex rounded-xl border p-1 ${shellClass}`}>
@@ -100,7 +100,7 @@ export function ViewLayoutToggle({
             }`}
           >
             <LayoutIcon layout={option.id} />
-            <span className={compactOnMobile ? "hidden sm:inline" : ""}>{option.shortLabel}</span>
+            <span className={compactOnMobile ? "hidden lg:inline" : ""}>{option.shortLabel}</span>
           </button>
         ))}
       </div>
