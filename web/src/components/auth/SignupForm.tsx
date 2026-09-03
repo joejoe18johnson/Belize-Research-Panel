@@ -309,7 +309,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
 
       {errors.submit ? <p className="text-sm text-red-600" role="alert">{errors.submit}</p> : null}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-4 lg:flex-row lg:items-center lg:justify-between">
         <button
           type="button"
           onClick={() => setStep("eligibility")}

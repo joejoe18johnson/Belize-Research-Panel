@@ -51,7 +51,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
               "Contact details such as phone number can be updated from your profile. Photo ID changes require support from the panel team."
             )}
           </p>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-4 flex flex-col gap-3 lg:flex-row">
             <Link
               href="/dashboard/profile"
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white transition hover:bg-teal-800"

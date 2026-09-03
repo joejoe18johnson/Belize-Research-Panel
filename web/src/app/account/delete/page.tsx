@@ -21,7 +21,7 @@ export default async function DeleteAccountPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-100 dark:bg-zinc-800">
+    <div className="flex min-h-full min-w-0 w-full max-w-full flex-1 flex-col overflow-x-clip bg-zinc-100 dark:bg-zinc-800">
       <AccountDeleteHeader logoHref={account.panelistRegistered ? "/dashboard" : "/register"} />
       <main className={`mx-auto w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 ${AUTH_CONTENT_MAX}`}>
         <div className="mb-6">

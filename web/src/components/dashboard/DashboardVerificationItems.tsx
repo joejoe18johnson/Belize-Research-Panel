@@ -101,7 +101,7 @@ function VerificationItemCard({
 
   return (
     <DashboardCard className={itemStatusClass(item.status)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 flex-1 items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 dark:text-teal-200 shadow-sm">
             <VerificationItemIcon id={item.id} />
