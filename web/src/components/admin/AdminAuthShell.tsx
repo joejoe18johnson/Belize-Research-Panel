@@ -24,7 +24,7 @@ export function AdminAuthShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white">
+    <div className="flex min-h-screen min-w-0 w-full max-w-full flex-col overflow-x-clip bg-gradient-to-b from-teal-950 via-teal-900 to-zinc-900 text-white">
       <header className="safe-top px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
           <BrpLogoLink href="/" variant="dark" />
