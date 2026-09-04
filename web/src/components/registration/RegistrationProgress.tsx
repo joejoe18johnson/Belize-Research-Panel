@@ -18,8 +18,12 @@ export function RegistrationProgress({
 
   return (
     <div
-      className="sticky top-14 z-20 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/95 px-4 py-5 shadow-sm backdrop-blur sm:top-16 sm:px-6 sm:py-4"
+      id="registration-progress"
+      data-sticky-chrome="progress"
+      className="sticky z-20 scroll-mt-[calc(var(--brp-header-height,4.75rem)+0.5rem)] rounded-2xl border border-zinc-200 bg-white/95 px-4 py-5 shadow-sm backdrop-blur outline-none dark:border-zinc-800 dark:bg-zinc-900/95 sm:px-6 sm:py-4"
+      style={{ top: "calc(var(--brp-header-height, 4.75rem) + 0.5rem)" }}
       aria-label="Registration progress"
+      tabIndex={-1}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-2 sm:mb-3">
         <div className="space-y-1.5 sm:space-y-1">

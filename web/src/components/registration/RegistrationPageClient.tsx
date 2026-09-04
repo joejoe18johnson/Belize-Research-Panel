@@ -19,7 +19,7 @@ import {
   type HomeLocale,
 } from "@/lib/home-locale";
 import { appContentClass, pageRootClass } from "@/lib/layout-widths";
-import { scrollViewportToTop } from "@/lib/scroll-viewport";
+import { observeStickyChrome, scrollViewportToTop } from "@/lib/scroll-viewport";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -43,6 +43,11 @@ export function RegistrationPageClient({
     setReady(true);
   }, []);
 
+  useEffect(() => {
+    if (!ready) return;
+    return observeStickyChrome();
+  }, [ready, languageConfirmed]);
+
   const handleLocaleChange = (next: HomeLocale) => {
     setLocale(next);
     storeHomeLocale(next);
@@ -65,7 +70,7 @@ export function RegistrationPageClient({
   if (!languageConfirmed) {
     return (
       <div className={`${pageRootClass} bg-zinc-100 dark:bg-zinc-950`}>
-        <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
+        <header data-sticky-chrome="header" className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
           <div className={`${appContentClass} min-w-0 px-3 py-3 sm:px-4 sm:py-4`}>
             <div className="flex min-w-0 items-center justify-between gap-3">
               <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
@@ -95,7 +100,7 @@ export function RegistrationPageClient({
 
   return (
     <div className={`${pageRootClass} bg-zinc-100 overscroll-y-contain dark:bg-zinc-950`}>
-      <header className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
+      <header data-sticky-chrome="header" className="safe-top sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
         <div className={`${appContentClass} min-w-0 px-3 py-3 sm:px-4 sm:py-4`}>
           <div className="flex min-w-0 items-center justify-between gap-2">
             <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />

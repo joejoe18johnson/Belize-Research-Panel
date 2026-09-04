@@ -67,7 +67,7 @@ import {
   type FieldErrors,
 } from "@/lib/validation";
 import { formatDobDisplay } from "@/lib/dob";
-import { scrollElementToTop, scrollViewportToTop } from "@/lib/scroll-viewport";
+import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStickyChromeOffsets } from "@/lib/scroll-viewport";
 import {
   getPhaseFieldKeys,
   getFirstPhaseIndexForErrors,
@@ -183,6 +183,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       cancelled = true;
     };
   }, [account.email]);
+
+  useEffect(() => observeStickyChrome(), []);
 
   useEffect(() => {
     saveRegistrationDraft({
@@ -348,6 +350,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   };
 
   const scrollToRegistrationTop = useCallback(() => {
+    const progress = document.getElementById("registration-progress");
+    if (progress) {
+      scrollElementToTop(progress);
+      return;
+    }
     const anchor = document.getElementById("registration-phase-content");
     if (anchor) {
       scrollElementToTop(anchor);
@@ -401,12 +408,25 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       return;
     }
     if (!scrollToTopAfterPhaseChange.current) return;
-    scrollToTopAfterPhaseChange.current = false;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        scrollToRegistrationTop();
-      });
+
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      syncStickyChromeOffsets();
+      scrollToRegistrationTop();
+      scrollToTopAfterPhaseChange.current = false;
+    };
+
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(run);
     });
+    const timeout = window.setTimeout(run, 80);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+    };
   }, [activePhaseIndex, scheduleErrorScroll, scrollToRegistrationTop]);
 
   const currentPhaseErrors = validateRegistrationPhase(activePhaseIndex, progressInput, validationOptions);
