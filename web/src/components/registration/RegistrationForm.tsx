@@ -505,9 +505,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
   return (
     <form id="registration-form-top" onSubmit={handleSubmit} className="w-full scroll-mt-6 space-y-6" noValidate>
-      <div className="rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-teal-50 px-6 py-5">
-        <p className="text-sm font-medium text-teal-900 dark:text-teal-100">Exclusive Belize Research Panel</p>
-        <p className="mt-1 text-sm text-teal-800 dark:text-teal-200">
+      <div className="rounded-2xl border border-teal-200 bg-teal-50 px-6 py-5 dark:border-teal-700 dark:bg-teal-950 dark:text-teal-50">
+        <p className="text-sm font-semibold text-teal-950 dark:text-teal-50">Exclusive Belize Research Panel</p>
+        <p className="mt-1 text-sm leading-relaxed text-teal-800 dark:text-teal-100">
           Complete registration to join the panel. Your information is kept confidential and used only for legitimate research.
         </p>
       </div>

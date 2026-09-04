@@ -6,7 +6,7 @@ import { BrpLogoLink } from "@/components/BrpLogo";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { RegistrationForm } from "@/components/registration/RegistrationForm";
 import { RegistrationLanguageStep } from "@/components/registration/RegistrationLanguageStep";
 import type { RegistrationAccountContext } from "@/components/registration/RegistrationForm";
@@ -69,7 +69,7 @@ export function RegistrationPageClient({
           <div className={`${appContentClass} min-w-0 px-3 py-3 sm:px-4 sm:py-4`}>
             <div className="flex min-w-0 items-center justify-between gap-3">
               <BrpLogoLink href="/" variant="light" className="min-w-0 shrink" />
-              <ThemeSwitch compact />
+              <ThemeIconButton />
             </div>
           </div>
         </header>
@@ -108,8 +108,14 @@ export function RegistrationPageClient({
                 {formatHeadingCase("Delete account")}
               </Link>
               <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 lg:inline">{account.email}</span>
-              <LogoutButton className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 sm:px-4" />
-              <ThemeSwitch compact />
+              <LogoutButton
+                compact
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 lg:hidden"
+              />
+              <LogoutButton
+                className="hidden min-h-11 items-center rounded-xl px-4 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 lg:flex"
+              />
+              <ThemeIconButton />
             </div>
           </div>
         </div>

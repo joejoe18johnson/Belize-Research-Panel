@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
-import { ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { portalStickyHeaderClass } from "@/lib/brand";
 import { AUTH_CONTENT_MAX, pageRootClass } from "@/lib/layout-widths";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
@@ -27,7 +27,7 @@ export function AuthPageShell({
         <div className={`mx-auto ${AUTH_CONTENT_MAX}`}>
           <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">
             <BrpLogoLink href="/" variant="light" />
-            <ThemeSwitch compact />
+            <ThemeIconButton />
           </div>
         </div>
       </header>

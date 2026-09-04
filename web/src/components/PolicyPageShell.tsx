@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { appContentClass, pageRootClass } from "@/lib/layout-widths";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
@@ -30,7 +30,7 @@ export function PolicyPageShell({
                 <span className="lg:hidden">{formatHeadingCase("Home")}</span>
                 <span className="hidden lg:inline">{formatHeadingCase("Back to home")}</span>
               </Link>
-              <ThemeSwitch compact />
+              <ThemeIconButton />
             </div>
           </div>
         </div>

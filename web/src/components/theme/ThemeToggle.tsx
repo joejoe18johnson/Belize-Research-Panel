@@ -71,6 +71,37 @@ function ThemeSwitchTrack({ isDark, compact = false }: { isDark: boolean; compac
   );
 }
 
+/** Icon-only theme control for cramped headers: sun in dark mode, moon in light mode. */
+export function ThemeIconButton({
+  className = "",
+  variant = "light",
+}: {
+  className?: string;
+  variant?: keyof typeof SWITCH_SHELL_CLASS;
+}) {
+  const { mounted, isDark, actionLabel, toggleTheme } = useThemeSwitchState();
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={actionLabel}
+      title={actionLabel}
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition ${SWITCH_SHELL_CLASS[variant]} ${className}`.trim()}
+    >
+      {mounted ? (
+        isDark ? (
+          <SunIcon className="h-5 w-5" />
+        ) : (
+          <MoonIcon className="h-5 w-5" />
+        )
+      ) : (
+        <span className="h-5 w-5" aria-hidden />
+      )}
+    </button>
+  );
+}
+
 /** Labeled dark-mode switch for toolbars and headers. */
 export function ThemeSwitch({
   className = "",

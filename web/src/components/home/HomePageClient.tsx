@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeMenuToggle, ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton, ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
@@ -181,7 +181,7 @@ export function HomePageClient() {
             />
 
             <div className="hidden items-center gap-2 lg:flex lg:gap-3">
-              <ThemeSwitch variant={onDarkHero ? "dark" : "light"} compact />
+              <ThemeIconButton variant={onDarkHero ? "dark" : "light"} />
               <Link href="/login" className={loginLinkClassDesktop}>
                 {t(copy.logIn)}
               </Link>

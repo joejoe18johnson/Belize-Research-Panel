@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function ClientLoginForm() {
@@ -51,7 +51,7 @@ export function ClientLoginForm() {
                 <span className="lg:hidden">{formatHeadingCase("Login")}</span>
                 <span className="hidden lg:inline">{formatHeadingCase("Panelist login")}</span>
               </Link>
-              <ThemeSwitch compact />
+              <ThemeIconButton />
             </div>
           </div>
         </div>

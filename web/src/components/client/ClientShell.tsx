@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { BrpLogoLink } from "@/components/BrpLogo";
-import { ThemeSwitch } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { portalStickyHeaderClass } from "@/lib/brand";
 import type { ClientSession } from "@/lib/client-session";
@@ -34,7 +34,7 @@ export function ClientShell({ session, children }: { session: ClientSession; chi
               <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{session.contactName}</p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">{session.email}</p>
             </div>
-            <ThemeSwitch compact />
+            <ThemeIconButton />
             <button
               type="button"
               onClick={logout}
