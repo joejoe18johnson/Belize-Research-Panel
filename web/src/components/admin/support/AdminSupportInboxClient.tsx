@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageIntro, AdminTableScroll, adminNewItemRowClass, adminResponsiveTableClass, AdminTableRow, AdminTableTd } from "@/components/admin/shared/AdminUi";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import type { SupportMessageRecord } from "@/lib/support-messages";
+import { scrollViewportToTop } from "@/lib/scroll-viewport";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 function formatTimestamp(value: string): string {
@@ -33,6 +34,7 @@ export function AdminSupportInboxClient({
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyNotice, setReplyNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [selectedId, setSelectedId] = useState(initialMessages[0]?.id ?? "");
+  const [ticketOpen, setTicketOpen] = useState(false);
 
   const filtered = useMemo(() => {
     if (filter === "new") return messages.filter((message) => message.status === "new");
@@ -114,6 +116,30 @@ export function AdminSupportInboxClient({
     }
   };
 
+  const openTicket = (id: string) => {
+    setSelectedId(id);
+    setReplyBody("");
+    setReplyNotice(null);
+    setTicketOpen(true);
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches) {
+      requestAnimationFrame(() => scrollViewportToTop());
+    }
+  };
+
+  const closeTicket = () => {
+    setTicketOpen(false);
+    requestAnimationFrame(() => scrollViewportToTop());
+  };
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setTicketOpen(false);
+    };
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
+
   const newCount = messages.filter((message) => message.status === "new").length;
 
   return (
@@ -141,7 +167,7 @@ export function AdminSupportInboxClient({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={`flex flex-wrap gap-2 ${ticketOpen ? "hidden lg:flex" : ""}`}>
         {(["all", "new", "read"] as const).map((value) => (
           <button
             key={value}
@@ -159,7 +185,7 @@ export function AdminSupportInboxClient({
       </div>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className={`min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 ${ticketOpen ? "hidden lg:block" : "block"}`}>
           <AdminTableScroll>
             <table className={`${adminResponsiveTableClass} w-full text-left text-sm`}>
               <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
@@ -168,12 +194,13 @@ export function AdminSupportInboxClient({
                   <th className="px-4 py-3">From</th>
                   <th className="px-4 py-3">Topic</th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Ticket</th>
                 </tr>
               </thead>
               <tbody>
                 {pageRows.length === 0 ? (
                   <AdminTableRow>
-                    <AdminTableTd colSpan={4} empty label="">
+                    <AdminTableTd colSpan={5} empty label="">
                       <span className="text-zinc-500 dark:text-zinc-400">No support messages yet.</span>
                     </AdminTableTd>
                   </AdminTableRow>
@@ -185,11 +212,7 @@ export function AdminSupportInboxClient({
                       <AdminTableRow
                         key={row.id}
                         className={`cursor-pointer ${active ? "bg-teal-50 dark:bg-teal-950/30" : adminNewItemRowClass(row.status === "new")}`}
-                        onClick={() => {
-                          setSelectedId(row.id);
-                          setReplyBody("");
-                          setReplyNotice(null);
-                        }}
+                        onClick={() => openTicket(row.id)}
                       >
                         <AdminTableTd label="Received">{formatTimestamp(row.createdAt)}</AdminTableTd>
                         <AdminTableTd label="From">
@@ -210,6 +233,18 @@ export function AdminSupportInboxClient({
                             {row.status === "new" ? "Unread" : replied ? "Replied" : "Read"}
                           </span>
                         </AdminTableTd>
+                        <AdminTableTd label="Action">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openTicket(row.id);
+                            }}
+                            className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-teal-700 px-3 text-xs font-semibold text-white hover:bg-teal-800 lg:min-h-9 lg:w-auto"
+                          >
+                            {formatHeadingCase("View ticket")}
+                          </button>
+                        </AdminTableTd>
                       </AdminTableRow>
                     );
                   })
@@ -229,6 +264,16 @@ export function AdminSupportInboxClient({
           </div>
         </div>
 
+        <div className={`min-w-0 ${ticketOpen ? "block" : "hidden lg:block"}`}>
+          {ticketOpen ? (
+            <button
+              type="button"
+              onClick={closeTicket}
+              className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 lg:hidden dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              ← {formatHeadingCase("Back to inbox")}
+            </button>
+          ) : null}
         <div className="min-w-0 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
           {selected ? (
             <div className="space-y-4">
@@ -326,6 +371,7 @@ export function AdminSupportInboxClient({
           ) : (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">Select a message to read the full details.</p>
           )}
+        </div>
         </div>
       </div>
     </div>
