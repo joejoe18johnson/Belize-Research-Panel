@@ -51,6 +51,19 @@ function throwIfError(error: { message: string; code?: string } | null): void {
   throw new Error(error.message);
 }
 
+/** Email is no longer unique. Always cap at one row so .maybeSingle() cannot crash the page. */
+async function findLatestPanelistByEmail(email: string, columns = "id") {
+  const { data, error } = await db()
+    .from("panelists")
+    .select(columns)
+    .eq("email", normalizePanelistEmail(email))
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  throwIfError(error);
+  return data as Record<string, unknown> | null;
+}
+
 function errorMessage(error: { message?: string; code?: string } | null): string {
   return (error?.message ?? "").toLowerCase();
 }
@@ -208,12 +221,7 @@ export async function supabaseRetargetPanelistEmail(oldEmail: string, newEmail: 
   throwIfError(panelistError);
   if (!panelist) return false;
 
-  const { data: existingTarget, error: targetError } = await db()
-    .from("panelists")
-    .select("id")
-    .eq("email", to)
-    .maybeSingle();
-  throwIfError(targetError);
+  const existingTarget = await findLatestPanelistByEmail(to, "id");
   if (existingTarget && String(existingTarget.id) !== String(panelist.id)) {
     throw new Error("The new email is already used by another panelist.");
   }
@@ -662,6 +670,8 @@ async function lookupDbAssignmentId(campaignId: string, email: string): Promise<
     .select("id")
     .eq("campaign_id", campaignId)
     .eq("panelist_email", normalized)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   throwIfError(error);
   return data?.id ? String(data.id) : resolveDbAssignmentId(campaignId, normalized);
@@ -881,12 +891,7 @@ export async function supabaseRecordSurveyCompletionPoints(input: {
   throwIfError(existingError);
   if (existing) return;
 
-  const { data: panelist, error: panelistError } = await db()
-    .from("panelists")
-    .select("id")
-    .eq("email", email)
-    .maybeSingle();
-  throwIfError(panelistError);
+  const panelist = await findLatestPanelistByEmail(email, "id");
   if (!panelist?.id) return;
 
   const { error } = await db().from("point_transactions").insert({
@@ -903,18 +908,18 @@ export async function supabaseRecordSurveyCompletionPoints(input: {
 
 export async function supabaseSumSurveyCompletionPoints(email: string): Promise<number> {
   const normalized = normalizePanelistEmail(email);
-  const { data: panelist, error: panelistError } = await db()
+  const { data: panelists, error: panelistError } = await db()
     .from("panelists")
     .select("id")
-    .eq("email", normalized)
-    .maybeSingle();
+    .eq("email", normalized);
   throwIfError(panelistError);
-  if (!panelist?.id) return 0;
+  const ids = (panelists ?? []).map((row) => String(row.id ?? "")).filter(Boolean);
+  if (!ids.length) return 0;
 
   const { data, error } = await db()
     .from("point_transactions")
     .select("points")
-    .eq("panelist_id", panelist.id)
+    .in("panelist_id", ids)
     .eq("kind", "survey_completion");
   throwIfError(error);
   return (data ?? []).reduce((sum, row) => sum + (Number(row.points) || 0), 0);
@@ -1001,11 +1006,7 @@ export async function supabaseLoadRedemptionRequests(email: string): Promise<Red
 }
 
 export async function supabaseUpsertRedemptionRequest(request: RedemptionRequest): Promise<void> {
-  const { data: panelist } = await db()
-    .from("panelists")
-    .select("id")
-    .eq("email", request.email)
-    .maybeSingle();
+  const panelist = await findLatestPanelistByEmail(request.email, "id");
   const { error } = await db().from("redemption_requests").upsert({
     id: request.id,
     panelist_id: panelist?.id,
@@ -1042,7 +1043,7 @@ export async function supabaseLoadSupportMessages(): Promise<SupportMessageRecor
 export async function supabaseCreateSupportMessage(record: SupportMessageRecord): Promise<void> {
   const email = normalizePanelistEmail(record.email);
   const panelistEmail = normalizePanelistEmail(record.panelistEmail || record.email);
-  const { data: panelist } = await db().from("panelists").select("id").eq("email", panelistEmail).maybeSingle();
+  const panelist = await findLatestPanelistByEmail(panelistEmail, "id");
 
   const payload = {
     id: record.id,
@@ -1105,6 +1106,7 @@ export async function supabaseLoadPointsOverride(email: string): Promise<number 
     .from("panelist_points_overrides")
     .select("total_points")
     .eq("panelist_email", normalizePanelistEmail(email))
+    .limit(1)
     .maybeSingle();
   throwIfError(error);
   return data?.total_points ?? null;
@@ -1131,6 +1133,7 @@ export async function supabaseLoadRewardBalanceSeed(email: string): Promise<numb
     .from("panelist_reward_balance_seeds")
     .select("total_points")
     .eq("panelist_email", normalizePanelistEmail(email))
+    .limit(1)
     .maybeSingle();
   throwIfError(error);
   return data?.total_points ?? null;
