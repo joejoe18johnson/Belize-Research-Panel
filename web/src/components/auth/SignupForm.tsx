@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DateOfBirthPicker } from "@/components/registration/DateOfBirthPicker";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import {
@@ -26,6 +26,7 @@ import {
   validatePasswordMatch,
   type FieldErrors,
 } from "@/lib/signup-validation";
+import { scrollToFirstElementById, scrollViewportToTop } from "@/lib/scroll-viewport";
 import { meetsMinimumAge, passwordStrength } from "@/lib/validation";
 
 const initialForm: SignupFormData = {
@@ -46,6 +47,10 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+
+  useEffect(() => {
+    scrollViewportToTop();
+  }, [step]);
 
   const ageIneligible = isValidDobString(form.dob) && !meetsMinimumAge(form.dob);
   const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
@@ -84,7 +89,10 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   const handleContinueEligibility = () => {
     const validationErrors = validateSignupEligibility(form);
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      scrollToFirstElementById(Object.keys(validationErrors));
+      return;
+    }
     if (!isSignupEligible(form)) return;
     setStep("account");
     setErrors({});
@@ -95,7 +103,10 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
     setConfirmPasswordTouched(true);
     const validationErrors = validateSignupForm(form);
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      scrollToFirstElementById(["firstName", "lastName", "email", "password", "confirmPassword", ...Object.keys(validationErrors)]);
+      return;
+    }
 
     setSubmitting(true);
     try {

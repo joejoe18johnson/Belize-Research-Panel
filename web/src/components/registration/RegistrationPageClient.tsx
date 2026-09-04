@@ -19,6 +19,7 @@ import {
   type HomeLocale,
 } from "@/lib/home-locale";
 import { appContentClass, pageRootClass } from "@/lib/layout-widths";
+import { scrollViewportToTop } from "@/lib/scroll-viewport";
 import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -51,6 +52,7 @@ export function RegistrationPageClient({
     storeHomeLocale(locale);
     confirmRegisterLanguage();
     setLanguageConfirmed(true);
+    scrollViewportToTop();
   };
 
   if (!ready) {

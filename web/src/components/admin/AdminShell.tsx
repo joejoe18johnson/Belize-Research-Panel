@@ -272,7 +272,7 @@ export function AdminShell({
             </div>
           </header>
           <AdminNeedsAttentionBanner badges={navBadges} />
-          <main ref={mainRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-6 sm:py-8">
+          <main ref={mainRef} data-scroll-root className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-6 sm:py-8">
             {children}
           </main>
           <AdminFooter />

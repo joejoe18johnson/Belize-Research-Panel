@@ -13,6 +13,7 @@ import {
   storeHomeLocale,
   type HomeLocale,
 } from "@/lib/home-locale";
+import { scrollViewportToTop } from "@/lib/scroll-viewport";
 import { formatSiteCase } from "@/lib/sentence-case";
 
 function displayCopy(text: string, locale: HomeLocale): string {
@@ -43,6 +44,7 @@ export function RegisterAuthGate({ nextPath = "/register" }: { nextPath?: string
     storeHomeLocale(locale);
     confirmRegisterLanguage();
     setStep("gate");
+    scrollViewportToTop();
   };
 
   if (!ready) {
