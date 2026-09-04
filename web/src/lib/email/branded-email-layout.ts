@@ -31,12 +31,12 @@ export function paragraph(text: string): string {
 }
 
 export function mutedParagraph(text: string): string {
-  return `<p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#71717a;">${escapeHtml(text)}</p>`;
+  return `<p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#52525b;">${escapeHtml(text)}</p>`;
 }
 
 export function detailRow(label: string, value: string): string {
   return `<tr>
-    <td style="padding:8px 0;font-size:13px;color:#71717a;width:140px;vertical-align:top;">${escapeHtml(label)}</td>
+    <td style="padding:8px 0;font-size:13px;color:#52525b;width:140px;vertical-align:top;">${escapeHtml(label)}</td>
     <td style="padding:8px 0;font-size:14px;color:#18181b;font-weight:600;vertical-align:top;">${escapeHtml(value)}</td>
   </tr>`;
 }
@@ -75,9 +75,11 @@ export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
       <td align="center">
         <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e4e4e7;">
           <tr>
-            <td style="background:linear-gradient(135deg,${BRAND.teal[800]} 0%,${BRAND.teal[950]} 100%);padding:28px 32px;">
-              <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#99f6e4;">Belize Research Panel</div>
-              <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:700;color:#ffffff;">${escapeHtml(options.title)}</h1>
+            <td bgcolor="${BRAND.teal[800]}" style="background-color:${BRAND.teal[800]};background-image:linear-gradient(135deg,${BRAND.teal[800]} 0%,${BRAND.teal[950]} 100%);padding:28px 32px;">
+              <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.teal[100]};">Belize Research Panel</div>
+              <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:700;color:#ffffff;">
+                <span style="color:#ffffff;">${escapeHtml(options.title)}</span>
+              </h1>
             </td>
           </tr>
           <tr>
@@ -88,7 +90,7 @@ export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
             </td>
           </tr>
         </table>
-        <p style="margin:16px 0 0;font-size:12px;line-height:1.5;color:#a1a1aa;max-width:560px;">
+        <p style="margin:16px 0 0;font-size:12px;line-height:1.5;color:#52525b;max-width:560px;">
           You received this message because you are registered with the Belize Research Panel.
         </p>
       </td>
