@@ -17,6 +17,7 @@ export interface RegistrationDraft {
   accountEmail: string;
   form: RegistrationDraftSnapshot;
   activePhaseIndex: number;
+  furthestPhaseIndex?: number;
   savedAt: string;
 }
 
@@ -60,6 +61,7 @@ export function saveRegistrationDraft(input: {
   accountEmail: string;
   form: RegistrationFormData;
   activePhaseIndex: number;
+  furthestPhaseIndex?: number;
 }): void {
   if (typeof window === "undefined") return;
   try {
@@ -68,6 +70,7 @@ export function saveRegistrationDraft(input: {
       accountEmail: input.accountEmail.trim().toLowerCase(),
       form: toSnapshot(input.form),
       activePhaseIndex: input.activePhaseIndex,
+      furthestPhaseIndex: Math.max(input.activePhaseIndex, input.furthestPhaseIndex ?? input.activePhaseIndex),
       savedAt: new Date().toISOString(),
     };
     window.localStorage.setItem(draftKey(input.accountEmail), JSON.stringify(draft));

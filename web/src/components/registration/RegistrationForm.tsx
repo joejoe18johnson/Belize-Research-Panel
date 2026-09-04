@@ -146,6 +146,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const draft = loadRegistrationDraft(account.email);
     return draft?.activePhaseIndex ?? 0;
   });
+  const [furthestPhaseIndex, setFurthestPhaseIndex] = useState(() => {
+    const draft = loadRegistrationDraft(account.email);
+    const current = draft?.activePhaseIndex ?? 0;
+    return Math.max(current, draft?.furthestPhaseIndex ?? current);
+  });
   const [draftNotice, setDraftNotice] = useState<string | null>(() => {
     const draft = loadRegistrationDraft(account.email);
     if (!draft) return null;
@@ -184,8 +189,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       accountEmail: account.email,
       form,
       activePhaseIndex,
+      furthestPhaseIndex,
     });
-  }, [account.email, form, activePhaseIndex]);
+  }, [account.email, form, activePhaseIndex, furthestPhaseIndex]);
 
   useEffect(() => {
     if (!draftFilesReady) return;
@@ -494,7 +500,18 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     });
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
-    setActivePhaseIndex((prev) => Math.min(prev + 1, REGISTRATION_PHASES.length - 1));
+    setActivePhaseIndex((prev) => {
+      const next = Math.min(prev + 1, REGISTRATION_PHASES.length - 1);
+      setFurthestPhaseIndex((furthest) => Math.max(furthest, next));
+      return next;
+    });
+  };
+
+  const handleSelectPhase = (index: number) => {
+    if (index < 0 || index > furthestPhaseIndex || index === activePhaseIndex) return;
+    setPhaseAttempted(false);
+    scrollToTopAfterPhaseChange.current = true;
+    setActivePhaseIndex(index);
   };
 
   const handleBackPhase = () => {
@@ -514,6 +531,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       <RegistrationProgress
         activePhaseIndex={activePhaseIndex}
+        furthestPhaseIndex={furthestPhaseIndex}
+        onSelectPhase={handleSelectPhase}
         form={form}
         registeredVoter={registeredVoter}
       />
