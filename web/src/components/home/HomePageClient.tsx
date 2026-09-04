@@ -147,12 +147,8 @@ export function HomePageClient() {
   const registerLinkClassDesktop = onDarkHero
     ? "flex min-h-11 items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-teal-900 hover:bg-teal-50"
     : "flex min-h-11 items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800";
-  const adminLinkClassDesktop = onDarkHero
-    ? "flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-teal-100 hover:bg-white/10"
-    : "flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800";
   const loginLinkClassMobile = `${loginLinkClassDesktop} w-full`;
   const registerLinkClassMobile = `${registerLinkClassDesktop} w-full`;
-  const adminLinkClassMobile = `${adminLinkClassDesktop} w-full`;
 
   return (
     <div
@@ -181,17 +177,13 @@ export function HomePageClient() {
             />
 
             <div className="hidden items-center gap-2 lg:flex lg:gap-3">
-              <ThemeIconButton variant={onDarkHero ? "dark" : "light"} />
               <Link href="/login" className={loginLinkClassDesktop}>
                 {t(copy.logIn)}
               </Link>
               <Link href="/register" className={registerLinkClassDesktop}>
                 {t(copy.register)}
               </Link>
-              {/* Temporary — remove before production */}
-              <Link href="/admin/login" className={adminLinkClassDesktop}>
-                Admin login
-              </Link>
+              <ThemeIconButton variant={onDarkHero ? "dark" : "light"} />
             </div>
 
             <button
@@ -237,9 +229,6 @@ export function HomePageClient() {
             </Link>
             <Link href="/register" className={registerLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
               {t(copy.register)}
-            </Link>
-            <Link href="/admin/login" className={adminLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
-              Admin login
             </Link>
           </div>
         ) : null}
