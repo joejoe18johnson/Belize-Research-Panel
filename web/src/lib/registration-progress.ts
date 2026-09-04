@@ -1,5 +1,5 @@
 import type { RegistrationFormData } from "./registration-types";
-import { isCommonwealthCitizenInBelize } from "./constants";
+import { isCommonwealthCitizenInBelize, isHeadOfHousehold } from "./constants";
 import {
   isEligibleCitizenship,
   isRegisteredVoter,
@@ -155,6 +155,9 @@ function collectPhaseErrors(
     delete allErrors.commonwealthCountry;
     delete allErrors.proofOfBelizeResidenceType;
     delete allErrors.proofOfBelizeResidenceFile;
+  }
+  if (phaseIndex === PROFILE_PHASE && !isHeadOfHousehold(form.householdHeadRelationship)) {
+    delete allErrors.householdSize;
   }
   if (phaseIndex === PROFILE_PHASE && !isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
     delete allErrors.constituency;

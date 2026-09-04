@@ -9,6 +9,7 @@ import {
   MAX_HOUSEHOLD_SIZE,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
+  isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveAbroad,
   mustLiveInBelize,
@@ -427,15 +428,17 @@ export function validateRegistrationForm(
   } else if (!isValidHouseholdHeadAnswer(data.householdHeadRelationship)) {
     errors.householdHeadRelationship = "Please select yes or no.";
   }
-  const householdSizeText = cleanText(data.householdSize);
-  if (!/^\d+$/.test(householdSizeText)) {
-    errors.householdSize = "Enter how many persons live in your household, including yourself.";
-  } else {
-    const size = Number(householdSizeText);
-    if (size < 1) {
-      errors.householdSize = "Household size must include at least yourself.";
-    } else if (size > MAX_HOUSEHOLD_SIZE) {
-      errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
+  if (isHeadOfHousehold(data.householdHeadRelationship)) {
+    const householdSizeText = cleanText(data.householdSize);
+    if (!/^\d+$/.test(householdSizeText)) {
+      errors.householdSize = "Enter how many persons live in your household, including yourself.";
+    } else {
+      const size = Number(householdSizeText);
+      if (size < 1) {
+        errors.householdSize = "Household size must include at least yourself.";
+      } else if (size > MAX_HOUSEHOLD_SIZE) {
+        errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
+      }
     }
   }
   if (!data.placeOfResidence) errors.placeOfResidence = errors.placeOfResidence ?? "Residence selection is required.";

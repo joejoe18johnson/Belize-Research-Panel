@@ -30,6 +30,7 @@ import {
   EDUCATION_LEVELS,
   ETHNICITY_OPTIONS,
   HOUSEHOLD_DEFINITION,
+  HEAD_OF_HOUSEHOLD_DEFINITION,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   cityTownVillageQuestionLabel,
@@ -44,6 +45,7 @@ import {
   getResidenceOptions,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
+  isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveAbroad,
   mustLiveInBelize,
@@ -65,7 +67,7 @@ import {
   type FieldErrors,
 } from "@/lib/validation";
 import { formatDobDisplay } from "@/lib/dob";
-import { formatSentenceCase } from "@/lib/sentence-case";
+import { scrollElementToTop, scrollViewportToTop } from "@/lib/scroll-viewport";
 import {
   getPhaseFieldKeys,
   getFirstPhaseIndexForErrors,
@@ -78,8 +80,10 @@ import {
   clearRegistrationDraft,
   draftRestoredFileHint,
   loadRegistrationDraft,
+  loadRegistrationDraftFiles,
   mergeDraftIntoForm,
   saveRegistrationDraft,
+  saveRegistrationDraftFiles,
 } from "@/lib/registration-draft-storage";
 
 function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
@@ -104,17 +108,7 @@ function findRegistrationErrorTarget(key: string): HTMLElement | null {
 }
 
 function scrollElementIntoView(el: HTMLElement) {
-  const header = document.querySelector("header");
-  const headerHeight = header instanceof HTMLElement ? header.getBoundingClientRect().height : 88;
-  const y = el.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
-  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-  if (typeof el.focus === "function") {
-    try {
-      el.focus({ preventScroll: true });
-    } catch {
-      /* ignore */
-    }
-  }
+  scrollElementToTop(el);
 }
 
 export interface RegistrationAccountContext {
@@ -155,11 +149,35 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const [draftNotice, setDraftNotice] = useState<string | null>(() => {
     const draft = loadRegistrationDraft(account.email);
     if (!draft) return null;
-    return draftRestoredFileHint(draft) ?? "Your registration answers were restored after the page refreshed.";
+    return "Your registration answers were restored. You can continue from where you left off.";
   });
+  const [draftFilesReady, setDraftFilesReady] = useState(false);
   const [phaseAttempted, setPhaseAttempted] = useState(false);
   const scrollToTopAfterPhaseChange = useRef(false);
   const pendingErrorScrollKeys = useRef<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadRegistrationDraftFiles(account.email).then((files) => {
+      if (cancelled) return;
+      setForm((prev) => ({
+        ...prev,
+        photoIdFile: files.photoIdFile ?? prev.photoIdFile,
+        proofOfBelizeResidenceFile: files.proofOfBelizeResidenceFile ?? prev.proofOfBelizeResidenceFile,
+      }));
+      const draft = loadRegistrationDraft(account.email);
+      if (draft) {
+        const hint = draftRestoredFileHint(draft, files);
+        setDraftNotice(
+          hint ?? "Your registration answers were restored. You can continue from where you left off."
+        );
+      }
+      setDraftFilesReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [account.email]);
 
   useEffect(() => {
     saveRegistrationDraft({
@@ -169,6 +187,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     });
   }, [account.email, form, activePhaseIndex]);
 
+  useEffect(() => {
+    if (!draftFilesReady) return;
+    void saveRegistrationDraftFiles(account.email, {
+      photoIdFile: form.photoIdFile,
+      proofOfBelizeResidenceFile: form.proofOfBelizeResidenceFile,
+    });
+  }, [account.email, draftFilesReady, form.photoIdFile, form.proofOfBelizeResidenceFile]);
+
   const validationOptions = useMemo(
     () => ({ accountBacked: true as const, accountEmail: account.email }),
     [account.email]
@@ -177,6 +203,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const update = useCallback(<K extends keyof RegistrationFormData>(key: K, value: RegistrationFormData[K]) => {
     setForm((prev) => {
       const next = { ...prev, [key]: value };
+      if (key === "householdHeadRelationship" && !isHeadOfHousehold(String(value))) {
+        next.householdSize = "";
+      }
       if (key === "placeOfResidence") {
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
@@ -265,7 +294,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Highest education", form.education],
       ["Ethnicity", form.ethnicity],
       ["Head of household", form.householdHeadRelationship],
-      ["Household size", form.householdSize],
+      ...(isHeadOfHousehold(form.householdHeadRelationship)
+        ? [["Household size", form.householdSize] as [string, string]]
+        : []),
       ["Current residence", form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence],
       ["District", form.placeOfResidence === "Abroad" ? "" : form.placeOfResidence],
       [
@@ -313,10 +344,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const scrollToRegistrationTop = useCallback(() => {
     const anchor = document.getElementById("registration-phase-content");
     if (anchor) {
-      scrollElementIntoView(anchor);
+      scrollElementToTop(anchor);
       return;
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollViewportToTop();
   }, []);
 
   const scrollToFirstError = useCallback((errorKeys: string[]) => {
@@ -537,6 +568,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <FileInput
                 id="photoIdFile"
                 accept=".png,.jpg,.jpeg,.pdf"
+                file={form.photoIdFile}
                 onChange={(file) => {
                   update("photoIdFile", file);
                   touch("photoIdFile");
@@ -641,7 +673,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </SelectInput>
           </Field>
           <Field label="Upload proof of Belize residence" required error={fieldError("proofOfBelizeResidenceFile")}>
-            <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
+            <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" file={form.proofOfBelizeResidenceFile} onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
           </Field>
         </FormSection>
       ) : null}
@@ -686,8 +718,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 {ETHNICITY_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
-            <p className="mb-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              {formatSentenceCase(HOUSEHOLD_DEFINITION)}
+            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+              {HOUSEHOLD_DEFINITION}
+            </p>
+            <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {HEAD_OF_HOUSEHOLD_DEFINITION}
             </p>
             <Field
               label="Are you the head of your household?"
@@ -714,26 +749,30 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 ))}
               </div>
             </Field>
-            <Field
-              label="Including yourself, how many persons live in your household?"
-              required
-              hint="Count everyone regardless of their age."
-              error={fieldError("householdSize")}
-              id="householdSize"
-            >
-              <TextInput
-                id="householdSize"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={MAX_HOUSEHOLD_SIZE}
-                step={1}
-                value={form.householdSize}
-                onChange={(e) => update("householdSize", e.target.value)}
-                onBlur={() => touchAndValidate("householdSize")}
+            {isHeadOfHousehold(form.householdHeadRelationship) ? (
+              <Field
+                label="Including yourself, how many persons live in your household?"
+                required
                 error={fieldError("householdSize")}
-              />
-            </Field>
+                id="householdSize"
+              >
+                <p className="mb-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+                  Count everyone regardless of age.
+                </p>
+                <TextInput
+                  id="householdSize"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={MAX_HOUSEHOLD_SIZE}
+                  step={1}
+                  value={form.householdSize}
+                  onChange={(e) => update("householdSize", e.target.value)}
+                  onBlur={() => touchAndValidate("householdSize")}
+                  error={fieldError("householdSize")}
+                />
+              </Field>
+            ) : null}
           </FormSection>
 
           <FormSection step={6} title="Residence details">

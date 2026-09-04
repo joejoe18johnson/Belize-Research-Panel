@@ -230,12 +230,14 @@ export function FileInput({
   error,
   optional,
   id,
+  file,
 }: {
   accept?: string;
   onChange: (file: File | null) => void;
   error?: string;
   optional?: boolean;
   id?: string;
+  file?: File | null;
 }) {
   return (
     <div>
@@ -246,6 +248,11 @@ export function FileInput({
         onChange={(e) => onChange(e.target.files?.[0] ?? null)}
         className={`block w-full text-sm text-zinc-700 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-800 ${error ? "rounded-lg ring-2 ring-red-500/30" : ""}`}
       />
+      {file ? (
+        <p className="mt-1.5 text-sm text-teal-800 dark:text-teal-200">
+          Attached: {file.name}
+        </p>
+      ) : null}
       {optional ? <p className={hintClass}>{formatSentenceCase("Optional")}</p> : null}
       {error ? <p className={errorClass} role="alert">{formatSentenceCase(error)}</p> : null}
     </div>

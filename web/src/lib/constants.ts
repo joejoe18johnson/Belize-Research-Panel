@@ -55,6 +55,8 @@ export const HOUSEHOLD_HEAD_SELF = HOUSEHOLD_HEAD_YES;
 export const HOUSEHOLD_HEAD_OTHER = HOUSEHOLD_HEAD_NO;
 export const HOUSEHOLD_HEAD_OPTIONS = [HOUSEHOLD_HEAD_YES, HOUSEHOLD_HEAD_NO] as const;
 export const HOUSEHOLD_DEFINITION =
+  "A household is a person or group of people living together in the same dwelling and sharing meals and other living arrangements, whether or not they are related.";
+export const HEAD_OF_HOUSEHOLD_DEFINITION =
   "The head of household is the person who is recognised by the household members as the main decision-maker or person primarily responsible for the household.";
 export const MAX_HOUSEHOLD_SIZE = 50;
 
@@ -63,7 +65,7 @@ export function isHeadOfHousehold(relationship: string): boolean {
 }
 
 export function cityTownVillageQuestionLabel(district: string): string {
-  return `City / town / village in “${district}” where you currently live`;
+  return `City / town / village in ${district} where you currently live`;
 }
 
 export const POLITICAL_INTERESTS = raw.POLITICAL_INTERESTS as string[];
