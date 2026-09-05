@@ -70,6 +70,7 @@ export function cityTownVillageQuestionLabel(district: string): string {
 
 export const POLITICAL_INTERESTS = raw.POLITICAL_INTERESTS as string[];
 export const MARKET_INTERESTS = raw.MARKET_INTERESTS as string[];
+export const MAX_MARKET_INTERESTS = 5;
 export const CIVIC_INTERESTS = raw.CIVIC_INTERESTS as string[];
 export const PHOTO_ID_TYPES = raw.PHOTO_ID_TYPES.filter((t) => {
   const normalized = t.trim().toLowerCase();

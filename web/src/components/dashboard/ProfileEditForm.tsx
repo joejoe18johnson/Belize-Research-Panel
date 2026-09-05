@@ -24,6 +24,7 @@ import {
   needsVoterRegistrationQuestion,
   cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
+  MAX_MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   US_DIASPORA_REGIONS,
   VOTING_STATUS,
@@ -570,13 +571,14 @@ export function ProfileEditForm({
         <div className="mt-4 space-y-5">
           {form.placeOfResidence !== "Abroad" ? (
             <Field
-              label="Select the products and services you are interested in and are willing to give feedback on."
+              label="Select up to 5 products and services you are interested in and are willing to give feedback on."
               required
               error={errors.marketInterests}
             >
               <MultiSelect
                 options={MARKET_INTERESTS}
                 values={form.marketInterests}
+                maxSelections={MAX_MARKET_INTERESTS}
                 onChange={(values) => update("marketInterests", values)}
                 error={errors.marketInterests}
               />

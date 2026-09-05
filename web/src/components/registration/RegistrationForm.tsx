@@ -35,6 +35,7 @@ import {
   MAX_HOUSEHOLD_SIZE,
   cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
+  MAX_MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
   SEX_OPTIONS,
@@ -904,11 +905,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           {form.placeOfResidence !== "Abroad" ? (
             <FormSection step={8} title="Market research interests">
               <Field
-                label="Select the products and services you are interested in and are willing to give feedback on."
+                label="Select up to 5 products and services you are interested in and are willing to give feedback on."
                 required
                 error={fieldError("marketInterests")}
               >
-                <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
+                <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} maxSelections={MAX_MARKET_INTERESTS} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
               </Field>
             </FormSection>
           ) : (

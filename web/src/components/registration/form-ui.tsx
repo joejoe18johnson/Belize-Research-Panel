@@ -173,40 +173,59 @@ export function MultiSelect({
   onChange,
   error,
   id,
+  maxSelections,
 }: {
   options: string[];
   values: string[];
   onChange: (values: string[]) => void;
   error?: string;
   id?: string;
+  maxSelections?: number;
 }) {
+  const atLimit = typeof maxSelections === "number" && values.length >= maxSelections;
+
   const toggle = (option: string) => {
     if (values.includes(option)) {
       onChange(values.filter((v) => v !== option));
-    } else {
-      onChange([...values, option]);
+      return;
     }
+    if (atLimit) return;
+    onChange([...values, option]);
   };
 
   return (
     <div id={id}>
+      {typeof maxSelections === "number" ? (
+        <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
+          {values.length} of {maxSelections} selected
+        </p>
+      ) : null}
       <div className={`grid gap-3 lg:grid-cols-2 ${error ? "rounded-lg ring-2 ring-red-500/30 p-2" : ""}`}>
-        {options.map((option) => (
+        {options.map((option) => {
+          const selected = values.includes(option);
+          const disabled = atLimit && !selected;
+          return (
           <label
             key={option}
-            className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800 ${
-              values.includes(option) ? "border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30" : ""
+            className={`flex min-h-12 items-center gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-900 transition dark:border-zinc-700 dark:text-zinc-100 ${
+              selected
+                ? "cursor-pointer border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30"
+                : disabled
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800"
             }`}
           >
             <input
               type="checkbox"
-              checked={values.includes(option)}
+              checked={selected}
+              disabled={disabled}
               onChange={() => toggle(option)}
               className={siteCheckboxClass}
             />
             <span>{formatSentenceCase(option)}</span>
           </label>
-        ))}
+          );
+        })}
       </div>
       {error ? <p className={errorClass} role="alert">{formatSentenceCase(error)}</p> : null}
     </div>

@@ -7,6 +7,7 @@ import {
   ELIGIBLE_CITIZENSHIP_STATUSES,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
+  MAX_MARKET_INTERESTS,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
   isHeadOfHousehold,
@@ -471,6 +472,8 @@ export function validateRegistrationForm(
   }
   if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
     errors.marketInterests = "Please select at least one market research interest.";
+  } else if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
+    errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
   if (contactCount < 2) {
@@ -653,6 +656,8 @@ export function validateProfileUpdateForm(
 
   if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
     errors.marketInterests = "Please select at least one market research interest.";
+  } else if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
+    errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
   if (contactCount < 2) {
