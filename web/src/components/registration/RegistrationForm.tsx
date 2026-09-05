@@ -350,16 +350,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   };
 
   const scrollToRegistrationTop = useCallback(() => {
-    const progress = document.getElementById("registration-progress");
-    if (progress) {
-      scrollElementToTop(progress);
-      return;
-    }
-    const anchor = document.getElementById("registration-phase-content");
-    if (anchor) {
-      scrollElementToTop(anchor);
-      return;
-    }
     scrollViewportToTop();
   }, []);
 
@@ -414,18 +404,22 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       if (cancelled) return;
       syncStickyChromeOffsets();
       scrollToRegistrationTop();
-      scrollToTopAfterPhaseChange.current = false;
     };
 
     const frame = requestAnimationFrame(() => {
       requestAnimationFrame(run);
     });
-    const timeout = window.setTimeout(run, 80);
+    const timeout = window.setTimeout(run, 50);
+    const late = window.setTimeout(() => {
+      run();
+      if (!cancelled) scrollToTopAfterPhaseChange.current = false;
+    }, 200);
 
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
       window.clearTimeout(timeout);
+      window.clearTimeout(late);
     };
   }, [activePhaseIndex, scheduleErrorScroll, scrollToRegistrationTop]);
 
@@ -520,6 +514,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     });
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
+    scrollViewportToTop();
     setActivePhaseIndex((prev) => {
       const next = Math.min(prev + 1, REGISTRATION_PHASES.length - 1);
       setFurthestPhaseIndex((furthest) => Math.max(furthest, next));
@@ -531,12 +526,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     if (index < 0 || index > furthestPhaseIndex || index === activePhaseIndex) return;
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
+    scrollViewportToTop();
     setActivePhaseIndex(index);
   };
 
   const handleBackPhase = () => {
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
+    scrollViewportToTop();
     setActivePhaseIndex((prev) => Math.max(prev - 1, 0));
   };
 

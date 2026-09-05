@@ -74,12 +74,27 @@ export function scrollViewportToTop() {
   });
 }
 
+/** Layout Y in the document. getBoundingClientRect + scrollY is wrong for sticky/fixed nodes. */
+export function elementDocumentTop(el: HTMLElement): number {
+  const position = window.getComputedStyle(el).position;
+  if (position === "sticky" || position === "fixed") {
+    let top = 0;
+    let node: HTMLElement | null = el;
+    while (node) {
+      top += node.offsetTop;
+      node = node.offsetParent instanceof HTMLElement ? node.offsetParent : null;
+    }
+    return top;
+  }
+  return el.getBoundingClientRect().top + window.scrollY;
+}
+
 export function scrollElementToTop(el: HTMLElement) {
   if (typeof window === "undefined") return;
 
   syncStickyChromeOffsets();
   const offset = measureStickyChromeHeight(el);
-  const y = el.getBoundingClientRect().top + window.scrollY - offset;
+  const y = elementDocumentTop(el) - offset;
   window.scrollTo({ top: Math.max(0, y), left: 0, behavior: "auto" });
 
   const scrollRoot = el.closest<HTMLElement>("[data-scroll-root]");
