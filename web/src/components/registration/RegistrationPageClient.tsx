@@ -20,11 +20,7 @@ import {
 } from "@/lib/home-locale";
 import { appContentClass, pageRootClass } from "@/lib/layout-widths";
 import { observeStickyChrome, scrollViewportToTop } from "@/lib/scroll-viewport";
-import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
-
-function displayCopy(text: string, locale: HomeLocale): string {
-  return locale === "en" ? formatSiteCase(text) : text;
-}
+import { formatHeadingCase } from "@/lib/sentence-case";
 
 export function RegistrationPageClient({
   account,
@@ -65,7 +61,6 @@ export function RegistrationPageClient({
   }
 
   const copy = REGISTER_GATE_COPY[locale];
-  const t = (text: string) => displayCopy(text, locale);
 
   if (!languageConfirmed) {
     return (
@@ -128,14 +123,12 @@ export function RegistrationPageClient({
       <main className={`${appContentClass} px-3 py-6 sm:px-4 sm:py-8`}>
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-            {t(copy.title)}
+            {locale === "en" ? "Verify Your Account to Continue" : "Verifique su cuenta para continuar"}
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-500">
             {locale === "en"
-              ? t(
-                  "Your account is verified. Complete the steps below to join the panel for public opinion polling, market research, and governance studies."
-                )
-              : "Su cuenta está verificada. Complete los pasos a continuación para unirse al panel de encuestas de opinión pública, investigación de mercado y estudios de gobernanza."}
+              ? "Complete verification to join the panel for Public Opinion Polling, Market Research, and Governance Studies."
+              : "Complete la verificación para unirse al panel de encuestas de opinión pública, investigación de mercado y estudios de gobernanza."}
           </p>
         </div>
         <RegistrationForm account={account} />
