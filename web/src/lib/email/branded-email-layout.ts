@@ -11,6 +11,7 @@ export interface BrandedEmailOptions {
   bodyHtml: string;
   cta?: BrandedEmailCta;
   footerNote?: string;
+  unsubscribeUrl?: string;
 }
 
 function escapeHtml(value: string): string {
@@ -108,7 +109,11 @@ export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
           </tr>
         </table>
         <p style="margin:16px 0 0;font-size:12px;line-height:1.5;color:#52525b;max-width:560px;">
-          You received this message because you are registered with the Belize Research Panel.
+          You received this message because you are registered with the Belize Research Panel.${
+            options.unsubscribeUrl
+              ? `<br /><a href="${escapeHtml(options.unsubscribeUrl)}" style="color:#0f766e;text-decoration:underline;">Unsubscribe from survey invitations</a>`
+              : ""
+          }
         </p>
       </td>
     </tr>

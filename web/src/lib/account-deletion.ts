@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { AccountRecord } from "./auth-types";
 import { findAccountById, verifyAccountPassword } from "./accounts";
+import { unsubscribeClosedAccount } from "./email/unsubscribe";
 import { findPanelistByEmail, loadPanelists, savePanelists, type PanelistRow } from "./panelists";
 import { cleanText } from "./validation";
 
@@ -146,6 +147,8 @@ export async function deleteAccountAndOptOut(
 
   const panelist = await findPanelistByEmail(account.email, account.id);
   const username = panelist ? cleanText(panelist.username) : "";
+
+  await unsubscribeClosedAccount(account.email);
 
   if (panelist) {
     await deletePanelistUploads(username);

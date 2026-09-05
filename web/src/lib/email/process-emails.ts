@@ -1,6 +1,12 @@
 import type { EmailTemplateId } from "./email-templates";
 import { renderEmailTemplate } from "./email-templates";
 import { sendTransactionalEmail } from "./send-transactional-email";
+import {
+  buildUnsubscribeApiUrl,
+  buildUnsubscribeUrl,
+  canSendToEmail,
+  templateOffersUnsubscribe,
+} from "./unsubscribe";
 import { getSignupNotifyEmail, shouldSendSignupAdminNotification } from "@/lib/signup-notify";
 
 export async function sendTemplateEmail(input: {
@@ -8,15 +14,34 @@ export async function sendTemplateEmail(input: {
   to: string;
   data?: Record<string, string>;
   context?: string;
+  force?: boolean;
 }): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
   try {
-    const rendered = renderEmailTemplate(input.templateId, input.data ?? {});
+    if (!input.force && !(await canSendToEmail(input.to, input.templateId))) {
+      console.info("[email] skipped unsubscribed recipient", input.templateId);
+      return { sent: false, logged: false, error: "unsubscribed" };
+    }
+
+    const data = { ...(input.data ?? {}) };
+    const includeUnsubscribe = templateOffersUnsubscribe(input.templateId);
+    if (includeUnsubscribe && !data.unsubscribeUrl) {
+      data.unsubscribeUrl = buildUnsubscribeUrl(input.to);
+    }
+
+    const rendered = renderEmailTemplate(input.templateId, data);
     const result = await sendTransactionalEmail({
       to: input.to,
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
       context: input.context ?? input.templateId,
+      headers:
+        includeUnsubscribe && data.unsubscribeUrl
+          ? {
+              "List-Unsubscribe": `<${buildUnsubscribeApiUrl(input.to)}>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            }
+          : undefined,
     });
     return {
       sent: result.sent,
@@ -364,6 +389,7 @@ export async function sendAccountDeletedEmail(input: {
     data: {
       firstName: panelistFirstName(input.firstName),
     },
+    force: true,
   });
 }
 

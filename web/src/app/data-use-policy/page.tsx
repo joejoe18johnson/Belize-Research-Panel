@@ -111,7 +111,8 @@ export default function DataUsePolicyPage() {
           <li>{formatHeadingCase("Restrict or object to certain processing, including direct marketing")}</li>
           <li>{formatHeadingCase("Data portability for information you provided in a structured, commonly used format")}</li>
           <li>{formatHeadingCase("Withdraw consent at any time, without affecting prior lawful processing")}</li>
-          <li>{formatHeadingCase("Delete your account and opt out from your profile or the delete account page")}</li>
+          <li>{formatHeadingCase("Unsubscribe from survey invitations using the link in those emails")}</li>
+          <li>{formatHeadingCase("Delete your account and opt out from your profile or the delete account page. Closing an account also unsubscribes that email from all future messages")}</li>
           <li>{formatHeadingCase("Lodge a complaint with a supervisory data protection authority")}</li>
         </ul>
         <p>

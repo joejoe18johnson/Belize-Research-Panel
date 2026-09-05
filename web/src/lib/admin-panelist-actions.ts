@@ -1,6 +1,7 @@
 import { buildDuplicateNameDobKeyCounts, isDuplicateNameDobMatch } from "./admin-panelists";
 import { findAccountByEmail, putAccountOnHoldForFraudReview, releaseAccountFromFraudReview } from "./accounts";
 import { sendPanelistOnHoldEmail } from "./email/process-emails";
+import { unsubscribeClosedAccount } from "./email/unsubscribe";
 import { findPanelistByEmail, loadPanelists, savePanelists, updatePanelistAdminFields } from "./panelists";
 import { getSiteUrl } from "./seo/site-config";
 import { cleanText } from "./validation";
@@ -74,6 +75,8 @@ export async function deletePanelistByEmail(email: string): Promise<boolean> {
     findAccountByEmail(normalized),
   ]);
   if (!panelist && !account) return false;
+
+  await unsubscribeClosedAccount(normalized);
 
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {

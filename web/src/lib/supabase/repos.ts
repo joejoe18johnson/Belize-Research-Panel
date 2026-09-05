@@ -91,7 +91,9 @@ function isMissingRelation(error: { message?: string; code?: string } | null): b
     message.includes("schema cache") ||
     message.includes("could not find the table") ||
     (message.includes("does not exist") &&
-      (message.includes("authorised_registrars") || message.includes("platform_settings")))
+      (message.includes("authorised_registrars") ||
+        message.includes("platform_settings") ||
+        message.includes("email_unsubscribes")))
   );
 }
 
@@ -1350,4 +1352,49 @@ export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistra
   if (blobError && !tableSaved) {
     throw blobError instanceof Error ? blobError : new Error("Could not save authorisation codes.");
   }
+}
+
+export async function supabaseGetEmailUnsubscribe(
+  email: string
+): Promise<{ email: string; scope: "outreach" | "all"; reason: string; updatedAt: string } | null> {
+  const { data, error } = await db()
+    .from("email_unsubscribes")
+    .select("email, scope, reason, updated_at")
+    .eq("email", email)
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    if (isMissingRelation(error)) {
+      throw new Error("missing_relation");
+    }
+    throwIfError(error);
+  }
+  if (!data) return null;
+  return {
+    email: String(data.email ?? email),
+    scope: data.scope === "all" ? "all" : "outreach",
+    reason: String(data.reason ?? ""),
+    updatedAt: String(data.updated_at ?? ""),
+  };
+}
+
+export async function supabaseUpsertEmailUnsubscribe(record: {
+  email: string;
+  scope: "outreach" | "all";
+  reason: string;
+  updatedAt: string;
+}): Promise<void> {
+  const { error } = await db().from("email_unsubscribes").upsert(
+    {
+      email: record.email,
+      scope: record.scope,
+      reason: record.reason,
+      updated_at: record.updatedAt,
+    },
+    { onConflict: "email" }
+  );
+  if (error && isMissingRelation(error)) {
+    throw new Error("missing_relation");
+  }
+  throwIfError(error);
 }

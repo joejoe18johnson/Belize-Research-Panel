@@ -34,6 +34,7 @@ export async function POST(
     to,
     data: emailTemplateSampleDataForOrigin(id, origin),
     context: `admin-test:${id}`,
+    force: true,
   });
 
   if (!result.sent) {

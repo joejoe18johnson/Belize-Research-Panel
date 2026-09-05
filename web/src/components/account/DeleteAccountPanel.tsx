@@ -47,7 +47,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
       </p>
       <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
         <li>{formatHeadingCase("Your account login will be permanently removed")}</li>
-        <li>{formatHeadingCase("You will stop receiving research invitations")}</li>
+        <li>{formatHeadingCase("You will be unsubscribed from all emails, including research invitations")}</li>
         <li>{formatHeadingCase("Profile and contact details will be anonymised or deleted")}</li>
         <li>{formatHeadingCase("Pending rewards or redemption requests may be cancelled")}</li>
       </ul>
@@ -62,7 +62,7 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
           />
           <span>
             {formatHeadingCase(
-              "I understand this permanently deletes my account, opts me out of the panel, and cannot be undone."
+              "I understand this permanently deletes my account, unsubscribes me from all emails, and cannot be undone."
             )}
           </span>
         </label>

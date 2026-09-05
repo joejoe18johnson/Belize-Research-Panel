@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { isEmailTemplateId, renderEmailTemplate } from "@/lib/email/email-templates";
+import { templateOffersUnsubscribe } from "@/lib/email/unsubscribe";
+import { getSiteUrl } from "@/lib/seo/site-config";
 
 export async function GET(
   _request: Request,
@@ -15,7 +17,12 @@ export async function GET(
     return NextResponse.json({ message: "Unknown email template." }, { status: 404 });
   }
 
-  const rendered = renderEmailTemplate(id);
+  const rendered = renderEmailTemplate(
+    id,
+    templateOffersUnsubscribe(id)
+      ? { unsubscribeUrl: `${getSiteUrl()}/unsubscribe?token=preview` }
+      : {}
+  );
   return new NextResponse(rendered.html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",

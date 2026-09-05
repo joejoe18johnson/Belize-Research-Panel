@@ -399,6 +399,27 @@ function finish(subject: string, bodyHtml: string, cta?: { label: string; href: 
   return { subject, html, text: htmlToPlainText(html) };
 }
 
+function withUnsubscribeFooter(rendered: RenderedEmail, unsubscribeUrl?: string): RenderedEmail {
+  const url = unsubscribeUrl?.trim();
+  if (!url) return rendered;
+  const marker = "You received this message because you are registered with the Belize Research Panel.";
+  if (!rendered.html.includes(marker)) return rendered;
+  const escapedUrl = url
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  const injectedHtml = rendered.html.replace(
+    marker,
+    `${marker}<br /><a href="${escapedUrl}" style="color:#0f766e;text-decoration:underline;">Unsubscribe from survey invitations</a>`
+  );
+  return {
+    ...rendered,
+    html: injectedHtml,
+    text: `${htmlToPlainText(injectedHtml)}\n\nUnsubscribe from survey invitations: ${url}`,
+  };
+}
+
 function renderSignupVerifyEmail(data: Record<string, string>): RenderedEmail {
   const firstName = pick(data, "firstName", "there");
   const verifyUrl = pick(data, "verifyUrl", "#");
@@ -829,7 +850,7 @@ export function renderEmailTemplate(
   data: Record<string, string> = {}
 ): RenderedEmail {
   const merged = { ...EMAIL_TEMPLATE_SAMPLE_DATA[id], ...data };
-  return RENDERERS[id](merged);
+  return withUnsubscribeFooter(RENDERERS[id](merged), merged.unsubscribeUrl);
 }
 
 export function listEmailTemplatesByCategory(): Array<{

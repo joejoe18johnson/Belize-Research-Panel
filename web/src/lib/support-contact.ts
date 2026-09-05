@@ -49,9 +49,14 @@ export const SUPPORT_FAQ: SupportFaqItem[] = [
       "Go to Dashboard → Profile and submit a change request. Your account will be on hold until an administrator approves the update. This helps protect your account from unauthorised changes.",
   },
   {
+    question: "How do I stop survey invitation emails?",
+    answer:
+      "Use the unsubscribe link at the bottom of a survey invitation or reminder. You will still receive account, verification, and payout messages while your account is open. Closing your account unsubscribes you from all emails.",
+  },
+  {
     question: "How do I delete my account?",
     answer:
-      "Signed-in panelists can delete their account from the delete account page linked in the site footer. You will need your password and must confirm that you want to opt out.",
+      "Signed-in panelists can delete their account from the delete account page linked in the site footer. You will need your password and must confirm that you want to opt out. Deleting your account also unsubscribes that email from all future messages.",
   },
   {
     question: "How do I exercise my privacy rights?",

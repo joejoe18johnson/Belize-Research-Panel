@@ -82,6 +82,7 @@ export async function sendTransactionalEmail(input: {
   html: string;
   text?: string;
   context: string;
+  headers?: Record<string, string>;
 }): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
   const email = cleanText(input.to).toLowerCase();
   const subject = cleanText(input.subject);
@@ -108,6 +109,7 @@ export async function sendTransactionalEmail(input: {
         subject,
         html,
         text: text || undefined,
+        ...(input.headers ? { headers: input.headers } : {}),
       });
       if (result.error) {
         deliveryStatus = "failed";
