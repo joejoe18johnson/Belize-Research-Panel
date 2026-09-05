@@ -1,7 +1,6 @@
 import {
   buildBrandedEmailHtml,
-  detailRow,
-  detailTable,
+  detailLine,
   htmlToPlainText,
   mutedParagraph,
   paragraph,
@@ -417,7 +416,10 @@ function renderSignupAdminNotification(data: Record<string, string>): RenderedEm
   const adminUrl = pick(data, "adminUrl", "#");
   const bodyHtml = [
     paragraph("A new user signed up for the Belize Research Panel."),
-    detailTable(detailRow("Name", name) + detailRow("Email", email)),
+    detailLine([
+      ["Name", name],
+      ["Email", email],
+    ]),
     mutedParagraph("This is an operator alert for tracking new signups. The applicant still needs to verify their email and complete panel registration."),
   ].join("");
   return finish(`New signup: ${name}`, bodyHtml, { label: "Open admin notifications", href: adminUrl });
@@ -477,7 +479,7 @@ function renderEmailChangeRequested(data: Record<string, string>): RenderedEmail
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("We received your request to change the email address on your account."),
-    detailTable(detailRow("Pending email", pendingEmail)),
+    detailLine([["Pending email", pendingEmail]]),
     paragraph("An administrator will review and approve the change. Your account remains on hold until then."),
   ].join("");
   return finish("Email change pending approval", bodyHtml, { label: "View account status", href: dashboardUrl });
@@ -490,7 +492,7 @@ function renderEmailChangeApproved(data: Record<string, string>): RenderedEmail 
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your email change has been approved."),
-    detailTable(detailRow("Active email", newEmail)),
+    detailLine([["Active email", newEmail]]),
     paragraph("Your account is active again. Sign in with your new email address."),
   ].join("");
   return finish("Email change approved", bodyHtml, { label: "Sign in", href: dashboardUrl });
@@ -504,7 +506,10 @@ function renderEmailChangeDenied(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your request to change the email address on your account was not approved."),
-    detailTable(detailRow("Current email", currentEmail) + detailRow("Requested email", deniedEmail)),
+    detailLine([
+      ["Current email", currentEmail],
+      ["Requested email", deniedEmail],
+    ]),
     paragraph("You can continue using your current email address. If you still need to update it, request a new change from your profile."),
   ].join("");
   return finish("Email change not approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
@@ -517,7 +522,7 @@ function renderPhoneChangeRequested(data: Record<string, string>): RenderedEmail
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("We received your request to update your phone / WhatsApp number."),
-    detailTable(detailRow("Pending number", pendingPhone)),
+    detailLine([["Pending number", pendingPhone]]),
     paragraph("An administrator will verify the number. Your account remains on hold until approval."),
   ].join("");
   return finish("Phone change pending approval", bodyHtml, { label: "View account status", href: dashboardUrl });
@@ -530,7 +535,7 @@ function renderPhoneChangeApproved(data: Record<string, string>): RenderedEmail 
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your phone / WhatsApp number has been verified."),
-    detailTable(detailRow("Active number", newPhone)),
+    detailLine([["Active number", newPhone]]),
     paragraph("Your account is active again."),
   ].join("");
   return finish("Phone change approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
@@ -543,7 +548,7 @@ function renderPhoneChangeDenied(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your request to update your phone / WhatsApp number was not approved."),
-    detailTable(detailRow("Requested number", deniedPhone)),
+    detailLine([["Requested number", deniedPhone]]),
     paragraph("Your current number on file stays in place. If you still need to update it, request a new change from your profile."),
   ].join("");
   return finish("Phone change not approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
@@ -558,11 +563,11 @@ function renderSurveyInvitation(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("You have been invited to participate in a new survey."),
-    detailTable(
-      detailRow("Survey", campaignTitle) +
-        detailRow("Reward", `${points} points`) +
-        detailRow("Complete by", completeByDate)
-    ),
+    detailLine([
+      ["Survey", campaignTitle],
+      ["Reward", `${points} points`],
+      ["Complete by", completeByDate],
+    ]),
     paragraph("Your responses help shape research that matters to Belize."),
   ].join("");
   return finish(`New survey: ${campaignTitle}`, bodyHtml, { label: "Start survey", href: surveyLink });
@@ -576,7 +581,7 @@ function renderSurveyReminder(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph(`This is a friendly reminder about "${campaignTitle}".`),
-    detailTable(detailRow("Complete by", completeByDate)),
+    detailLine([["Complete by", completeByDate]]),
     paragraph("Please complete the survey before the deadline to earn your points."),
   ].join("");
   return finish(`Reminder: ${campaignTitle}`, bodyHtml, { label: "Continue survey", href: surveyLink });
@@ -590,7 +595,7 @@ function renderSurveyCompleted(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph(`Thank you for completing "${campaignTitle}".`),
-    detailTable(detailRow("Points earned", points)),
+    detailLine([["Points earned", points]]),
     paragraph("Your reward balance has been updated."),
   ].join("");
   return finish("Survey completed — thank you", bodyHtml, { label: "View surveys", href: dashboardUrl });
@@ -605,9 +610,11 @@ function renderRedemptionSubmitted(data: Record<string, string>): RenderedEmail 
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("We received your redemption request."),
-    detailTable(
-      detailRow("Option", optionLabel) + detailRow("Amount", amount) + detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["Option", optionLabel],
+      ["Amount", amount],
+      ["Reference", referenceId],
+    ]),
     mutedParagraph("Our team will process your request within 5–7 business days."),
   ].join("");
   return finish("Redemption request received", bodyHtml, { label: "Track payout", href: dashboardUrl });
@@ -622,9 +629,11 @@ function renderPayoutProcessing(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your redemption is now being processed."),
-    detailTable(
-      detailRow("Option", optionLabel) + detailRow("Amount", amount) + detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["Option", optionLabel],
+      ["Amount", amount],
+      ["Reference", referenceId],
+    ]),
   ].join("");
   return finish("Payout processing", bodyHtml, { label: "View payout status", href: dashboardUrl });
 }
@@ -638,9 +647,11 @@ function renderPayoutCompleted(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your payout has been completed."),
-    detailTable(
-      detailRow("Option", optionLabel) + detailRow("Amount", amount) + detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["Option", optionLabel],
+      ["Amount", amount],
+      ["Reference", referenceId],
+    ]),
     paragraph("Thank you for participating in the Belize Research Panel."),
   ].join("");
   return finish("Payout completed", bodyHtml, { label: "View payout details", href: dashboardUrl });
@@ -655,9 +666,11 @@ function renderPayoutRejected(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Your redemption request was not approved at this time."),
-    detailTable(
-      detailRow("Option", optionLabel) + detailRow("Amount", amount) + detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["Option", optionLabel],
+      ["Amount", amount],
+      ["Reference", referenceId],
+    ]),
     mutedParagraph("Your points remain in your balance. Contact support if you have questions."),
   ].join("");
   return finish("Payout request declined", bodyHtml, { label: "View rewards", href: dashboardUrl });
@@ -681,7 +694,10 @@ function renderStaffWelcome(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("An administrator account has been created for you on the Belize Research Panel admin console."),
-    detailTable(detailRow("Role", roleLabel) + detailRow("Login email", email)),
+    detailLine([
+      ["Role", roleLabel],
+      ["Login email", email],
+    ]),
     mutedParagraph("Use the password provided by your administrator when signing in for the first time."),
   ].join("");
   return finish("Welcome to the admin console", bodyHtml, { label: "Admin sign in", href: loginUrl });
@@ -707,9 +723,10 @@ function renderSupportRequestReceived(data: Record<string, string>): RenderedEma
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Thanks for contacting the Belize Research Panel support team."),
-    detailTable(
-      detailRow("Topic", topicLabel) + detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["Topic", topicLabel],
+      ["Reference", referenceId],
+    ]),
     paragraph("We typically respond within 1–2 business days. If your matter is urgent, reply to this email with your reference number."),
     mutedParagraph("Please do not share your password or photo ID in email replies."),
   ].join("");
@@ -725,12 +742,12 @@ function renderSupportInboxNotification(data: Record<string, string>): RenderedE
   const adminInboxUrl = pick(data, "adminInboxUrl", "#");
   const bodyHtml = [
     paragraph("A new help request was submitted on the Belize Research Panel website."),
-    detailTable(
-      detailRow("From", name) +
-        detailRow("Email", email) +
-        detailRow("Topic", topicLabel) +
-        detailRow("Reference", referenceId)
-    ),
+    detailLine([
+      ["From", name],
+      ["Email", email],
+      ["Topic", topicLabel],
+      ["Reference", referenceId],
+    ]),
     paragraph(messagePreview ? `"${messagePreview}"` : "Open the admin support inbox for the full message."),
   ].join("");
   return finish(`Support request: ${topicLabel}`, bodyHtml, { label: "Open support inbox", href: adminInboxUrl });
@@ -745,7 +762,10 @@ function renderSupportReply(data: Record<string, string>): RenderedEmail {
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("The Belize Research Panel support team has replied to your help request."),
-    detailTable(detailRow("Topic", topicLabel) + detailRow("Reference", referenceId)),
+    detailLine([
+      ["Topic", topicLabel],
+      ["Reference", referenceId],
+    ]),
     quotedMessage(replyBody || "Please sign in to the help centre if you need further assistance."),
     paragraph("If you still need help, sign in and send another message from Help & contact."),
     mutedParagraph("Please do not share your password or photo ID in email replies."),

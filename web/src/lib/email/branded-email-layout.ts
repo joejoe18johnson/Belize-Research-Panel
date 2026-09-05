@@ -35,14 +35,19 @@ export function mutedParagraph(text: string): string {
 }
 
 export function detailRow(label: string, value: string): string {
+  const labeled = label.trim().endsWith(":") ? label.trim() : `${label.trim()}:`;
   return `<tr>
-    <td style="padding:8px 0;font-size:13px;color:#52525b;width:140px;vertical-align:top;">${escapeHtml(label)}</td>
+    <td style="padding:8px 0;font-size:13px;color:#52525b;width:140px;vertical-align:top;">${escapeHtml(labeled)}</td>
     <td style="padding:8px 0;font-size:14px;color:#18181b;font-weight:600;vertical-align:top;">${escapeHtml(value)}</td>
   </tr>`;
 }
 
 export function detailTable(rows: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 20px;border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;">${rows}</table>`;
+}
+
+export function detailLine(pairs: Array<[string, string]>): string {
+  return detailTable(pairs.map(([label, value]) => detailRow(label, value)).join(""));
 }
 
 export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
@@ -61,6 +66,20 @@ export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
     ? mutedParagraph(options.footerNote)
     : mutedParagraph("Belize Research Panel · Confidential panel communications");
 
+  const colonAt = options.title.indexOf(": ");
+  const titleLead = colonAt >= 0 ? options.title.slice(0, colonAt + 1) : "";
+  const titleMain = colonAt >= 0 ? options.title.slice(colonAt + 2) : options.title;
+  const titleBlock = titleLead
+    ? `<div style="margin:8px 0 0;">
+              <div style="font-size:16px;line-height:1.4;font-weight:500;color:${BRAND.teal[100]};">${escapeHtml(titleLead)}</div>
+              <h1 style="margin:6px 0 0;font-size:24px;line-height:1.3;font-weight:700;color:#ffffff;">
+                <span style="color:#ffffff;">${escapeHtml(titleMain)}</span>
+              </h1>
+            </div>`
+    : `<h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:700;color:#ffffff;">
+              <span style="color:#ffffff;">${escapeHtml(titleMain)}</span>
+            </h1>`;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,9 +96,7 @@ export function buildBrandedEmailHtml(options: BrandedEmailOptions): string {
           <tr>
             <td bgcolor="${BRAND.teal[800]}" style="background-color:${BRAND.teal[800]};background-image:linear-gradient(135deg,${BRAND.teal[800]} 0%,${BRAND.teal[950]} 100%);padding:28px 32px;">
               <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.teal[100]};">Belize Research Panel</div>
-              <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:700;color:#ffffff;">
-                <span style="color:#ffffff;">${escapeHtml(options.title)}</span>
-              </h1>
+              ${titleBlock}
             </td>
           </tr>
           <tr>
