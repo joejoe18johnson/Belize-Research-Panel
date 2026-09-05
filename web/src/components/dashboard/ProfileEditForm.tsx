@@ -325,7 +325,7 @@ export function ProfileEditForm({
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
                 <Field
-                  label={`Where in the "${form.constituency}" constituency were you living when you registered to vote?`}
+                  label={`Where in the ${form.constituency} constituency were you living when you registered to vote?`}
                   required
                   error={errors.registeredCtvArea}
                   id="registeredCtvArea"

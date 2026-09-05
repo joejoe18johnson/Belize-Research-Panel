@@ -887,7 +887,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </SelectInput>
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
-                <Field label={`Where in the "${form.constituency}" constituency were you living at the time you registered to vote there?`} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
+                <Field label={`Where in the ${form.constituency} constituency were you living at the time you registered to vote there?`} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
                   <SelectInput id="registeredCtvArea" value={form.registeredCtvArea} onChange={(e) => update("registeredCtvArea", e.target.value)} onBlur={() => touchAndValidate("registeredCtvArea")} error={fieldError("registeredCtvArea")}>
                     <option value="">Select city, town, or village</option>
                     {ctvOptions.map((s) => <option key={s} value={s}>{s}</option>)}
