@@ -58,7 +58,7 @@ export function StreetAddressFields({
         </div>
 
         <Field
-          label="City or village"
+          label="City or Village"
           required={required}
           error={errors?.addressCityVillage}
           id="addressCityVillage"

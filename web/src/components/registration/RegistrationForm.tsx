@@ -359,7 +359,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Other contact platform", otherPlatform],
       ["Other contact detail", form.otherContact],
       ["Street address", form.streetAddress],
-      ["City or village", form.addressCityVillage],
+      ["City or Village", form.addressCityVillage],
       ["District", form.addressDistrict],
       ["Photo ID type", form.photoIdType],
       ["Proof of Belize residence", form.proofOfBelizeResidenceType],

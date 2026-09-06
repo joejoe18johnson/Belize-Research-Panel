@@ -92,7 +92,7 @@ export function validateStreetAddressParts(
     errors.streetAddress = "Street address is required.";
   }
   if (!trim(parts.addressCityVillage)) {
-    errors.addressCityVillage = "City or village is required.";
+    errors.addressCityVillage = "City or Village is required.";
   }
   const district = trim(parts.addressDistrict);
   if (!district) {
