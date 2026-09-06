@@ -129,14 +129,16 @@ export interface RegistrationAccountContext {
 }
 
 function buildInitialForm(account: RegistrationAccountContext): RegistrationFormData {
+  const citizenshipStatus = account.citizenshipStatus ?? "";
   return {
     ...initialRegistrationForm,
     firstName: account.firstName,
     lastName: account.lastName,
     email: account.email,
-    citizenshipStatus: account.citizenshipStatus ?? "",
+    citizenshipStatus,
     commonwealthCountry: account.commonwealthCountry ?? "",
     dob: account.dob ?? "",
+    placeOfResidence: mustLiveAbroad(citizenshipStatus) ? "Abroad" : "",
   };
 }
 
@@ -193,6 +195,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   }, [account.email]);
 
   useEffect(() => observeStickyChrome(), []);
+
+  // Diaspora citizenship hides the district picker; ensure placeOfResidence is Abroad
+  // so the country-of-residence fields always render (drafts/account prefill can miss this).
+  useEffect(() => {
+    if (!mustLiveAbroad(form.citizenshipStatus)) return;
+    if (form.placeOfResidence === "Abroad") return;
+    setForm((prev) => ({
+      ...prev,
+      placeOfResidence: "Abroad",
+      cityTownVillage: "",
+      cityTownVillageOther: "",
+    }));
+  }, [form.citizenshipStatus, form.placeOfResidence]);
 
   useEffect(() => {
     saveRegistrationDraft({
@@ -861,7 +876,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </SelectInput>
             </Field>
             )}
-            {form.placeOfResidence === "Abroad" ? (
+            {mustLiveAbroad(form.citizenshipStatus) || form.placeOfResidence === "Abroad" ? (
               <div className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4">
                 <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Living outside Belize</p>
                 <Field label="Country of residence" required error={fieldError("countryIfAbroad")} id="countryIfAbroad">

@@ -69,6 +69,17 @@ export function ProfileEditForm({
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [focusSection]);
 
+  useEffect(() => {
+    if (!mustLiveAbroad(form.citizenshipStatus)) return;
+    if (form.placeOfResidence === "Abroad") return;
+    setForm((prev) => ({
+      ...prev,
+      placeOfResidence: "Abroad",
+      cityTownVillage: "",
+      cityTownVillageOther: "",
+    }));
+  }, [form.citizenshipStatus, form.placeOfResidence]);
+
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
   const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
@@ -384,7 +395,7 @@ export function ProfileEditForm({
           </Field>
           )}
 
-          {form.placeOfResidence === "Abroad" ? (
+          {mustLiveAbroad(form.citizenshipStatus) || form.placeOfResidence === "Abroad" ? (
             <>
               <Field label="Country of residence" required error={errors.countryIfAbroad} id="countryIfAbroad">
                 <SelectInput
@@ -415,7 +426,7 @@ export function ProfileEditForm({
                     onChange={(e) => update("usDiasporaRegion", e.target.value)}
                     error={errors.usDiasporaRegion}
                   >
-                    <option value="">Select US region</option>
+                    <option value="">Select US region…</option>
                     {US_DIASPORA_REGIONS.map((region) => (
                       <option key={region} value={region}>
                         {region}
