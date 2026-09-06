@@ -477,8 +477,6 @@ export function ProfileEditForm({
             id="facebook"
             value={form.facebook}
             onChange={(value) => update("facebook", value)}
-            firstName={profile.firstName}
-            lastName={profile.lastName}
           />
           <SocialContactField
             platform="instagram"
@@ -486,8 +484,6 @@ export function ProfileEditForm({
             id="instagram"
             value={form.instagram}
             onChange={(value) => update("instagram", value)}
-            firstName={profile.firstName}
-            lastName={profile.lastName}
           />
           <SocialContactField
             platform="tiktok"
@@ -495,8 +491,6 @@ export function ProfileEditForm({
             id="tiktok"
             value={form.tiktok}
             onChange={(value) => update("tiktok", value)}
-            firstName={profile.firstName}
-            lastName={profile.lastName}
           />
 
           <Field label="Other contact platform" id="otherContactPlatform">

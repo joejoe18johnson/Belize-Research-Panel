@@ -938,8 +938,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.facebook}
                 onChange={(value) => update("facebook", value)}
                 placeholder="username or https://facebook.com/username"
-                firstName={form.firstName}
-                lastName={form.lastName}
               />
               <Field
                 label="Phone / WhatsApp number"
@@ -963,8 +961,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.instagram}
                 onChange={(value) => update("instagram", value)}
                 placeholder="@username or profile link"
-                firstName={form.firstName}
-                lastName={form.lastName}
               />
               <SocialContactField
                 platform="tiktok"
@@ -973,8 +969,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.tiktok}
                 onChange={(value) => update("tiktok", value)}
                 placeholder="@username or profile link"
-                firstName={form.firstName}
-                lastName={form.lastName}
               />
               <div className="space-y-4">
                 <Field label="Other contact platform / application" hint="Optional" id="otherContactPlatform">

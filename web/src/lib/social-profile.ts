@@ -73,7 +73,7 @@ export function resolveSocialProfileUrl(platform: SocialPlatform, rawValue: stri
         platform,
         handle: segment,
         profileUrl: parsed.toString(),
-        displayName: segment.replace(/\./g, " "),
+        displayName: segment,
         imageUrl: null,
         previewAvailable: false,
       };
