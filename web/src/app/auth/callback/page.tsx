@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { AuthPageSkeleton } from "@/components/shared/PageSkeletons";
 import { FACEBOOK_ELIGIBILITY_STORAGE_KEY } from "@/lib/facebook-auth";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { safeAppNextPath } from "@/lib/login-redirect";
@@ -130,15 +131,7 @@ function AuthCallbackInner() {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense
-      fallback={
-        <AuthPageShell title="Facebook sign-in" subtitle="Connecting your Facebook account…">
-          <BrandedAlert tone="info" title="Please wait" showIcon>
-            Finishing Facebook sign-in…
-          </BrandedAlert>
-        </AuthPageShell>
-      }
-    >
+    <Suspense fallback={<AuthPageSkeleton />}>
       <AuthCallbackInner />
     </Suspense>
   );

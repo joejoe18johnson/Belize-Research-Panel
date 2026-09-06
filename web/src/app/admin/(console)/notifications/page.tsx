@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { InlinePanelSkeleton } from "@/components/shared/PageSkeletons";
 import { AdminNotificationsDashboard } from "@/components/admin/queues/AdminNotificationsDashboard";
 import { buildCampaignSummaries } from "@/lib/campaign-targeting";
 import { loadCampaignRecords } from "@/lib/campaigns";
@@ -33,13 +34,7 @@ export default async function AdminNotificationsPage() {
   };
 
   return (
-    <Suspense
-      fallback={
-        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-          Loading notifications…
-        </div>
-      }
-    >
+    <Suspense fallback={<InlinePanelSkeleton rows={5} />}>
       <AdminNotificationsDashboard
         rows={rows}
         unreadIds={unreadIds}

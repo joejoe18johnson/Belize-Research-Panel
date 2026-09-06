@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { InlinePanelSkeleton } from "@/components/shared/PageSkeletons";
 import { AdminUnderReviewDashboard } from "@/components/admin/queues/AdminUnderReviewDashboard";
 import { buildUnderReviewRows } from "@/lib/admin-dashboard-metrics";
 import { loadAdminDataHub } from "@/lib/admin-data-hub";
@@ -21,13 +22,7 @@ export default async function AdminUnderReviewPage() {
   ]);
 
   return (
-    <Suspense
-      fallback={
-        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-          Loading review queue…
-        </div>
-      }
-    >
+    <Suspense fallback={<InlinePanelSkeleton rows={5} />}>
       <AdminUnderReviewDashboard
         rows={buildUnderReviewRows(hub, photoUploadUsernames)}
         unreadEmails={unreadPanelistVerificationEmails(hub, readState)}

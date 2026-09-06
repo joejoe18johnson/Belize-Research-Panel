@@ -288,3 +288,69 @@ input.site-radio:checked::after {
   border-radius: 9999px;
   background-color: #0f766e;
 }
+
+/* ——— Staggered skeleton loading ——— */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes skeleton-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skeleton-bone {
+  --skeleton-i: 0;
+  display: block;
+  background-image: linear-gradient(
+    105deg,
+    #e4e4e7 0%,
+    #e4e4e7 35%,
+    #ccfbf1 50%,
+    #e4e4e7 65%,
+    #e4e4e7 100%
+  );
+  background-size: 200% 100%;
+  background-color: #e4e4e7;
+  animation: skeleton-shimmer 1.55s ease-in-out infinite;
+  animation-delay: calc(var(--skeleton-i) * 90ms);
+}
+
+.dark .skeleton-bone {
+  background-image: linear-gradient(
+    105deg,
+    #27272a 0%,
+    #27272a 35%,
+    #134e4a 50%,
+    #27272a 65%,
+    #27272a 100%
+  );
+  background-color: #27272a;
+}
+
+.skeleton-stagger-item {
+  animation: skeleton-rise 0.42s ease both;
+  animation-delay: calc(var(--skeleton-i, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bone,
+  .skeleton-stagger-item {
+    animation: none;
+  }
+
+  .skeleton-bone {
+    background-image: none;
+  }
+}

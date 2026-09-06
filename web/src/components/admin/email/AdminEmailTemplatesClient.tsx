@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageIntro } from "@/components/admin/shared/AdminUi";
+import { Skeleton, Stagger } from "@/components/shared/Skeleton";
 import type { EmailTemplateMeta } from "@/lib/email/email-templates";
 import { EMAIL_TEMPLATE_CATEGORIES, listEmailTemplatesByCategory } from "@/lib/email/email-templates";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -44,8 +45,18 @@ function TemplatePreviewFrame({ templateId }: { templateId: string }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-[280px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-sm text-zinc-500 sm:min-h-[360px] lg:min-h-[420px] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
-        Loading preview…
+      <div
+        className="flex min-h-[280px] flex-col justify-center rounded-xl border border-teal-100 bg-white p-6 sm:min-h-[360px] lg:min-h-[420px] dark:border-teal-900/40 dark:bg-zinc-900"
+        aria-busy="true"
+      >
+        <Stagger className="mx-auto w-full max-w-md space-y-3">
+          <Skeleton className="mx-auto h-4 w-32" />
+          <Skeleton className="h-40 w-full" rounded="xl" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-[80%]" />
+          <Skeleton className="h-3 w-[60%]" />
+        </Stagger>
+        <span className="sr-only">Loading preview…</span>
       </div>
     );
   }
