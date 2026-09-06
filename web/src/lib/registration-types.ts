@@ -35,6 +35,8 @@ export interface RegistrationFormData {
   otherContactPlatformCustom: string;
   otherContact: string;
   streetAddress: string;
+  addressCityVillage: string;
+  addressDistrict: string;
   contactDetailsConfirmed: boolean;
   photoIdType: string;
   photoIdFile: File | null;
@@ -85,6 +87,8 @@ export const initialRegistrationForm: RegistrationFormData = {
   otherContactPlatformCustom: "",
   otherContact: "",
   streetAddress: "",
+  addressCityVillage: "",
+  addressDistrict: "",
   contactDetailsConfirmed: false,
   photoIdType: "",
   photoIdFile: null,

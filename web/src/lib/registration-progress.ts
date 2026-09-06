@@ -85,6 +85,8 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "otherContactPlatform",
     "contact",
     "streetAddress",
+    "addressCityVillage",
+    "addressDistrict",
     "contactDetailsConfirmed",
   ],
   ["consentResearch", "consentContact", "consentPrivacy", "finalReviewConfirmed"],

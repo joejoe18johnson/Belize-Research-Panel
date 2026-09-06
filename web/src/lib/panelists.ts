@@ -14,8 +14,8 @@ import {
   normalizeContactHandle,
   normalizeContactPlatform,
   titleCaseName,
-  titleCaseStreetAddress,
 } from "./validation";
+import { composeStreetAddress } from "./street-address";
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
 import { authorisedRegistrationNotes } from "./authorised-registrars";
@@ -459,7 +459,11 @@ export async function registerPanelist(
     tiktok: normalizeContactHandle(data.tiktok),
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
-    street_address: titleCaseStreetAddress(data.streetAddress),
+    street_address: composeStreetAddress({
+      streetAddress: data.streetAddress,
+      addressCityVillage: data.addressCityVillage,
+      addressDistrict: data.addressDistrict,
+    }),
     photo_id_type: data.photoIdType,
     photo_id_last4: "",
     photo_id_path: photoIdPath,
@@ -555,7 +559,11 @@ export async function updatePanelistProfile(
     tiktok: normalizeContactHandle(data.tiktok),
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
-    street_address: titleCaseStreetAddress(data.streetAddress),
+    street_address: composeStreetAddress({
+      streetAddress: data.streetAddress,
+      addressCityVillage: data.addressCityVillage,
+      addressDistrict: data.addressDistrict,
+    }),
     political_interests: data.politicalInterests.join("; "),
     market_interests: data.marketInterests.join("; "),
     civic_interests: data.civicInterests.join("; "),

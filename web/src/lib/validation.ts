@@ -18,6 +18,7 @@ import {
   US_DIASPORA_REGIONS,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
+import { validateStreetAddressParts } from "./street-address";
 
 export const MIN_REGISTRATION_AGE = 18;
 
@@ -491,15 +492,22 @@ export function validateRegistrationForm(
     errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
+  const addressRequired = streetAddressRequiredForContacts(data.placeOfResidence, contactCount);
+  const addressErrors = validateStreetAddressParts(
+    {
+      streetAddress: data.streetAddress,
+      addressCityVillage: data.addressCityVillage,
+      addressDistrict: data.addressDistrict,
+    },
+    { required: addressRequired }
+  );
+  Object.assign(errors, addressErrors);
+
   if (contactCount < 2) {
-    if (streetAddressRequiredForContacts(data.placeOfResidence, contactCount)) {
-      if (!cleanText(data.streetAddress)) {
-        errors.contact =
-          "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
-        errors.streetAddress =
-          "Street address is required when you live in Belize and have fewer than two other ways to contact you.";
-      }
-    } else {
+    if (addressRequired && Object.keys(addressErrors).length > 0) {
+      errors.contact =
+        "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
+    } else if (!addressRequired) {
       errors.contact = "Please provide at least two ways to contact you in case one fails.";
     }
   }
@@ -673,15 +681,22 @@ export function validateProfileUpdateForm(
     errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
+  const addressRequired = streetAddressRequiredForContacts(data.placeOfResidence, contactCount);
+  const addressErrors = validateStreetAddressParts(
+    {
+      streetAddress: data.streetAddress,
+      addressCityVillage: data.addressCityVillage,
+      addressDistrict: data.addressDistrict,
+    },
+    { required: addressRequired }
+  );
+  Object.assign(errors, addressErrors);
+
   if (contactCount < 2) {
-    if (streetAddressRequiredForContacts(data.placeOfResidence, contactCount)) {
-      if (!cleanText(data.streetAddress)) {
-        errors.contact =
-          "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
-        errors.streetAddress =
-          "Street address is required when you live in Belize and have fewer than two other ways to contact you.";
-      }
-    } else {
+    if (addressRequired && Object.keys(addressErrors).length > 0) {
+      errors.contact =
+        "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
+    } else if (!addressRequired) {
       errors.contact = "Please provide at least two ways to contact you in case one fails.";
     }
   }

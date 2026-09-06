@@ -4,6 +4,7 @@ import {
 } from "./constants";
 import type { PanelistRow } from "./panelists";
 import type { ProfileUpdateFormData } from "./profile-update-types";
+import { parseStreetAddress } from "./street-address";
 import { cleanText, parseStoredPhoneNumber } from "./validation";
 
 function splitInterests(value: string): string[] {
@@ -44,7 +45,7 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     otherContactPlatform: isKnownPlatform ? otherPlatform : otherPlatform ? "Other" : "",
     otherContactPlatformCustom: isKnownPlatform ? "" : otherPlatform,
     otherContact: row.other_contact ?? "",
-    streetAddress: row.street_address ?? "",
+    ...parseStreetAddress(row.street_address ?? ""),
     placeOfResidence,
     cityTownVillage,
     cityTownVillageOther,

@@ -28,6 +28,8 @@ function parseProfileUpdateBody(body: unknown): ProfileUpdateFormData | null {
     otherContactPlatformCustom: String(data.otherContactPlatformCustom ?? ""),
     otherContact: String(data.otherContact ?? ""),
     streetAddress: String(data.streetAddress ?? ""),
+    addressCityVillage: String(data.addressCityVillage ?? ""),
+    addressDistrict: String(data.addressDistrict ?? ""),
     placeOfResidence: String(data.placeOfResidence ?? ""),
     cityTownVillage: String(data.cityTownVillage ?? ""),
     cityTownVillageOther: String(data.cityTownVillageOther ?? ""),

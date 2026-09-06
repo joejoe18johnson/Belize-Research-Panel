@@ -3,14 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SocialContactField } from "@/components/registration/SocialContactField";
+import { StreetAddressFields } from "@/components/registration/StreetAddressFields";
 import {
   Field,
   MultiSelect,
   SelectInput,
-  TextArea,
   TextInput,
 } from "@/components/registration/form-ui";
 import {
+  BELIZE_DISTRICTS,
   COMMONWEALTH_COUNTRIES,
   COUNTRIES,
   EDUCATION_LEVELS,
@@ -34,7 +35,7 @@ import {
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { ProfileContactDisplay, ProfileUpdateFormData } from "@/lib/profile-update-types";
-import { countContactMethods, isRegisteredVoter, streetAddressRequiredForContacts, titleCaseStreetAddress, type FieldErrors } from "@/lib/validation";
+import { countContactMethods, isRegisteredVoter, streetAddressRequiredForContacts, type FieldErrors } from "@/lib/validation";
 import { ProfileContactChangePanel } from "./ProfileContactChangePanel";
 import { SectionHeading } from "./DashboardShell";
 
@@ -117,6 +118,11 @@ export function ProfileEditForm({
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
         next.usDiasporaRegion = "";
+        if (typeof value === "string" && BELIZE_DISTRICTS.includes(value)) {
+          if (!next.addressDistrict || next.addressDistrict === prev.placeOfResidence) {
+            next.addressDistrict = value;
+          }
+        }
       }
       if (key === "countryIfAbroad") {
         next.usDiasporaRegion = "";
@@ -527,30 +533,25 @@ export function ProfileEditForm({
             />
           </Field>
 
-          <Field
-            label="Street address / physical contact address"
+          <StreetAddressFields
+            streetAddress={form.streetAddress}
+            addressCityVillage={form.addressCityVillage}
+            addressDistrict={form.addressDistrict}
             required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
-            error={errors.streetAddress ?? errors.contact}
-            id="streetAddress"
             hint={
               streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
                 ? "Required because you live in Belize and have fewer than two contact methods, counting email."
                 : form.placeOfResidence === "Abroad"
-                  ? "Optional. Street address is only required for people living in Belize who have fewer than two contact methods, counting email."
+                  ? "Optional. A physical address is only required for people living in Belize who have fewer than two contact methods, counting email."
                   : "Optional when you have already given at least two ways to contact you, counting email."
             }
-          >
-            <TextArea
-              id="streetAddress"
-              value={form.streetAddress}
-              onChange={(e) => update("streetAddress", e.target.value)}
-              onBlur={(e) => {
-                const formatted = titleCaseStreetAddress(e.target.value);
-                if (formatted !== form.streetAddress) update("streetAddress", formatted);
-              }}
-              error={errors.streetAddress ?? errors.contact}
-            />
-          </Field>
+            errors={{
+              streetAddress: errors.streetAddress,
+              addressCityVillage: errors.addressCityVillage,
+              addressDistrict: errors.addressDistrict,
+            }}
+            onChange={(field, value) => update(field, value)}
+          />
         </div>
       </div>
       </div>

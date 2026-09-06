@@ -55,6 +55,8 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     otherContactPlatformCustom: String(formData.get("otherContactPlatformCustom") ?? ""),
     otherContact: String(formData.get("otherContact") ?? ""),
     streetAddress: String(formData.get("streetAddress") ?? ""),
+    addressCityVillage: String(formData.get("addressCityVillage") ?? ""),
+    addressDistrict: String(formData.get("addressDistrict") ?? ""),
     contactDetailsConfirmed: parseBoolean(formData.get("contactDetailsConfirmed")),
     photoIdType: String(formData.get("photoIdType") ?? ""),
     photoIdFile: (() => {

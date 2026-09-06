@@ -13,7 +13,6 @@ import {
   MultiSelect,
   SelectInput,
   siteRadioClass,
-  TextArea,
   TextInput,
 } from "./form-ui";
 import { DateOfBirthPicker } from "./DateOfBirthPicker";
@@ -21,7 +20,9 @@ import { RegistrationProgress } from "./RegistrationProgress";
 import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
+import { StreetAddressFields } from "./StreetAddressFields";
 import {
+  BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
   CITY_TOWN_VILLAGE,
   COMMONWEALTH_COUNTRIES,
@@ -64,10 +65,10 @@ import {
   streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
-  titleCaseStreetAddress,
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
+import { formatStreetAddressDisplay } from "@/lib/street-address";
 import { formatDobDisplay } from "@/lib/dob";
 import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStickyChromeOffsets } from "@/lib/scroll-viewport";
 import {
@@ -232,6 +233,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
         next.usDiasporaRegion = "";
+        if (typeof value === "string" && BELIZE_DISTRICTS.includes(value)) {
+          if (!next.addressDistrict || next.addressDistrict === prev.placeOfResidence) {
+            next.addressDistrict = value;
+          }
+        }
       }
       if (key === "constituency") {
         next.registeredCtvArea = "";
@@ -345,6 +351,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ["Other contact platform", otherPlatform],
       ["Other contact detail", form.otherContact],
       ["Street address", form.streetAddress],
+      ["City or village", form.addressCityVillage],
+      ["District", form.addressDistrict],
       ["Photo ID type", form.photoIdType],
       ["Proof of Belize residence", form.proofOfBelizeResidenceType],
     ],
@@ -988,33 +996,29 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </FieldGroup>
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
-            <Field
-              label="Street address / physical contact address"
+            <StreetAddressFields
+              streetAddress={form.streetAddress}
+              addressCityVillage={form.addressCityVillage}
+              addressDistrict={form.addressDistrict}
               required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
               hint={
                 streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
                   ? "Required because you live in Belize and have fewer than two contact methods, counting email."
                   : form.placeOfResidence === "Abroad"
-                    ? "Optional. Street address is only required for people living in Belize who have fewer than two contact methods, counting email."
+                    ? "Optional. A physical address is only required for people living in Belize who have fewer than two contact methods, counting email."
                     : "Optional when you have already given at least two ways to contact you, counting email."
               }
-              error={fieldError("streetAddress")}
-              id="streetAddress"
-            >
-              <TextArea
-                id="streetAddress"
-                value={form.streetAddress}
-                onChange={(e) => update("streetAddress", e.target.value)}
-                onBlur={(e) => {
-                  const formatted = titleCaseStreetAddress(e.target.value);
-                  if (formatted !== form.streetAddress) update("streetAddress", formatted);
-                  touch("streetAddress");
-                  validateField("streetAddress", formatted);
-                }}
-                error={fieldError("streetAddress")}
-                placeholder="House number, street, village or city, district"
-              />
-            </Field>
+              errors={{
+                streetAddress: fieldError("streetAddress"),
+                addressCityVillage: fieldError("addressCityVillage"),
+                addressDistrict: fieldError("addressDistrict"),
+              }}
+              onChange={(field, value) => update(field, value)}
+              onBlurField={(field) => {
+                touch(field);
+                validateField(field);
+              }}
+            />
           </FormSection>
 
           <FormSection step={12} title="Confirm contact details">
@@ -1026,7 +1030,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <p><strong>TikTok:</strong> {form.tiktok || "Not provided"}</p>
               <p><strong>Other contact platform:</strong> {otherPlatform || "Not provided"}</p>
               <p><strong>Other contact detail:</strong> {form.otherContact || "Not provided"}</p>
-              <p><strong>Street address:</strong> {form.streetAddress || "Not provided"}</p>
+              <p>
+                <strong>Physical address:</strong>{" "}
+                {formatStreetAddressDisplay({
+                  streetAddress: form.streetAddress,
+                  addressCityVillage: form.addressCityVillage,
+                  addressDistrict: form.addressDistrict,
+                })}
+              </p>
             </div>
             <CheckboxField id="contactDetailsConfirmed" label="I confirm that the contact information shown above is correct. *" checked={form.contactDetailsConfirmed} onChange={(checked) => { update("contactDetailsConfirmed", checked); touch("contactDetailsConfirmed"); validateField("contactDetailsConfirmed", checked); }} error={fieldError("contactDetailsConfirmed")} />
           </FormSection>
