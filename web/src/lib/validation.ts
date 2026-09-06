@@ -542,7 +542,8 @@ export function validateRegistrationForm(
   }
 
   if (!data.contactDetailsConfirmed) {
-    errors.contactDetailsConfirmed = "Please confirm that your contact information is correct.";
+    errors.contactDetailsConfirmed =
+      "Please confirm that your contact information is correct. Wrong details can mean missed research opportunities.";
   }
 
   if (!data.photoIdType) errors.photoIdType = "Photo ID type is required.";

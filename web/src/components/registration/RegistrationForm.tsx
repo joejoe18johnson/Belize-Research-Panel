@@ -62,13 +62,14 @@ import { phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
   countContactMethods,
   getFullPhoneNumber,
+  livesInBelizeResidence,
   streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
-import { formatStreetAddressDisplay } from "@/lib/street-address";
+import { formatStreetAddressDisplay, streetAddressPartsPresent } from "@/lib/street-address";
 import { formatDobDisplay } from "@/lib/dob";
 import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStickyChromeOffsets } from "@/lib/scroll-viewport";
 import {
@@ -305,6 +306,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : [];
   const ctvOptions = getRegisteredCtvOptions(form.constituency);
   const contactCount = countContactMethods(form);
+  const physicalAddressProvided = streetAddressPartsPresent({
+    streetAddress: form.streetAddress,
+    addressCityVillage: form.addressCityVillage,
+    addressDistrict: form.addressDistrict,
+  });
+  const meetsContactMinimum =
+    contactCount >= 2 || (livesInBelizeResidence(form.placeOfResidence) && physicalAddressProvided);
   const otherPlatform =
     form.otherContactPlatform === "Other"
       ? form.otherContactPlatformCustom
@@ -931,7 +939,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
           <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-              We need at least two ways to contact you in case one fails. Your email counts as one. Phone / WhatsApp
+              We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp
               is optional. If you live in Belize and have fewer than two contact methods in total, a street address is
               required.
             </p>
@@ -1022,7 +1030,42 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={12} title="Confirm contact details">
-            <div className="space-y-1 rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-950/40 dark:text-sky-100">
+            {meetsContactMinimum ? (
+              <Alert variant="success">
+                You have submitted {contactCount} means of contact
+                {contactCount < 2 && physicalAddressProvided ? ", plus a physical address" : ""}. Please
+                double-check every detail below — wrong contact information can mean you miss survey and
+                research opportunities.
+              </Alert>
+            ) : (
+              <Alert variant="warning">
+                Only {contactCount}{" "}
+                {contactCount === 1 ? "means of contact has" : "means of contact have"} been submitted so
+                far. We need at least two means of contact in case one fails
+                {livesInBelizeResidence(form.placeOfResidence)
+                  ? ", or a complete physical address if you live in Belize"
+                  : ""}
+                . Go back and add another method before confirming. Also make sure every detail is correct —
+                wrong contact information can mean you miss survey and research opportunities.
+              </Alert>
+            )}
+
+            <div className="space-y-1 rounded-lg border border-teal-200/70 bg-gradient-to-br from-teal-50/90 to-sky-50/50 px-4 py-3 text-sm text-teal-950 dark:border-teal-800 dark:from-teal-950/40 dark:to-sky-950/20 dark:text-teal-100">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2 dark:border-teal-800">
+                <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-200">
+                  Contact summary
+                </p>
+                <p
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                    meetsContactMinimum
+                      ? "bg-teal-700 text-white dark:bg-teal-600"
+                      : "bg-amber-100 text-amber-950 ring-1 ring-amber-300/80 dark:bg-amber-950/50 dark:text-amber-100 dark:ring-amber-700"
+                  }`}
+                >
+                  {contactCount} of 2 means of contact
+                  {!meetsContactMinimum ? " — incomplete" : ""}
+                </p>
+              </div>
               <p><strong>Email:</strong> {form.email || "Not provided"}</p>
               <p><strong>Phone / WhatsApp:</strong> {getFullPhoneNumber(form) || "Not provided"}</p>
               <p><strong>Facebook:</strong> {form.facebook || "Not provided"}</p>
@@ -1039,7 +1082,23 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 })}
               </p>
             </div>
-            <CheckboxField id="contactDetailsConfirmed" label="I confirm that the contact information shown above is correct. *" checked={form.contactDetailsConfirmed} onChange={(checked) => { update("contactDetailsConfirmed", checked); touch("contactDetailsConfirmed"); validateField("contactDetailsConfirmed", checked); }} error={fieldError("contactDetailsConfirmed")} />
+
+            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+              Please verify that every means of contact above is accurate and up to date. If we cannot reach
+              you, you may miss out on paid surveys, polls, and other research opportunities.
+            </p>
+
+            <CheckboxField
+              id="contactDetailsConfirmed"
+              label="I confirm that the contact information shown above is correct, and I understand I may miss opportunities if it is wrong. *"
+              checked={form.contactDetailsConfirmed}
+              onChange={(checked) => {
+                update("contactDetailsConfirmed", checked);
+                touch("contactDetailsConfirmed");
+                validateField("contactDetailsConfirmed", checked);
+              }}
+              error={fieldError("contactDetailsConfirmed")}
+            />
           </FormSection>
         </>
       ) : null}
