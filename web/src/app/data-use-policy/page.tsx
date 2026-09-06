@@ -40,6 +40,11 @@ export default function DataUsePolicyPage() {
           <li>{formatHeadingCase("Verification materials — phone number, photo identification, and proof of residence where required")}</li>
           <li>{formatHeadingCase("Participation data — survey responses, reward points, and redemption requests")}</li>
           <li>{formatHeadingCase("Technical data — device/browser information and security logs necessary to operate the service")}</li>
+          <li>
+            {formatHeadingCase(
+              "Social contact details — Facebook, Instagram, or TikTok handle or profile link you provide, and, if you connect Facebook Login, your Facebook user identifier, name, and email Facebook shares with us"
+            )}
+          </li>
         </ul>
       </PolicySection>
 
@@ -112,7 +117,17 @@ export default function DataUsePolicyPage() {
           <li>{formatHeadingCase("Data portability for information you provided in a structured, commonly used format")}</li>
           <li>{formatHeadingCase("Withdraw consent at any time, without affecting prior lawful processing")}</li>
           <li>{formatHeadingCase("Unsubscribe from survey invitations using the link in those emails")}</li>
-          <li>{formatHeadingCase("Delete your account and opt out from your profile or the delete account page. Closing an account also unsubscribes that email from all future messages")}</li>
+          <li>
+            {formatHeadingCase("Delete your account and opt out from your profile, the")}{" "}
+            <Link href="/account/delete" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+              delete account
+            </Link>{" "}
+            {formatHeadingCase("page, or the public")}{" "}
+            <Link href="/data-deletion" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+              data deletion
+            </Link>{" "}
+            {formatHeadingCase("instructions. Closing an account also unsubscribes that email from all future messages")}
+          </li>
           <li>{formatHeadingCase("Lodge a complaint with a supervisory data protection authority")}</li>
         </ul>
         <p>
@@ -125,6 +140,23 @@ export default function DataUsePolicyPage() {
             privacy@belizepanel.test
           </a>
           . {formatHeadingCase("We may need to verify your identity before responding.")}
+        </p>
+      </PolicySection>
+
+      <PolicySection title="Facebook and other platforms">
+        <p>
+          {formatHeadingCase(
+            "You may give us a Facebook, Instagram, or TikTok profile as a way to contact you. If Facebook Login is enabled, connecting your Facebook account lets us receive the name, email, and public profile Facebook is authorised to share. We use this only to confirm your identity or contact details for panel administration."
+          )}
+        </p>
+        <p>
+          {formatHeadingCase(
+            "We do not post to your Facebook account. You can remove a stored Facebook handle in your profile, disconnect the app in Facebook Settings → Apps and websites, or delete your panel account. Step-by-step instructions are on our"
+          )}{" "}
+          <Link href="/data-deletion" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            data deletion
+          </Link>{" "}
+          {formatHeadingCase("page.")}
         </p>
       </PolicySection>
 

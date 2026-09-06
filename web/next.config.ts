@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
     "127.0.0.1",
     "192.168.58.110",
   ],
+  async redirects() {
+    return [
+      { source: "/privacy", destination: "/data-use-policy", permanent: true },
+      { source: "/terms", destination: "/site-policy", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

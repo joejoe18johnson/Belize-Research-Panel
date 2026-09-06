@@ -1,5 +1,5 @@
 import type { RegistrationFormData } from "./registration-types";
-import { isCommonwealthCitizenInBelize, isHeadOfHousehold } from "./constants";
+import { isCommonwealthCitizenInBelize, isHeadOfHousehold, isUnitedStatesCountry } from "./constants";
 import {
   isEligibleCitizenship,
   isRegisteredVoter,
@@ -96,6 +96,34 @@ const INTERESTS_PHASE = 3;
 const CONTACT_PHASE = 4;
 const REVIEW_PHASE = 5;
 
+export function skipsInterestsPhase(placeOfResidence: string): boolean {
+  return placeOfResidence === "Abroad";
+}
+
+export function getNextRegistrationPhaseIndex(current: number, placeOfResidence: string): number {
+  const last = REGISTRATION_PHASES.length - 1;
+  let next = Math.min(current + 1, last);
+  if (next === INTERESTS_PHASE && skipsInterestsPhase(placeOfResidence)) {
+    next = CONTACT_PHASE;
+  }
+  return next;
+}
+
+export function getPreviousRegistrationPhaseIndex(current: number, placeOfResidence: string): number {
+  let prev = Math.max(current - 1, 0);
+  if (prev === INTERESTS_PHASE && skipsInterestsPhase(placeOfResidence)) {
+    prev = PROFILE_PHASE;
+  }
+  return prev;
+}
+
+export function resolveSelectablePhaseIndex(index: number, placeOfResidence: string): number {
+  if (index === INTERESTS_PHASE && skipsInterestsPhase(placeOfResidence)) {
+    return CONTACT_PHASE;
+  }
+  return index;
+}
+
 export function getPhaseIndexForField(fieldKey: string): number {
   const index = PHASE_ERROR_KEYS.findIndex((keys) => keys.includes(fieldKey));
   if (index >= 0) return index;
@@ -169,6 +197,9 @@ function collectPhaseErrors(
   }
   if (phaseIndex === PROFILE_PHASE && form.placeOfResidence && form.placeOfResidence !== "Abroad") {
     delete allErrors.countryIfAbroad;
+    delete allErrors.usDiasporaRegion;
+  }
+  if (phaseIndex === PROFILE_PHASE && !isUnitedStatesCountry(form.countryIfAbroad)) {
     delete allErrors.usDiasporaRegion;
   }
   if (phaseIndex === PROFILE_PHASE && form.placeOfResidence !== "Abroad") {

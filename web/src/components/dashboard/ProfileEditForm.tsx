@@ -34,7 +34,7 @@ import {
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistDashboardProfile } from "@/lib/panelist-dashboard";
 import type { ProfileContactDisplay, ProfileUpdateFormData } from "@/lib/profile-update-types";
-import { countContactMethods, isRegisteredVoter, streetAddressRequiredForContacts, type FieldErrors } from "@/lib/validation";
+import { countContactMethods, isRegisteredVoter, streetAddressRequiredForContacts, titleCaseStreetAddress, type FieldErrors } from "@/lib/validation";
 import { ProfileContactChangePanel } from "./ProfileContactChangePanel";
 import { SectionHeading } from "./DashboardShell";
 
@@ -356,6 +356,11 @@ export function ProfileEditForm({
           Residence
         </SectionHeading>
         <div className="mt-4 space-y-5">
+          {mustLiveAbroad(form.citizenshipStatus) ? (
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              You selected Belizean residing abroad. Tell us the country where you currently live.
+            </p>
+          ) : (
           <Field label="Where do you currently live?" required error={errors.placeOfResidence} id="placeOfResidence">
             <SelectInput
               id="placeOfResidence"
@@ -371,6 +376,7 @@ export function ProfileEditForm({
               ))}
             </SelectInput>
           </Field>
+          )}
 
           {form.placeOfResidence === "Abroad" ? (
             <>
@@ -393,7 +399,7 @@ export function ProfileEditForm({
                 <Field
                   label="Region of country"
                   required
-                  hint="US Census regions."
+                  hint="Required for United States residents. US Census regions."
                   error={errors.usDiasporaRegion}
                   id="usDiasporaRegion"
                 >
@@ -410,22 +416,6 @@ export function ProfileEditForm({
                       </option>
                     ))}
                   </SelectInput>
-                </Field>
-              ) : form.countryIfAbroad ? (
-                <Field
-                  label="Region of country"
-                  required
-                  hint="City or town is not required. A region such as a province, state, or area of the country is enough."
-                  error={errors.usDiasporaRegion}
-                  id="usDiasporaRegion"
-                >
-                  <TextInput
-                    id="usDiasporaRegion"
-                    value={form.usDiasporaRegion}
-                    onChange={(e) => update("usDiasporaRegion", e.target.value)}
-                    error={errors.usDiasporaRegion}
-                    placeholder="Province, state, or region"
-                  />
                 </Field>
               ) : null}
             </>
@@ -487,6 +477,8 @@ export function ProfileEditForm({
             id="facebook"
             value={form.facebook}
             onChange={(value) => update("facebook", value)}
+            firstName={profile.firstName}
+            lastName={profile.lastName}
           />
           <SocialContactField
             platform="instagram"
@@ -494,6 +486,8 @@ export function ProfileEditForm({
             id="instagram"
             value={form.instagram}
             onChange={(value) => update("instagram", value)}
+            firstName={profile.firstName}
+            lastName={profile.lastName}
           />
           <SocialContactField
             platform="tiktok"
@@ -501,6 +495,8 @@ export function ProfileEditForm({
             id="tiktok"
             value={form.tiktok}
             onChange={(value) => update("tiktok", value)}
+            firstName={profile.firstName}
+            lastName={profile.lastName}
           />
 
           <Field label="Other contact platform" id="otherContactPlatform">
@@ -544,16 +540,20 @@ export function ProfileEditForm({
             id="streetAddress"
             hint={
               streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
-                ? "Required because you live in Belize and have fewer than two other ways to contact you."
+                ? "Required because you live in Belize and have fewer than two contact methods, counting email."
                 : form.placeOfResidence === "Abroad"
-                  ? "Optional. Street address is only required for people living in Belize who have fewer than two other contact methods."
-                  : "Optional when you have already given at least two ways to contact you."
+                  ? "Optional. Street address is only required for people living in Belize who have fewer than two contact methods, counting email."
+                  : "Optional when you have already given at least two ways to contact you, counting email."
             }
           >
             <TextArea
               id="streetAddress"
               value={form.streetAddress}
               onChange={(e) => update("streetAddress", e.target.value)}
+              onBlur={(e) => {
+                const formatted = titleCaseStreetAddress(e.target.value);
+                if (formatted !== form.streetAddress) update("streetAddress", formatted);
+              }}
               error={errors.streetAddress ?? errors.contact}
             />
           </Field>
@@ -561,6 +561,7 @@ export function ProfileEditForm({
       </div>
       </div>
 
+      {form.placeOfResidence !== "Abroad" ? (
       <div
         id="profile-section-interests"
         className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6"
@@ -569,10 +570,10 @@ export function ProfileEditForm({
           Research interests
         </SectionHeading>
         <div className="mt-4 space-y-5">
-          {form.placeOfResidence !== "Abroad" ? (
             <Field
               label="Select up to 5 products and services you are interested in and are willing to give feedback on."
               required
+              hint="Asked of people living in Belize."
               error={errors.marketInterests}
             >
               <MultiSelect
@@ -583,14 +584,9 @@ export function ProfileEditForm({
                 error={errors.marketInterests}
               />
             </Field>
-          ) : (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Market research interests apply to panelists living in Belize. You may still receive diaspora and
-              political surveys where eligible.
-            </p>
-          )}
         </div>
       </div>
+      ) : null}
 
       {errors.submit ? (
         <p className="text-sm text-red-600" role="alert">

@@ -14,6 +14,7 @@ import {
   normalizeContactHandle,
   normalizeContactPlatform,
   titleCaseName,
+  titleCaseStreetAddress,
 } from "./validation";
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
@@ -458,7 +459,7 @@ export async function registerPanelist(
     tiktok: normalizeContactHandle(data.tiktok),
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
-    street_address: cleanText(data.streetAddress),
+    street_address: titleCaseStreetAddress(data.streetAddress),
     photo_id_type: data.photoIdType,
     photo_id_last4: "",
     photo_id_path: photoIdPath,
@@ -554,7 +555,7 @@ export async function updatePanelistProfile(
     tiktok: normalizeContactHandle(data.tiktok),
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
-    street_address: cleanText(data.streetAddress),
+    street_address: titleCaseStreetAddress(data.streetAddress),
     political_interests: data.politicalInterests.join("; "),
     market_interests: data.marketInterests.join("; "),
     civic_interests: data.civicInterests.join("; "),

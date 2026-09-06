@@ -36,6 +36,18 @@ export default function SitePolicyPage() {
         </p>
       </PolicySection>
 
+      <PolicySection title="Connected accounts">
+        <p>
+          {formatHeadingCase(
+            "If you add a Facebook, Instagram, or TikTok profile, or connect Facebook Login, you must use an account that belongs to you. We may use that information only to contact you or confirm your panelist identity. You can remove the connection from your profile, from Facebook app settings, or by deleting your account as described on our"
+          )}{" "}
+          <Link href="/data-deletion" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            data deletion
+          </Link>{" "}
+          {formatHeadingCase("page.")}
+        </p>
+      </PolicySection>
+
       <PolicySection title="Acceptable use">
         <p>
           {formatHeadingCase(

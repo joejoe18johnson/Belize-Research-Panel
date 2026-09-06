@@ -15,12 +15,11 @@ export const ELIGIBLE_CITIZENSHIP_STATUSES = [
   CITIZENSHIP_BELIZEAN_ABROAD,
   CITIZENSHIP_COMMONWEALTH_IN_BELIZE,
   CITIZENSHIP_FOREIGNER_IN_BELIZE,
-  CITIZENSHIP_OTHER,
 ] as const;
 
 export const MARKET_RESEARCH_ONLY_CITIZENSHIP_STATUSES: readonly string[] = [];
 
-export const INELIGIBLE_CITIZENSHIP_STATUSES = [] as const;
+export const INELIGIBLE_CITIZENSHIP_STATUSES = [CITIZENSHIP_OTHER] as const;
 
 export const CITIZENSHIP_PANEL_INTRO =
   "Choose the option that best describes your citizenship and where you live. " +

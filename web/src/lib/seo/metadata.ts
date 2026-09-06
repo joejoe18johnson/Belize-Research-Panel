@@ -136,8 +136,11 @@ export function rootMetadata(): Metadata {
       ...(TWITTER_HANDLE ? { site: TWITTER_HANDLE, creator: TWITTER_HANDLE } : {}),
     },
     icons: {
-      icon: [{ url: "/images/BRP-Logo-01.png", type: "image/png" }],
-      apple: [{ url: "/images/BRP-Logo-01.png", type: "image/png" }],
+      icon: [
+        { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+        { url: "/images/brp-icon.png", sizes: "1024x1024", type: "image/png" },
+      ],
+      apple: [{ url: "/images/brp-icon.png", sizes: "180x180", type: "image/png" }],
     },
   };
 }

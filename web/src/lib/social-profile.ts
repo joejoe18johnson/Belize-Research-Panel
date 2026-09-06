@@ -171,6 +171,6 @@ export function enrichSocialPreview(
     displayName,
     imageUrl,
     previewAvailable: Boolean(ogTitle || imageUrl),
-    message: ogTitle || imageUrl ? undefined : "We couldn't load a live preview. Please double-check your handle or link.",
+    message: undefined,
   };
 }

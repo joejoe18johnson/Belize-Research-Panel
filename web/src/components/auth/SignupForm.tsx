@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { DateOfBirthPicker } from "@/components/registration/DateOfBirthPicker";
+import { CitizenshipEligibilityBanner } from "@/components/registration/CitizenshipEligibilityBanner";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import {
   choiceBoxLabelClass,
@@ -27,7 +28,7 @@ import {
   type FieldErrors,
 } from "@/lib/signup-validation";
 import { scrollToFirstElementById, scrollViewportToTop } from "@/lib/scroll-viewport";
-import { meetsMinimumAge, passwordStrength } from "@/lib/validation";
+import { isEligibleCitizenship, meetsMinimumAge, passwordStrength } from "@/lib/validation";
 
 const initialForm: SignupFormData = {
   citizenshipStatus: "",
@@ -53,6 +54,9 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   }, [step]);
 
   const ageIneligible = isValidDobString(form.dob) && !meetsMinimumAge(form.dob);
+  const citizenshipIneligible =
+    Boolean(form.citizenshipStatus) && !isEligibleCitizenship(form.citizenshipStatus);
+  const eligibilityBlocked = ageIneligible || citizenshipIneligible;
   const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
 
   const pwdStrength = useMemo(
@@ -177,9 +181,16 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
               {errors.citizenshipStatus}
             </p>
           ) : null}
+          {citizenshipIneligible ? (
+            <CitizenshipEligibilityBanner
+              citizenshipStatus={form.citizenshipStatus}
+              eligible={false}
+              compact
+            />
+          ) : null}
         </div>
 
-        {needsCommonwealthCountry ? (
+        {needsCommonwealthCountry && !citizenshipIneligible ? (
           <Field
             label="Commonwealth country of citizenship"
             required
@@ -202,6 +213,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
           </Field>
         ) : null}
 
+        {!citizenshipIneligible ? (
         <Field label="Date of birth" required error={errors.dob} id="dob">
           <DateOfBirthPicker
             value={form.dob}
@@ -210,8 +222,9 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
             compact
           />
         </Field>
+        ) : null}
 
-        {ageIneligible ? (
+        {eligibilityBlocked ? (
           <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
             <Link
               href="/"

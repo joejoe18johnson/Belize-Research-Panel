@@ -64,6 +64,7 @@ import {
   streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
+  titleCaseStreetAddress,
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
@@ -72,8 +73,12 @@ import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStick
 import {
   getPhaseFieldKeys,
   getFirstPhaseIndexForErrors,
+  getNextRegistrationPhaseIndex,
   getOrderedErrorKeys,
+  getPreviousRegistrationPhaseIndex,
   REGISTRATION_PHASES,
+  resolveSelectablePhaseIndex,
+  skipsInterestsPhase,
   validatePhasesThrough,
   validateRegistrationPhase,
 } from "@/lib/registration-progress";
@@ -204,6 +209,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     });
   }, [account.email, draftFilesReady, form.photoIdFile, form.proofOfBelizeResidenceFile]);
 
+  useEffect(() => {
+    if (!skipsInterestsPhase(form.placeOfResidence)) return;
+    if (activePhaseIndex !== 3) return;
+    setActivePhaseIndex(4);
+    setFurthestPhaseIndex((furthest) => Math.max(furthest, 4));
+  }, [activePhaseIndex, form.placeOfResidence]);
+
   const validationOptions = useMemo(
     () => ({ accountBacked: true as const, accountEmail: account.email }),
     [account.email]
@@ -317,10 +329,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             : form.cityTownVillage,
       ],
       ["Country if abroad", form.countryIfAbroad],
-      ["Region of country", form.placeOfResidence === "Abroad" ? form.usDiasporaRegion : ""],
+      ...(form.placeOfResidence === "Abroad" && isUnitedStatesCountry(form.countryIfAbroad)
+        ? [["Region of country", form.usDiasporaRegion] as [string, string]]
+        : []),
       ["Constituency registered to vote", form.constituency],
       ["Registered CTV area", form.registeredCtvArea],
-      ["Market research interests", form.marketInterests.join(", ")],
+      ...(skipsInterestsPhase(form.placeOfResidence)
+        ? []
+        : [["Market research interests", form.marketInterests.join(", ")] as [string, string]]),
       ["Account email", account.email],
       ["Phone / WhatsApp", getFullPhoneNumber(form)],
       ["Facebook", form.facebook],
@@ -517,25 +533,26 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     scrollToTopAfterPhaseChange.current = true;
     scrollViewportToTop();
     setActivePhaseIndex((prev) => {
-      const next = Math.min(prev + 1, REGISTRATION_PHASES.length - 1);
+      const next = getNextRegistrationPhaseIndex(prev, form.placeOfResidence);
       setFurthestPhaseIndex((furthest) => Math.max(furthest, next));
       return next;
     });
   };
 
   const handleSelectPhase = (index: number) => {
-    if (index < 0 || index > furthestPhaseIndex || index === activePhaseIndex) return;
+    const resolved = resolveSelectablePhaseIndex(index, form.placeOfResidence);
+    if (resolved < 0 || resolved > furthestPhaseIndex || resolved === activePhaseIndex) return;
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
     scrollViewportToTop();
-    setActivePhaseIndex(index);
+    setActivePhaseIndex(resolved);
   };
 
   const handleBackPhase = () => {
     setPhaseAttempted(false);
     scrollToTopAfterPhaseChange.current = true;
     scrollViewportToTop();
-    setActivePhaseIndex((prev) => Math.max(prev - 1, 0));
+    setActivePhaseIndex((prev) => getPreviousRegistrationPhaseIndex(prev, form.placeOfResidence));
   };
 
   return (
@@ -820,12 +837,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   ? "Select the Belize district where you currently live."
                   : "Select your current district if you live in Belize, or choose Abroad if you live in another country."}
             </p>
+            {mustLiveAbroad(form.citizenshipStatus) ? null : (
             <Field label="Where do you currently live?" required error={fieldError("placeOfResidence")} id="placeOfResidence">
               <SelectInput id="placeOfResidence" value={form.placeOfResidence} onChange={(e) => update("placeOfResidence", e.target.value)} onBlur={() => touchAndValidate("placeOfResidence")} error={fieldError("placeOfResidence")}>
                 <option value="">Select location</option>
                 {residenceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
+            )}
             {form.placeOfResidence === "Abroad" ? (
               <div className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4">
                 <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Living outside Belize</p>
@@ -836,28 +855,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   </SelectInput>
                 </Field>
                 {isUnitedStatesCountry(form.countryIfAbroad) ? (
-                  <Field label="Region of country" required hint="US Census regions." error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
+                  <Field label="Region of country" required hint="Required for United States residents. US Census regions." error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
                     <SelectInput id="usDiasporaRegion" value={form.usDiasporaRegion} onChange={(e) => update("usDiasporaRegion", e.target.value)} onBlur={() => touchAndValidate("usDiasporaRegion")} error={fieldError("usDiasporaRegion")}>
                       <option value="">Select US region</option>
                       {US_DIASPORA_REGIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </SelectInput>
-                  </Field>
-                ) : form.countryIfAbroad ? (
-                  <Field
-                    label="Region of country"
-                    required
-                    hint="City or town is not required. A region such as a province, state, or area of the country is enough."
-                    error={fieldError("usDiasporaRegion")}
-                    id="usDiasporaRegion"
-                  >
-                    <TextInput
-                      id="usDiasporaRegion"
-                      value={form.usDiasporaRegion}
-                      onChange={(e) => update("usDiasporaRegion", e.target.value)}
-                      onBlur={() => touchAndValidate("usDiasporaRegion")}
-                      error={fieldError("usDiasporaRegion")}
-                      placeholder="Province, state, or region"
-                    />
                   </Field>
                 ) : null}
               </div>
@@ -902,21 +904,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 3 ? (
         <>
-          {form.placeOfResidence !== "Abroad" ? (
+          {skipsInterestsPhase(form.placeOfResidence) ? null : (
             <FormSection step={8} title="Market research interests">
               <Field
                 label="Select up to 5 products and services you are interested in and are willing to give feedback on."
                 required
+                hint="Asked of people living in Belize."
                 error={fieldError("marketInterests")}
               >
                 <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} maxSelections={MAX_MARKET_INTERESTS} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
               </Field>
-            </FormSection>
-          ) : (
-            <FormSection step={8} title="Market research interests">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Market research interests are collected for people living in Belize. You can continue to contact details.
-              </p>
             </FormSection>
           )}
         </>
@@ -926,11 +923,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
           <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-              We need at least two ways to contact you in case one fails. Phone / WhatsApp is optional. If you live
-              in Belize and have fewer than two other contact methods, a street address is required.
+              We need at least two ways to contact you in case one fails. Your email counts as one. Phone / WhatsApp
+              is optional. If you live in Belize and have fewer than two contact methods in total, a street address is
+              required.
             </p>
             <FieldGroup columns={2}>
-              <Field label="Email address" hint="This is your verified account email." error={fieldError("email")} id="email">
+              <Field label="Email address" hint="This is your verified account email. It counts as one way to contact you." error={fieldError("email")} id="email">
                 <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50 dark:bg-zinc-950" error={fieldError("email")} />
               </Field>
               <SocialContactField
@@ -940,6 +938,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.facebook}
                 onChange={(value) => update("facebook", value)}
                 placeholder="username or https://facebook.com/username"
+                firstName={form.firstName}
+                lastName={form.lastName}
               />
               <Field
                 label="Phone / WhatsApp number"
@@ -963,6 +963,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.instagram}
                 onChange={(value) => update("instagram", value)}
                 placeholder="@username or profile link"
+                firstName={form.firstName}
+                lastName={form.lastName}
               />
               <SocialContactField
                 platform="tiktok"
@@ -971,6 +973,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 value={form.tiktok}
                 onChange={(value) => update("tiktok", value)}
                 placeholder="@username or profile link"
+                firstName={form.firstName}
+                lastName={form.lastName}
               />
               <div className="space-y-4">
                 <Field label="Other contact platform / application" hint="Optional" id="otherContactPlatform">
@@ -995,10 +999,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
               hint={
                 streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
-                  ? "Required because you live in Belize and have fewer than two other ways to contact you."
+                  ? "Required because you live in Belize and have fewer than two contact methods, counting email."
                   : form.placeOfResidence === "Abroad"
-                    ? "Optional. Street address is only required for people living in Belize who have fewer than two other contact methods."
-                    : "Optional when you have already given at least two ways to contact you."
+                    ? "Optional. Street address is only required for people living in Belize who have fewer than two contact methods, counting email."
+                    : "Optional when you have already given at least two ways to contact you, counting email."
               }
               error={fieldError("streetAddress")}
               id="streetAddress"
@@ -1007,7 +1011,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 id="streetAddress"
                 value={form.streetAddress}
                 onChange={(e) => update("streetAddress", e.target.value)}
-                onBlur={() => touchAndValidate("streetAddress")}
+                onBlur={(e) => {
+                  const formatted = titleCaseStreetAddress(e.target.value);
+                  if (formatted !== form.streetAddress) update("streetAddress", formatted);
+                  touch("streetAddress");
+                  validateField("streetAddress", formatted);
+                }}
                 error={fieldError("streetAddress")}
                 placeholder="House number, street, village or city, district"
               />

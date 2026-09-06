@@ -32,6 +32,23 @@ export function titleCaseName(name: string): string {
   return cleaned.split(/\s+/).map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
 }
 
+/** Title-case a street address: each main word starts with a capital letter. */
+export function titleCaseStreetAddress(address: string): string {
+  return String(address ?? "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) =>
+      line
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ")
+    )
+    .join("\n")
+    .replace(/^\n+|\n+$/g, "");
+}
+
 export function calculateAge(dob: string): number {
   const birth = parseBirthDate(dob);
   if (!birth) return -1;
@@ -454,8 +471,6 @@ export function validateRegistrationForm(
       } else if (!US_DIASPORA_REGIONS.includes(data.usDiasporaRegion)) {
         errors.usDiasporaRegion = "Please select Northeast, Midwest, South, or West.";
       }
-    } else if (data.countryIfAbroad && !cleanText(data.usDiasporaRegion)) {
-      errors.usDiasporaRegion = "Region of country is required.";
     }
   } else if (data.placeOfResidence && !data.cityTownVillage) {
     errors.cityTownVillage = "City / town / village is required.";
@@ -632,8 +647,6 @@ export function validateProfileUpdateForm(
       } else if (!US_DIASPORA_REGIONS.includes(data.usDiasporaRegion)) {
         errors.usDiasporaRegion = "Please select Northeast, Midwest, South, or West.";
       }
-    } else if (data.countryIfAbroad && !cleanText(data.usDiasporaRegion)) {
-      errors.usDiasporaRegion = "Region of country is required.";
     }
   } else if (data.placeOfResidence && !data.cityTownVillage) {
     errors.cityTownVillage = "City / town / village is required.";

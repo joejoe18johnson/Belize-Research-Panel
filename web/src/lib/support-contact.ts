@@ -56,7 +56,7 @@ export const SUPPORT_FAQ: SupportFaqItem[] = [
   {
     question: "How do I delete my account?",
     answer:
-      "Signed-in panelists can delete their account from the delete account page linked in the site footer. You will need your password and must confirm that you want to opt out. Deleting your account also unsubscribes that email from all future messages.",
+      "Signed-in panelists can delete their account from the delete account page linked in the site footer. You will need your password and must confirm that you want to opt out. Deleting your account also unsubscribes that email from all future messages. Public instructions, including how to remove Facebook-connected data, are on the data deletion page.",
   },
   {
     question: "How do I exercise my privacy rights?",

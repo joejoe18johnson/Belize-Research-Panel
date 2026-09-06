@@ -11,6 +11,8 @@ export function SocialContactField({
   value,
   onChange,
   placeholder,
+  firstName,
+  lastName,
 }: {
   platform: SocialPlatform;
   label: string;
@@ -18,6 +20,8 @@ export function SocialContactField({
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  firstName?: string;
+  lastName?: string;
 }) {
   return (
     <Field label={label} id={id}>
@@ -27,7 +31,12 @@ export function SocialContactField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
       />
-      <SocialProfilePreview platform={platform} value={value} />
+      <SocialProfilePreview
+        platform={platform}
+        value={value}
+        firstName={firstName}
+        lastName={lastName}
+      />
     </Field>
   );
 }

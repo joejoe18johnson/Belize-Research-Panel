@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       return NextResponse.json({
         ...base,
-        message: "We couldn't load a live preview. Please double-check your handle or link.",
       });
     }
 
@@ -47,7 +46,6 @@ export async function GET(request: NextRequest) {
   } catch {
     return NextResponse.json({
       ...base,
-      message: "We couldn't load a live preview. Please double-check your handle or link.",
     });
   }
 }

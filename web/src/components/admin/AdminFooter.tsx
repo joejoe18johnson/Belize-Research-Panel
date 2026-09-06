@@ -20,6 +20,9 @@ export function AdminFooter() {
           <Link href="/data-use-policy" className="transition hover:text-teal-950 dark:text-teal-100 hover:underline">
             {formatHeadingCase("Data use policy")}
           </Link>
+          <Link href="/data-deletion" className="transition hover:text-teal-950 dark:text-teal-100 hover:underline">
+            {formatHeadingCase("Data deletion")}
+          </Link>
         </nav>
       </div>
     </footer>

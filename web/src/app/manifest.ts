@@ -14,8 +14,8 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait-primary",
     icons: [
       {
-        src: "/images/BRP-Logo-01.png",
-        sizes: "512x512",
+        src: "/images/brp-icon.png",
+        sizes: "1024x1024",
         type: "image/png",
         purpose: "any",
       },
