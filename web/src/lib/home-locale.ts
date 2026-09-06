@@ -42,7 +42,7 @@ export const HOME_COPY = {
     howItWorksSteps: [
       {
         title: "Create your account",
-        body: "Register with your email, confirm eligibility, and verify your address to unlock panelist registration.",
+        body: "Register with Facebook or email, confirm eligibility, and verify your address to unlock panelist registration.",
       },
       {
         title: "Join the panel",
@@ -68,7 +68,7 @@ export const HOME_COPY = {
       },
       {
         title: "Secure accounts",
-        body: "Create an account with email verification before completing panelist registration.",
+        body: "Create an account with Facebook or email verification before completing panelist registration.",
       },
       {
         title: "Matched research",
@@ -117,7 +117,7 @@ export const HOME_COPY = {
     howItWorksSteps: [
       {
         title: "Cree su cuenta",
-        body: "Regístrese con su correo, confirme su elegibilidad y verifique su dirección para desbloquear el registro del panelista.",
+        body: "Regístrese con Facebook o correo electrónico, confirme su elegibilidad y verifique su dirección para desbloquear el registro del panelista.",
       },
       {
         title: "Únase al panel",
@@ -143,7 +143,7 @@ export const HOME_COPY = {
       },
       {
         title: "Cuentas seguras",
-        body: "Cree una cuenta con verificación de correo electrónico antes de completar el registro del panelista.",
+        body: "Cree una cuenta con Facebook o verificación de correo electrónico antes de completar el registro del panelista.",
       },
       {
         title: "Investigación personalizada",
