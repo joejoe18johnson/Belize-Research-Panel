@@ -119,9 +119,20 @@ export async function supabaseFindAccountsByEmail(email: string): Promise<Accoun
   return (data ?? []).map((row) => accountRowToRecord(row as Record<string, unknown>));
 }
 
-export async function supabaseFindAccountByEmail(email: string): Promise<AccountRecord | null> {
-  const matches = await supabaseFindAccountsByEmail(email);
-  return matches[0] ?? null;
+export async function supabaseFindAccountByFacebookUserId(
+  facebookUserId: string
+): Promise<AccountRecord | null> {
+  const id = cleanText(facebookUserId);
+  if (!id) return null;
+
+  const { data, error } = await db()
+    .from("accounts")
+    .select("*")
+    .filter("metadata->>facebook_user_id", "eq", id)
+    .limit(1);
+  throwIfError(error);
+  const row = data?.[0];
+  return row ? accountRowToRecord(row as Record<string, unknown>) : null;
 }
 
 export async function supabaseFindAccountByVerificationToken(token: string): Promise<AccountRecord | null> {

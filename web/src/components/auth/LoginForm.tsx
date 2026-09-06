@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { AuthMethodDivider, FacebookAuthButton } from "@/components/auth/FacebookAuthButton";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { Field, TextInput } from "@/components/registration/form-ui";
 import { formatSiteCase } from "@/lib/sentence-case";
@@ -71,51 +72,59 @@ export function LoginForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <Field label="Email address" required error={errors.email} id="email">
-        <TextInput
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={errors.email}
-          autoComplete="email"
-        />
-      </Field>
+    <div className="space-y-5">
+      <FacebookAuthButton nextPath={nextPath} mode="login" />
+      <AuthMethodDivider />
 
-      <Field label="Password" required error={errors.password} id="password">
-        <PasswordInput
-          id="password"
-          ref={passwordRef}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={errors.password}
-          autoComplete="current-password"
-        />
-      </Field>
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        <Field label="Email address" required error={errors.email} id="email">
+          <TextInput
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={errors.email}
+            autoComplete="email"
+          />
+        </Field>
 
-      <p className="-mt-2 text-right text-sm">
-        <Link href="/forgot-password" className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300">
-          {formatSiteCase("Forgot password?")}
-        </Link>
-      </p>
+        <Field label="Password" required error={errors.password} id="password">
+          <PasswordInput
+            id="password"
+            ref={passwordRef}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={errors.password}
+            autoComplete="current-password"
+          />
+        </Field>
 
-      {errors.submit ? <p className="text-sm text-red-600" role="alert">{formatSiteCase(errors.submit)}</p> : null}
+        <p className="-mt-2 text-right text-sm">
+          <Link href="/forgot-password" className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300">
+            {formatSiteCase("Forgot password?")}
+          </Link>
+        </p>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
-      >
-        {submitting ? formatSiteCase("Signing in…") : formatSiteCase("Log in")}
-      </button>
+        {errors.submit ? <p className="text-sm text-red-600" role="alert">{formatSiteCase(errors.submit)}</p> : null}
 
-      <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-        {formatSiteCase("Need an account?")}{" "}
-        <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100">
-          {formatSiteCase("Create account")}
-        </Link>
-      </p>
-    </form>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+        >
+          {submitting ? formatSiteCase("Signing in…") : formatSiteCase("Log in")}
+        </button>
+
+        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          {formatSiteCase("Need an account?")}{" "}
+          <Link
+            href={`/signup?next=${encodeURIComponent(nextPath)}`}
+            className="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100"
+          >
+            {formatSiteCase("Create account")}
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 }

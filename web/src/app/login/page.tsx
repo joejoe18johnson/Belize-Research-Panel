@@ -33,7 +33,7 @@ export default async function LoginPage({
   return (
     <AuthPageShell
       title="Panelist login"
-      subtitle="Sign in with the email and password you used when creating your account."
+      subtitle="Sign in with Facebook or with the email and password you used when creating your account."
     >
       {verified === "1" ? (
         <BrandedAlert tone="success" title="Congratulations, your email has been verified" className="mb-6" showIcon>

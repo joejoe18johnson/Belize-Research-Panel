@@ -16,6 +16,7 @@ import {
 } from "@/components/registration/form-ui";
 import { PasswordStrengthBar } from "@/components/registration/PasswordStrengthBar";
 import { PasswordInput } from "@/components/auth/PasswordInput";
+import { AuthMethodDivider, FacebookAuthButton } from "@/components/auth/FacebookAuthButton";
 import { PasswordMatchStatus } from "@/components/auth/PasswordMatchStatus";
 import type { SignupFormData } from "@/lib/auth-types";
 import { CITIZENSHIP_STATUS, COMMONWEALTH_COUNTRIES, CITIZENSHIP_PANEL_INTRO, isCommonwealthCitizenInBelize } from "@/lib/constants";
@@ -256,11 +257,12 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+    <div className="space-y-5">
       <BrandedAlert tone="success" title="Eligibility confirmed" showIcon>
         <p>{form.citizenshipStatus}</p>
         <p className="mt-2">
-          Proof of citizenship or residency will be required when you complete panelist registration.
+          Proof of citizenship or residency will be required when you complete panelist registration. If you do not use
+          email, sign up with Facebook and add WhatsApp or another social contact on the next registration step.
         </p>
         <button
           type="button"
@@ -271,6 +273,18 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         </button>
       </BrandedAlert>
 
+      <FacebookAuthButton
+        nextPath={nextPath}
+        mode="signup"
+        eligibility={{
+          citizenshipStatus: form.citizenshipStatus,
+          commonwealthCountry: form.commonwealthCountry,
+          dob: form.dob,
+        }}
+      />
+      <AuthMethodDivider label="or create with email" />
+
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <FieldGroup columns={2}>
         <Field label="First name" required error={errors.firstName} id="firstName">
           <TextInput
@@ -355,6 +369,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
           Log in
         </Link>
       </p>
-    </form>
+      </form>
+    </div>
   );
 }

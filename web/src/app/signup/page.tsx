@@ -23,7 +23,7 @@ export default async function SignupPage({
   return (
     <AuthPageShell
       title="Create your account"
-      subtitle="First confirm your eligibility, then create your account and verify your email before completing panelist registration."
+      subtitle="Confirm eligibility, then create your account with Facebook or email. Prefer WhatsApp or social contact if you do not use email."
     >
       {account ? <SignedInBanner account={account} nextPath={destination} /> : null}
       <SignupForm nextPath={destination} />

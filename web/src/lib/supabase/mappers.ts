@@ -1,4 +1,4 @@
-import type { AccountRecord, AccountStatus, AccountHoldReason } from "../auth-types";
+import type { AccountRecord, AccountStatus, AccountHoldReason, AccountAuthProvider } from "../auth-types";
 import type { PanelistRow } from "../panelists";
 import type { PanelistSurveyRecord } from "../panelist-surveys-types";
 import type { SurveyResponseRecord } from "../survey-responses";
@@ -84,6 +84,8 @@ export function accountRowToRecord(row: Record<string, unknown>): AccountRecord 
     phone_change_requested_at: metadataString(meta, "phone_change_requested_at"),
     password_reset_token: metadataString(meta, "password_reset_token"),
     password_reset_sent_at: metadataString(meta, "password_reset_sent_at"),
+    auth_provider: (metadataString(meta, "auth_provider") || "password") as AccountAuthProvider,
+    facebook_user_id: metadataString(meta, "facebook_user_id"),
   };
 }
 
@@ -102,6 +104,8 @@ export function accountRecordToRow(account: AccountRecord): Record<string, unkno
     phone_change_requested_at: account.phone_change_requested_at ?? "",
     password_reset_token: account.password_reset_token ?? "",
     password_reset_sent_at: account.password_reset_sent_at ?? "",
+    auth_provider: account.auth_provider ?? "password",
+    facebook_user_id: account.facebook_user_id ?? "",
   };
 
   return {

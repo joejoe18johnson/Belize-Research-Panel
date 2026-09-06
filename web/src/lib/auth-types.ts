@@ -1,5 +1,6 @@
 export type AccountStatus = "active" | "on_hold";
 export type AccountHoldReason = "" | "email_change" | "phone_change" | "email_and_phone" | "fraud_review";
+export type AccountAuthProvider = "password" | "facebook";
 
 export interface AccountRecord {
   id: string;
@@ -26,6 +27,10 @@ export interface AccountRecord {
   phone_change_requested_at?: string;
   password_reset_token?: string;
   password_reset_sent_at?: string;
+  /** How the account was created / primarily authenticates. */
+  auth_provider?: AccountAuthProvider;
+  /** Facebook user id when signed in with Facebook. */
+  facebook_user_id?: string;
 }
 
 export interface SessionAccount {

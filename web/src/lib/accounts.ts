@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import type {
@@ -8,6 +8,7 @@ import type {
   AccountStatus,
   SessionAccount,
 } from "./auth-types";
+import { facebookPlaceholderEmail, isFacebookPlaceholderEmail } from "./facebook-auth";
 import { hashPassword, loadPanelists, updatePanelistCredentialsByEmail } from "./panelists";
 import { isCommonwealthCitizenInBelize } from "./constants";
 import {
@@ -720,4 +721,164 @@ export function isPhoneDuplicateAmongPanelists(
     const rowPhone = normalizePhoneForComparison(row.phone_whatsapp ?? "");
     return rowPhone === target;
   });
+}
+
+export interface FacebookIdentityInput {
+  facebookUserId: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+}
+
+export interface FacebookEligibilityInput {
+  citizenshipStatus?: string;
+  commonwealthCountry?: string;
+  dob?: string;
+}
+
+function splitFacebookName(identity: FacebookIdentityInput): { firstName: string; lastName: string } {
+  const first = cleanText(identity.firstName);
+  const last = cleanText(identity.lastName);
+  if (first || last) {
+    return { firstName: first || "Facebook", lastName: last || "User" };
+  }
+  const full = cleanText(identity.fullName);
+  if (!full) return { firstName: "Facebook", lastName: "User" };
+  const parts = full.split(/\s+/);
+  return {
+    firstName: parts[0] || "Facebook",
+    lastName: parts.slice(1).join(" ") || "User",
+  };
+}
+
+export async function findAccountByFacebookUserId(facebookUserId: string): Promise<AccountRecord | null> {
+  const id = cleanText(facebookUserId);
+  if (!id) return null;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseFindAccountByFacebookUserId } = await import("./supabase/repos");
+    return supabaseFindAccountByFacebookUserId(id);
+  }
+
+  const accounts = await loadAccountsRaw();
+  return accounts.find((account) => cleanText(account.facebook_user_id) === id) ?? null;
+}
+
+/**
+ * Create or link a panel account from a verified Facebook identity (via Supabase Auth).
+ * Real Facebook emails are treated as verified. If Facebook shares no email, a placeholder
+ * is used so the person can continue with WhatsApp / social contact during registration.
+ */
+export async function createOrLinkFacebookAccount(
+  identity: FacebookIdentityInput,
+  eligibility: FacebookEligibilityInput = {}
+): Promise<{ account: AccountRecord; created: boolean }> {
+  const facebookUserId = cleanText(identity.facebookUserId);
+  if (!facebookUserId) throw new Error("missing_facebook_id");
+
+  const existingByFacebook = await findAccountByFacebookUserId(facebookUserId);
+  if (existingByFacebook) {
+    const { firstName, lastName } = splitFacebookName(identity);
+    const updated: AccountRecord = {
+      ...existingByFacebook,
+      auth_provider: "facebook",
+      facebook_user_id: facebookUserId,
+      first_name: existingByFacebook.first_name || titleCaseName(firstName),
+      last_name: existingByFacebook.last_name || titleCaseName(lastName),
+      email_verified: "true",
+    };
+
+    if (!cleanText(updated.citizenship_status) && cleanText(eligibility.citizenshipStatus)) {
+      updated.citizenship_status = cleanText(eligibility.citizenshipStatus);
+      updated.commonwealth_country = isCommonwealthCitizenInBelize(updated.citizenship_status)
+        ? cleanText(eligibility.commonwealthCountry)
+        : "";
+    }
+    if (!cleanText(updated.dob) && cleanText(eligibility.dob)) {
+      updated.dob = cleanText(eligibility.dob);
+    }
+
+    await persistAccount(updated);
+    return { account: updated, created: false };
+  }
+
+  const facebookEmail = cleanText(identity.email).toLowerCase();
+  const hasRealEmail = Boolean(
+    facebookEmail && validEmail(facebookEmail) && !isFacebookPlaceholderEmail(facebookEmail)
+  );
+  const email = hasRealEmail ? facebookEmail : facebookPlaceholderEmail(facebookUserId);
+
+  if (hasRealEmail) {
+    const byEmail = await findAccountByEmail(email);
+    if (byEmail) {
+      const linked: AccountRecord = {
+        ...byEmail,
+        auth_provider: byEmail.auth_provider ?? "password",
+        facebook_user_id: facebookUserId,
+        email_verified: "true",
+        verification_token: "",
+      };
+      if (!cleanText(linked.citizenship_status) && cleanText(eligibility.citizenshipStatus)) {
+        linked.citizenship_status = cleanText(eligibility.citizenshipStatus);
+        linked.commonwealth_country = isCommonwealthCitizenInBelize(linked.citizenship_status)
+          ? cleanText(eligibility.commonwealthCountry)
+          : "";
+      }
+      if (!cleanText(linked.dob) && cleanText(eligibility.dob)) {
+        linked.dob = cleanText(eligibility.dob);
+      }
+      await persistAccount(linked);
+      return { account: linked, created: false };
+    }
+  }
+
+  const { firstName, lastName } = splitFacebookName(identity);
+  const { salt, hash } = hashPassword(randomBytes(32).toString("hex"));
+  const now = new Date().toISOString();
+  const citizenshipStatus = cleanText(eligibility.citizenshipStatus);
+
+  const account: AccountRecord = {
+    id: randomUUID(),
+    first_name: titleCaseName(firstName),
+    last_name: titleCaseName(lastName),
+    email,
+    password_salt: salt,
+    password_hash: hash,
+    email_verified: "true",
+    verification_token: "",
+    verification_sent_at: now,
+    created_at: now,
+    panelist_registered: "false",
+    citizenship_status: citizenshipStatus,
+    commonwealth_country: isCommonwealthCitizenInBelize(citizenshipStatus)
+      ? cleanText(eligibility.commonwealthCountry)
+      : "",
+    dob: cleanText(eligibility.dob),
+    account_status: "active",
+    hold_reason: "",
+    auth_provider: "facebook",
+    facebook_user_id: facebookUserId,
+  };
+
+  const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseInsertAccount } = await import("./supabase/repos");
+    try {
+      await supabaseInsertAccount(account);
+    } catch (error) {
+      if (error instanceof Error && error.message === "duplicate_key") {
+        throw new Error("email_exists");
+      }
+      throw error;
+    }
+    return { account, created: true };
+  }
+
+  assertCanPersistData();
+  const accounts = await loadAccountsRaw();
+  accounts.push(account);
+  await saveAccountsRaw(accounts);
+  return { account, created: true };
 }
