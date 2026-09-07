@@ -1,6 +1,6 @@
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
-import { isValidPhoneCountryCode } from "./phone-codes";
+import { validateNationalPhoneNumber } from "./phone-codes";
 import {
   COMMONWEALTH_COUNTRIES,
   EDUCATION_LEVELS,
@@ -134,16 +134,7 @@ export function validatePhoneFields(
 ): string | null {
   const localDigits = phoneLocalDigits(data.phoneLocalNumber);
   if (!localDigits) return null;
-  if (!isValidPhoneCountryCode(data.phoneCountryCode)) {
-    return "Please select a valid country code.";
-  }
-  if (localDigits.length < 7) {
-    return "Enter at least 7 digits for the phone number (without the country code).";
-  }
-  if (localDigits.length > 15) {
-    return "Phone number is too long. Check the number and country code.";
-  }
-  return null;
+  return validateNationalPhoneNumber(data.phoneCountryCode, localDigits);
 }
 
 export function livesInBelizeResidence(placeOfResidence: string): boolean {

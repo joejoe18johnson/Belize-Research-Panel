@@ -4,7 +4,84 @@ export interface PhoneCountryCode {
   label: string;
 }
 
+export interface PhoneNumberRule {
+  /** Minimum national digits (without country code). */
+  minLength: number;
+  /** Maximum national digits (without country code). */
+  maxLength: number;
+  /** If set, the national number must start with one of these prefixes. */
+  startsWith?: readonly string[];
+  /** Short hint shown under the phone field. */
+  hint: string;
+  /** Placeholder example (digits only). */
+  example: string;
+}
+
 export const DEFAULT_PHONE_COUNTRY_CODE = "+501";
+
+/**
+ * National (local) number rules by dialing code.
+ * Lengths exclude the country code — what the registrant types in the local field.
+ */
+export const PHONE_NUMBER_RULES: Record<string, PhoneNumberRule> = {
+  "+54": { minLength: 10, maxLength: 10, hint: "Argentina numbers use 10 digits.", example: "9112345678" },
+  "+61": { minLength: 9, maxLength: 9, hint: "Australia numbers use 9 digits (without the leading 0).", example: "412345678" },
+  "+1242": { minLength: 7, maxLength: 7, hint: "Bahamas numbers use 7 digits after +1 242.", example: "3591234" },
+  "+1246": { minLength: 7, maxLength: 7, hint: "Barbados numbers use 7 digits after +1 246.", example: "4301234" },
+  "+501": {
+    minLength: 7,
+    maxLength: 7,
+    startsWith: ["6"],
+    hint: "Belize mobile / WhatsApp numbers use exactly 7 digits and start with 6.",
+    example: "6123456",
+  },
+  "+55": { minLength: 10, maxLength: 11, hint: "Brazil numbers use 10–11 digits (including area code).", example: "11987654321" },
+  "+56": { minLength: 9, maxLength: 9, hint: "Chile numbers use 9 digits.", example: "912345678" },
+  "+86": { minLength: 11, maxLength: 11, hint: "China mobile numbers use 11 digits.", example: "13812345678" },
+  "+57": { minLength: 10, maxLength: 10, hint: "Colombia numbers use 10 digits.", example: "3001234567" },
+  "+506": { minLength: 8, maxLength: 8, hint: "Costa Rica numbers use 8 digits.", example: "83123456" },
+  "+53": { minLength: 8, maxLength: 8, hint: "Cuba numbers use 8 digits.", example: "51234567" },
+  "+593": { minLength: 9, maxLength: 9, hint: "Ecuador numbers use 9 digits.", example: "991234567" },
+  "+503": { minLength: 8, maxLength: 8, hint: "El Salvador numbers use 8 digits.", example: "70123456" },
+  "+971": { minLength: 9, maxLength: 9, hint: "UAE numbers use 9 digits (without the leading 0).", example: "501234567" },
+  "+33": { minLength: 9, maxLength: 9, hint: "France numbers use 9 digits (without the leading 0).", example: "612345678" },
+  "+49": { minLength: 10, maxLength: 11, hint: "Germany numbers usually use 10–11 digits (without the leading 0).", example: "15123456789" },
+  "+502": { minLength: 8, maxLength: 8, hint: "Guatemala numbers use 8 digits.", example: "51234567" },
+  "+852": { minLength: 8, maxLength: 8, hint: "Hong Kong numbers use 8 digits.", example: "91234567" },
+  "+504": { minLength: 8, maxLength: 8, hint: "Honduras numbers use 8 digits.", example: "91234567" },
+  "+91": { minLength: 10, maxLength: 10, hint: "India mobile numbers use 10 digits.", example: "9876543210" },
+  "+353": { minLength: 9, maxLength: 9, hint: "Ireland numbers use 9 digits (without the leading 0).", example: "851234567" },
+  "+39": { minLength: 9, maxLength: 10, hint: "Italy mobile numbers usually use 9–10 digits.", example: "3123456789" },
+  "+1876": { minLength: 7, maxLength: 7, hint: "Jamaica numbers use 7 digits after +1 876.", example: "2101234" },
+  "+81": { minLength: 10, maxLength: 10, hint: "Japan mobile numbers use 10 digits (without the leading 0).", example: "9012345678" },
+  "+52": { minLength: 10, maxLength: 10, hint: "Mexico numbers use 10 digits.", example: "5512345678" },
+  "+31": { minLength: 9, maxLength: 9, hint: "Netherlands numbers use 9 digits (without the leading 0).", example: "612345678" },
+  "+64": { minLength: 8, maxLength: 10, hint: "New Zealand numbers usually use 8–10 digits (without the leading 0).", example: "211234567" },
+  "+234": { minLength: 10, maxLength: 10, hint: "Nigeria numbers use 10 digits (without the leading 0).", example: "8012345678" },
+  "+505": { minLength: 8, maxLength: 8, hint: "Nicaragua numbers use 8 digits.", example: "81234567" },
+  "+507": { minLength: 8, maxLength: 8, hint: "Panama numbers use 8 digits.", example: "61234567" },
+  "+63": { minLength: 10, maxLength: 10, hint: "Philippines mobile numbers use 10 digits.", example: "9171234567" },
+  "+51": { minLength: 9, maxLength: 9, hint: "Peru numbers use 9 digits.", example: "912345678" },
+  "+966": { minLength: 9, maxLength: 9, hint: "Saudi Arabia numbers use 9 digits (without the leading 0).", example: "512345678" },
+  "+65": { minLength: 8, maxLength: 8, hint: "Singapore numbers use 8 digits.", example: "81234567" },
+  "+27": { minLength: 9, maxLength: 9, hint: "South Africa numbers use 9 digits (without the leading 0).", example: "821234567" },
+  "+82": { minLength: 9, maxLength: 10, hint: "South Korea numbers usually use 9–10 digits (without the leading 0).", example: "1012345678" },
+  "+34": { minLength: 9, maxLength: 9, hint: "Spain numbers use 9 digits.", example: "612345678" },
+  "+46": { minLength: 9, maxLength: 9, hint: "Sweden numbers use 9 digits (without the leading 0).", example: "701234567" },
+  "+41": { minLength: 9, maxLength: 9, hint: "Switzerland numbers use 9 digits (without the leading 0).", example: "791234567" },
+  "+886": { minLength: 9, maxLength: 9, hint: "Taiwan mobile numbers use 9 digits.", example: "912345678" },
+  "+1868": { minLength: 7, maxLength: 7, hint: "Trinidad and Tobago numbers use 7 digits after +1 868.", example: "6201234" },
+  "+1": { minLength: 10, maxLength: 10, hint: "US / Canada numbers use 10 digits (area code + number).", example: "2025550123" },
+  "+44": { minLength: 10, maxLength: 10, hint: "UK numbers use 10 digits (without the leading 0).", example: "7400123456" },
+  "+58": { minLength: 10, maxLength: 10, hint: "Venezuela numbers use 10 digits.", example: "4121234567" },
+};
+
+const DEFAULT_PHONE_RULE: PhoneNumberRule = {
+  minLength: 7,
+  maxLength: 15,
+  hint: "Enter the phone number without the country code.",
+  example: "1234567",
+};
 
 /** Sorted alphabetically by country name for easier lookup. */
 export const PHONE_COUNTRY_CODES: PhoneCountryCode[] = [
@@ -73,4 +150,50 @@ export function phoneCountryCodeForCountry(country: string): string | null {
 
 export function isValidPhoneCountryCode(code: string): boolean {
   return PHONE_COUNTRY_CODES.some((entry) => entry.code === code);
+}
+
+export function getPhoneNumberRule(countryCode: string): PhoneNumberRule {
+  return PHONE_NUMBER_RULES[countryCode] ?? DEFAULT_PHONE_RULE;
+}
+
+export function getPhoneCountryLabel(countryCode: string): string {
+  return PHONE_COUNTRY_CODES.find((entry) => entry.code === countryCode)?.country ?? "selected country";
+}
+
+/** Validate national digits for a country code. Empty input is allowed (optional field). */
+export function validateNationalPhoneNumber(countryCode: string, localDigits: string): string | null {
+  const digits = String(localDigits || "").replace(/\D/g, "");
+  if (!digits) return null;
+  if (!isValidPhoneCountryCode(countryCode)) {
+    return "Please select a valid country code.";
+  }
+
+  const rule = getPhoneNumberRule(countryCode);
+  const country = getPhoneCountryLabel(countryCode);
+  const exact = rule.minLength === rule.maxLength;
+
+  if (digits.length < rule.minLength) {
+    return exact
+      ? `${country} phone numbers must be exactly ${rule.minLength} digits (without the country code).`
+      : `${country} phone numbers need at least ${rule.minLength} digits (without the country code).`;
+  }
+
+  if (digits.length > rule.maxLength) {
+    return exact
+      ? `${country} phone numbers must be exactly ${rule.maxLength} digits (without the country code).`
+      : `${country} phone numbers can have at most ${rule.maxLength} digits (without the country code).`;
+  }
+
+  if (rule.startsWith?.length) {
+    const ok = rule.startsWith.some((prefix) => digits.startsWith(prefix));
+    if (!ok) {
+      if (countryCode === "+501") {
+        return "Belize mobile / WhatsApp numbers must start with 6 (7 digits total, e.g. 6123456).";
+      }
+      const prefixes = rule.startsWith.join(" or ");
+      return `${country} phone numbers must start with ${prefixes}.`;
+    }
+  }
+
+  return null;
 }

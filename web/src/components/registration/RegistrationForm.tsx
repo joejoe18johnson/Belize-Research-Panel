@@ -57,12 +57,13 @@ import {
   initialRegistrationForm,
   type RegistrationFormData,
 } from "@/lib/registration-types";
-import { phoneCountryCodeForCountry } from "@/lib/phone-codes";
+import { getPhoneNumberRule, phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
   countContactMethods,
   cleanText,
   getFullPhoneNumber,
   livesInBelizeResidence,
+  phoneLocalDigits,
   streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
@@ -1021,7 +1022,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               />
               <Field
                 label="Phone / WhatsApp number"
-                hint="Optional. Select your country code, then enter your number without the country code."
+                hint="Optional."
                 id="phoneLocalNumber"
                 error={fieldError("phoneLocalNumber")}
               >
@@ -1029,9 +1030,23 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   countryCode={form.phoneCountryCode}
                   localNumber={form.phoneLocalNumber}
                   onCountryCodeChange={(code) => {
-                    update("phoneCountryCode", code);
+                    const rule = getPhoneNumberRule(code);
+                    const trimmed = phoneLocalDigits(form.phoneLocalNumber).slice(0, rule.maxLength);
+                    setForm((prev) => ({
+                      ...prev,
+                      phoneCountryCode: code,
+                      phoneLocalNumber: trimmed,
+                    }));
                     touch("phoneLocalNumber");
-                    validateField("phoneLocalNumber");
+                    const fieldErrors = validateRegistrationForm(
+                      { ...form, phoneCountryCode: code, phoneLocalNumber: trimmed },
+                      validationOptions
+                    );
+                    setErrors((prev) =>
+                      fieldErrors.phoneLocalNumber
+                        ? { ...prev, phoneLocalNumber: fieldErrors.phoneLocalNumber }
+                        : clearFieldError(prev, "phoneLocalNumber")
+                    );
                   }}
                   onLocalNumberChange={(number) => {
                     update("phoneLocalNumber", number);
