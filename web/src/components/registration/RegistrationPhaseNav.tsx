@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRegistrationCopy } from "@/components/locale/LocaleProvider";
 
 const navButtonClass =
   "inline-flex min-h-12 w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed lg:w-auto";
@@ -22,6 +23,8 @@ export function RegistrationPhaseNav({
   onBack: () => void;
   onNext: () => void;
 }) {
+  const copy = useRegistrationCopy();
+
   return (
     <div className="flex flex-col-reverse gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-6 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
       {activePhaseIndex > 0 ? (
@@ -30,7 +33,7 @@ export function RegistrationPhaseNav({
           onClick={onBack}
           className={`${navButtonClass} border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950`}
         >
-          Back
+          {copy.back}
         </button>
       ) : (
         <span className="hidden lg:block" aria-hidden="true" />
@@ -41,7 +44,7 @@ export function RegistrationPhaseNav({
           href="/"
           className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800`}
         >
-          Return home
+          {copy.returnHome}
         </Link>
       ) : isLastPhase ? (
         <button
@@ -49,7 +52,7 @@ export function RegistrationPhaseNav({
           disabled={submitting}
           className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:opacity-60`}
         >
-          {submitting ? "Submitting..." : "Submit registration"}
+          {submitting ? copy.submitting : copy.submit}
         </button>
       ) : (
         <button
@@ -58,7 +61,7 @@ export function RegistrationPhaseNav({
           disabled={nextDisabled}
           className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 disabled:shadow-none disabled:hover:bg-zinc-300`}
         >
-          Next
+          {copy.next}
         </button>
       )}
     </div>

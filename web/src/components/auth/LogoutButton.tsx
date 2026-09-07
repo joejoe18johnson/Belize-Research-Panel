@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { formatSiteCase } from "@/lib/sentence-case";
 
 function LogoutIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -16,16 +15,22 @@ export function LogoutButton({
   className = "",
   compact = false,
   showIcon = false,
+  label,
+  loadingLabel,
 }: {
   className?: string;
   /** Icon-only control for cramped mobile toolbars. */
   compact?: boolean;
   /** Show the logout icon beside the label. */
   showIcon?: boolean;
+  label?: string;
+  loadingLabel?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const label = loading ? "Logging out" : "Log out";
+  const idleLabel = label ?? "Log out";
+  const busyLabel = loadingLabel ?? "Logging out…";
+  const displayLabel = loading ? busyLabel : idleLabel;
 
   const handleLogout = async () => {
     setLoading(true);
@@ -43,8 +48,8 @@ export function LogoutButton({
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      aria-label={formatSiteCase(label)}
-      title={formatSiteCase(label)}
+      aria-label={displayLabel}
+      title={displayLabel}
       className={className}
     >
       {compact ? (
@@ -52,7 +57,7 @@ export function LogoutButton({
       ) : (
         <>
           {showIcon ? <LogoutIcon className="h-5 w-5 shrink-0" /> : null}
-          {loading ? formatSiteCase("Logging out…") : formatSiteCase("Log out")}
+          {displayLabel}
         </>
       )}
     </button>

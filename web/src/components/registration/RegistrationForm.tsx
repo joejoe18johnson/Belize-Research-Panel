@@ -21,6 +21,7 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
+import { useRegistrationCopy } from "@/components/locale/LocaleProvider";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -34,7 +35,6 @@ import {
   HEAD_OF_HOUSEHOLD_DEFINITION,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
-  cityTownVillageQuestionLabel,
   MARKET_INTERESTS,
   MAX_MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
@@ -167,6 +167,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const [phaseAttempted, setPhaseAttempted] = useState(false);
   const scrollToTopAfterPhaseChange = useRef(false);
   const pendingErrorScrollKeys = useRef<string[] | null>(null);
+  const copy = useRegistrationCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -361,8 +362,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : form.otherContactPlatform;
 
   const reviewRows = useMemo(() => {
-    const asked = (value: string) => (cleanText(value) ? value : "Not provided");
-    const na = "Not applicable";
+    const asked = (value: string) => (cleanText(value) ? value : copy.notProvided);
+    const na = copy.notApplicable;
     const livingAbroad = form.placeOfResidence === "Abroad";
     const livingInBelize = livesInBelizeResidence(form.placeOfResidence);
     const headOfHousehold = isHeadOfHousehold(form.householdHeadRelationship);
@@ -373,55 +374,56 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
     const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
     const addressAsked = streetAddressRequired;
+    const rl = copy.reviewLabels;
 
     const cityValue =
       form.cityTownVillage === "Other" ? form.cityTownVillageOther : form.cityTownVillage;
 
     const rows: [string, string][] = [
-      ["Citizenship / residency status", asked(form.citizenshipStatus)],
+      [rl.citizenship, asked(form.citizenshipStatus)],
       [
-        "Commonwealth country of citizenship",
+        rl.commonwealthCountry,
         commonwealthAsked ? asked(form.commonwealthCountry) : na,
       ],
       [
-        "Registered to vote in Belize",
+        rl.registeredVoter,
         voterAsked ? asked(form.votingStatus) : na,
       ],
-      ["First name", asked(form.firstName)],
-      ["Last name(s)", asked(form.lastName)],
-      ["Date of birth", form.dob ? formatDobDisplay(form.dob) : "Not provided"],
-      ["Sex", asked(form.sex)],
-      ["Highest education", asked(form.education)],
-      ["Ethnicity", asked(form.ethnicity)],
-      ["Head of household", asked(form.householdHeadRelationship)],
-      ["Household size", headOfHousehold ? asked(form.householdSize) : na],
+      [rl.firstName, asked(form.firstName)],
+      [rl.lastName, asked(form.lastName)],
+      [rl.dob, form.dob ? formatDobDisplay(form.dob) : copy.notProvided],
+      [rl.sex, asked(form.sex)],
+      [rl.education, asked(form.education)],
+      [rl.ethnicity, asked(form.ethnicity)],
+      [rl.householdHead, asked(form.householdHeadRelationship)],
+      [rl.householdSize, headOfHousehold ? asked(form.householdSize) : na],
       [
-        "Current residence",
-        asked(form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence),
+        rl.currentResidence,
+        asked(form.placeOfResidence === "Abroad" ? rl.livingAbroad : form.placeOfResidence),
       ],
-      ["District where you currently live", livingInBelize ? asked(form.placeOfResidence) : na],
-      ["City / town / village", livingInBelize ? asked(cityValue) : na],
-      ["Country if abroad", livingAbroad ? asked(form.countryIfAbroad) : na],
-      ["Region of country", usRegionAsked ? asked(form.usDiasporaRegion) : na],
-      ["Constituency registered to vote", registeredVoter ? asked(form.constituency) : na],
-      ["Registered CTV area", ctvAsked ? asked(form.registeredCtvArea) : na],
+      [rl.districtLive, livingInBelize ? asked(form.placeOfResidence) : na],
+      [rl.cityTownVillage, livingInBelize ? asked(cityValue) : na],
+      [rl.countryAbroad, livingAbroad ? asked(form.countryIfAbroad) : na],
+      [rl.usRegion, usRegionAsked ? asked(form.usDiasporaRegion) : na],
+      [rl.constituency, registeredVoter ? asked(form.constituency) : na],
+      [rl.registeredCtv, ctvAsked ? asked(form.registeredCtvArea) : na],
       [
-        "Market research interests",
+        rl.marketInterests,
         interestsAsked ? asked(form.marketInterests.join(", ")) : na,
       ],
-      ["Account email", asked(account.email)],
-      ["Phone / WhatsApp", asked(getFullPhoneNumber(form))],
-      ["Facebook", asked(form.facebook)],
-      ["Instagram", asked(form.instagram)],
-      ["TikTok", asked(form.tiktok)],
-      ["Other contact platform", asked(otherPlatform)],
-      ["Other contact detail", asked(form.otherContact)],
-      ["Street address", addressAsked ? asked(form.streetAddress) : na],
-      ["City or Village", addressAsked ? asked(form.addressCityVillage) : na],
-      ["Contact address district", addressAsked ? asked(form.addressDistrict) : na],
-      ["Photo ID type", asked(form.photoIdType)],
+      [rl.accountEmail, asked(account.email)],
+      [rl.phone, asked(getFullPhoneNumber(form))],
+      [rl.facebook, asked(form.facebook)],
+      [rl.instagram, asked(form.instagram)],
+      [rl.tiktok, asked(form.tiktok)],
+      [rl.otherPlatform, asked(otherPlatform)],
+      [rl.otherContact, asked(form.otherContact)],
+      [rl.streetAddress, addressAsked ? asked(form.streetAddress) : na],
+      [rl.cityOrVillage, addressAsked ? asked(form.addressCityVillage) : na],
+      [rl.addressDistrict, addressAsked ? asked(form.addressDistrict) : na],
+      [rl.photoIdType, asked(form.photoIdType)],
       [
-        "Proof of Belize residence",
+        rl.proofResidence,
         proofAsked ? asked(form.proofOfBelizeResidenceType) : na,
       ],
     ];
@@ -433,6 +435,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     account.email,
     registeredVoter,
     streetAddressRequired,
+    copy,
   ]);
 
   const validateField = <K extends keyof RegistrationFormData>(
@@ -642,9 +645,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   return (
     <form id="registration-form-top" onSubmit={handleSubmit} className="w-full scroll-mt-6 space-y-6" noValidate>
       <div className="rounded-2xl border border-teal-200 bg-teal-50 px-6 py-5 dark:border-teal-700 dark:bg-teal-950 dark:text-teal-50">
-        <p className="text-sm font-semibold text-teal-950 dark:text-teal-50">Exclusive Belize Research Panel</p>
+        <p className="text-sm font-semibold text-teal-950 dark:text-teal-50">{copy.exclusiveTitle}</p>
         <p className="mt-1 text-sm leading-relaxed text-teal-800 dark:text-teal-100">
-          Complete registration to join the panel. Your information is kept confidential and used only for legitimate research.
+          {copy.exclusiveBody}
         </p>
       </div>
 
@@ -664,7 +667,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             className="ml-2 font-medium underline"
             onClick={() => setDraftNotice(null)}
           >
-            Dismiss
+            {copy.dismiss}
           </button>
         </Alert>
       ) : null}
@@ -672,21 +675,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       <div id="registration-phase-content" className="space-y-6" key={activePhaseIndex} tabIndex={-1}>
       {showPhaseValidationAlert ? (
         <Alert variant="error">
-          Please fix the highlighted fields in this section before continuing.
+          {copy.phaseFixAlert}
         </Alert>
       ) : null}
       {activePhaseIndex === 0 ? (
-        <FormSection step={1} title="How we will verify you" id="photo-id-section">
+        <FormSection step={1} title={copy.sections.verifyHow} id="photo-id-section">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Upload a government-issued photo ID to verify yourself, then continue the form.
+            {copy.photoIdIntro}
           </p>
           <Alert variant="info">
-            Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do
-            not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long
-            as your name, photograph, and eligibility details remain visible.
+            {copy.photoIdAlert}
           </Alert>
           <FieldGroup columns={2}>
-            <Field label="Photo ID type" required error={fieldError("photoIdType")} id="photoIdType">
+            <Field label={copy.photoIdType} required error={fieldError("photoIdType")} id="photoIdType">
               <SelectInput
                 id="photoIdType"
                 value={form.photoIdType}
@@ -694,7 +695,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 onBlur={() => touchAndValidate("photoIdType")}
                 error={fieldError("photoIdType")}
               >
-                <option value="">Select photo ID type</option>
+                <option value="">{copy.selectPhotoId}</option>
                 {PHOTO_ID_TYPES.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -702,7 +703,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 ))}
               </SelectInput>
             </Field>
-            <Field label="Upload photo ID image or PDF" required error={fieldError("photoIdFile")}>
+            <Field label={copy.photoIdUpload} required error={fieldError("photoIdFile")}>
               <FileInput
                 id="photoIdFile"
                 accept=".png,.jpg,.jpeg,.pdf"
@@ -722,7 +723,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 1 ? (
         <>
       <div id="citizenship-section">
-        <FormSection step={1} title="Citizenship / residency">
+        <FormSection step={1} title={copy.sections.citizenship}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{CITIZENSHIP_PANEL_INTRO}</p>
           <div className="flex flex-col gap-3">
             {CITIZENSHIP_STATUS.map((status) => (
@@ -740,8 +741,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </div>
           {citizenshipIneligible ? (
             <Alert variant="error">
-              You are not eligible to register under this citizenship / residency status. Choose a qualifying option
-              or return home.
+              {copy.citizenshipIneligible}
             </Alert>
           ) : null}
           {fieldError("citizenshipStatus") ? (
@@ -751,7 +751,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           ) : null}
           {needsCommonwealthCountry ? (
             <Field
-              label="Commonwealth country of citizenship"
+              label={copy.commonwealthCountry}
               required
               error={fieldError("commonwealthCountry")}
               id="commonwealthCountry"
@@ -763,7 +763,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 onBlur={() => touchAndValidate("commonwealthCountry")}
                 error={fieldError("commonwealthCountry")}
               >
-                <option value="">Select commonwealth country</option>
+                <option value="">{copy.selectCommonwealthCountry}</option>
                 {COMMONWEALTH_COUNTRIES.map((country) => (
                   <option key={country} value={country}>
                     {country}
@@ -776,7 +776,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       </div>
 
       {!citizenshipIneligible ? (
-      <FormSection step={2} title="Date of birth">
+      <FormSection step={2} title={copy.sections.dob}>
         <div id="dob-section">
           <DateOfBirthPicker
             value={form.dob}
@@ -790,10 +790,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {needsVoterQuestion && !citizenshipIneligible ? (
         <div id="voter-section">
-        <FormSection step={3} title="Voter registration">
-          <Field label="Are you registered to vote in Belize?" required error={fieldError("votingStatus")} id="votingStatus">
+        <FormSection step={3} title={copy.sections.voter}>
+          <Field label={copy.voterQuestion} required error={fieldError("votingStatus")} id="votingStatus">
             <SelectInput id="votingStatus" value={form.votingStatus} onChange={(e) => update("votingStatus", e.target.value)} onBlur={() => touchAndValidate("votingStatus")} error={fieldError("votingStatus")}>
-              <option value="">Select voter status</option>
+              <option value="">{copy.selectVoterStatus}</option>
               {VOTING_STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
             </SelectInput>
           </Field>
@@ -802,15 +802,15 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ) : null}
 
       {needsCommonwealthCountry && !citizenshipIneligible ? (
-        <FormSection step={4} title="Proof of Belize residence">
-          <Alert variant="warning">Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.</Alert>
-          <Field label="Proof of residence in Belize" required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">
+        <FormSection step={4} title={copy.sections.proofResidence}>
+          <Alert variant="warning">{copy.proofAlert}</Alert>
+          <Field label={copy.proofType} required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">
             <SelectInput id="proofOfBelizeResidenceType" value={form.proofOfBelizeResidenceType} onChange={(e) => update("proofOfBelizeResidenceType", e.target.value)} onBlur={() => touchAndValidate("proofOfBelizeResidenceType")} error={fieldError("proofOfBelizeResidenceType")}>
-              <option value="">Select proof type</option>
+              <option value="">{copy.selectProof}</option>
               {COMMONWEALTH_RESIDENCE_PROOF_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
             </SelectInput>
           </Field>
-          <Field label="Upload proof of Belize residence" required error={fieldError("proofOfBelizeResidenceFile")}>
+          <Field label={copy.proofUpload} required error={fieldError("proofOfBelizeResidenceFile")}>
             <FileInput id="proofOfBelizeResidenceFile" accept=".png,.jpg,.jpeg,.pdf" file={form.proofOfBelizeResidenceFile} onChange={(file) => { update("proofOfBelizeResidenceFile", file); touch("proofOfBelizeResidenceFile"); validateField("proofOfBelizeResidenceFile", file); }} error={fieldError("proofOfBelizeResidenceFile")} />
           </Field>
         </FormSection>
@@ -820,39 +820,38 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 2 ? (
         <>
-          <FormSection step={4} title="Name">
+          <FormSection step={4} title={copy.sections.name}>
             <Alert variant="info">
-              Enter your first name and last name(s) exactly as they appear on your government-issued photo ID. If you
-              have more than one last name, include all of them.
+              {copy.nameAlert}
             </Alert>
             <FieldGroup columns={2}>
-              <Field label="First name" required error={fieldError("firstName")} id="firstName">
+              <Field label={copy.firstName} required error={fieldError("firstName")} id="firstName">
                 <TextInput id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} onBlur={() => { touch("firstName"); validateField("firstName"); }} error={fieldError("firstName")} />
               </Field>
-              <Field label="Last name(s)" required error={fieldError("lastName")} id="lastName">
+              <Field label={copy.lastName} required error={fieldError("lastName")} id="lastName">
                 <TextInput id="lastName" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} onBlur={() => { touch("lastName"); validateField("lastName"); }} error={fieldError("lastName")} />
               </Field>
             </FieldGroup>
           </FormSection>
 
-          <FormSection step={5} title="Demographic information">
+          <FormSection step={5} title={copy.sections.demographics}>
             <FieldGroup columns={2}>
-              <Field label="Sex" required error={fieldError("sex")} id="sex">
+              <Field label={copy.sex} required error={fieldError("sex")} id="sex">
                 <SelectInput id="sex" value={form.sex} onChange={(e) => update("sex", e.target.value)} onBlur={() => touchAndValidate("sex")} error={fieldError("sex")}>
-                  <option value="">Select sex</option>
+                  <option value="">{copy.selectSex}</option>
                   {SEX_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                 </SelectInput>
               </Field>
-              <Field label="Highest level of education" required error={fieldError("education")} id="education">
+              <Field label={copy.education} required error={fieldError("education")} id="education">
                 <SelectInput id="education" value={form.education} onChange={(e) => update("education", e.target.value)} onBlur={() => touchAndValidate("education")} error={fieldError("education")}>
-                  <option value="">Select education</option>
+                  <option value="">{copy.selectEducationShort}</option>
                   {EDUCATION_LEVELS.map((s) => <option key={s} value={s}>{s}</option>)}
                 </SelectInput>
               </Field>
             </FieldGroup>
-            <Field label="Ethnicity" required error={fieldError("ethnicity")} id="ethnicity">
+            <Field label={copy.ethnicity} required error={fieldError("ethnicity")} id="ethnicity">
               <SelectInput id="ethnicity" value={form.ethnicity} onChange={(e) => update("ethnicity", e.target.value)} onBlur={() => touchAndValidate("ethnicity")} error={fieldError("ethnicity")}>
-                <option value="">Select ethnicity</option>
+                <option value="">{copy.selectEthnicity}</option>
                 {ETHNICITY_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
@@ -863,7 +862,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               {HEAD_OF_HOUSEHOLD_DEFINITION}
             </p>
             <Field
-              label="Are you the head of your household?"
+              label={copy.householdHead}
               required
               error={fieldError("householdHeadRelationship")}
               id="householdHeadRelationship"
@@ -889,13 +888,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </Field>
             {isHeadOfHousehold(form.householdHeadRelationship) ? (
               <Field
-                label="Including yourself, how many persons live in your household?"
+                label={copy.householdSize}
                 required
                 error={fieldError("householdSize")}
                 id="householdSize"
               >
                 <p className="mb-1.5 text-sm text-zinc-600 dark:text-zinc-400">
-                  Count everyone regardless of age.
+                  {copy.householdCountNote}
                 </p>
                 <TextInput
                   id="householdSize"
@@ -913,33 +912,33 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={6} title="Residence details">
+          <FormSection step={6} title={copy.sections.residence}>
             {mustLiveAbroad(form.citizenshipStatus) ? (
               <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                You selected Belizean residing abroad. Tell us the country where you currently live.
+                {copy.abroadIntro}
               </p>
             ) : null}
             {mustLiveAbroad(form.citizenshipStatus) ? null : (
-            <Field label="District where you currently live" required error={fieldError("placeOfResidence")} id="placeOfResidence">
+            <Field label={copy.districtLive} required error={fieldError("placeOfResidence")} id="placeOfResidence">
               <SelectInput id="placeOfResidence" value={form.placeOfResidence} onChange={(e) => update("placeOfResidence", e.target.value)} onBlur={() => touchAndValidate("placeOfResidence")} error={fieldError("placeOfResidence")}>
-                <option value="">Select location</option>
+                <option value="">{copy.selectLocation}</option>
                 {residenceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
               </SelectInput>
             </Field>
             )}
             {mustLiveAbroad(form.citizenshipStatus) || form.placeOfResidence === "Abroad" ? (
               <div className="space-y-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4">
-                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Living outside Belize</p>
-                <Field label="Country of residence" required error={fieldError("countryIfAbroad")} id="countryIfAbroad">
+                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{copy.livingOutsideBelize}</p>
+                <Field label={copy.countryOfResidence} required error={fieldError("countryIfAbroad")} id="countryIfAbroad">
                   <SelectInput id="countryIfAbroad" value={form.countryIfAbroad} onChange={(e) => update("countryIfAbroad", e.target.value)} onBlur={() => touchAndValidate("countryIfAbroad")} error={fieldError("countryIfAbroad")}>
-                    <option value="">Select country</option>
+                    <option value="">{copy.selectCountry}</option>
                     {COUNTRIES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
                 {isUnitedStatesCountry(form.countryIfAbroad) ? (
-                  <Field label="Region of country" required hint="Required for United States residents. US Census regions." error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
+                  <Field label={copy.usRegion} required hint={copy.usRegionHint} error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
                     <SelectInput id="usDiasporaRegion" value={form.usDiasporaRegion} onChange={(e) => update("usDiasporaRegion", e.target.value)} onBlur={() => touchAndValidate("usDiasporaRegion")} error={fieldError("usDiasporaRegion")}>
-                      <option value="">Select US region</option>
+                      <option value="">{copy.selectUsRegion}</option>
                       {US_DIASPORA_REGIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </SelectInput>
                   </Field>
@@ -948,14 +947,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
             {form.placeOfResidence && form.placeOfResidence !== "Abroad" ? (
               <>
-                <Field label={cityTownVillageQuestionLabel(form.placeOfResidence)} required error={fieldError("cityTownVillage")} id="cityTownVillage">
+                <Field label={copy.cityTownVillage(form.placeOfResidence)} required error={fieldError("cityTownVillage")} id="cityTownVillage">
                   <SelectInput id="cityTownVillage" value={form.cityTownVillage} onChange={(e) => update("cityTownVillage", e.target.value)} onBlur={() => touchAndValidate("cityTownVillage")} error={fieldError("cityTownVillage")}>
-                    <option value="">Select city, town, or village</option>
+                    <option value="">{copy.selectCtv}</option>
                     {cityOptions.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
                 {form.cityTownVillage === "Other" ? (
-                  <Field label={cityTownVillageQuestionLabel(form.placeOfResidence)} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
+                  <Field label={copy.cityTownVillage(form.placeOfResidence)} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
                     <TextInput id="cityTownVillageOther" value={form.cityTownVillageOther} onChange={(e) => update("cityTownVillageOther", e.target.value)} onBlur={() => touchAndValidate("cityTownVillageOther")} error={fieldError("cityTownVillageOther")} />
                   </Field>
                 ) : null}
@@ -964,17 +963,17 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           {registeredVoter ? (
-            <FormSection step={7} title="Constituency registration">
-              <Field label="In which constituency are you registered to vote?" required error={fieldError("constituency")} id="constituency">
+            <FormSection step={7} title={copy.sections.constituency}>
+              <Field label={copy.constituencyQuestion} required error={fieldError("constituency")} id="constituency">
                 <SelectInput id="constituency" value={form.constituency} onChange={(e) => update("constituency", e.target.value)} onBlur={() => touchAndValidate("constituency")} error={fieldError("constituency")}>
-                  <option value="">Select constituency</option>
+                  <option value="">{copy.selectConstituency}</option>
                   {getConstituencyOptions().map((s) => <option key={s} value={s}>{s}</option>)}
                 </SelectInput>
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
-                <Field label={`Where in the ${form.constituency} constituency were you living at the time you registered to vote there?`} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
+                <Field label={copy.registeredCtvQuestion(form.constituency)} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
                   <SelectInput id="registeredCtvArea" value={form.registeredCtvArea} onChange={(e) => update("registeredCtvArea", e.target.value)} onBlur={() => touchAndValidate("registeredCtvArea")} error={fieldError("registeredCtvArea")}>
-                    <option value="">Select city, town, or village</option>
+                    <option value="">{copy.selectCtv}</option>
                     {ctvOptions.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
@@ -987,9 +986,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 3 ? (
         <>
           {skipsInterestsPhase(form.placeOfResidence) ? null : (
-            <FormSection step={8} title="Market research interests">
+            <FormSection step={8} title={copy.sections.marketInterests}>
               <Field
-                label="Select up to 5 products and services you are interested in and are willing to give feedback on."
+                label={copy.marketInterestsLabel}
                 required
                 error={fieldError("marketInterests")}
               >
@@ -1002,27 +1001,25 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 4 ? (
         <>
-          <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
+          <FormSection step={11} title={copy.sections.contact} id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-              We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp
-              is optional. A street address is only requested if you live in Belize and still have fewer than two
-              means of contact.
+              {copy.contactIntro}
             </p>
             <FieldGroup columns={2}>
-              <Field label="Email address" hint="This is your verified account email. It counts as one way to contact you." error={fieldError("email")} id="email">
+              <Field label={copy.email} hint={copy.emailHint} error={fieldError("email")} id="email">
                 <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50 dark:bg-zinc-950" error={fieldError("email")} />
               </Field>
               <SocialContactField
                 platform="facebook"
-                label="Facebook name or profile link"
+                label={copy.facebook}
                 id="facebook"
                 value={form.facebook}
                 onChange={(value) => update("facebook", value)}
-                placeholder="username or https://facebook.com/username"
+                placeholder={copy.facebookPlaceholder}
               />
               <Field
-                label="Phone / WhatsApp number"
-                hint="Optional."
+                label={copy.phone}
+                hint={copy.optional}
                 id="phoneLocalNumber"
                 error={fieldError("phoneLocalNumber")}
               >
@@ -1059,34 +1056,34 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </Field>
               <SocialContactField
                 platform="instagram"
-                label="Instagram handle"
+                label={copy.instagram}
                 id="instagram"
                 value={form.instagram}
                 onChange={(value) => update("instagram", value)}
-                placeholder="@username or profile link"
+                placeholder={copy.instagramPlaceholder}
               />
               <SocialContactField
                 platform="tiktok"
-                label="TikTok handle"
+                label={copy.tiktok}
                 id="tiktok"
                 value={form.tiktok}
                 onChange={(value) => update("tiktok", value)}
-                placeholder="@username or profile link"
+                placeholder={copy.tiktokPlaceholder}
               />
               <div className="space-y-4">
-                <Field label="Other contact platform / application" hint="Optional" id="otherContactPlatform">
+                <Field label={copy.otherPlatform} hint={copy.optional} id="otherContactPlatform">
                   <SelectInput id="otherContactPlatform" value={form.otherContactPlatform} onChange={(e) => update("otherContactPlatform", e.target.value)} error={fieldError("otherContactPlatform")}>
-                    <option value="">Select other contact type (optional)</option>
+                    <option value="">{copy.selectOtherContact}</option>
                     {OTHER_CONTACT_PLATFORM_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
                 {form.otherContactPlatform === "Other" ? (
-                  <Field label="Specify other contact platform / application" hint="Optional" id="otherContactPlatformCustom">
-                    <TextInput id="otherContactPlatformCustom" value={form.otherContactPlatformCustom} onChange={(e) => update("otherContactPlatformCustom", e.target.value)} placeholder="Telegram, Signal, LinkedIn..." />
+                  <Field label={copy.otherPlatformCustom} hint={copy.optional} id="otherContactPlatformCustom">
+                    <TextInput id="otherContactPlatformCustom" value={form.otherContactPlatformCustom} onChange={(e) => update("otherContactPlatformCustom", e.target.value)} placeholder={copy.otherPlatformPlaceholder} />
                   </Field>
                 ) : null}
-                <Field label={otherPlatform === "Second email address" ? "Second email address" : "Other contact detail"} hint="Optional" error={fieldError("otherContact")} id="otherContact">
-                  <TextInput id="otherContact" value={form.otherContact} onChange={(e) => update("otherContact", e.target.value)} onBlur={() => touchAndValidate("otherContact")} placeholder={otherPlatform === "Second email address" ? "Enter second email address" : "Username, handle, phone, link, or ID"} error={fieldError("otherContact")} />
+                <Field label={otherPlatform === "Second email address" ? copy.secondEmail : copy.otherContact} hint={copy.optional} error={fieldError("otherContact")} id="otherContact">
+                  <TextInput id="otherContact" value={form.otherContact} onChange={(e) => update("otherContact", e.target.value)} onBlur={() => touchAndValidate("otherContact")} placeholder={otherPlatform === "Second email address" ? copy.secondEmailPlaceholder : copy.otherContactPlaceholder} error={fieldError("otherContact")} />
                 </Field>
               </div>
             </FieldGroup>
@@ -1097,7 +1094,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 addressCityVillage={form.addressCityVillage}
                 addressDistrict={form.addressDistrict}
                 required
-                hint="Required only because you live in Belize and have fewer than two means of contact. Home visits are a last resort."
+                hint={copy.streetRequiredHint}
                 errors={{
                   streetAddress: fieldError("streetAddress"),
                   addressCityVillage: fieldError("addressCityVillage"),
@@ -1112,31 +1109,21 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={12} title="Confirm contact details">
+          <FormSection step={12} title={copy.sections.confirmContact}>
             {meetsContactMinimum ? (
               <Alert variant="success">
-                You have submitted {contactCount} means of contact
-                {contactCount < 2 && physicalAddressProvided ? ", plus a physical address" : ""}. Please
-                double-check every detail below — wrong contact information can mean you miss survey and
-                research opportunities.
+                {copy.contactSuccess(contactCount, contactCount < 2 && physicalAddressProvided)}
               </Alert>
             ) : (
               <Alert variant="warning">
-                Only {contactCount}{" "}
-                {contactCount === 1 ? "means of contact has" : "means of contact have"} been submitted so
-                far. We need at least two means of contact in case one fails
-                {livesInBelizeResidence(form.placeOfResidence)
-                  ? ", or a complete physical address if you live in Belize"
-                  : ""}
-                . Go back and add another method before confirming. Also make sure every detail is correct —
-                wrong contact information can mean you miss survey and research opportunities.
+                {copy.contactWarning(contactCount, livesInBelizeResidence(form.placeOfResidence))}
               </Alert>
             )}
 
             <div className="space-y-1 rounded-lg border border-teal-200/70 bg-gradient-to-br from-teal-50/90 to-sky-50/50 px-4 py-3 text-sm text-teal-950 dark:border-teal-800 dark:from-teal-950/40 dark:to-sky-950/20 dark:text-teal-100">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2 dark:border-teal-800">
                 <p className="text-xs font-semibold uppercase tracking-wide text-teal-800 dark:text-teal-200">
-                  Contact summary
+                  {copy.contactSummary}
                 </p>
                 <p
                   className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -1145,20 +1132,20 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                       : "bg-amber-100 text-amber-950 ring-1 ring-amber-300/80 dark:bg-amber-950/50 dark:text-amber-100 dark:ring-amber-700"
                   }`}
                 >
-                  {contactCount} of 2 means of contact
-                  {!meetsContactMinimum ? " — incomplete" : ""}
+                  {copy.contactMeansOf(contactCount)}
+                  {!meetsContactMinimum ? ` — ${copy.contactIncomplete}` : ""}
                 </p>
               </div>
-              <p><strong>Email:</strong> {form.email || "Not provided"}</p>
-              <p><strong>Phone / WhatsApp:</strong> {getFullPhoneNumber(form) || "Not provided"}</p>
-              <p><strong>Facebook:</strong> {form.facebook || "Not provided"}</p>
-              <p><strong>Instagram:</strong> {form.instagram || "Not provided"}</p>
-              <p><strong>TikTok:</strong> {form.tiktok || "Not provided"}</p>
-              <p><strong>Other contact platform:</strong> {otherPlatform || "Not provided"}</p>
-              <p><strong>Other contact detail:</strong> {form.otherContact || "Not provided"}</p>
+              <p><strong>{copy.reviewLabels.accountEmail}:</strong> {form.email || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.phone}:</strong> {getFullPhoneNumber(form) || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.facebook}:</strong> {form.facebook || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.instagram}:</strong> {form.instagram || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.tiktok}:</strong> {form.tiktok || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.otherPlatform}:</strong> {otherPlatform || copy.notProvided}</p>
+              <p><strong>{copy.reviewLabels.otherContact}:</strong> {form.otherContact || copy.notProvided}</p>
               {streetAddressRequired ? (
                 <p>
-                  <strong>Physical address:</strong>{" "}
+                  <strong>{copy.physicalAddress}:</strong>{" "}
                   {formatStreetAddressDisplay({
                     streetAddress: form.streetAddress,
                     addressCityVillage: form.addressCityVillage,
@@ -1169,13 +1156,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </div>
 
             <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-              Please verify that every means of contact above is accurate and up to date. If we cannot reach
-              you, you may miss out on paid surveys, polls, and other research opportunities.
+              {copy.contactVerifyNote}
             </p>
 
             <CheckboxField
               id="contactDetailsConfirmed"
-              label="I confirm that the contact information shown above is correct, and I understand I may miss opportunities if it is wrong. *"
+              label={copy.contactConfirm}
               checked={form.contactDetailsConfirmed}
               onChange={(checked) => {
                 update("contactDetailsConfirmed", checked);
@@ -1190,20 +1176,20 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 5 ? (
         <>
-          <FormSection step={14} title="Consent" id="consent-section">
+          <FormSection step={14} title={copy.sections.consent} id="consent-section">
             <div className="space-y-4">
-              <CheckboxField id="consentResearch" label="I agree to be considered for surveys, polls, interviews, or research activities. *" checked={form.consentResearch} onChange={(c) => { update("consentResearch", c); touch("consentResearch"); validateField("consentResearch", c); }} error={fieldError("consentResearch")} />
-              <CheckboxField id="consentContact" label="I agree to be contacted using the contact details I provided. *" checked={form.consentContact} onChange={(c) => { update("consentContact", c); touch("consentContact"); validateField("consentContact", c); }} error={fieldError("consentContact")} />
-              <CheckboxField id="consentPrivacy" label="I understand that my information should be kept confidential and used only for legitimate research-related purposes. *" checked={form.consentPrivacy} onChange={(c) => { update("consentPrivacy", c); touch("consentPrivacy"); validateField("consentPrivacy", c); }} error={fieldError("consentPrivacy")} />
+              <CheckboxField id="consentResearch" label={copy.consentResearch} checked={form.consentResearch} onChange={(c) => { update("consentResearch", c); touch("consentResearch"); validateField("consentResearch", c); }} error={fieldError("consentResearch")} />
+              <CheckboxField id="consentContact" label={copy.consentContact} checked={form.consentContact} onChange={(c) => { update("consentContact", c); touch("consentContact"); validateField("consentContact", c); }} error={fieldError("consentContact")} />
+              <CheckboxField id="consentPrivacy" label={copy.consentPrivacy} checked={form.consentPrivacy} onChange={(c) => { update("consentPrivacy", c); touch("consentPrivacy"); validateField("consentPrivacy", c); }} error={fieldError("consentPrivacy")} />
             </div>
           </FormSection>
 
-          <FormSection step={15} title="Review full registration before submitting">
+          <FormSection step={15} title={copy.sections.review}>
             <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 lg:hidden">
               {reviewRows.map(([label, value]) => (
                 <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">
                   <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{label}</p>
-                  <p className="mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-words">{String(value || "Not provided")}</p>
+                  <p className="mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-words">{String(value || copy.notProvided)}</p>
                 </div>
               ))}
             </div>
@@ -1211,21 +1197,21 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50 dark:bg-zinc-950">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">Question / field</th>
-                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">Response</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">{copy.reviewQuestion}</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-700 dark:text-zinc-300">{copy.reviewResponse}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 bg-white dark:bg-zinc-900">
                   {reviewRows.map(([label, value]) => (
                     <tr key={label}>
                       <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{label}</td>
-                      <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{String(value || "Not provided")}</td>
+                      <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{String(value || copy.notProvided)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <CheckboxField id="finalReviewConfirmed" label="I have reviewed the full form and confirm that the information is correct. *" checked={form.finalReviewConfirmed} onChange={(c) => { update("finalReviewConfirmed", c); touch("finalReviewConfirmed"); validateField("finalReviewConfirmed", c); }} error={fieldError("finalReviewConfirmed")} />
+            <CheckboxField id="finalReviewConfirmed" label={copy.finalReviewConfirm} checked={form.finalReviewConfirmed} onChange={(c) => { update("finalReviewConfirmed", c); touch("finalReviewConfirmed"); validateField("finalReviewConfirmed", c); }} error={fieldError("finalReviewConfirmed")} />
           </FormSection>
         </>
       ) : null}

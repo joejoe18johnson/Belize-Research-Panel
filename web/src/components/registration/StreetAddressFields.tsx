@@ -2,6 +2,7 @@
 
 import { Field, SelectInput, TextInput } from "./form-ui";
 import { CtvAutocomplete } from "./CtvAutocomplete";
+import { useRegistrationCopy } from "@/components/locale/LocaleProvider";
 import { BELIZE_DISTRICTS } from "@/lib/constants";
 import { titleCaseStreetAddress } from "@/lib/validation";
 
@@ -28,10 +29,12 @@ export function StreetAddressFields({
   onChange: (field: "streetAddress" | "addressCityVillage" | "addressDistrict", value: string) => void;
   onBlurField?: (field: "streetAddress" | "addressCityVillage" | "addressDistrict") => void;
 }) {
+  const copy = useRegistrationCopy();
+
   return (
     <div className="space-y-4 rounded-xl border border-teal-800/10 bg-gradient-to-br from-teal-50/80 via-white to-sky-50/40 p-4 dark:border-teal-400/10 dark:from-teal-950/30 dark:via-zinc-900 dark:to-sky-950/20 sm:p-5">
       <div>
-        <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">Physical contact address</p>
+        <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">{copy.streetTitle}</p>
         {hint ? (
           <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{hint}</p>
         ) : null}
@@ -39,7 +42,7 @@ export function StreetAddressFields({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div className="sm:col-span-2 lg:col-span-1">
-          <Field label="Street address" required={required} error={errors?.streetAddress} id="streetAddress">
+          <Field label={copy.streetAddress} required={required} error={errors?.streetAddress} id="streetAddress">
             <TextInput
               id="streetAddress"
               value={streetAddress}
@@ -50,14 +53,14 @@ export function StreetAddressFields({
                 onBlurField?.("streetAddress");
               }}
               error={errors?.streetAddress}
-              placeholder="House number and street name"
+              placeholder={copy.streetAddressPlaceholder}
               autoComplete="street-address"
             />
           </Field>
         </div>
 
         <Field
-          label="City or Village"
+          label={copy.cityOrVillage}
           required={required}
           error={errors?.addressCityVillage}
           id="addressCityVillage"
@@ -66,6 +69,7 @@ export function StreetAddressFields({
             id="addressCityVillage"
             value={addressCityVillage}
             error={errors?.addressCityVillage}
+            placeholder={copy.ctvPlaceholder}
             onChange={(value) => onChange("addressCityVillage", value)}
             onBlur={() => onBlurField?.("addressCityVillage")}
             onSelectDistrict={(district) => {
@@ -74,7 +78,7 @@ export function StreetAddressFields({
           />
         </Field>
 
-        <Field label="District" required={required} error={errors?.addressDistrict} id="addressDistrict">
+        <Field label={copy.district} required={required} error={errors?.addressDistrict} id="addressDistrict">
           <SelectInput
             id="addressDistrict"
             value={addressDistrict}
@@ -82,7 +86,7 @@ export function StreetAddressFields({
             onBlur={() => onBlurField?.("addressDistrict")}
             error={errors?.addressDistrict}
           >
-            <option value="">Select district</option>
+            <option value="">{copy.selectDistrict}</option>
             {BELIZE_DISTRICTS.map((district) => (
               <option key={district} value={district}>
                 {district}
