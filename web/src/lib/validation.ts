@@ -138,7 +138,7 @@ export function validatePhoneFields(
     return "Please select a valid country code.";
   }
   if (localDigits.length < 7) {
-    return "Phone number is too short. Enter the number without the country code.";
+    return "Enter at least 7 digits for the phone number (without the country code).";
   }
   if (localDigits.length > 15) {
     return "Phone number is too long. Check the number and country code.";

@@ -59,6 +59,7 @@ export function PhoneNumberField({
           placeholder="Phone number without country code"
           error={error}
           autoComplete="tel-national"
+          maxLength={15}
         />
       </div>
     </div>

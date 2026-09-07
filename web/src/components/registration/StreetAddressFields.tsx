@@ -1,6 +1,7 @@
 "use client";
 
 import { Field, SelectInput, TextInput } from "./form-ui";
+import { CtvAutocomplete } from "./CtvAutocomplete";
 import { BELIZE_DISTRICTS } from "@/lib/constants";
 import { titleCaseStreetAddress } from "@/lib/validation";
 
@@ -32,9 +33,7 @@ export function StreetAddressFields({
       <div>
         <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">Physical contact address</p>
         {hint ? (
-          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {hint}
-          </p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{hint}</p>
         ) : null}
       </div>
 
@@ -63,14 +62,15 @@ export function StreetAddressFields({
           error={errors?.addressCityVillage}
           id="addressCityVillage"
         >
-          <TextInput
+          <CtvAutocomplete
             id="addressCityVillage"
             value={addressCityVillage}
-            onChange={(e) => onChange("addressCityVillage", e.target.value)}
-            onBlur={() => onBlurField?.("addressCityVillage")}
             error={errors?.addressCityVillage}
-            placeholder="e.g. Belmopan"
-            autoComplete="address-level2"
+            onChange={(value) => onChange("addressCityVillage", value)}
+            onBlur={() => onBlurField?.("addressCityVillage")}
+            onSelectDistrict={(district) => {
+              if (!addressDistrict) onChange("addressDistrict", district);
+            }}
           />
         </Field>
 

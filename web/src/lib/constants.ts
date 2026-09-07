@@ -33,6 +33,48 @@ export const PLACE_OPTIONS = raw.PLACE_OPTIONS as string[];
 export const CONSTITUENCIES = raw.CONSTITUENCIES as string[];
 export const CITY_TOWN_VILLAGE = raw.CITY_TOWN_VILLAGE as Record<string, string[]>;
 
+/** All Belize cities, towns, and villages (unique, sorted), for typeahead search. */
+export const ALL_BELIZE_CTVS: string[] = (() => {
+  const names = new Set<string>();
+  for (const list of Object.values(CITY_TOWN_VILLAGE)) {
+    for (const name of list) {
+      const cleaned = name.trim();
+      if (cleaned && cleaned !== "Other") names.add(cleaned);
+    }
+  }
+  for (const list of Object.values(raw.CONSTITUENCY_CTV as Record<string, string[]>)) {
+    for (const name of list) {
+      const cleaned = name.trim();
+      if (cleaned && cleaned !== "Other") names.add(cleaned);
+    }
+  }
+  return [...names].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+})();
+
+export function findDistrictForCtv(ctv: string): string | null {
+  const needle = ctv.trim().toLowerCase();
+  if (!needle) return null;
+  for (const [district, list] of Object.entries(CITY_TOWN_VILLAGE)) {
+    if (list.some((name) => name.trim().toLowerCase() === needle)) return district;
+  }
+  return null;
+}
+
+/** Prefix-first CTV suggestions as the user types (e.g. "B" → Barranco, Belmopan…). */
+export function filterBelizeCtvs(query: string, limit = 12): string[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const starts: string[] = [];
+  const contains: string[] = [];
+  for (const name of ALL_BELIZE_CTVS) {
+    const lower = name.toLowerCase();
+    if (lower.startsWith(q)) starts.push(name);
+    else if (lower.includes(q)) contains.push(name);
+    if (starts.length >= limit) break;
+  }
+  return [...starts, ...contains].slice(0, limit);
+}
+
 export function sortDropdownOptions(options: string[]): string[] {
   const cleaned = options.map((o) => o.trim()).filter(Boolean);
   const unique = [...new Set(cleaned)].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));

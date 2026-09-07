@@ -50,7 +50,6 @@ import {
   isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveAbroad,
-  mustLiveInBelize,
   needsVoterRegistrationQuestion,
   CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
@@ -61,6 +60,7 @@ import {
 import { phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
   countContactMethods,
+  cleanText,
   getFullPhoneNumber,
   livesInBelizeResidence,
   streetAddressRequiredForContacts,
@@ -161,11 +161,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const current = draft?.activePhaseIndex ?? 0;
     return Math.max(current, draft?.furthestPhaseIndex ?? current);
   });
-  const [draftNotice, setDraftNotice] = useState<string | null>(() => {
-    const draft = loadRegistrationDraft(account.email);
-    if (!draft) return null;
-    return "Your registration answers were restored. You can continue from where you left off.";
-  });
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
   const [draftFilesReady, setDraftFilesReady] = useState(false);
   const [phaseAttempted, setPhaseAttempted] = useState(false);
   const scrollToTopAfterPhaseChange = useRef(false);
@@ -183,9 +179,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       const draft = loadRegistrationDraft(account.email);
       if (draft) {
         const hint = draftRestoredFileHint(draft, files);
-        setDraftNotice(
-          hint ?? "Your registration answers were restored. You can continue from where you left off."
-        );
+        if (hint) setDraftNotice(hint);
       }
       setDraftFilesReady(true);
     });
@@ -208,6 +202,37 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       cityTownVillageOther: "",
     }));
   }, [form.citizenshipStatus, form.placeOfResidence]);
+
+  // Only collect a home address when it is required as a last-resort contact method.
+  useEffect(() => {
+    const required = streetAddressRequiredForContacts(form.placeOfResidence, countContactMethods(form));
+    if (required) return;
+    if (
+      !form.streetAddress &&
+      !form.addressCityVillage &&
+      !form.addressDistrict
+    ) {
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      streetAddress: "",
+      addressCityVillage: "",
+      addressDistrict: "",
+    }));
+  }, [
+    form.placeOfResidence,
+    form.email,
+    form.phoneCountryCode,
+    form.phoneLocalNumber,
+    form.facebook,
+    form.instagram,
+    form.tiktok,
+    form.otherContact,
+    form.streetAddress,
+    form.addressCityVillage,
+    form.addressDistrict,
+  ]);
 
   useEffect(() => {
     saveRegistrationDraft({
@@ -328,59 +353,86 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   });
   const meetsContactMinimum =
     contactCount >= 2 || (livesInBelizeResidence(form.placeOfResidence) && physicalAddressProvided);
+  const streetAddressRequired = streetAddressRequiredForContacts(form.placeOfResidence, contactCount);
   const otherPlatform =
     form.otherContactPlatform === "Other"
       ? form.otherContactPlatformCustom
       : form.otherContactPlatform;
-  const reviewRows = useMemo(
-    () => [
-      ["Citizenship / residency status", form.citizenshipStatus],
-      ["Commonwealth country of citizenship", form.commonwealthCountry],
-      ["Registered to vote in Belize", form.votingStatus || "Not applicable"],
-      ["First name", form.firstName],
-      ["Last name(s)", form.lastName],
-      ["Date of birth", form.dob ? formatDobDisplay(form.dob) : ""],
-      ["Sex", form.sex],
-      ["Highest education", form.education],
-      ["Ethnicity", form.ethnicity],
-      ["Head of household", form.householdHeadRelationship],
-      ...(isHeadOfHousehold(form.householdHeadRelationship)
-        ? [["Household size", form.householdSize] as [string, string]]
-        : []),
-      ["Current residence", form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence],
-      ["District", form.placeOfResidence === "Abroad" ? "" : form.placeOfResidence],
+
+  const reviewRows = useMemo(() => {
+    const asked = (value: string) => (cleanText(value) ? value : "Not provided");
+    const na = "Not applicable";
+    const livingAbroad = form.placeOfResidence === "Abroad";
+    const livingInBelize = livesInBelizeResidence(form.placeOfResidence);
+    const headOfHousehold = isHeadOfHousehold(form.householdHeadRelationship);
+    const commonwealthAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
+    const voterAsked = needsVoterRegistrationQuestion(form.citizenshipStatus);
+    const ctvAsked = registeredVoter && hasRegisteredCtvQuestion(form.constituency);
+    const interestsAsked = !skipsInterestsPhase(form.placeOfResidence);
+    const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
+    const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
+    const addressAsked = streetAddressRequired;
+
+    const cityValue =
+      form.cityTownVillage === "Other" ? form.cityTownVillageOther : form.cityTownVillage;
+
+    const rows: [string, string][] = [
+      ["Citizenship / residency status", asked(form.citizenshipStatus)],
       [
-        "City / town / village",
-        form.placeOfResidence === "Abroad"
-          ? ""
-          : form.cityTownVillage === "Other"
-            ? form.cityTownVillageOther
-            : form.cityTownVillage,
+        "Commonwealth country of citizenship",
+        commonwealthAsked ? asked(form.commonwealthCountry) : na,
       ],
-      ["Country if abroad", form.countryIfAbroad],
-      ...(form.placeOfResidence === "Abroad" && isUnitedStatesCountry(form.countryIfAbroad)
-        ? [["Region of country", form.usDiasporaRegion] as [string, string]]
-        : []),
-      ["Constituency registered to vote", form.constituency],
-      ["Registered CTV area", form.registeredCtvArea],
-      ...(skipsInterestsPhase(form.placeOfResidence)
-        ? []
-        : [["Market research interests", form.marketInterests.join(", ")] as [string, string]]),
-      ["Account email", account.email],
-      ["Phone / WhatsApp", getFullPhoneNumber(form)],
-      ["Facebook", form.facebook],
-      ["Instagram", form.instagram],
-      ["TikTok", form.tiktok],
-      ["Other contact platform", otherPlatform],
-      ["Other contact detail", form.otherContact],
-      ["Street address", form.streetAddress],
-      ["City or Village", form.addressCityVillage],
-      ["District", form.addressDistrict],
-      ["Photo ID type", form.photoIdType],
-      ["Proof of Belize residence", form.proofOfBelizeResidenceType],
-    ],
-    [form, otherPlatform, account.email]
-  );
+      [
+        "Registered to vote in Belize",
+        voterAsked ? asked(form.votingStatus) : na,
+      ],
+      ["First name", asked(form.firstName)],
+      ["Last name(s)", asked(form.lastName)],
+      ["Date of birth", form.dob ? formatDobDisplay(form.dob) : "Not provided"],
+      ["Sex", asked(form.sex)],
+      ["Highest education", asked(form.education)],
+      ["Ethnicity", asked(form.ethnicity)],
+      ["Head of household", asked(form.householdHeadRelationship)],
+      ["Household size", headOfHousehold ? asked(form.householdSize) : na],
+      [
+        "Current residence",
+        asked(form.placeOfResidence === "Abroad" ? "Living abroad" : form.placeOfResidence),
+      ],
+      ["District where you currently live", livingInBelize ? asked(form.placeOfResidence) : na],
+      ["City / town / village", livingInBelize ? asked(cityValue) : na],
+      ["Country if abroad", livingAbroad ? asked(form.countryIfAbroad) : na],
+      ["Region of country", usRegionAsked ? asked(form.usDiasporaRegion) : na],
+      ["Constituency registered to vote", registeredVoter ? asked(form.constituency) : na],
+      ["Registered CTV area", ctvAsked ? asked(form.registeredCtvArea) : na],
+      [
+        "Market research interests",
+        interestsAsked ? asked(form.marketInterests.join(", ")) : na,
+      ],
+      ["Account email", asked(account.email)],
+      ["Phone / WhatsApp", asked(getFullPhoneNumber(form))],
+      ["Facebook", asked(form.facebook)],
+      ["Instagram", asked(form.instagram)],
+      ["TikTok", asked(form.tiktok)],
+      ["Other contact platform", asked(otherPlatform)],
+      ["Other contact detail", asked(form.otherContact)],
+      ["Street address", addressAsked ? asked(form.streetAddress) : na],
+      ["City or Village", addressAsked ? asked(form.addressCityVillage) : na],
+      ["Contact address district", addressAsked ? asked(form.addressDistrict) : na],
+      ["Photo ID type", asked(form.photoIdType)],
+      [
+        "Proof of Belize residence",
+        proofAsked ? asked(form.proofOfBelizeResidenceType) : na,
+      ],
+    ];
+
+    return rows;
+  }, [
+    form,
+    otherPlatform,
+    account.email,
+    registeredVoter,
+    streetAddressRequired,
+  ]);
 
   const validateField = <K extends keyof RegistrationFormData>(
     key: K,
@@ -861,15 +913,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           <FormSection step={6} title="Residence details">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-              {mustLiveAbroad(form.citizenshipStatus)
-                ? "You selected Belizean residing abroad. Tell us the country where you currently live."
-                : mustLiveInBelize(form.citizenshipStatus)
-                  ? "Select the Belize district where you currently live."
-                  : "Select your current district if you live in Belize, or choose Abroad if you live in another country."}
-            </p>
+            {mustLiveAbroad(form.citizenshipStatus) ? (
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                You selected Belizean residing abroad. Tell us the country where you currently live.
+              </p>
+            ) : null}
             {mustLiveAbroad(form.citizenshipStatus) ? null : (
-            <Field label="Where do you currently live?" required error={fieldError("placeOfResidence")} id="placeOfResidence">
+            <Field label="District where you currently live" required error={fieldError("placeOfResidence")} id="placeOfResidence">
               <SelectInput id="placeOfResidence" value={form.placeOfResidence} onChange={(e) => update("placeOfResidence", e.target.value)} onBlur={() => touchAndValidate("placeOfResidence")} error={fieldError("placeOfResidence")}>
                 <option value="">Select location</option>
                 {residenceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -940,7 +990,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <Field
                 label="Select up to 5 products and services you are interested in and are willing to give feedback on."
                 required
-                hint="Asked of people living in Belize."
                 error={fieldError("marketInterests")}
               >
                 <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} maxSelections={MAX_MARKET_INTERESTS} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
@@ -955,8 +1004,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           <FormSection step={11} title="Preferred ways to contact you" id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp
-              is optional. If you live in Belize and have fewer than two contact methods in total, a street address is
-              required.
+              is optional. A street address is only requested if you live in Belize and still have fewer than two
+              means of contact.
             </p>
             <FieldGroup columns={2}>
               <Field label="Email address" hint="This is your verified account email. It counts as one way to contact you." error={fieldError("email")} id="email">
@@ -979,8 +1028,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 <PhoneNumberField
                   countryCode={form.phoneCountryCode}
                   localNumber={form.phoneLocalNumber}
-                  onCountryCodeChange={(code) => update("phoneCountryCode", code)}
-                  onLocalNumberChange={(number) => update("phoneLocalNumber", number)}
+                  onCountryCodeChange={(code) => {
+                    update("phoneCountryCode", code);
+                    touch("phoneLocalNumber");
+                    validateField("phoneLocalNumber");
+                  }}
+                  onLocalNumberChange={(number) => {
+                    update("phoneLocalNumber", number);
+                    touch("phoneLocalNumber");
+                    validateField("phoneLocalNumber", number);
+                  }}
                   onBlur={() => touchAndValidate("phoneLocalNumber")}
                   error={fieldError("phoneLocalNumber")}
                 />
@@ -1019,29 +1076,25 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </FieldGroup>
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
-            <StreetAddressFields
-              streetAddress={form.streetAddress}
-              addressCityVillage={form.addressCityVillage}
-              addressDistrict={form.addressDistrict}
-              required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
-              hint={
-                streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
-                  ? "Required because you live in Belize and have fewer than two contact methods, counting email."
-                  : form.placeOfResidence === "Abroad"
-                    ? "Optional. A physical address is only required for people living in Belize who have fewer than two contact methods, counting email."
-                    : "Optional when you have already given at least two ways to contact you, counting email."
-              }
-              errors={{
-                streetAddress: fieldError("streetAddress"),
-                addressCityVillage: fieldError("addressCityVillage"),
-                addressDistrict: fieldError("addressDistrict"),
-              }}
-              onChange={(field, value) => update(field, value)}
-              onBlurField={(field) => {
-                touch(field);
-                validateField(field);
-              }}
-            />
+            {streetAddressRequired ? (
+              <StreetAddressFields
+                streetAddress={form.streetAddress}
+                addressCityVillage={form.addressCityVillage}
+                addressDistrict={form.addressDistrict}
+                required
+                hint="Required only because you live in Belize and have fewer than two means of contact. Home visits are a last resort."
+                errors={{
+                  streetAddress: fieldError("streetAddress"),
+                  addressCityVillage: fieldError("addressCityVillage"),
+                  addressDistrict: fieldError("addressDistrict"),
+                }}
+                onChange={(field, value) => update(field, value)}
+                onBlurField={(field) => {
+                  touch(field);
+                  validateField(field);
+                }}
+              />
+            ) : null}
           </FormSection>
 
           <FormSection step={12} title="Confirm contact details">
@@ -1088,14 +1141,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <p><strong>TikTok:</strong> {form.tiktok || "Not provided"}</p>
               <p><strong>Other contact platform:</strong> {otherPlatform || "Not provided"}</p>
               <p><strong>Other contact detail:</strong> {form.otherContact || "Not provided"}</p>
-              <p>
-                <strong>Physical address:</strong>{" "}
-                {formatStreetAddressDisplay({
-                  streetAddress: form.streetAddress,
-                  addressCityVillage: form.addressCityVillage,
-                  addressDistrict: form.addressDistrict,
-                })}
-              </p>
+              {streetAddressRequired ? (
+                <p>
+                  <strong>Physical address:</strong>{" "}
+                  {formatStreetAddressDisplay({
+                    streetAddress: form.streetAddress,
+                    addressCityVillage: form.addressCityVillage,
+                    addressDistrict: form.addressDistrict,
+                  })}
+                </p>
+              ) : null}
             </div>
 
             <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">

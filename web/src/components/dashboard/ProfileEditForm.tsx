@@ -102,6 +102,23 @@ export function ProfileEditForm({
     tiktok: form.tiktok,
     otherContact: form.otherContact,
   });
+  const streetAddressRequired = streetAddressRequiredForContacts(form.placeOfResidence, contactCount);
+
+  useEffect(() => {
+    if (streetAddressRequired) return;
+    if (!form.streetAddress && !form.addressCityVillage && !form.addressDistrict) return;
+    setForm((prev) => ({
+      ...prev,
+      streetAddress: "",
+      addressCityVillage: "",
+      addressDistrict: "",
+    }));
+  }, [
+    streetAddressRequired,
+    form.streetAddress,
+    form.addressCityVillage,
+    form.addressDistrict,
+  ]);
 
   const update = <K extends keyof ProfileUpdateFormData>(key: K, value: ProfileUpdateFormData[K]) => {
     setForm((prev) => {
@@ -378,7 +395,7 @@ export function ProfileEditForm({
               You selected Belizean residing abroad. Tell us the country where you currently live.
             </p>
           ) : (
-          <Field label="Where do you currently live?" required error={errors.placeOfResidence} id="placeOfResidence">
+          <Field label="District where you currently live" required error={errors.placeOfResidence} id="placeOfResidence">
             <SelectInput
               id="placeOfResidence"
               value={form.placeOfResidence}
@@ -544,25 +561,21 @@ export function ProfileEditForm({
             />
           </Field>
 
-          <StreetAddressFields
-            streetAddress={form.streetAddress}
-            addressCityVillage={form.addressCityVillage}
-            addressDistrict={form.addressDistrict}
-            required={streetAddressRequiredForContacts(form.placeOfResidence, contactCount)}
-            hint={
-              streetAddressRequiredForContacts(form.placeOfResidence, contactCount)
-                ? "Required because you live in Belize and have fewer than two contact methods, counting email."
-                : form.placeOfResidence === "Abroad"
-                  ? "Optional. A physical address is only required for people living in Belize who have fewer than two contact methods, counting email."
-                  : "Optional when you have already given at least two ways to contact you, counting email."
-            }
-            errors={{
-              streetAddress: errors.streetAddress,
-              addressCityVillage: errors.addressCityVillage,
-              addressDistrict: errors.addressDistrict,
-            }}
-            onChange={(field, value) => update(field, value)}
-          />
+          {streetAddressRequired ? (
+            <StreetAddressFields
+              streetAddress={form.streetAddress}
+              addressCityVillage={form.addressCityVillage}
+              addressDistrict={form.addressDistrict}
+              required
+              hint="Required only because you live in Belize and have fewer than two means of contact. Home visits are a last resort."
+              errors={{
+                streetAddress: errors.streetAddress,
+                addressCityVillage: errors.addressCityVillage,
+                addressDistrict: errors.addressDistrict,
+              }}
+              onChange={(field, value) => update(field, value)}
+            />
+          ) : null}
         </div>
       </div>
       </div>
@@ -579,7 +592,6 @@ export function ProfileEditForm({
             <Field
               label="Select up to 5 products and services you are interested in and are willing to give feedback on."
               required
-              hint="Asked of people living in Belize."
               error={errors.marketInterests}
             >
               <MultiSelect
