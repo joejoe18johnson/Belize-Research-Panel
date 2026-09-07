@@ -154,9 +154,12 @@ function isValidHouseholdHeadAnswer(value: string): boolean {
 }
 
 export function countContactMethods(data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "facebook" | "instagram" | "tiktok" | "otherContact">): number {
+  const hasValidPhone =
+    Boolean(phoneLocalDigits(data.phoneLocalNumber)) && validatePhoneFields(data) === null;
+
   return [
     cleanText(data.email),
-    getFullPhoneNumber(data),
+    hasValidPhone ? getFullPhoneNumber(data) : "",
     cleanText(data.facebook),
     cleanText(data.instagram),
     cleanText(data.tiktok),

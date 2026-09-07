@@ -204,17 +204,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }));
   }, [form.citizenshipStatus, form.placeOfResidence]);
 
-  // Only collect a home address when it is required as a last-resort contact method.
+  // Clear physical address when the registrant does not live in Belize.
   useEffect(() => {
-    const required = streetAddressRequiredForContacts(form.placeOfResidence, countContactMethods(form));
-    if (required) return;
-    if (
-      !form.streetAddress &&
-      !form.addressCityVillage &&
-      !form.addressDistrict
-    ) {
-      return;
-    }
+    if (livesInBelizeResidence(form.placeOfResidence)) return;
+    if (!form.streetAddress && !form.addressCityVillage && !form.addressDistrict) return;
     setForm((prev) => ({
       ...prev,
       streetAddress: "",
@@ -223,13 +216,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }));
   }, [
     form.placeOfResidence,
-    form.email,
-    form.phoneCountryCode,
-    form.phoneLocalNumber,
-    form.facebook,
-    form.instagram,
-    form.tiktok,
-    form.otherContact,
     form.streetAddress,
     form.addressCityVillage,
     form.addressDistrict,
@@ -347,14 +333,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : [];
   const ctvOptions = getRegisteredCtvOptions(form.constituency);
   const contactCount = countContactMethods(form);
+  const livingInBelize = livesInBelizeResidence(form.placeOfResidence);
   const physicalAddressProvided = streetAddressPartsPresent({
     streetAddress: form.streetAddress,
     addressCityVillage: form.addressCityVillage,
     addressDistrict: form.addressDistrict,
   });
   const meetsContactMinimum =
-    contactCount >= 2 || (livesInBelizeResidence(form.placeOfResidence) && physicalAddressProvided);
+    contactCount >= 2 || (livingInBelize && physicalAddressProvided);
   const streetAddressRequired = streetAddressRequiredForContacts(form.placeOfResidence, contactCount);
+  const showStreetAddress = livingInBelize;
   const otherPlatform =
     form.otherContactPlatform === "Other"
       ? form.otherContactPlatformCustom
