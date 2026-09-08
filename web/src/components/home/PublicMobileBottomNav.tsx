@@ -29,26 +29,6 @@ function HomeIcon({ active, className = "h-5 w-5" }: { active?: boolean; classNa
   );
 }
 
-function FaqsIcon({ active, className = "h-5 w-5" }: { active?: boolean; className?: string }) {
-  if (active) {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className={className} fill="currentColor">
-        <path d="M7 3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-3.2L9.5 20.4c-.5.4-1.2 0-1.2-.6V17H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm5 11.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm-.1-7.7c-1.5 0-2.5.9-2.5 2.2 0 .4.3.8.8.8s.8-.4.8-.8c0-.4.4-.7.9-.7s.9.3.9.8c0 .4-.2.6-.8 1.1-.7.5-1.1 1-1.1 1.8v.1c0 .4.3.8.8.8s.8-.4.8-.8v-.1c0-.2.1-.4.5-.7.9-.7 1.4-1.2 1.4-2.2 0-1.4-1.1-2.3-2.5-2.3Z" />
-      </svg>
-    );
-  }
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="1.8">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M7.5 4.5h9A2.5 2.5 0 0 1 19 7v7.5a2.5 2.5 0 0 1-2.5 2.5H13l-3.2 2.6c-.4.3-1 0-1-.5v-2.1H7.5A2.5 2.5 0 0 1 5 14.5V7A2.5 2.5 0 0 1 7.5 4.5Z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.8 9.2a2.1 2.1 0 1 1 3.2 1.8c-.6.4-1.1.8-1.1 1.6M12 15.2h.01" />
-    </svg>
-  );
-}
-
 function HelpIcon({ active, className = "h-5 w-5" }: { active?: boolean; className?: string }) {
   if (active) {
     return (
@@ -126,18 +106,10 @@ function shouldHideBottomNav(pathname: string | null): boolean {
 export function PublicMobileBottomNav({ signedIn = false }: { signedIn?: boolean }) {
   const pathname = usePathname();
   const [locale, setLocale] = useState<HomeLocale>("en");
-  const [hash, setHash] = useState("");
   const hidden = shouldHideBottomNav(pathname);
 
   useEffect(() => {
     setLocale(readStoredHomeLocale());
-  }, [pathname]);
-
-  useEffect(() => {
-    const syncHash = () => setHash(window.location.hash);
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
   }, [pathname]);
 
   useEffect(() => {
@@ -157,9 +129,7 @@ export function PublicMobileBottomNav({ signedIn = false }: { signedIn?: boolean
   const copy = HOME_COPY[locale];
   const t = (text: string) => displayCopy(text, locale);
   const isHome = pathname === "/";
-  const onHelp = pathname.startsWith("/help");
-  const isFaqs = onHelp && hash === "#faqs";
-  const isHelp = onHelp && !isFaqs;
+  const isHelp = pathname.startsWith("/help");
   const isProfile =
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
@@ -176,21 +146,13 @@ export function PublicMobileBottomNav({ signedIn = false }: { signedIn?: boolean
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <div className="pointer-events-auto mx-auto flex max-w-md items-stretch overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-white/95 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-950/95 dark:shadow-black/40">
+      <div className="pointer-events-auto mx-auto flex max-w-sm items-stretch overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-white/95 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-950/95 dark:shadow-black/40">
         <NavItem href="/" label={t(copy.navHome)} active={isHome} icon={<HomeIcon active={isHome} />} />
-        <NavItem
-          href="/help#faqs"
-          label={t(copy.navFaqsShort)}
-          active={isFaqs}
-          icon={<FaqsIcon active={isFaqs} />}
-          onClick={() => setHash("#faqs")}
-        />
         <NavItem
           href="/help"
           label={t(copy.navHelp)}
           active={isHelp}
           icon={<HelpIcon active={isHelp} />}
-          onClick={() => setHash("")}
         />
         <NavItem
           href={profileHref}
