@@ -50,6 +50,7 @@ function RegistrationVerifiedShell({
                 {display(copy.deleteAccount, formatHeadingCase)}
               </Link>
               <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 lg:inline">{account.email}</span>
+              <ThemeIconButton />
               <LogoutButton
                 compact
                 label={copy.logOut}
@@ -61,7 +62,6 @@ function RegistrationVerifiedShell({
                 loadingLabel={copy.loggingOut}
                 className="hidden min-h-11 items-center rounded-xl px-4 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 dark:text-teal-100 dark:hover:bg-teal-900/40 lg:flex"
               />
-              <ThemeIconButton />
             </div>
           </div>
         </div>
