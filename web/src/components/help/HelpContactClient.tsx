@@ -100,7 +100,7 @@ export function HelpContactClient({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
-      <section className="min-w-0 space-y-4">
+      <section className="min-w-0 space-y-4" id="faqs">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {formatHeadingCase("Frequently asked questions")}

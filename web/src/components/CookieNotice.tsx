@@ -40,10 +40,13 @@ export function CookieNotice() {
 
   return (
     <div
-      className="safe-bottom fixed inset-x-0 bottom-0 z-50 border-t border-teal-200/80 bg-white/95 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md dark:border-teal-900/60 dark:bg-zinc-950/95 dark:shadow-black/40"
+      className="safe-bottom fixed inset-x-0 z-50 border-t border-teal-200/80 bg-white/95 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md dark:border-teal-900/60 dark:bg-zinc-950/95 dark:shadow-black/40"
       role="dialog"
       aria-label={formatHeadingCase("Cookie notice")}
       aria-describedby="cookie-notice-copy"
+      style={{
+        bottom: "var(--brp-mobile-bottom-nav-offset, 0px)",
+      }}
     >
       <div className={`${appContentClass} px-4 py-4 sm:px-6 sm:py-5`}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">

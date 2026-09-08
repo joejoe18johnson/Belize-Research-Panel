@@ -1,5 +1,6 @@
 import { HomePageClient } from "@/components/home/HomePageClient";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getSessionAccount } from "@/lib/auth";
 import { DEFAULT_DESCRIPTION } from "@/lib/seo/site-config";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { organizationJsonLd, webPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
@@ -10,7 +11,8 @@ export const metadata = buildPageMetadata({
   path: "/",
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await getSessionAccount();
   const pageTitle = "Belize Research Panel — Earn rewards for sharing your opinions in Belize";
 
   return (
@@ -26,7 +28,7 @@ export default function HomePage() {
           }),
         ]}
       />
-      <HomePageClient />
+      <HomePageClient signedIn={Boolean(session)} />
     </>
   );
 }

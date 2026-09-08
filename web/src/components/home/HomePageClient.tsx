@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
-import { ThemeIconButton, ThemeMenuToggle } from "@/components/theme/ThemeToggle";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
@@ -121,7 +121,7 @@ function HomeHowItWorksStep({
   );
 }
 
-export function HomePageClient() {
+export function HomePageClient({ signedIn = false }: { signedIn?: boolean }) {
   const [locale, setLocale] = useState<HomeLocale>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolved } = useTheme();
@@ -133,10 +133,22 @@ export function HomePageClient() {
     document.documentElement.lang = stored;
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   const handleLocaleChange = (next: HomeLocale) => {
     setLocale(next);
     storeHomeLocale(next);
   };
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const copy = HOME_COPY[locale];
   const t = (text: string) => displayCopy(text, locale);
@@ -149,6 +161,9 @@ export function HomePageClient() {
     : "flex min-h-11 items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800";
   const loginLinkClassMobile = `${loginLinkClassDesktop} w-full`;
   const registerLinkClassMobile = `${registerLinkClassDesktop} w-full`;
+  const mobileNavLinkClass = onDarkHero
+    ? "flex min-h-11 w-full items-center rounded-xl px-3 text-sm font-semibold text-teal-50 hover:bg-white/10"
+    : "flex min-h-11 w-full items-center rounded-xl px-3 text-sm font-semibold text-teal-900 hover:bg-teal-50 dark:text-teal-100 dark:hover:bg-teal-950/40";
 
   return (
     <div
@@ -176,13 +191,26 @@ export function HomePageClient() {
               variant={onDarkHero ? "dark" : "light"}
             />
 
+            <ThemeIconButton
+              variant={onDarkHero ? "dark" : "light"}
+              className="lg:hidden"
+            />
+
             <div className="hidden items-center gap-2 lg:flex lg:gap-3">
-              <Link href="/login" className={loginLinkClassDesktop}>
-                {t(copy.logIn)}
-              </Link>
-              <Link href="/register" className={registerLinkClassDesktop}>
-                {t(copy.register)}
-              </Link>
+              {signedIn ? (
+                <Link href="/dashboard" className={registerLinkClassDesktop}>
+                  {t(copy.navDashboard)}
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" className={loginLinkClassDesktop}>
+                    {t(copy.logIn)}
+                  </Link>
+                  <Link href="/register" className={registerLinkClassDesktop}>
+                    {t(copy.register)}
+                  </Link>
+                </>
+              )}
               <ThemeIconButton variant={onDarkHero ? "dark" : "light"} />
             </div>
 
@@ -214,22 +242,49 @@ export function HomePageClient() {
         {mobileMenuOpen ? (
           <div
             id="home-mobile-menu"
-            className={`mt-3 space-y-2 rounded-2xl border p-3 lg:hidden ${
+            className={`mt-3 space-y-1 rounded-2xl border p-2 lg:hidden ${
               onDarkHero
                 ? "border-white/15 bg-black/30 backdrop-blur-sm"
                 : "border-teal-200 bg-white shadow-sm dark:border-teal-800 dark:bg-zinc-900"
             }`}
           >
-            <ThemeMenuToggle
-              variant={onDarkHero ? "heroDark" : "heroLight"}
-              onActivate={() => setMobileMenuOpen(false)}
+            <Link
+              href="/#how-it-works"
+              className={mobileNavLinkClass}
+              onClick={(event) => {
+                closeMobileMenu();
+                event.preventDefault();
+                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              {t(copy.navHowItWorks)}
+            </Link>
+            <Link href="/help#faqs" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+              {t(copy.navFaqs)}
+            </Link>
+            <Link href="/help" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+              {t(copy.navHelpContact)}
+            </Link>
+            <Link href="/data-use-policy" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+              {t(copy.navPrivacy)}
+            </Link>
+            <div
+              className={`my-1 border-t ${onDarkHero ? "border-white/10" : "border-teal-100 dark:border-teal-900"}`}
             />
-            <Link href="/login" className={loginLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
-              {t(copy.logIn)}
-            </Link>
-            <Link href="/register" className={registerLinkClassMobile} onClick={() => setMobileMenuOpen(false)}>
-              {t(copy.register)}
-            </Link>
+            {signedIn ? (
+              <Link href="/dashboard" className={registerLinkClassMobile} onClick={closeMobileMenu}>
+                {t(copy.navDashboard)}
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className={loginLinkClassMobile} onClick={closeMobileMenu}>
+                  {t(copy.logIn)}
+                </Link>
+                <Link href="/register" className={registerLinkClassMobile} onClick={closeMobileMenu}>
+                  {t(copy.register)}
+                </Link>
+              </>
+            )}
           </div>
         ) : null}
         </header>
@@ -293,7 +348,7 @@ export function HomePageClient() {
           </div>
         </section>
 
-        <section className="mt-14 sm:mt-20">
+        <section id="how-it-works" className="mt-14 scroll-mt-24 sm:mt-20">
           <p
             className={
               onDarkHero

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { CookieNotice } from "@/components/CookieNotice";
+import { PublicMobileBottomNav } from "@/components/home/PublicMobileBottomNav";
 import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
 import { ScrollToTopOnNavigate } from "@/components/shared/ScrollToTopOnNavigate";
 import { ThemeInitScript } from "@/components/theme/ThemeInitScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { getSessionAccount } from "@/lib/auth";
 import { rootMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
@@ -25,11 +27,13 @@ export const viewport = {
   viewportFit: "cover" as const,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSessionAccount();
+
   return (
     <html lang="en-BZ" className={`${geistSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full min-w-0 max-w-full flex-col overflow-x-clip bg-background font-sans text-foreground">
@@ -37,11 +41,14 @@ export default function RootLayout({
         <ThemeProvider>
           <ScrollToTopOnNavigate />
           <NetlifyDeployBanner />
-          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          <div className="flex min-h-0 flex-1 flex-col pb-[var(--brp-mobile-bottom-nav-offset,0px)] lg:pb-0">
+            {children}
+          </div>
           <SiteFooterGate>
             <SiteFooter />
           </SiteFooterGate>
           <CookieNotice />
+          <PublicMobileBottomNav signedIn={Boolean(session)} />
         </ThemeProvider>
       </body>
     </html>
