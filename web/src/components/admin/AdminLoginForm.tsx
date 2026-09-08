@@ -70,7 +70,7 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
                   required
-                  placeholder="name.role@belizepanel.test"
+                  placeholder="name@dashboardresearch.com"
                   className={adminAuthInputClassName}
                 />
               </div>

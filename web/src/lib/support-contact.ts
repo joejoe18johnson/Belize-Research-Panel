@@ -65,8 +65,9 @@ export const SUPPORT_FAQ: SupportFaqItem[] = [
   },
 ];
 
-const DEFAULT_SUPPORT_INBOX = "support@belizepanel.test";
-const DEFAULT_PRIVACY_INBOX = "privacy@belizepanel.test";
+const DEFAULT_CONTACT_INBOX = "info@dashboardresearch.com";
+const DEFAULT_SUPPORT_INBOX = DEFAULT_CONTACT_INBOX;
+const DEFAULT_PRIVACY_INBOX = DEFAULT_CONTACT_INBOX;
 
 function isPlaceholderInbox(email: string): boolean {
   const lower = email.trim().toLowerCase();

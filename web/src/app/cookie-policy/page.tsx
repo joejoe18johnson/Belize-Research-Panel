@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PolicyPageShell, PolicySection } from "@/components/PolicyPageShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPrivacyContactEmail } from "@/lib/support-contact";
 
 export const metadata = buildPageMetadata({
   title: "Cookie policy",
@@ -11,6 +12,8 @@ export const metadata = buildPageMetadata({
 });
 
 export default function CookiePolicyPage() {
+  const privacyEmail = getPrivacyContactEmail();
+
   return (
     <PolicyPageShell
       title="Cookie policy"
@@ -127,8 +130,8 @@ export default function CookiePolicyPage() {
             help & contact page
           </Link>{" "}
           {formatHeadingCase("or emailed to")}{" "}
-          <a href="mailto:privacy@belizepanel.test" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
-            privacy@belizepanel.test
+          <a href={`mailto:${privacyEmail}`} className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            {privacyEmail}
           </a>
           .
         </p>
