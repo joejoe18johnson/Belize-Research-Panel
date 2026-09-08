@@ -51,5 +51,6 @@ export const PUBLIC_INDEXABLE_ROUTES: Array<{
   { path: "/help", changeFrequency: "monthly", priority: 0.7 },
   { path: "/site-policy", changeFrequency: "yearly", priority: 0.4 },
   { path: "/data-use-policy", changeFrequency: "yearly", priority: 0.4 },
+  { path: "/cookie-policy", changeFrequency: "yearly", priority: 0.4 },
   { path: "/data-deletion", changeFrequency: "yearly", priority: 0.4 },
 ];

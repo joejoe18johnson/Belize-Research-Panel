@@ -163,8 +163,13 @@ export default function DataUsePolicyPage() {
       <PolicySection title="Cookies and similar technologies">
         <p>
           {formatHeadingCase(
-            "We use essential cookies and session storage necessary for authentication, security, and core site functionality. We do not use non-essential tracking cookies without appropriate notice and consent where required."
-          )}
+            "We use essential cookies and browser storage necessary for authentication, security, preferences, and core site functionality. We do not use advertising or third-party tracking cookies."
+          )}{" "}
+          {formatHeadingCase("Full details are in our")}{" "}
+          <Link href="/cookie-policy" className="font-medium text-teal-700 hover:underline dark:text-teal-300">
+            cookie policy
+          </Link>
+          .
         </p>
       </PolicySection>
 

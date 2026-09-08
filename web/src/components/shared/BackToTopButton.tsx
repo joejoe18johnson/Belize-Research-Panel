@@ -60,7 +60,7 @@ export function BackToTopButton({
         visible ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
       style={{
-        bottom: "max(1rem, env(safe-area-inset-bottom, 0px))",
+        bottom: "calc(max(1rem, env(safe-area-inset-bottom, 0px)) + var(--brp-cookie-notice-offset, 0px))",
         right: "max(1rem, env(safe-area-inset-right, 0px))",
       }}
     >

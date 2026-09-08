@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { CookieNotice } from "@/components/CookieNotice";
 import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
@@ -40,6 +41,7 @@ export default function RootLayout({
           <SiteFooterGate>
             <SiteFooter />
           </SiteFooterGate>
+          <CookieNotice />
         </ThemeProvider>
       </body>
     </html>

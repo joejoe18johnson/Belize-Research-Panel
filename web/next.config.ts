@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/privacy", destination: "/data-use-policy", permanent: true },
       { source: "/terms", destination: "/site-policy", permanent: true },
+      { source: "/cookies", destination: "/cookie-policy", permanent: true },
     ];
   },
 };

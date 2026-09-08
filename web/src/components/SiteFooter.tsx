@@ -33,6 +33,9 @@ export async function SiteFooter() {
             <Link href="/data-use-policy" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
               {formatHeadingCase("Data use policy")}
             </Link>
+            <Link href="/cookie-policy" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
+              {formatHeadingCase("Cookie policy")}
+            </Link>
             <Link href="/data-deletion" className="transition hover:text-teal-950 hover:underline dark:hover:text-teal-100">
               {formatHeadingCase("Data deletion")}
             </Link>
