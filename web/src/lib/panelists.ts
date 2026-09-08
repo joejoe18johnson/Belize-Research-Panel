@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "crypto";
 import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
-import { PANELIST_COLUMNS, isCommonwealthCitizenInBelize, storedVotingStatus } from "./constants";
+import { PANELIST_COLUMNS, isCommonwealthCitizenInBelize, ownsBusinessOrNgo, storedVotingStatus } from "./constants";
 import {
   calculateAge,
   cleanText,
@@ -441,6 +441,10 @@ export async function registerPanelist(
     district: data.placeOfResidence === "Abroad" ? "" : data.placeOfResidence,
     city_town_village: cleanText(cityFinal),
     country_if_abroad: data.placeOfResidence === "Abroad" ? data.countryIfAbroad : "",
+    country_if_abroad_other:
+      data.placeOfResidence === "Abroad" && data.countryIfAbroad === "Other"
+        ? cleanText(data.countryIfAbroadOther)
+        : "",
     residence_region: data.placeOfResidence === "Abroad" ? cleanText(data.usDiasporaRegion) : "",
     constituency: registeredVoter ? data.constituency : "",
     registered_ctv_area: registeredVoter ? cleanText(data.registeredCtvArea) : "",
@@ -479,6 +483,32 @@ export async function registerPanelist(
     consent_research: String(data.consentResearch),
     consent_contact: String(data.consentContact),
     consent_privacy: String(data.consentPrivacy),
+    owns_business_or_ngo: cleanText(data.ownsBusinessOrNgo),
+    org_name: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgName) : "",
+    org_street_address: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgStreetAddress)
+      : "",
+    org_city_village: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgCityVillage)
+      : "",
+    org_district: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgDistrict) : "",
+    org_description: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgDescription)
+      : "",
+    org_size: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgSize) : "",
+    org_ownership_structure: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgOwnershipStructure)
+      : "",
+    org_ownership_structure_other:
+      ownsBusinessOrNgo(data.ownsBusinessOrNgo) && data.orgOwnershipStructure === "Other"
+        ? cleanText(data.orgOwnershipStructureOther)
+        : "",
+    org_year_started: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgYearStarted)
+      : "",
+    org_contact_means: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? cleanText(data.orgContactMeans)
+      : "",
     status: "Active",
     notes: authorisedBy
       ? authorisedRegistrationNotes(authorisedBy.code, authorisedBy.name)
@@ -552,6 +582,10 @@ export async function updatePanelistProfile(
     district: data.placeOfResidence === "Abroad" ? "" : data.placeOfResidence,
     city_town_village: cleanText(cityFinal),
     country_if_abroad: data.placeOfResidence === "Abroad" ? cleanText(data.countryIfAbroad) : "",
+    country_if_abroad_other:
+      data.placeOfResidence === "Abroad" && data.countryIfAbroad === "Other"
+        ? cleanText(data.countryIfAbroadOther)
+        : "",
     residence_region: data.placeOfResidence === "Abroad" ? cleanText(data.usDiasporaRegion) : "",
     phone_whatsapp: existing.phone_whatsapp,
     facebook: normalizeContactHandle(data.facebook),

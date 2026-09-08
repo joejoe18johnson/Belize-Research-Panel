@@ -10,7 +10,6 @@ import {
   choiceBoxLabelClass,
   Field,
   FieldGroup,
-  SelectInput,
   siteRadioClass,
   TextInput,
 } from "@/components/registration/form-ui";
@@ -19,7 +18,7 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 import { AuthMethodDivider, FacebookAuthButton } from "@/components/auth/FacebookAuthButton";
 import { PasswordMatchStatus } from "@/components/auth/PasswordMatchStatus";
 import type { SignupFormData } from "@/lib/auth-types";
-import { CITIZENSHIP_STATUS, COMMONWEALTH_COUNTRIES, CITIZENSHIP_PANEL_INTRO, isCommonwealthCitizenInBelize } from "@/lib/constants";
+import { CITIZENSHIP_STATUS, CITIZENSHIP_PANEL_INTRO } from "@/lib/constants";
 import { isValidDobString } from "@/lib/dob";
 import {
   isSignupEligible,
@@ -58,7 +57,6 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   const citizenshipIneligible =
     Boolean(form.citizenshipStatus) && !isEligibleCitizenship(form.citizenshipStatus);
   const eligibilityBlocked = ageIneligible || citizenshipIneligible;
-  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
 
   const pwdStrength = useMemo(
     () => passwordStrength(form.password, "", form.firstName, form.lastName),
@@ -66,13 +64,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
   );
 
   const update = <K extends keyof SignupFormData>(key: K, value: SignupFormData[K]) => {
-    setForm((prev) => {
-      const next = { ...prev, [key]: value };
-      if (key === "citizenshipStatus") {
-        next.commonwealthCountry = "";
-      }
-      return next;
-    });
+    setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => {
       if (!prev[key as string] && key !== "password" && key !== "confirmPassword") return prev;
       const next = { ...prev };
@@ -191,29 +183,6 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
           ) : null}
         </div>
 
-        {needsCommonwealthCountry && !citizenshipIneligible ? (
-          <Field
-            label="Commonwealth country of citizenship"
-            required
-            error={errors.commonwealthCountry}
-            id="commonwealthCountry"
-          >
-            <SelectInput
-              id="commonwealthCountry"
-              value={form.commonwealthCountry}
-              onChange={(e) => update("commonwealthCountry", e.target.value)}
-              error={errors.commonwealthCountry}
-            >
-              <option value="">Select commonwealth country</option>
-              {COMMONWEALTH_COUNTRIES.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </SelectInput>
-          </Field>
-        ) : null}
-
         {!citizenshipIneligible ? (
         <Field label="Date of birth" required error={errors.dob} id="dob">
           <DateOfBirthPicker
@@ -278,7 +247,7 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         mode="signup"
         eligibility={{
           citizenshipStatus: form.citizenshipStatus,
-          commonwealthCountry: form.commonwealthCountry,
+          commonwealthCountry: "",
           dob: form.dob,
         }}
       />

@@ -20,6 +20,7 @@ export interface ProfileUpdateFormData {
   cityTownVillage: string;
   cityTownVillageOther: string;
   countryIfAbroad: string;
+  countryIfAbroadOther: string;
   usDiasporaRegion: string;
   politicalInterests: string[];
   marketInterests: string[];
@@ -46,6 +47,7 @@ export const initialProfileUpdateForm: ProfileUpdateFormData = {
   cityTownVillage: "",
   cityTownVillageOther: "",
   countryIfAbroad: "",
+  countryIfAbroadOther: "",
   usDiasporaRegion: "",
   politicalInterests: [],
   marketInterests: [],

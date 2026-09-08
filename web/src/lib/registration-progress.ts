@@ -54,7 +54,6 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
   ],
   [
     "citizenshipStatus",
-    "commonwealthCountry",
     "dob",
     "votingStatus",
     "proofOfBelizeResidenceType",
@@ -70,6 +69,7 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "householdSize",
     "placeOfResidence",
     "countryIfAbroad",
+    "countryIfAbroadOther",
     "usDiasporaRegion",
     "cityTownVillage",
     "cityTownVillageOther",
@@ -89,7 +89,23 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "addressDistrict",
     "contactDetailsConfirmed",
   ],
-  ["consentResearch", "consentContact", "consentPrivacy", "finalReviewConfirmed"],
+  [
+    "consentResearch",
+    "consentContact",
+    "consentPrivacy",
+    "ownsBusinessOrNgo",
+    "orgName",
+    "orgStreetAddress",
+    "orgCityVillage",
+    "orgDistrict",
+    "orgDescription",
+    "orgSize",
+    "orgOwnershipStructure",
+    "orgOwnershipStructureOther",
+    "orgYearStarted",
+    "orgContactMeans",
+    "finalReviewConfirmed",
+  ],
 ];
 
 const ELIGIBILITY_PHASE = 1;
@@ -179,10 +195,8 @@ function collectPhaseErrors(
 
   if (phaseIndex === ELIGIBILITY_PHASE && !isEligibleCitizenship(form.citizenshipStatus)) {
     delete allErrors.votingStatus;
-    delete allErrors.commonwealthCountry;
   }
   if (phaseIndex === ELIGIBILITY_PHASE && !isCommonwealthCitizenInBelize(form.citizenshipStatus)) {
-    delete allErrors.commonwealthCountry;
     delete allErrors.proofOfBelizeResidenceType;
     delete allErrors.proofOfBelizeResidenceFile;
   }
@@ -199,7 +213,11 @@ function collectPhaseErrors(
   }
   if (phaseIndex === PROFILE_PHASE && form.placeOfResidence && form.placeOfResidence !== "Abroad") {
     delete allErrors.countryIfAbroad;
+    delete allErrors.countryIfAbroadOther;
     delete allErrors.usDiasporaRegion;
+  }
+  if (phaseIndex === PROFILE_PHASE && form.countryIfAbroad !== "Other") {
+    delete allErrors.countryIfAbroadOther;
   }
   if (phaseIndex === PROFILE_PHASE && !isUnitedStatesCountry(form.countryIfAbroad)) {
     delete allErrors.usDiasporaRegion;
@@ -211,6 +229,21 @@ function collectPhaseErrors(
     if (form.placeOfResidence === "Abroad") {
       delete allErrors.marketInterests;
     }
+  }
+  if (phaseIndex === REVIEW_PHASE && form.ownsBusinessOrNgo !== "Yes") {
+    delete allErrors.orgName;
+    delete allErrors.orgStreetAddress;
+    delete allErrors.orgCityVillage;
+    delete allErrors.orgDistrict;
+    delete allErrors.orgDescription;
+    delete allErrors.orgSize;
+    delete allErrors.orgOwnershipStructure;
+    delete allErrors.orgOwnershipStructureOther;
+    delete allErrors.orgYearStarted;
+    delete allErrors.orgContactMeans;
+  }
+  if (phaseIndex === REVIEW_PHASE && form.orgOwnershipStructure !== "Other") {
+    delete allErrors.orgOwnershipStructureOther;
   }
 
   const phaseErrors: FieldErrors = {};

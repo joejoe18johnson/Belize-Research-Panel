@@ -12,7 +12,6 @@ import {
 } from "@/components/registration/form-ui";
 import {
   BELIZE_DISTRICTS,
-  COMMONWEALTH_COUNTRIES,
   COUNTRIES,
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
@@ -20,7 +19,6 @@ import {
   getRegisteredCtvOptions,
   getResidenceOptions,
   hasRegisteredCtvQuestion,
-  isCommonwealthCitizenInBelize,
   mustLiveAbroad,
   needsVoterRegistrationQuestion,
   cityTownVillageQuestionLabel,
@@ -82,7 +80,6 @@ export function ProfileEditForm({
 
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
-  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
 
   const residenceOptions = useMemo(() => getResidenceOptions(form.citizenshipStatus), [form.citizenshipStatus]);
   const cityOptions =
@@ -132,6 +129,7 @@ export function ProfileEditForm({
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
+        next.countryIfAbroadOther = "";
         next.usDiasporaRegion = "";
       }
       if (key === "votingStatus") {
@@ -145,6 +143,7 @@ export function ProfileEditForm({
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
+        next.countryIfAbroadOther = "";
         next.usDiasporaRegion = "";
         if (typeof value === "string" && BELIZE_DISTRICTS.includes(value)) {
           if (!next.addressDistrict || next.addressDistrict === prev.placeOfResidence) {
@@ -154,6 +153,7 @@ export function ProfileEditForm({
       }
       if (key === "countryIfAbroad") {
         next.usDiasporaRegion = "";
+        if (value !== "Other") next.countryIfAbroadOther = "";
       }
       return next;
     });
@@ -295,29 +295,6 @@ export function ProfileEditForm({
             </SelectInput>
           </Field>
 
-          {needsCommonwealthCountry ? (
-            <Field
-              label="Commonwealth country of citizenship"
-              required
-              error={errors.commonwealthCountry}
-              id="commonwealthCountry"
-            >
-              <SelectInput
-                id="commonwealthCountry"
-                value={form.commonwealthCountry}
-                onChange={(e) => update("commonwealthCountry", e.target.value)}
-                error={errors.commonwealthCountry}
-              >
-                <option value="">Select country…</option>
-                {COMMONWEALTH_COUNTRIES.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-          ) : null}
-
           {needsVoterQuestion ? (
             <Field
               label="Are you registered to vote in Belize?"
@@ -429,6 +406,22 @@ export function ProfileEditForm({
                   ))}
                 </SelectInput>
               </Field>
+              {form.countryIfAbroad === "Other" ? (
+                <Field
+                  label="Country of residence (please specify)"
+                  required
+                  error={errors.countryIfAbroadOther}
+                  id="countryIfAbroadOther"
+                >
+                  <TextInput
+                    id="countryIfAbroadOther"
+                    value={form.countryIfAbroadOther}
+                    onChange={(e) => update("countryIfAbroadOther", e.target.value)}
+                    error={errors.countryIfAbroadOther}
+                    placeholder="Please specify your country of residence"
+                  />
+                </Field>
+              ) : null}
               {isUnitedStatesCountry(form.countryIfAbroad) ? (
                 <Field
                   label="Region of country"

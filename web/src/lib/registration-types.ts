@@ -19,6 +19,7 @@ export interface RegistrationFormData {
   cityTownVillage: string;
   cityTownVillageOther: string;
   countryIfAbroad: string;
+  countryIfAbroadOther: string;
   usDiasporaRegion: string;
   constituency: string;
   registeredCtvArea: string;
@@ -50,6 +51,17 @@ export interface RegistrationFormData {
   consentResearch: boolean;
   consentContact: boolean;
   consentPrivacy: boolean;
+  ownsBusinessOrNgo: string;
+  orgName: string;
+  orgStreetAddress: string;
+  orgCityVillage: string;
+  orgDistrict: string;
+  orgDescription: string;
+  orgSize: string;
+  orgOwnershipStructure: string;
+  orgOwnershipStructureOther: string;
+  orgYearStarted: string;
+  orgContactMeans: string;
   finalReviewConfirmed: boolean;
 }
 
@@ -71,6 +83,7 @@ export const initialRegistrationForm: RegistrationFormData = {
   cityTownVillage: "",
   cityTownVillageOther: "",
   countryIfAbroad: "",
+  countryIfAbroadOther: "",
   usDiasporaRegion: "",
   constituency: "",
   registeredCtvArea: "",
@@ -102,6 +115,17 @@ export const initialRegistrationForm: RegistrationFormData = {
   consentResearch: false,
   consentContact: false,
   consentPrivacy: false,
+  ownsBusinessOrNgo: "",
+  orgName: "",
+  orgStreetAddress: "",
+  orgCityVillage: "",
+  orgDistrict: "",
+  orgDescription: "",
+  orgSize: "",
+  orgOwnershipStructure: "",
+  orgOwnershipStructureOther: "",
+  orgYearStarted: "",
+  orgContactMeans: "",
   finalReviewConfirmed: false,
 };
 

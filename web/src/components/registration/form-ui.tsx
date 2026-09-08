@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { SiteSelectField } from "@/components/shared/SiteSelect";
 import { siteCheckboxClass, siteRadioClass } from "@/lib/site-controls";
@@ -117,12 +117,12 @@ export function TextArea({
   error,
   className = "",
   ...props
-}: InputHTMLAttributes<HTMLTextAreaElement> & { error?: string }) {
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & { error?: string }) {
   return (
     <textarea
       className={`${inputClass} min-h-24 resize-y py-3 ${error ? errorInputClass : ""} ${className}`}
       aria-invalid={error ? "true" : undefined}
-      {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+      {...props}
     />
   );
 }

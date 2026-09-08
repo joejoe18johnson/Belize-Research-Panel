@@ -9,26 +9,17 @@ import {
   validateDateOfBirth,
   type FieldErrors,
 } from "./validation";
-import { COMMONWEALTH_COUNTRIES, isCommonwealthCitizenInBelize } from "./constants";
 import { validateEmailForBotSignup } from "./suspicious-email";
 
 export type { FieldErrors };
 
 export function validateSignupEligibility(
-  data: Pick<SignupFormData, "citizenshipStatus" | "commonwealthCountry" | "dob">
+  data: Pick<SignupFormData, "citizenshipStatus" | "dob">
 ): FieldErrors {
   const errors: FieldErrors = {};
 
   const citizenshipError = validateCitizenship(data.citizenshipStatus);
   if (citizenshipError) errors.citizenshipStatus = citizenshipError;
-
-  if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
-    if (!cleanText(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select your Commonwealth country of citizenship.";
-    } else if (!COMMONWEALTH_COUNTRIES.includes(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select a valid Commonwealth country of citizenship.";
-    }
-  }
 
   if (!data.dob) {
     errors.dob = "Please select your month, day, and year of birth.";
@@ -41,7 +32,7 @@ export function validateSignupEligibility(
 }
 
 export function isSignupEligible(
-  data: Pick<SignupFormData, "citizenshipStatus" | "commonwealthCountry" | "dob">
+  data: Pick<SignupFormData, "citizenshipStatus" | "dob">
 ): boolean {
   return (
     Object.keys(validateSignupEligibility(data)).length === 0 &&

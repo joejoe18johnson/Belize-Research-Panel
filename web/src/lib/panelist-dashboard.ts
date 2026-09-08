@@ -29,6 +29,7 @@ export interface PanelistDashboardProfile {
   district: string;
   cityTownVillage: string;
   countryIfAbroad: string;
+  countryIfAbroadOther: string;
   constituency: string;
   registeredCtvArea: string;
   email: string;
@@ -136,6 +137,7 @@ export function panelistRowToDashboardProfile(row: PanelistRow): PanelistDashboa
     district: livingAbroad ? "" : displayValue(row.district, ""),
     cityTownVillage: displayValue(row.city_town_village),
     countryIfAbroad: displayValue(row.country_if_abroad, ""),
+    countryIfAbroadOther: displayValue(row.country_if_abroad_other, ""),
     constituency: displayValue(row.constituency, ""),
     registeredCtvArea: displayValue(row.registered_ctv_area, ""),
     email: displayValue(row.email),

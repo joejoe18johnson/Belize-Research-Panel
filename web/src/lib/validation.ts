@@ -2,12 +2,13 @@ import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
 import { validateNationalPhoneNumber } from "./phone-codes";
 import {
-  COMMONWEALTH_COUNTRIES,
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   MAX_MARKET_INTERESTS,
+  ORG_OPERATION_SIZES,
+  ORG_OWNERSHIP_STRUCTURES,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
   isHeadOfHousehold,
@@ -15,7 +16,9 @@ import {
   mustLiveAbroad,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
+  ownsBusinessOrNgo,
   US_DIASPORA_REGIONS,
+  YES_NO_OPTIONS,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
 import { validateStreetAddressParts } from "./street-address";
@@ -153,6 +156,8 @@ function isValidHouseholdHeadAnswer(value: string): boolean {
   );
 }
 
+export const TOTAL_CONTACT_MEANS = 7;
+
 export function countContactMethods(data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "facebook" | "instagram" | "tiktok" | "otherContact">): number {
   return [
     cleanText(data.email),
@@ -162,6 +167,30 @@ export function countContactMethods(data: Pick<RegistrationFormData, "email" | "
     cleanText(data.tiktok),
     cleanText(data.otherContact),
   ].filter(Boolean).length;
+}
+
+/** Digital contacts plus physical address when provided (max TOTAL_CONTACT_MEANS). */
+export function countAllContactMeans(
+  data: Pick<
+    RegistrationFormData,
+    | "email"
+    | "phoneCountryCode"
+    | "phoneLocalNumber"
+    | "facebook"
+    | "instagram"
+    | "tiktok"
+    | "otherContact"
+    | "streetAddress"
+    | "addressCityVillage"
+    | "addressDistrict"
+  >
+): number {
+  const digital = countContactMethods(data);
+  const hasAddress =
+    Boolean(cleanText(data.streetAddress)) &&
+    Boolean(cleanText(data.addressCityVillage)) &&
+    Boolean(cleanText(data.addressDistrict));
+  return digital + (hasAddress ? 1 : 0);
 }
 
 export function validEmail(email: string): boolean {
@@ -403,10 +432,11 @@ export function validateRegistrationForm(
   }
 
   if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
-    if (!cleanText(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select your Commonwealth country of citizenship.";
-    } else if (!COMMONWEALTH_COUNTRIES.includes(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select a valid Commonwealth country of citizenship.";
+    if (!cleanText(data.proofOfBelizeResidenceType)) {
+      errors.proofOfBelizeResidenceType = "Please provide proof of residence in Belize for Commonwealth citizens.";
+    }
+    if (!data.proofOfBelizeResidenceFile) {
+      errors.proofOfBelizeResidenceFile = "Please upload proof of Belize residence for Commonwealth citizens.";
     }
   }
 
@@ -417,15 +447,6 @@ export function validateRegistrationForm(
 
   if (mustLiveAbroad(data.citizenshipStatus) && data.placeOfResidence && data.placeOfResidence !== "Abroad") {
     errors.placeOfResidence = "This category is for Belizeans living abroad. Please select living abroad.";
-  }
-
-  if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
-    if (!cleanText(data.proofOfBelizeResidenceType)) {
-      errors.proofOfBelizeResidenceType = "Please provide proof of residence in Belize for Commonwealth citizens.";
-    }
-    if (!data.proofOfBelizeResidenceFile) {
-      errors.proofOfBelizeResidenceFile = "Please upload proof of Belize residence for Commonwealth citizens.";
-    }
   }
 
   if (!cleanText(data.firstName)) errors.firstName = "First name is required.";
@@ -456,6 +477,8 @@ export function validateRegistrationForm(
   if (data.placeOfResidence === "Abroad") {
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
+    } else if (data.countryIfAbroad === "Other" && !cleanText(data.countryIfAbroadOther)) {
+      errors.countryIfAbroadOther = "Please specify your country of residence.";
     }
     if (isUnitedStatesCountry(data.countryIfAbroad)) {
       if (!data.usDiasporaRegion) {
@@ -494,13 +517,11 @@ export function validateRegistrationForm(
   );
   Object.assign(errors, addressErrors);
 
-  if (contactCount < 2) {
-    if (addressRequired && Object.keys(addressErrors).length > 0) {
-      errors.contact =
-        "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize.";
-    } else if (!addressRequired) {
-      errors.contact = "Please provide at least two ways to contact you in case one fails.";
-    }
+  const totalContactMeans = countAllContactMeans(data);
+  if (totalContactMeans < 2) {
+    errors.contact = livesInBelizeResidence(data.placeOfResidence)
+      ? "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize."
+      : "Please provide at least two ways to contact you in case one fails.";
   }
 
   if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";
@@ -566,6 +587,55 @@ export function validateRegistrationForm(
   if (!data.consentResearch) errors.consentResearch = "Research participation consent is required.";
   if (!data.consentContact) errors.consentContact = "Contact consent is required.";
   if (!data.consentPrivacy) errors.consentPrivacy = "Privacy acknowledgement is required.";
+
+  if (!cleanText(data.ownsBusinessOrNgo)) {
+    errors.ownsBusinessOrNgo =
+      "Please indicate whether you are the majority owner of a private business or head of an NGO in Belize.";
+  } else if (!(YES_NO_OPTIONS as readonly string[]).includes(data.ownsBusinessOrNgo)) {
+    errors.ownsBusinessOrNgo = "Please select yes or no.";
+  } else if (ownsBusinessOrNgo(data.ownsBusinessOrNgo)) {
+    if (!cleanText(data.orgName)) errors.orgName = "Organisation / business name is required.";
+    const orgAddressErrors = validateStreetAddressParts(
+      {
+        streetAddress: data.orgStreetAddress,
+        addressCityVillage: data.orgCityVillage,
+        addressDistrict: data.orgDistrict,
+      },
+      { required: true }
+    );
+    if (orgAddressErrors.streetAddress) errors.orgStreetAddress = orgAddressErrors.streetAddress;
+    if (orgAddressErrors.addressCityVillage) errors.orgCityVillage = orgAddressErrors.addressCityVillage;
+    if (orgAddressErrors.addressDistrict) errors.orgDistrict = orgAddressErrors.addressDistrict;
+    if (!cleanText(data.orgDescription)) {
+      errors.orgDescription = "Please briefly describe the main products or services.";
+    }
+    if (!cleanText(data.orgSize)) {
+      errors.orgSize = "Please select the size of your operation.";
+    } else if (!(ORG_OPERATION_SIZES as readonly string[]).includes(data.orgSize)) {
+      errors.orgSize = "Please select a valid operation size.";
+    }
+    if (!cleanText(data.orgOwnershipStructure)) {
+      errors.orgOwnershipStructure = "Please select the legal ownership structure.";
+    } else if (!(ORG_OWNERSHIP_STRUCTURES as readonly string[]).includes(data.orgOwnershipStructure)) {
+      errors.orgOwnershipStructure = "Please select a valid ownership structure.";
+    } else if (data.orgOwnershipStructure === "Other" && !cleanText(data.orgOwnershipStructureOther)) {
+      errors.orgOwnershipStructureOther = "Please specify the ownership structure.";
+    }
+    const yearText = cleanText(data.orgYearStarted);
+    const currentYear = new Date().getFullYear();
+    if (!/^\d{4}$/.test(yearText)) {
+      errors.orgYearStarted = "Enter the four-digit year the operation started.";
+    } else {
+      const year = Number(yearText);
+      if (year < 1900 || year > currentYear) {
+        errors.orgYearStarted = `Enter a year between 1900 and ${currentYear}.`;
+      }
+    }
+    if (!cleanText(data.orgContactMeans)) {
+      errors.orgContactMeans = "Please provide means of contact for the organisation.";
+    }
+  }
+
   if (!data.finalReviewConfirmed) {
     errors.finalReviewConfirmed = "Please review and confirm the full registration form before submitting.";
   }
@@ -616,14 +686,6 @@ export function validateProfileUpdateForm(
     errors.votingStatus = "Please indicate your voter registration status.";
   }
 
-  if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
-    if (!cleanText(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select your Commonwealth country of citizenship.";
-    } else if (!COMMONWEALTH_COUNTRIES.includes(data.commonwealthCountry)) {
-      errors.commonwealthCountry = "Please select a valid Commonwealth country of citizenship.";
-    }
-  }
-
   if (mustLiveInBelize(data.citizenshipStatus) && data.placeOfResidence === "Abroad") {
     errors.placeOfResidence =
       "You must currently live in Belize to be eligible under this citizenship / residency category.";
@@ -640,6 +702,8 @@ export function validateProfileUpdateForm(
   if (data.placeOfResidence === "Abroad") {
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
+    } else if (data.countryIfAbroad === "Other" && !cleanText(data.countryIfAbroadOther)) {
+      errors.countryIfAbroadOther = "Please specify your country of residence.";
     }
     if (isUnitedStatesCountry(data.countryIfAbroad)) {
       if (!data.usDiasporaRegion) {

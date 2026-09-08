@@ -50,6 +50,7 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     cityTownVillage,
     cityTownVillageOther,
     countryIfAbroad: row.country_if_abroad ?? "",
+    countryIfAbroadOther: row.country_if_abroad_other ?? "",
     usDiasporaRegion:
       placeOfResidence === "Abroad"
         ? cleanText(row.residence_region) || cityStored

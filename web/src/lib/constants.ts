@@ -95,6 +95,29 @@ export const HOUSEHOLD_HEAD_NO = "No";
 export const HOUSEHOLD_HEAD_SELF = HOUSEHOLD_HEAD_YES;
 export const HOUSEHOLD_HEAD_OTHER = HOUSEHOLD_HEAD_NO;
 export const HOUSEHOLD_HEAD_OPTIONS = [HOUSEHOLD_HEAD_YES, HOUSEHOLD_HEAD_NO] as const;
+export const YES_NO_OPTIONS = [HOUSEHOLD_HEAD_YES, HOUSEHOLD_HEAD_NO] as const;
+
+export const ORG_OPERATION_SIZES = [
+  "No employees",
+  "Micro (1-9 employees)",
+  "Small (10-49 employees)",
+  "Medium (50-99 employees)",
+  "Large (100+ employees)",
+] as const;
+
+export const ORG_OWNERSHIP_STRUCTURES = [
+  "Sole proprietorship",
+  "Partnership",
+  "Private company",
+  "Cooperative",
+  "Non-profit organisation",
+  "Other",
+] as const;
+
+export function ownsBusinessOrNgo(value: string): boolean {
+  return value === HOUSEHOLD_HEAD_YES;
+}
+
 export const HOUSEHOLD_DEFINITION =
   "A household is a person or group of people living together in the same dwelling and sharing meals and other living arrangements, whether or not they are related.";
 export const HEAD_OF_HOUSEHOLD_DEFINITION =
@@ -178,6 +201,18 @@ export const PANELIST_COLUMNS = [
   "consent_research",
   "consent_contact",
   "consent_privacy",
+  "owns_business_or_ngo",
+  "org_name",
+  "org_street_address",
+  "org_city_village",
+  "org_district",
+  "org_description",
+  "org_size",
+  "org_ownership_structure",
+  "org_ownership_structure_other",
+  "org_year_started",
+  "org_contact_means",
+  "country_if_abroad_other",
   "status",
   "notes",
 ] as const;

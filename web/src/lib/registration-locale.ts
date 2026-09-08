@@ -64,6 +64,7 @@ export type RegistrationCopy = {
     districtLive: string;
     cityTownVillage: string;
     countryAbroad: string;
+    countryOther: string;
     usRegion: string;
     constituency: string;
     registeredCtv: string;
@@ -80,6 +81,16 @@ export type RegistrationCopy = {
     addressDistrict: string;
     photoIdType: string;
     proofResidence: string;
+    ownsBusinessOrNgo: string;
+    orgName: string;
+    orgStreetAddress: string;
+    orgCityVillage: string;
+    orgDistrict: string;
+    orgDescription: string;
+    orgSize: string;
+    orgOwnershipStructure: string;
+    orgYearStarted: string;
+    orgContactMeans: string;
   };
   sections: {
     verifyHow: string;
@@ -95,6 +106,7 @@ export type RegistrationCopy = {
     contact: string;
     confirmContact: string;
     consent: string;
+    organisation: string;
     review: string;
   };
   photoIdIntro: string;
@@ -153,7 +165,7 @@ export type RegistrationCopy = {
   contactSummary: string;
   contactMeans: string;
   contactIncomplete: string;
-  contactSuccess: (count: number, withAddress: boolean) => string;
+  contactSuccess: (count: number) => string;
   contactWarning: (count: number, belize: boolean) => string;
   contactVerifyNote: string;
   contactConfirm: string;
@@ -161,6 +173,20 @@ export type RegistrationCopy = {
   consentResearch: string;
   consentContact: string;
   consentPrivacy: string;
+  specifyCountryOther: string;
+  countryOtherLabel: string;
+  ownsBusinessOrNgo: string;
+  orgName: string;
+  orgLocationIntro: string;
+  orgDescription: string;
+  orgDescriptionPlaceholder: string;
+  orgSize: string;
+  orgOwnershipStructure: string;
+  orgOwnershipStructureOther: string;
+  orgYearStarted: string;
+  orgContactMeans: string;
+  selectOrgSize: string;
+  selectOrgOwnership: string;
   reviewTitle: string;
 };
 
@@ -228,7 +254,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "I have reviewed the full form and confirm that the information is correct. *",
     reviewQuestion: "Question / field",
     reviewResponse: "Response",
-    contactMeansOf: (count) => `${count} of 2 means of contact`,
+    contactMeansOf: (count) => `${count} of 7 means of contact`,
     reviewLabels: {
       citizenship: "Citizenship / residency status",
       commonwealthCountry: "Commonwealth country of citizenship",
@@ -246,6 +272,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       districtLive: "District where you currently live",
       cityTownVillage: "City / town / village",
       countryAbroad: "Country if abroad",
+      countryOther: "Country of residence (specified)",
       usRegion: "Region of country",
       constituency: "Constituency registered to vote",
       registeredCtv: "Registered CTV area",
@@ -262,6 +289,16 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       addressDistrict: "Contact address district",
       photoIdType: "Photo ID type",
       proofResidence: "Proof of Belize residence",
+      ownsBusinessOrNgo: "Majority owner of business / head of NGO",
+      orgName: "Business / organisation name",
+      orgStreetAddress: "Organisation street address",
+      orgCityVillage: "Organisation city or village",
+      orgDistrict: "Organisation district",
+      orgDescription: "Organisation products / services",
+      orgSize: "Organisation size",
+      orgOwnershipStructure: "Ownership structure",
+      orgYearStarted: "Year started",
+      orgContactMeans: "Organisation means of contact",
     },
     sections: {
       verifyHow: "How we will verify you",
@@ -277,6 +314,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       contact: "Preferred ways to contact you",
       confirmContact: "Confirm contact details",
       consent: "Consent",
+      organisation: "Business / organisation",
       review: "Review full registration before submitting",
     },
     photoIdIntro: "Upload a government-issued photo ID to verify yourself, then continue the form.",
@@ -344,8 +382,8 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     contactSummary: "Contact summary",
     contactMeans: "means of contact",
     contactIncomplete: "incomplete",
-    contactSuccess: (count, withAddress) =>
-      `You have submitted ${count} means of contact${withAddress ? ", plus a physical address" : ""}. Please double-check every detail below — wrong contact information can mean you miss survey and research opportunities.`,
+    contactSuccess: (count) =>
+      `You have submitted ${count} means of contact. Please double-check every detail below — wrong contact information can mean you miss survey and research opportunities.`,
     contactWarning: (count, belize) =>
       `Only ${count} ${count === 1 ? "means of contact has" : "means of contact have"} been submitted so far. We need at least two means of contact in case one fails${belize ? ", or a complete physical address if you live in Belize" : ""}. Go back and add another method before confirming. Also make sure every detail is correct — wrong contact information can mean you miss survey and research opportunities.`,
     contactVerifyNote:
@@ -357,6 +395,21 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     consentContact: "I agree to be contacted using the contact details I provided. *",
     consentPrivacy:
       "I understand that my information should be kept confidential and used only for legitimate research-related purposes. *",
+    specifyCountryOther: "Please specify your country of residence",
+    countryOtherLabel: "Country of residence (please specify)",
+    ownsBusinessOrNgo:
+      "Are you the majority owner of a private business(es) or head of a non-governmental organisation in Belize?",
+    orgName: "Name of the business / organisation",
+    orgLocationIntro: "Where is the business / organisation located in Belize?",
+    orgDescription: "Briefly describe the main products or services",
+    orgDescriptionPlaceholder: "e.g. panades business at home, supermarket, corn tortilla mill",
+    orgSize: "Size of the operation",
+    orgOwnershipStructure: "Legal ownership structure",
+    orgOwnershipStructureOther: "Please specify the ownership structure",
+    orgYearStarted: "Year the operation started",
+    orgContactMeans: "Means of contact for the organisation",
+    selectOrgSize: "Select operation size",
+    selectOrgOwnership: "Select ownership structure",
     reviewTitle: "Review full registration before submitting",
   },
   es: {
@@ -407,7 +460,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "He revisado el formulario completo y confirmo que la información es correcta. *",
     reviewQuestion: "Pregunta / campo",
     reviewResponse: "Respuesta",
-    contactMeansOf: (count) => `${count} de 2 medios de contacto`,
+    contactMeansOf: (count) => `${count} de 7 medios de contacto`,
     reviewLabels: {
       citizenship: "Estado de ciudadanía / residencia",
       commonwealthCountry: "País de ciudadanía de la Commonwealth",
@@ -425,6 +478,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       districtLive: "Distrito donde vive actualmente",
       cityTownVillage: "Ciudad / pueblo / aldea",
       countryAbroad: "País si vive en el extranjero",
+      countryOther: "País de residencia (especificado)",
       usRegion: "Región del país",
       constituency: "Circunscripción donde está registrado",
       registeredCtv: "Área CTV registrada",
@@ -441,6 +495,16 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       addressDistrict: "Distrito de la dirección de contacto",
       photoIdType: "Tipo de identificación con foto",
       proofResidence: "Comprobante de residencia en Belice",
+      ownsBusinessOrNgo: "Propietario mayoritario de negocio / jefe(a) de ONG",
+      orgName: "Nombre del negocio / organización",
+      orgStreetAddress: "Dirección de la organización",
+      orgCityVillage: "Ciudad o aldea de la organización",
+      orgDistrict: "Distrito de la organización",
+      orgDescription: "Productos / servicios de la organización",
+      orgSize: "Tamaño de la organización",
+      orgOwnershipStructure: "Estructura de propiedad",
+      orgYearStarted: "Año de inicio",
+      orgContactMeans: "Medios de contacto de la organización",
     },
     sections: {
       verifyHow: "Cómo lo verificaremos",
@@ -456,6 +520,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       contact: "Formas preferidas de contacto",
       confirmContact: "Confirmar datos de contacto",
       consent: "Consentimiento",
+      organisation: "Negocio / organización",
       review: "Revise el registro completo antes de enviar",
     },
     photoIdIntro: "Suba una identificación con foto emitida por el gobierno para verificarse y luego continúe el formulario.",
@@ -523,8 +588,8 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     contactSummary: "Resumen de contacto",
     contactMeans: "medios de contacto",
     contactIncomplete: "incompleto",
-    contactSuccess: (count, withAddress) =>
-      `Ha enviado ${count} medios de contacto${withAddress ? ", más una dirección física" : ""}. Revise cada detalle a continuación: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
+    contactSuccess: (count) =>
+      `Ha enviado ${count} medios de contacto. Revise cada detalle a continuación: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
     contactWarning: (count, belize) =>
       `Solo se ha enviado ${count} ${count === 1 ? "medio de contacto" : "medios de contacto"} hasta ahora. Necesitamos al menos dos medios de contacto por si uno falla${belize ? ", o una dirección física completa si vive en Belice" : ""}. Regrese y agregue otro método antes de confirmar. Asegúrese también de que cada detalle sea correcto: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
     contactVerifyNote:
@@ -537,6 +602,21 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     consentContact: "Acepto que me contacten con los datos de contacto que proporcioné. *",
     consentPrivacy:
       "Entiendo que mi información debe mantenerse confidencial y usarse solo para fines legítimos relacionados con la investigación. *",
+    specifyCountryOther: "Indique su país de residencia",
+    countryOtherLabel: "País de residencia (especifique)",
+    ownsBusinessOrNgo:
+      "¿Es usted el propietario mayoritario de un negocio privado o el/la jefe(a) de una organización no gubernamental en Belice?",
+    orgName: "Nombre del negocio / organización",
+    orgLocationIntro: "¿Dónde está ubicado el negocio / organización en Belice?",
+    orgDescription: "Describa brevemente los principales productos o servicios",
+    orgDescriptionPlaceholder: "p. ej. negocio de panades en casa, supermercado, molino de tortillas de maíz",
+    orgSize: "Tamaño de la operación",
+    orgOwnershipStructure: "Estructura legal de propiedad",
+    orgOwnershipStructureOther: "Especifique la estructura de propiedad",
+    orgYearStarted: "Año en que inició la operación",
+    orgContactMeans: "Medios de contacto de la organización",
+    selectOrgSize: "Seleccione el tamaño de la operación",
+    selectOrgOwnership: "Seleccione la estructura de propiedad",
     reviewTitle: "Revise el registro completo antes de enviar",
   },
 };

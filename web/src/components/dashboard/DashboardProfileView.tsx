@@ -140,15 +140,19 @@ export function DashboardProfileView({
           />
           <dl className="mt-4 grid gap-4 lg:grid-cols-2">
             <ProfileField label="Citizenship / residency status" value={profile.citizenshipStatus} />
-            {profile.commonwealthCountry ? (
-              <ProfileField label="Commonwealth country of citizenship" value={profile.commonwealthCountry} />
-            ) : null}
             <ProfileField label="Registered to vote in Belize" value={profile.votingStatus} />
             <ProfileField label="Current place of residence" value={profile.placeOfResidence} />
             {livingAbroad ? (
               <>
                 {profile.countryIfAbroad ? (
-                  <ProfileField label="Country of residence" value={profile.countryIfAbroad} />
+                  <ProfileField
+                    label="Country of residence"
+                    value={
+                      profile.countryIfAbroad === "Other" && profile.countryIfAbroadOther
+                        ? profile.countryIfAbroadOther
+                        : profile.countryIfAbroad
+                    }
+                  />
                 ) : null}
                 {profile.cityTownVillage ? (
                   <ProfileField label="Current city / town / village" value={profile.cityTownVillage} />

@@ -13,6 +13,7 @@ import {
   MultiSelect,
   SelectInput,
   siteRadioClass,
+  TextArea,
   TextInput,
 } from "./form-ui";
 import { DateOfBirthPicker } from "./DateOfBirthPicker";
@@ -26,7 +27,6 @@ import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
   CITY_TOWN_VILLAGE,
-  COMMONWEALTH_COUNTRIES,
   COMMONWEALTH_RESIDENCE_PROOF_TYPES,
   COUNTRIES,
   EDUCATION_LEVELS,
@@ -37,11 +37,14 @@ import {
   MAX_HOUSEHOLD_SIZE,
   MARKET_INTERESTS,
   MAX_MARKET_INTERESTS,
+  ORG_OPERATION_SIZES,
+  ORG_OWNERSHIP_STRUCTURES,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
   SEX_OPTIONS,
   US_DIASPORA_REGIONS,
   VOTING_STATUS,
+  YES_NO_OPTIONS,
   getConstituencyOptions,
   getRegisteredCtvOptions,
   getResidenceOptions,
@@ -51,6 +54,7 @@ import {
   isUnitedStatesCountry,
   mustLiveAbroad,
   needsVoterRegistrationQuestion,
+  ownsBusinessOrNgo,
   CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
 import {
@@ -59,6 +63,7 @@ import {
 } from "@/lib/registration-types";
 import { getPhoneNumberRule, phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
+  countAllContactMeans,
   countContactMethods,
   cleanText,
   getFullPhoneNumber,
@@ -105,6 +110,7 @@ function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
 function findRegistrationErrorTarget(key: string): HTMLElement | null {
   const candidates = [key, `${key}-section`];
   if (key.startsWith("consent")) candidates.push("consent-section");
+  if (key === "ownsBusinessOrNgo" || key.startsWith("org")) candidates.push("organisation-section");
   if (key === "contact") candidates.push("contact-section");
   if (key === "photoIdFile" || key === "photoIdType") candidates.push("photo-id-section");
   for (const id of candidates) {
@@ -265,6 +271,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     [account.email]
   );
 
+  const clearOrgFields = (next: RegistrationFormData) => {
+    next.orgName = "";
+    next.orgStreetAddress = "";
+    next.orgCityVillage = "";
+    next.orgDistrict = "";
+    next.orgDescription = "";
+    next.orgSize = "";
+    next.orgOwnershipStructure = "";
+    next.orgOwnershipStructureOther = "";
+    next.orgYearStarted = "";
+    next.orgContactMeans = "";
+  };
+
   const update = useCallback(<K extends keyof RegistrationFormData>(key: K, value: RegistrationFormData[K]) => {
     setForm((prev) => {
       const next = { ...prev, [key]: value };
@@ -275,6 +294,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";
+        next.countryIfAbroadOther = "";
         next.usDiasporaRegion = "";
         if (typeof value === "string" && BELIZE_DISTRICTS.includes(value)) {
           if (!next.addressDistrict || next.addressDistrict === prev.placeOfResidence) {
@@ -293,10 +313,17 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       }
       if (key === "countryIfAbroad" && typeof value === "string") {
         next.usDiasporaRegion = "";
+        if (value !== "Other") next.countryIfAbroadOther = "";
         const suggestedCode = phoneCountryCodeForCountry(value);
         if (suggestedCode && !next.phoneLocalNumber.trim()) {
           next.phoneCountryCode = suggestedCode;
         }
+      }
+      if (key === "ownsBusinessOrNgo" && !ownsBusinessOrNgo(String(value))) {
+        clearOrgFields(next);
+      }
+      if (key === "orgOwnershipStructure" && value !== "Other") {
+        next.orgOwnershipStructureOther = "";
       }
       return next;
     });
@@ -319,6 +346,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       cityTownVillage: "",
       cityTownVillageOther: "",
       countryIfAbroad: "",
+      countryIfAbroadOther: "",
       usDiasporaRegion: "",
       constituency: "",
       registeredCtvArea: "",
@@ -326,10 +354,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       proofOfBelizeResidenceFile: null,
     }));
     setErrors((prev) =>
-      clearFieldError(
-        clearFieldError(clearFieldError(prev, "citizenshipStatus"), "votingStatus"),
-        "commonwealthCountry"
-      )
+      clearFieldError(clearFieldError(prev, "citizenshipStatus"), "votingStatus")
     );
   };
 
@@ -348,18 +373,27 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : [];
   const ctvOptions = getRegisteredCtvOptions(form.constituency);
   const contactCount = countContactMethods(form);
+  const totalContactMeans = countAllContactMeans(form);
   const physicalAddressProvided = streetAddressPartsPresent({
     streetAddress: form.streetAddress,
     addressCityVillage: form.addressCityVillage,
     addressDistrict: form.addressDistrict,
   });
-  const meetsContactMinimum =
-    contactCount >= 2 || (livesInBelizeResidence(form.placeOfResidence) && physicalAddressProvided);
+  const meetsContactMinimum = totalContactMeans >= 2;
   const streetAddressRequired = streetAddressRequiredForContacts(form.placeOfResidence, contactCount);
   const otherPlatform =
     form.otherContactPlatform === "Other"
       ? form.otherContactPlatformCustom
       : form.otherContactPlatform;
+  const showOrgFields = ownsBusinessOrNgo(form.ownsBusinessOrNgo);
+  const countryAbroadDisplay =
+    form.countryIfAbroad === "Other"
+      ? form.countryIfAbroadOther || form.countryIfAbroad
+      : form.countryIfAbroad;
+  const ownershipDisplay =
+    form.orgOwnershipStructure === "Other"
+      ? form.orgOwnershipStructureOther || form.orgOwnershipStructure
+      : form.orgOwnershipStructure;
 
   const reviewRows = useMemo(() => {
     const asked = (value: string) => (cleanText(value) ? value : copy.notProvided);
@@ -367,13 +401,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const livingAbroad = form.placeOfResidence === "Abroad";
     const livingInBelize = livesInBelizeResidence(form.placeOfResidence);
     const headOfHousehold = isHeadOfHousehold(form.householdHeadRelationship);
-    const commonwealthAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
     const voterAsked = needsVoterRegistrationQuestion(form.citizenshipStatus);
     const ctvAsked = registeredVoter && hasRegisteredCtvQuestion(form.constituency);
     const interestsAsked = !skipsInterestsPhase(form.placeOfResidence);
     const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
     const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
-    const addressAsked = streetAddressRequired;
+    const addressAsked = streetAddressRequired || physicalAddressProvided;
+    const orgAsked = ownsBusinessOrNgo(form.ownsBusinessOrNgo);
     const rl = copy.reviewLabels;
 
     const cityValue =
@@ -381,10 +415,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
     const rows: [string, string][] = [
       [rl.citizenship, asked(form.citizenshipStatus)],
-      [
-        rl.commonwealthCountry,
-        commonwealthAsked ? asked(form.commonwealthCountry) : na,
-      ],
       [
         rl.registeredVoter,
         voterAsked ? asked(form.votingStatus) : na,
@@ -403,7 +433,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ],
       [rl.districtLive, livingInBelize ? asked(form.placeOfResidence) : na],
       [rl.cityTownVillage, livingInBelize ? asked(cityValue) : na],
-      [rl.countryAbroad, livingAbroad ? asked(form.countryIfAbroad) : na],
+      [rl.countryAbroad, livingAbroad ? asked(countryAbroadDisplay) : na],
       [rl.usRegion, usRegionAsked ? asked(form.usDiasporaRegion) : na],
       [rl.constituency, registeredVoter ? asked(form.constituency) : na],
       [rl.registeredCtv, ctvAsked ? asked(form.registeredCtvArea) : na],
@@ -426,12 +456,30 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         rl.proofResidence,
         proofAsked ? asked(form.proofOfBelizeResidenceType) : na,
       ],
+      [rl.ownsBusinessOrNgo, asked(form.ownsBusinessOrNgo)],
     ];
+
+    if (orgAsked) {
+      rows.push(
+        [rl.orgName, asked(form.orgName)],
+        [rl.orgStreetAddress, asked(form.orgStreetAddress)],
+        [rl.orgCityVillage, asked(form.orgCityVillage)],
+        [rl.orgDistrict, asked(form.orgDistrict)],
+        [rl.orgDescription, asked(form.orgDescription)],
+        [rl.orgSize, asked(form.orgSize)],
+        [rl.orgOwnershipStructure, asked(ownershipDisplay)],
+        [rl.orgYearStarted, asked(form.orgYearStarted)],
+        [rl.orgContactMeans, asked(form.orgContactMeans)]
+      );
+    }
 
     return rows;
   }, [
     form,
     otherPlatform,
+    countryAbroadDisplay,
+    ownershipDisplay,
+    physicalAddressProvided,
     account.email,
     registeredVoter,
     streetAddressRequired,
@@ -749,29 +797,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               {fieldError("citizenshipStatus")}
             </p>
           ) : null}
-          {needsCommonwealthCountry ? (
-            <Field
-              label={copy.commonwealthCountry}
-              required
-              error={fieldError("commonwealthCountry")}
-              id="commonwealthCountry"
-            >
-              <SelectInput
-                id="commonwealthCountry"
-                value={form.commonwealthCountry}
-                onChange={(e) => update("commonwealthCountry", e.target.value)}
-                onBlur={() => touchAndValidate("commonwealthCountry")}
-                error={fieldError("commonwealthCountry")}
-              >
-                <option value="">{copy.selectCommonwealthCountry}</option>
-                {COMMONWEALTH_COUNTRIES.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-          ) : null}
         </FormSection>
       </div>
 
@@ -935,6 +960,23 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                     {COUNTRIES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </SelectInput>
                 </Field>
+                {form.countryIfAbroad === "Other" ? (
+                  <Field
+                    label={copy.countryOtherLabel}
+                    required
+                    error={fieldError("countryIfAbroadOther")}
+                    id="countryIfAbroadOther"
+                  >
+                    <TextInput
+                      id="countryIfAbroadOther"
+                      value={form.countryIfAbroadOther}
+                      onChange={(e) => update("countryIfAbroadOther", e.target.value)}
+                      onBlur={() => touchAndValidate("countryIfAbroadOther")}
+                      error={fieldError("countryIfAbroadOther")}
+                      placeholder={copy.specifyCountryOther}
+                    />
+                  </Field>
+                ) : null}
                 {isUnitedStatesCountry(form.countryIfAbroad) ? (
                   <Field label={copy.usRegion} required hint={copy.usRegionHint} error={fieldError("usDiasporaRegion")} id="usDiasporaRegion">
                     <SelectInput id="usDiasporaRegion" value={form.usDiasporaRegion} onChange={(e) => update("usDiasporaRegion", e.target.value)} onBlur={() => touchAndValidate("usDiasporaRegion")} error={fieldError("usDiasporaRegion")}>
@@ -1112,7 +1154,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           <FormSection step={12} title={copy.sections.confirmContact}>
             {meetsContactMinimum ? (
               <Alert variant="success">
-                {copy.contactSuccess(contactCount, contactCount < 2 && physicalAddressProvided)}
+                {copy.contactSuccess(totalContactMeans)}
               </Alert>
             ) : (
               <Alert variant="warning">
@@ -1132,7 +1174,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                       : "bg-amber-100 text-amber-950 ring-1 ring-amber-300/80 dark:bg-amber-950/50 dark:text-amber-100 dark:ring-amber-700"
                   }`}
                 >
-                  {copy.contactMeansOf(contactCount)}
+                  {copy.contactMeansOf(totalContactMeans)}
                   {!meetsContactMinimum ? ` — ${copy.contactIncomplete}` : ""}
                 </p>
               </div>
@@ -1143,7 +1185,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               <p><strong>{copy.reviewLabels.tiktok}:</strong> {form.tiktok || copy.notProvided}</p>
               <p><strong>{copy.reviewLabels.otherPlatform}:</strong> {otherPlatform || copy.notProvided}</p>
               <p><strong>{copy.reviewLabels.otherContact}:</strong> {form.otherContact || copy.notProvided}</p>
-              {streetAddressRequired ? (
+              {physicalAddressProvided ? (
                 <p>
                   <strong>{copy.physicalAddress}:</strong>{" "}
                   {formatStreetAddressDisplay({
@@ -1184,7 +1226,179 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </div>
           </FormSection>
 
-          <FormSection step={15} title={copy.sections.review}>
+          <FormSection step={15} title={copy.sections.organisation} id="organisation-section">
+            <Field label={copy.ownsBusinessOrNgo} required error={fieldError("ownsBusinessOrNgo")} id="ownsBusinessOrNgo">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {YES_NO_OPTIONS.map((option) => (
+                  <label key={option} className={choiceBoxLabelClass}>
+                    <input
+                      type="radio"
+                      name="ownsBusinessOrNgo"
+                      checked={form.ownsBusinessOrNgo === option}
+                      onChange={() => {
+                        update("ownsBusinessOrNgo", option);
+                        touch("ownsBusinessOrNgo");
+                        validateField("ownsBusinessOrNgo", option);
+                      }}
+                      className={siteRadioClass}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </Field>
+
+            {showOrgFields ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Field label={copy.orgName} required error={fieldError("orgName")} id="orgName">
+                    <TextInput
+                      id="orgName"
+                      value={form.orgName}
+                      onChange={(e) => update("orgName", e.target.value)}
+                      onBlur={() => touchAndValidate("orgName")}
+                      error={fieldError("orgName")}
+                    />
+                  </Field>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <StreetAddressFields
+                    streetAddress={form.orgStreetAddress}
+                    addressCityVillage={form.orgCityVillage}
+                    addressDistrict={form.orgDistrict}
+                    required
+                    title={null}
+                    hint={copy.orgLocationIntro}
+                    fieldIds={{
+                      streetAddress: "orgStreetAddress",
+                      addressCityVillage: "orgCityVillage",
+                      addressDistrict: "orgDistrict",
+                    }}
+                    errors={{
+                      streetAddress: fieldError("orgStreetAddress"),
+                      addressCityVillage: fieldError("orgCityVillage"),
+                      addressDistrict: fieldError("orgDistrict"),
+                    }}
+                    onChange={(field, value) => {
+                      if (field === "streetAddress") update("orgStreetAddress", value);
+                      else if (field === "addressCityVillage") update("orgCityVillage", value);
+                      else update("orgDistrict", value);
+                    }}
+                    onBlurField={(field) => {
+                      const key =
+                        field === "streetAddress"
+                          ? "orgStreetAddress"
+                          : field === "addressCityVillage"
+                            ? "orgCityVillage"
+                            : "orgDistrict";
+                      touch(key);
+                      validateField(key);
+                    }}
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Field label={copy.orgDescription} required error={fieldError("orgDescription")} id="orgDescription">
+                    <TextArea
+                      id="orgDescription"
+                      value={form.orgDescription}
+                      onChange={(e) => update("orgDescription", e.target.value)}
+                      onBlur={() => touchAndValidate("orgDescription")}
+                      error={fieldError("orgDescription")}
+                      placeholder={copy.orgDescriptionPlaceholder}
+                      rows={3}
+                    />
+                  </Field>
+                </div>
+
+                <Field label={copy.orgSize} required error={fieldError("orgSize")} id="orgSize">
+                  <SelectInput
+                    id="orgSize"
+                    value={form.orgSize}
+                    onChange={(e) => update("orgSize", e.target.value)}
+                    onBlur={() => touchAndValidate("orgSize")}
+                    error={fieldError("orgSize")}
+                  >
+                    <option value="">{copy.selectOrgSize}</option>
+                    {ORG_OPERATION_SIZES.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </SelectInput>
+                </Field>
+
+                <Field
+                  label={copy.orgOwnershipStructure}
+                  required
+                  error={fieldError("orgOwnershipStructure")}
+                  id="orgOwnershipStructure"
+                >
+                  <SelectInput
+                    id="orgOwnershipStructure"
+                    value={form.orgOwnershipStructure}
+                    onChange={(e) => update("orgOwnershipStructure", e.target.value)}
+                    onBlur={() => touchAndValidate("orgOwnershipStructure")}
+                    error={fieldError("orgOwnershipStructure")}
+                  >
+                    <option value="">{copy.selectOrgOwnership}</option>
+                    {ORG_OWNERSHIP_STRUCTURES.map((structure) => (
+                      <option key={structure} value={structure}>
+                        {structure}
+                      </option>
+                    ))}
+                  </SelectInput>
+                </Field>
+
+                {form.orgOwnershipStructure === "Other" ? (
+                  <div className="sm:col-span-2">
+                    <Field
+                      label={copy.orgOwnershipStructureOther}
+                      required
+                      error={fieldError("orgOwnershipStructureOther")}
+                      id="orgOwnershipStructureOther"
+                    >
+                      <TextInput
+                        id="orgOwnershipStructureOther"
+                        value={form.orgOwnershipStructureOther}
+                        onChange={(e) => update("orgOwnershipStructureOther", e.target.value)}
+                        onBlur={() => touchAndValidate("orgOwnershipStructureOther")}
+                        error={fieldError("orgOwnershipStructureOther")}
+                      />
+                    </Field>
+                  </div>
+                ) : null}
+
+                <Field label={copy.orgYearStarted} required error={fieldError("orgYearStarted")} id="orgYearStarted">
+                  <TextInput
+                    id="orgYearStarted"
+                    type="number"
+                    inputMode="numeric"
+                    min={1900}
+                    max={new Date().getFullYear()}
+                    step={1}
+                    value={form.orgYearStarted}
+                    onChange={(e) => update("orgYearStarted", e.target.value)}
+                    onBlur={() => touchAndValidate("orgYearStarted")}
+                    error={fieldError("orgYearStarted")}
+                  />
+                </Field>
+
+                <Field label={copy.orgContactMeans} required error={fieldError("orgContactMeans")} id="orgContactMeans">
+                  <TextInput
+                    id="orgContactMeans"
+                    value={form.orgContactMeans}
+                    onChange={(e) => update("orgContactMeans", e.target.value)}
+                    onBlur={() => touchAndValidate("orgContactMeans")}
+                    error={fieldError("orgContactMeans")}
+                  />
+                </Field>
+              </div>
+            ) : null}
+          </FormSection>
+
+          <FormSection step={16} title={copy.sections.review}>
             <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 lg:hidden">
               {reviewRows.map(([label, value]) => (
                 <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">
