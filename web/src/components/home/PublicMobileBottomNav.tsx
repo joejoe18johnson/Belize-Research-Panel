@@ -120,14 +120,17 @@ function NavItem({
       href={href}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={`relative flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 px-1 pb-1.5 pt-2.5 text-[10px] font-semibold tracking-wide transition ${
+      className={`relative flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 px-1 pb-1.5 pt-1.5 text-[10px] font-semibold tracking-wide transition ${
         active ? "text-teal-700 dark:text-teal-300" : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
       }`}
     >
-      {active ? (
-        <span aria-hidden className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-teal-600 dark:bg-teal-400" />
-      ) : null}
-      {icon}
+      <span
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
+          active ? "bg-teal-100 text-teal-700 dark:bg-teal-900/70 dark:text-teal-200" : ""
+        }`}
+      >
+        {icon}
+      </span>
       <span className="leading-none">{label}</span>
     </Link>
   );
