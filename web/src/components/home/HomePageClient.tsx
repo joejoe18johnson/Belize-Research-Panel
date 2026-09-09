@@ -121,7 +121,13 @@ function HomeHowItWorksStep({
   );
 }
 
-export function HomePageClient({ signedIn = false }: { signedIn?: boolean }) {
+export function HomePageClient({
+  signedIn = false,
+  panelistRegistered = false,
+}: {
+  signedIn?: boolean;
+  panelistRegistered?: boolean;
+}) {
   const [locale, setLocale] = useState<HomeLocale>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolved } = useTheme();
@@ -272,9 +278,16 @@ export function HomePageClient({ signedIn = false }: { signedIn?: boolean }) {
               className={`my-1 border-t ${onDarkHero ? "border-white/10" : "border-teal-100 dark:border-teal-900"}`}
             />
             {signedIn ? (
-              <Link href="/dashboard" className={registerLinkClassMobile} onClick={closeMobileMenu}>
-                {t(copy.navDashboard)}
-              </Link>
+              <>
+                {panelistRegistered ? (
+                  <Link href="/dashboard/profile" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+                    {t(copy.navProfile)}
+                  </Link>
+                ) : null}
+                <Link href="/dashboard" className={registerLinkClassMobile} onClick={closeMobileMenu}>
+                  {t(copy.navDashboard)}
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/login" className={loginLinkClassMobile} onClick={closeMobileMenu}>

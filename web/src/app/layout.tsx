@@ -43,12 +43,15 @@ export default async function RootLayout({
           <NetlifyDeployBanner />
           <div className="flex min-h-0 flex-1 flex-col pb-[var(--brp-mobile-bottom-nav-offset,0px)] lg:pb-0">
             {children}
+            <SiteFooterGate>
+              <SiteFooter />
+            </SiteFooterGate>
           </div>
-          <SiteFooterGate>
-            <SiteFooter />
-          </SiteFooterGate>
           <CookieNotice />
-          <PublicMobileBottomNav signedIn={Boolean(session)} />
+          <PublicMobileBottomNav
+            signedIn={Boolean(session)}
+            panelistRegistered={Boolean(session?.panelistRegistered)}
+          />
         </ThemeProvider>
       </body>
     </html>

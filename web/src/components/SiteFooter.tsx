@@ -9,7 +9,7 @@ export async function SiteFooter() {
   const account = await getSessionAccount();
 
   return (
-    <footer className="safe-bottom mt-auto shrink-0 border-t border-zinc-200 bg-white pb-[var(--brp-mobile-bottom-nav-offset,0px)] dark:border-zinc-800 dark:bg-zinc-900 lg:pb-0">
+    <footer className="mt-auto shrink-0 border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <div className={`${appContentClass} px-4 py-6 sm:px-6 sm:py-8`}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">

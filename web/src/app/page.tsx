@@ -28,7 +28,10 @@ export default async function HomePage() {
           }),
         ]}
       />
-      <HomePageClient signedIn={Boolean(session)} />
+      <HomePageClient
+        signedIn={Boolean(session)}
+        panelistRegistered={Boolean(session?.panelistRegistered)}
+      />
     </>
   );
 }
