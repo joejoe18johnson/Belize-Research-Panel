@@ -154,7 +154,10 @@ function shouldHideBottomNav(pathname: string | null, panelistRegistered: boolea
 function scrollToHowItWorks(event: MouseEvent<HTMLAnchorElement>, pathname: string | null) {
   if (pathname !== "/") return;
   event.preventDefault();
-  document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const section = document.getElementById("how-it-works");
+  if (!section) return;
+  window.history.replaceState(null, "", "/#how-it-works");
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 export function PublicMobileBottomNav({
@@ -166,6 +169,7 @@ export function PublicMobileBottomNav({
 }) {
   const pathname = usePathname();
   const [locale, setLocale] = useState<HomeLocale>("en");
+  const [howItWorksActive, setHowItWorksActive] = useState(false);
   const showPanelistNav = signedIn && panelistRegistered;
   const hidden = shouldHideBottomNav(pathname, showPanelistNav);
 
@@ -185,6 +189,54 @@ export function PublicMobileBottomNav({
     };
   }, [hidden]);
 
+  useEffect(() => {
+    if (showPanelistNav || pathname !== "/") {
+      setHowItWorksActive(false);
+      return;
+    }
+
+    const section = document.getElementById("how-it-works");
+    if (!section) {
+      setHowItWorksActive(window.location.hash === "#how-it-works");
+      return;
+    }
+
+    const syncFromHash = () => {
+      if (window.location.hash === "#how-it-works") setHowItWorksActive(true);
+    };
+    syncFromHash();
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
+          setHowItWorksActive(true);
+          return;
+        }
+        // Near top of page → Home is active again
+        if (window.scrollY < 120) {
+          setHowItWorksActive(false);
+          if (window.location.hash === "#how-it-works") {
+            window.history.replaceState(null, "", "/");
+          }
+        } else if (!entry.isIntersecting && entry.boundingClientRect.top > 0) {
+          setHowItWorksActive(false);
+        }
+      },
+      {
+        root: null,
+        threshold: [0.2, 0.35, 0.5],
+        rootMargin: "-15% 0px -40% 0px",
+      }
+    );
+
+    observer.observe(section);
+    window.addEventListener("hashchange", syncFromHash);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("hashchange", syncFromHash);
+    };
+  }, [pathname, showPanelistNav]);
+
   if (hidden) return null;
 
   const copy = HOME_COPY[locale];
@@ -192,7 +244,8 @@ export function PublicMobileBottomNav({
 
   const isHome = showPanelistNav
     ? pathname === "/dashboard"
-    : pathname === "/";
+    : pathname === "/" && !howItWorksActive;
+  const isHowItWorks = !showPanelistNav && pathname === "/" && howItWorksActive;
   const isSurveys = Boolean(pathname?.startsWith("/dashboard/surveys"));
   const isRewards =
     Boolean(pathname?.startsWith("/dashboard/rewards")) ||
@@ -237,15 +290,24 @@ export function PublicMobileBottomNav({
             <NavItem
               href="/"
               label={t(copy.navHome)}
-              active={pathname === "/"}
-              icon={<HomeIcon active={pathname === "/"} />}
+              active={isHome}
+              icon={<HomeIcon active={isHome} />}
+              onClick={() => {
+                if (pathname === "/") {
+                  setHowItWorksActive(false);
+                  if (window.location.hash) window.history.replaceState(null, "", "/");
+                }
+              }}
             />
             <NavItem
               href="/#how-it-works"
               label={t(copy.navHowItWorks)}
-              active={false}
-              icon={<HowItWorksIcon />}
-              onClick={(event) => scrollToHowItWorks(event, pathname)}
+              active={isHowItWorks}
+              icon={<HowItWorksIcon active={isHowItWorks} />}
+              onClick={(event) => {
+                setHowItWorksActive(true);
+                scrollToHowItWorks(event, pathname);
+              }}
             />
             <NavItem
               href="/register"
