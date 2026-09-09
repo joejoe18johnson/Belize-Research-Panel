@@ -202,6 +202,7 @@ export const PANELIST_COLUMNS = [
   "consent_contact",
   "consent_privacy",
   "owns_business_or_ngo",
+  "organisations",
   "org_name",
   "org_street_address",
   "org_city_village",
@@ -222,17 +223,22 @@ export function getConstituencyOptions(): string[] {
 }
 
 export function getRegisteredCtvOptions(constituency: string): string[] {
-  if (!constituency.trim()) return [];
+  if (!hasRegisteredCtvQuestion(constituency)) return [];
   const values = (CONSTITUENCY_CTV[constituency] ?? []).map((v) => v.trim()).filter(Boolean);
-  const realValues = values.filter((v) => !["Other", "Prefer not to say"].includes(v));
-  if (realValues.length === 0) return [];
   const withOther = values.includes("Other") ? values : [...values, "Other"];
   return sortDropdownOptions(withOther);
 }
 
+/**
+ * CTV breakdowns are only asked for constituencies made up of several towns/villages
+ * (e.g. Cayo South). Urban/single-area seats like Belmopan or Mesopotamia are excluded.
+ */
 export function hasRegisteredCtvQuestion(constituency: string): boolean {
-  const values = (CONSTITUENCY_CTV[constituency] ?? []).map((v) => v.trim()).filter(Boolean);
-  return values.filter((v) => !["Other", "Prefer not to say"].includes(v)).length > 0;
+  const values = (CONSTITUENCY_CTV[constituency] ?? [])
+    .map((v) => v.trim())
+    .filter(Boolean)
+    .filter((v) => !["Other", "Prefer not to say"].includes(v));
+  return values.length > 1;
 }
 
 export function isMarketResearchOnlyCitizenship(citizenshipStatus: string): boolean {

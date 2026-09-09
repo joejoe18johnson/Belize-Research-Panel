@@ -60,6 +60,8 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "proofOfBelizeResidenceFile",
   ],
   [
+    "ownsBusinessOrNgo",
+    "organisations",
     "firstName",
     "lastName",
     "sex",
@@ -93,17 +95,6 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "consentResearch",
     "consentContact",
     "consentPrivacy",
-    "ownsBusinessOrNgo",
-    "orgName",
-    "orgStreetAddress",
-    "orgCityVillage",
-    "orgDistrict",
-    "orgDescription",
-    "orgSize",
-    "orgOwnershipStructure",
-    "orgOwnershipStructureOther",
-    "orgYearStarted",
-    "orgContactMeans",
     "finalReviewConfirmed",
   ],
 ];
@@ -230,25 +221,21 @@ function collectPhaseErrors(
       delete allErrors.marketInterests;
     }
   }
-  if (phaseIndex === REVIEW_PHASE && form.ownsBusinessOrNgo !== "Yes") {
-    delete allErrors.orgName;
-    delete allErrors.orgStreetAddress;
-    delete allErrors.orgCityVillage;
-    delete allErrors.orgDistrict;
-    delete allErrors.orgDescription;
-    delete allErrors.orgSize;
-    delete allErrors.orgOwnershipStructure;
-    delete allErrors.orgOwnershipStructureOther;
-    delete allErrors.orgYearStarted;
-    delete allErrors.orgContactMeans;
-  }
-  if (phaseIndex === REVIEW_PHASE && form.orgOwnershipStructure !== "Other") {
-    delete allErrors.orgOwnershipStructureOther;
+  if (phaseIndex === PROFILE_PHASE && form.ownsBusinessOrNgo !== "Yes") {
+    delete allErrors.organisations;
+    for (const key of Object.keys(allErrors)) {
+      if (key.startsWith("organisations.")) delete allErrors[key];
+    }
   }
 
   const phaseErrors: FieldErrors = {};
   for (const key of keys) {
     if (allErrors[key]) phaseErrors[key] = allErrors[key];
+  }
+  if (phaseIndex === PROFILE_PHASE) {
+    for (const [key, message] of Object.entries(allErrors)) {
+      if (key.startsWith("organisations.")) phaseErrors[key] = message;
+    }
   }
   if (phaseIndex === CONTACT_PHASE && allErrors.contact) {
     phaseErrors.contact = allErrors.contact;

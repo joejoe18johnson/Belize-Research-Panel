@@ -158,6 +158,11 @@ function isValidHouseholdHeadAnswer(value: string): boolean {
 
 export const TOTAL_CONTACT_MEANS = 7;
 
+/**
+ * Counts digital contact channels only (max 6).
+ * Other contact platform + detail together count as one method when a detail is provided.
+ * Physical street address is counted separately via countAllContactMeans (7th method).
+ */
 export function countContactMethods(data: Pick<RegistrationFormData, "email" | "phoneCountryCode" | "phoneLocalNumber" | "facebook" | "instagram" | "tiktok" | "otherContact">): number {
   return [
     cleanText(data.email),
@@ -594,46 +599,53 @@ export function validateRegistrationForm(
   } else if (!(YES_NO_OPTIONS as readonly string[]).includes(data.ownsBusinessOrNgo)) {
     errors.ownsBusinessOrNgo = "Please select yes or no.";
   } else if (ownsBusinessOrNgo(data.ownsBusinessOrNgo)) {
-    if (!cleanText(data.orgName)) errors.orgName = "Organisation / business name is required.";
-    const orgAddressErrors = validateStreetAddressParts(
-      {
-        streetAddress: data.orgStreetAddress,
-        addressCityVillage: data.orgCityVillage,
-        addressDistrict: data.orgDistrict,
-      },
-      { required: true }
-    );
-    if (orgAddressErrors.streetAddress) errors.orgStreetAddress = orgAddressErrors.streetAddress;
-    if (orgAddressErrors.addressCityVillage) errors.orgCityVillage = orgAddressErrors.addressCityVillage;
-    if (orgAddressErrors.addressDistrict) errors.orgDistrict = orgAddressErrors.addressDistrict;
-    if (!cleanText(data.orgDescription)) {
-      errors.orgDescription = "Please briefly describe the main products or services.";
+    const organisations = Array.isArray(data.organisations) ? data.organisations : [];
+    if (organisations.length === 0) {
+      errors.organisations = "Add at least one business or organisation.";
     }
-    if (!cleanText(data.orgSize)) {
-      errors.orgSize = "Please select the size of your operation.";
-    } else if (!(ORG_OPERATION_SIZES as readonly string[]).includes(data.orgSize)) {
-      errors.orgSize = "Please select a valid operation size.";
-    }
-    if (!cleanText(data.orgOwnershipStructure)) {
-      errors.orgOwnershipStructure = "Please select the legal ownership structure.";
-    } else if (!(ORG_OWNERSHIP_STRUCTURES as readonly string[]).includes(data.orgOwnershipStructure)) {
-      errors.orgOwnershipStructure = "Please select a valid ownership structure.";
-    } else if (data.orgOwnershipStructure === "Other" && !cleanText(data.orgOwnershipStructureOther)) {
-      errors.orgOwnershipStructureOther = "Please specify the ownership structure.";
-    }
-    const yearText = cleanText(data.orgYearStarted);
     const currentYear = new Date().getFullYear();
-    if (!/^\d{4}$/.test(yearText)) {
-      errors.orgYearStarted = "Enter the four-digit year the operation started.";
-    } else {
-      const year = Number(yearText);
-      if (year < 1900 || year > currentYear) {
-        errors.orgYearStarted = `Enter a year between 1900 and ${currentYear}.`;
+    organisations.forEach((org, index) => {
+      const prefix = `organisations.${index}`;
+      if (!cleanText(org.name)) errors[`${prefix}.name`] = "Organisation / business name is required.";
+      const orgAddressErrors = validateStreetAddressParts(
+        {
+          streetAddress: org.streetAddress,
+          addressCityVillage: org.cityVillage,
+          addressDistrict: org.district,
+        },
+        { required: true }
+      );
+      if (orgAddressErrors.streetAddress) errors[`${prefix}.streetAddress`] = orgAddressErrors.streetAddress;
+      if (orgAddressErrors.addressCityVillage) errors[`${prefix}.cityVillage`] = orgAddressErrors.addressCityVillage;
+      if (orgAddressErrors.addressDistrict) errors[`${prefix}.district`] = orgAddressErrors.addressDistrict;
+      if (!cleanText(org.description)) {
+        errors[`${prefix}.description`] = "Please briefly describe the main products or services.";
       }
-    }
-    if (!cleanText(data.orgContactMeans)) {
-      errors.orgContactMeans = "Please provide means of contact for the organisation.";
-    }
+      if (!cleanText(org.size)) {
+        errors[`${prefix}.size`] = "Please select the size of your operation.";
+      } else if (!(ORG_OPERATION_SIZES as readonly string[]).includes(org.size)) {
+        errors[`${prefix}.size`] = "Please select a valid operation size.";
+      }
+      if (!cleanText(org.ownershipStructure)) {
+        errors[`${prefix}.ownershipStructure`] = "Please select the legal ownership structure.";
+      } else if (!(ORG_OWNERSHIP_STRUCTURES as readonly string[]).includes(org.ownershipStructure)) {
+        errors[`${prefix}.ownershipStructure`] = "Please select a valid ownership structure.";
+      } else if (org.ownershipStructure === "Other" && !cleanText(org.ownershipStructureOther)) {
+        errors[`${prefix}.ownershipStructureOther`] = "Please specify the ownership structure.";
+      }
+      const yearText = cleanText(org.yearStarted);
+      if (!/^\d{4}$/.test(yearText)) {
+        errors[`${prefix}.yearStarted`] = "Enter the four-digit year the operation started.";
+      } else {
+        const year = Number(yearText);
+        if (year < 1900 || year > currentYear) {
+          errors[`${prefix}.yearStarted`] = `Enter a year between 1900 and ${currentYear}.`;
+        }
+      }
+      if (!cleanText(org.contactMeans)) {
+        errors[`${prefix}.contactMeans`] = "Please provide means of contact for the organisation.";
+      }
+    });
   }
 
   if (!data.finalReviewConfirmed) {

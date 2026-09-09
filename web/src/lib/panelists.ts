@@ -3,6 +3,7 @@ import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
 import { PANELIST_COLUMNS, isCommonwealthCitizenInBelize, ownsBusinessOrNgo, storedVotingStatus } from "./constants";
+import { flattenFirstOrganisation } from "./organisations";
 import {
   calculateAge,
   cleanText,
@@ -484,31 +485,43 @@ export async function registerPanelist(
     consent_contact: String(data.consentContact),
     consent_privacy: String(data.consentPrivacy),
     owns_business_or_ngo: cleanText(data.ownsBusinessOrNgo),
-    org_name: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgName) : "",
-    org_street_address: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgStreetAddress)
-      : "",
-    org_city_village: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgCityVillage)
-      : "",
-    org_district: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgDistrict) : "",
-    org_description: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgDescription)
-      : "",
-    org_size: ownsBusinessOrNgo(data.ownsBusinessOrNgo) ? cleanText(data.orgSize) : "",
-    org_ownership_structure: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgOwnershipStructure)
-      : "",
-    org_ownership_structure_other:
-      ownsBusinessOrNgo(data.ownsBusinessOrNgo) && data.orgOwnershipStructure === "Other"
-        ? cleanText(data.orgOwnershipStructureOther)
-        : "",
-    org_year_started: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgYearStarted)
-      : "",
-    org_contact_means: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
-      ? cleanText(data.orgContactMeans)
-      : "",
+    organisations: ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+      ? JSON.stringify(
+          (Array.isArray(data.organisations) ? data.organisations : []).map((org) => ({
+            name: cleanText(org.name),
+            streetAddress: cleanText(org.streetAddress),
+            cityVillage: cleanText(org.cityVillage),
+            district: cleanText(org.district),
+            description: cleanText(org.description),
+            size: cleanText(org.size),
+            ownershipStructure: cleanText(org.ownershipStructure),
+            ownershipStructureOther:
+              org.ownershipStructure === "Other" ? cleanText(org.ownershipStructureOther) : "",
+            yearStarted: cleanText(org.yearStarted),
+            contactMeans: cleanText(org.contactMeans),
+          }))
+        )
+      : "[]",
+    ...(() => {
+      const first = ownsBusinessOrNgo(data.ownsBusinessOrNgo)
+        ? flattenFirstOrganisation(data.organisations ?? [])
+        : null;
+      return {
+        org_name: first ? cleanText(first.orgName) : "",
+        org_street_address: first ? cleanText(first.orgStreetAddress) : "",
+        org_city_village: first ? cleanText(first.orgCityVillage) : "",
+        org_district: first ? cleanText(first.orgDistrict) : "",
+        org_description: first ? cleanText(first.orgDescription) : "",
+        org_size: first ? cleanText(first.orgSize) : "",
+        org_ownership_structure: first ? cleanText(first.orgOwnershipStructure) : "",
+        org_ownership_structure_other:
+          first && first.orgOwnershipStructure === "Other"
+            ? cleanText(first.orgOwnershipStructureOther)
+            : "",
+        org_year_started: first ? cleanText(first.orgYearStarted) : "",
+        org_contact_means: first ? cleanText(first.orgContactMeans) : "",
+      };
+    })(),
     status: "Active",
     notes: authorisedBy
       ? authorisedRegistrationNotes(authorisedBy.code, authorisedBy.name)

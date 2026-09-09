@@ -1,5 +1,16 @@
 [
   {
+    "id": "fab6186f-96c6-4b4d-8af5-ea481144acc0",
+    "sentAt": "2026-09-08T18:44:01.473Z",
+    "email": "joejoe18johnson@gmail.com",
+    "phone": "",
+    "channel": "email",
+    "subject": "Verify your email address",
+    "body": "Verify your email address\n\n  Verify your email address\n  \n    \n      \n        \n          \n            \n              Belize Research Panel\n              \n              Verify your email address\n            \n\n            \n          \n\n          \n            \n              Hi Katalina,\n\nThanks for joining the Belize Research Panel. Please confirm your email address to continue with registration.\n\nThis link expires after 24 hours. If you did not create an account, you can ignore this message.\n\n              \n        \n          \n            Verify email\n          \n        \n\n      \n              Belize Research Panel · Confidential panel communications\n\n            \n          \n\n        \n        \n          You received this message because you are registered with the Belize Research Panel.",
+    "context": "signup-verify-email",
+    "deliveryStatus": "failed"
+  },
+  {
     "id": "67876ce0-c5b6-445b-b53c-d754226a15d0",
     "sentAt": "2026-08-29T22:51:45.870Z",
     "email": "joejoeq8johnson@gmail.com",
@@ -229,6 +240,9 @@
     "channel": "email",
     "subject": "Payout processing",
     "body": "Your Mobile top-up redemption (BZ$20) is now being processed. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
+    "context": "payout-start"
+  }
+]d. Reference 0531DD.\n\nSign in to your Belize Research Panel dashboard for details.",
     "context": "payout-start"
   }
 ]

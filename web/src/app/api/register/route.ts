@@ -4,6 +4,7 @@ import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
+import { emptyOrganisationEntry, type OrganisationEntry } from "@/lib/organisations";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -15,6 +16,32 @@ function parseJsonArray(value: FormDataEntryValue | null): string[] {
   try {
     const parsed = JSON.parse(String(value));
     return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseOrganisations(value: FormDataEntryValue | null): OrganisationEntry[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(String(value));
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((entry) => {
+      const raw = entry && typeof entry === "object" ? (entry as Record<string, unknown>) : {};
+      return {
+        ...emptyOrganisationEntry(),
+        name: String(raw.name ?? ""),
+        streetAddress: String(raw.streetAddress ?? ""),
+        cityVillage: String(raw.cityVillage ?? ""),
+        district: String(raw.district ?? ""),
+        description: String(raw.description ?? ""),
+        size: String(raw.size ?? ""),
+        ownershipStructure: String(raw.ownershipStructure ?? ""),
+        ownershipStructureOther: String(raw.ownershipStructureOther ?? ""),
+        yearStarted: String(raw.yearStarted ?? ""),
+        contactMeans: String(raw.contactMeans ?? ""),
+      };
+    });
   } catch {
     return [];
   }
@@ -78,16 +105,7 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     consentContact: parseBoolean(formData.get("consentContact")),
     consentPrivacy: parseBoolean(formData.get("consentPrivacy")),
     ownsBusinessOrNgo: String(formData.get("ownsBusinessOrNgo") ?? ""),
-    orgName: String(formData.get("orgName") ?? ""),
-    orgStreetAddress: String(formData.get("orgStreetAddress") ?? ""),
-    orgCityVillage: String(formData.get("orgCityVillage") ?? ""),
-    orgDistrict: String(formData.get("orgDistrict") ?? ""),
-    orgDescription: String(formData.get("orgDescription") ?? ""),
-    orgSize: String(formData.get("orgSize") ?? ""),
-    orgOwnershipStructure: String(formData.get("orgOwnershipStructure") ?? ""),
-    orgOwnershipStructureOther: String(formData.get("orgOwnershipStructureOther") ?? ""),
-    orgYearStarted: String(formData.get("orgYearStarted") ?? ""),
-    orgContactMeans: String(formData.get("orgContactMeans") ?? ""),
+    organisations: parseOrganisations(formData.get("organisations")),
     finalReviewConfirmed: parseBoolean(formData.get("finalReviewConfirmed")),
   };
 }

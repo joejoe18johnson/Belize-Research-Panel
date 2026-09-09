@@ -35,6 +35,7 @@ export type RegistrationCopy = {
   selectConstituency: string;
   selectEthnicity: string;
   selectSex: string;
+  selectYesNo: string;
   selectEducation: string;
   selectPhotoId: string;
   selectProof: string;
@@ -187,6 +188,9 @@ export type RegistrationCopy = {
   orgContactMeans: string;
   selectOrgSize: string;
   selectOrgOwnership: string;
+  organisationEntryTitle: (index: number) => string;
+  addOrganisation: string;
+  removeOrganisation: string;
   reviewTitle: string;
 };
 
@@ -242,6 +246,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectConstituency: "Select constituency",
     selectEthnicity: "Select ethnicity",
     selectSex: "Select sex",
+    selectYesNo: "Select yes or no",
     selectEducation: "Select education level",
     selectPhotoId: "Select photo ID type",
     selectProof: "Select proof type",
@@ -290,7 +295,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       photoIdType: "Photo ID type",
       proofResidence: "Proof of Belize residence",
       ownsBusinessOrNgo: "Majority owner of business / head of NGO",
-      orgName: "Business / organisation name",
+      orgName: "Business / Organisation name",
       orgStreetAddress: "Organisation street address",
       orgCityVillage: "Organisation city or village",
       orgDistrict: "Organisation district",
@@ -314,7 +319,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       contact: "Preferred ways to contact you",
       confirmContact: "Confirm contact details",
       consent: "Consent",
-      organisation: "Business / organisation",
+      organisation: "Business / Organisation",
       review: "Review full registration before submitting",
     },
     photoIdIntro: "Upload a government-issued photo ID to verify yourself, then continue the form.",
@@ -351,7 +356,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     marketInterestsLabel:
       "Select up to 5 products and services you are interested in and are willing to give feedback on.",
     contactIntro:
-      "We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp is optional. If you live in Belize and still have fewer than two means of contact, a street address is required as a last resort.",
+      "We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp, Facebook, Instagram, TikTok, and other contact (platform + detail together) each count as one. A complete street address is a seventh option and is required if you live in Belize and still have fewer than two means of contact.",
     email: "Email address",
     emailHint: "This is your verified account email. It counts as one way to contact you.",
     facebook: "Facebook name or profile link",
@@ -410,6 +415,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     orgContactMeans: "Means of contact for the organisation",
     selectOrgSize: "Select operation size",
     selectOrgOwnership: "Select ownership structure",
+    organisationEntryTitle: (index) => `Business / Organisation ${index + 1}`,
+    addOrganisation: "Add another business / organisation",
+    removeOrganisation: "Remove",
     reviewTitle: "Review full registration before submitting",
   },
   es: {
@@ -448,6 +456,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectConstituency: "Seleccione circunscripción",
     selectEthnicity: "Seleccione etnia",
     selectSex: "Seleccione sexo",
+    selectYesNo: "Seleccione sí o no",
     selectEducation: "Seleccione nivel educativo",
     selectPhotoId: "Seleccione tipo de identificación",
     selectProof: "Seleccione tipo de comprobante",
@@ -557,7 +566,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     marketInterestsLabel:
       "Seleccione hasta 5 productos y servicios sobre los que le interesa dar su opinión.",
     contactIntro:
-      "Necesitamos al menos dos medios de contacto por si uno falla. Su correo cuenta como uno. Teléfono / WhatsApp es opcional. Si vive en Belice y aún tiene menos de dos medios de contacto, se requiere una dirección como último recurso.",
+      "Necesitamos al menos dos medios de contacto por si uno falla. Su correo cuenta como uno. Teléfono / WhatsApp, Facebook, Instagram, TikTok y otro contacto (plataforma + detalle juntos) cuentan cada uno como uno. Una dirección completa es la séptima opción y es obligatoria si vive en Belice y aún tiene menos de dos medios de contacto.",
     email: "Correo electrónico",
     emailHint: "Este es el correo verificado de su cuenta. Cuenta como una forma de contactarlo.",
     facebook: "Nombre o enlace de perfil de Facebook",
@@ -617,6 +626,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     orgContactMeans: "Medios de contacto de la organización",
     selectOrgSize: "Seleccione el tamaño de la operación",
     selectOrgOwnership: "Seleccione la estructura de propiedad",
+    organisationEntryTitle: (index) => `Negocio / organización ${index + 1}`,
+    addOrganisation: "Agregar otro negocio / organización",
+    removeOrganisation: "Eliminar",
     reviewTitle: "Revise el registro completo antes de enviar",
   },
 };

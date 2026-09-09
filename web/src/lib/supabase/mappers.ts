@@ -184,6 +184,26 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     consent_contact: metadataString(meta, "consent_contact") || "True",
     consent_privacy: metadataString(meta, "consent_privacy") || "True",
     owns_business_or_ngo: metadataString(meta, "owns_business_or_ngo"),
+    organisations: (() => {
+      const stored = metadataString(meta, "organisations");
+      if (stored) return stored;
+      const orgName = metadataString(meta, "org_name");
+      if (!orgName) return "";
+      return JSON.stringify([
+        {
+          name: orgName,
+          streetAddress: metadataString(meta, "org_street_address"),
+          cityVillage: metadataString(meta, "org_city_village"),
+          district: metadataString(meta, "org_district"),
+          description: metadataString(meta, "org_description"),
+          size: metadataString(meta, "org_size"),
+          ownershipStructure: metadataString(meta, "org_ownership_structure"),
+          ownershipStructureOther: metadataString(meta, "org_ownership_structure_other"),
+          yearStarted: metadataString(meta, "org_year_started"),
+          contactMeans: metadataString(meta, "org_contact_means"),
+        },
+      ]);
+    })(),
     org_name: metadataString(meta, "org_name"),
     org_street_address: metadataString(meta, "org_street_address"),
     org_city_village: metadataString(meta, "org_city_village"),
@@ -232,6 +252,7 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     consent_contact: row.consent_contact ?? "",
     consent_privacy: row.consent_privacy ?? "",
     owns_business_or_ngo: row.owns_business_or_ngo ?? "",
+    organisations: row.organisations ?? "",
     org_name: row.org_name ?? "",
     org_street_address: row.org_street_address ?? "",
     org_city_village: row.org_city_village ?? "",

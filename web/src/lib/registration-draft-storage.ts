@@ -1,6 +1,7 @@
+import { organisationsFromLegacyFlat } from "./organisations";
 import type { RegistrationFormData } from "./registration-types";
 
-const DRAFT_VERSION = 2;
+const DRAFT_VERSION = 3;
 const FILE_DB_NAME = "brp-registration-drafts";
 const FILE_STORE = "files";
 
@@ -10,6 +11,17 @@ export type RegistrationDraftSnapshot = Omit<
 > & {
   photoIdFileName?: string;
   proofOfBelizeResidenceFileName?: string;
+  /** Legacy single-org draft fields (versions 1–2). */
+  orgName?: string;
+  orgStreetAddress?: string;
+  orgCityVillage?: string;
+  orgDistrict?: string;
+  orgDescription?: string;
+  orgSize?: string;
+  orgOwnershipStructure?: string;
+  orgOwnershipStructureOther?: string;
+  orgYearStarted?: string;
+  orgContactMeans?: string;
 };
 
 export interface RegistrationDraft {
@@ -49,7 +61,9 @@ export function loadRegistrationDraft(accountEmail: string): RegistrationDraft |
     const raw = window.localStorage.getItem(draftKey(accountEmail));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as RegistrationDraft;
-    if (parsed.version !== DRAFT_VERSION && parsed.version !== 1) return null;
+    if (parsed.version !== DRAFT_VERSION && parsed.version !== 1 && parsed.version !== 2) {
+      return null;
+    }
     if (parsed.accountEmail.trim().toLowerCase() !== accountEmail.trim().toLowerCase()) return null;
     return parsed;
   } catch {
@@ -94,10 +108,39 @@ export function mergeDraftIntoForm(
   draft: RegistrationDraft,
   files?: RegistrationDraftFiles
 ): RegistrationFormData {
-  const { photoIdFileName, proofOfBelizeResidenceFileName, ...formFields } = draft.form;
+  const {
+    photoIdFileName,
+    proofOfBelizeResidenceFileName,
+    orgName,
+    orgStreetAddress,
+    orgCityVillage,
+    orgDistrict,
+    orgDescription,
+    orgSize,
+    orgOwnershipStructure,
+    orgOwnershipStructureOther,
+    orgYearStarted,
+    orgContactMeans,
+    organisations: draftOrganisations,
+    ...formFields
+  } = draft.form;
+  const organisations = organisationsFromLegacyFlat({
+    organisations: draftOrganisations,
+    orgName,
+    orgStreetAddress,
+    orgCityVillage,
+    orgDistrict,
+    orgDescription,
+    orgSize,
+    orgOwnershipStructure,
+    orgOwnershipStructureOther,
+    orgYearStarted,
+    orgContactMeans,
+  });
   return {
     ...base,
     ...formFields,
+    organisations,
     registrationMode: "Self-registration",
     authorisedVerificationCode: "",
     photoIdFile: files?.photoIdFile ?? null,

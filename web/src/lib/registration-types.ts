@@ -1,5 +1,8 @@
 import type { RegistrationMode } from "./constants";
+import { emptyOrganisationEntry, type OrganisationEntry } from "./organisations";
 import { DEFAULT_PHONE_COUNTRY_CODE } from "./phone-codes";
+
+export type { OrganisationEntry };
 
 export interface RegistrationFormData {
   registrationMode: RegistrationMode;
@@ -52,16 +55,7 @@ export interface RegistrationFormData {
   consentContact: boolean;
   consentPrivacy: boolean;
   ownsBusinessOrNgo: string;
-  orgName: string;
-  orgStreetAddress: string;
-  orgCityVillage: string;
-  orgDistrict: string;
-  orgDescription: string;
-  orgSize: string;
-  orgOwnershipStructure: string;
-  orgOwnershipStructureOther: string;
-  orgYearStarted: string;
-  orgContactMeans: string;
+  organisations: OrganisationEntry[];
   finalReviewConfirmed: boolean;
 }
 
@@ -116,18 +110,11 @@ export const initialRegistrationForm: RegistrationFormData = {
   consentContact: false,
   consentPrivacy: false,
   ownsBusinessOrNgo: "",
-  orgName: "",
-  orgStreetAddress: "",
-  orgCityVillage: "",
-  orgDistrict: "",
-  orgDescription: "",
-  orgSize: "",
-  orgOwnershipStructure: "",
-  orgOwnershipStructureOther: "",
-  orgYearStarted: "",
-  orgContactMeans: "",
+  organisations: [],
   finalReviewConfirmed: false,
 };
+
+export { emptyOrganisationEntry };
 
 export interface RegistrationSuccess {
   verificationStatus: string;
