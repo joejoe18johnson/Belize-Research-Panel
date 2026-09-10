@@ -103,17 +103,27 @@ export function ProfileEditForm({
 
   useEffect(() => {
     if (streetAddressRequired) return;
-    if (!form.streetAddress && !form.addressCityVillage && !form.addressDistrict) return;
+    if (
+      !form.streetAddress &&
+      !form.addressHouseNumber &&
+      !form.addressCityVillage &&
+      !form.addressCityVillageOther &&
+      !form.addressDistrict
+    ) return;
     setForm((prev) => ({
       ...prev,
       streetAddress: "",
+      addressHouseNumber: "",
       addressCityVillage: "",
+      addressCityVillageOther: "",
       addressDistrict: "",
     }));
   }, [
     streetAddressRequired,
     form.streetAddress,
+    form.addressHouseNumber,
     form.addressCityVillage,
+    form.addressCityVillageOther,
     form.addressDistrict,
   ]);
 
@@ -556,14 +566,18 @@ export function ProfileEditForm({
 
           {streetAddressRequired ? (
             <StreetAddressFields
+              addressHouseNumber={form.addressHouseNumber}
               streetAddress={form.streetAddress}
               addressCityVillage={form.addressCityVillage}
+              addressCityVillageOther={form.addressCityVillageOther}
               addressDistrict={form.addressDistrict}
               required
               hint="Required only because you live in Belize and have fewer than two means of contact. Home visits are a last resort."
               errors={{
+                addressHouseNumber: errors.addressHouseNumber,
                 streetAddress: errors.streetAddress,
                 addressCityVillage: errors.addressCityVillage,
+                addressCityVillageOther: errors.addressCityVillageOther,
                 addressDistrict: errors.addressDistrict,
               }}
               onChange={(field, value) => update(field, value)}

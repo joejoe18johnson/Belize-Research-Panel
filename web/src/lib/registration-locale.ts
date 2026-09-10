@@ -140,6 +140,7 @@ export type RegistrationCopy = {
   contactIntro: string;
   email: string;
   emailHint: string;
+  emailVerifiedBadge: string;
   facebook: string;
   facebookPlaceholder: string;
   phone: string;
@@ -157,11 +158,16 @@ export type RegistrationCopy = {
   streetRequiredHint: string;
   streetOptionalHint: string;
   streetTitle: string;
+  houseNumber: string;
+  houseNumberPlaceholder: string;
   streetAddress: string;
   streetAddressPlaceholder: string;
   cityOrVillage: string;
+  cityOrVillageOther: string;
+  cityOrVillageOtherPlaceholder: string;
   district: string;
   selectDistrict: string;
+  selectDistrictFirst: string;
   ctvPlaceholder: string;
   contactSummary: string;
   contactMeans: string;
@@ -259,7 +265,12 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "I have reviewed the full form and confirm that the information is correct. *",
     reviewQuestion: "Question / field",
     reviewResponse: "Response",
-    contactMeansOf: (count) => `${count} of 7 means of contact`,
+    contactMeansOf: (count) =>
+      count >= 2
+        ? `Great, you have provided ${count} means of contact!`
+        : count === 1
+          ? "You have provided 1 means of contact"
+          : "No means of contact provided yet",
     reviewLabels: {
       citizenship: "Citizenship / residency status",
       commonwealthCountry: "Commonwealth country of citizenship",
@@ -322,7 +333,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       organisation: "Business / Organisation",
       review: "Review full registration before submitting",
     },
-    photoIdIntro: "Upload a government-issued photo ID to verify yourself, then continue the form.",
+    photoIdIntro: "",
     photoIdAlert:
       "Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.",
     photoIdType: "Photo ID type",
@@ -356,9 +367,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     marketInterestsLabel:
       "Select up to 5 products and services you are interested in and are willing to give feedback on.",
     contactIntro:
-      "We need at least two means of contact in case one fails. Your email counts as one. Phone / WhatsApp, Facebook, Instagram, TikTok, and other contact (platform + detail together) each count as one. A complete street address is a seventh option and is required if you live in Belize and still have fewer than two means of contact.",
+      "We need at least two means of contact in case one fails. If you live in Belize and do not have two other means of contact, please provide your complete street address.",
     email: "Email address",
-    emailHint: "This is your verified account email. It counts as one way to contact you.",
+    emailHint: "",
+    emailVerifiedBadge: "Verified",
     facebook: "Facebook name or profile link",
     facebookPlaceholder: "username or https://facebook.com/username",
     phone: "Phone / WhatsApp number",
@@ -378,19 +390,23 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetOptionalHint:
       "Optional. You already have at least two means of contact. Add an address only if you want a backup.",
     streetTitle: "Physical contact address",
-    streetAddress: "Street address",
-    streetAddressPlaceholder: "House number and street name",
-    cityOrVillage: "City or Village",
+    houseNumber: "House number",
+    houseNumberPlaceholder: "e.g. 42",
+    streetAddress: "Street name",
+    streetAddressPlaceholder: "Street or road name",
+    cityOrVillage: "City, town, or village",
+    cityOrVillageOther: "Specify city, town, or village",
+    cityOrVillageOtherPlaceholder: "Enter the place name",
     district: "District",
     selectDistrict: "Select district",
+    selectDistrictFirst: "Select district first",
     ctvPlaceholder: "Start typing a city, town, or village",
     contactSummary: "Contact summary",
     contactMeans: "means of contact",
     contactIncomplete: "incomplete",
     contactSuccess: (count) =>
       `You have submitted ${count} means of contact. Please double-check every detail below — wrong contact information can mean you miss survey and research opportunities.`,
-    contactWarning: (count, belize) =>
-      `Only ${count} ${count === 1 ? "means of contact has" : "means of contact have"} been submitted so far. We need at least two means of contact in case one fails${belize ? ", or a complete physical address if you live in Belize" : ""}. Go back and add another method before confirming. Also make sure every detail is correct — wrong contact information can mean you miss survey and research opportunities.`,
+    contactWarning: (_count, _belize) => "",
     contactVerifyNote:
       "Please verify that every means of contact above is accurate and up to date. If we cannot reach you, you may miss out on paid surveys, polls, and other research opportunities.",
     contactConfirm:
@@ -469,7 +485,12 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "He revisado el formulario completo y confirmo que la información es correcta. *",
     reviewQuestion: "Pregunta / campo",
     reviewResponse: "Respuesta",
-    contactMeansOf: (count) => `${count} de 7 medios de contacto`,
+    contactMeansOf: (count) =>
+      count >= 2
+        ? `¡Genial, ha proporcionado ${count} medios de contacto!`
+        : count === 1
+          ? "Ha proporcionado 1 medio de contacto"
+          : "Aún no ha proporcionado medios de contacto",
     reviewLabels: {
       citizenship: "Estado de ciudadanía / residencia",
       commonwealthCountry: "País de ciudadanía de la Commonwealth",
@@ -532,7 +553,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       organisation: "Negocio / organización",
       review: "Revise el registro completo antes de enviar",
     },
-    photoIdIntro: "Suba una identificación con foto emitida por el gobierno para verificarse y luego continúe el formulario.",
+    photoIdIntro: "",
     photoIdAlert:
       "Suba una identificación con foto emitida por el gobierno. Solo la usamos para verificar su identidad y elegibilidad. No guardamos ni almacenamos imágenes de identificación. Puede ocultar o difuminar números de identificación antes de subirla, siempre que su nombre, fotografía y datos de elegibilidad sigan visibles.",
     photoIdType: "Tipo de identificación con foto",
@@ -566,9 +587,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     marketInterestsLabel:
       "Seleccione hasta 5 productos y servicios sobre los que le interesa dar su opinión.",
     contactIntro:
-      "Necesitamos al menos dos medios de contacto por si uno falla. Su correo cuenta como uno. Teléfono / WhatsApp, Facebook, Instagram, TikTok y otro contacto (plataforma + detalle juntos) cuentan cada uno como uno. Una dirección completa es la séptima opción y es obligatoria si vive en Belice y aún tiene menos de dos medios de contacto.",
+      "Necesitamos al menos dos medios de contacto por si uno falla. Si vive en Belice y no tiene dos otros medios de contacto, proporcione su dirección completa.",
     email: "Correo electrónico",
-    emailHint: "Este es el correo verificado de su cuenta. Cuenta como una forma de contactarlo.",
+    emailHint: "",
+    emailVerifiedBadge: "Verificado",
     facebook: "Nombre o enlace de perfil de Facebook",
     facebookPlaceholder: "usuario o https://facebook.com/usuario",
     phone: "Número de teléfono / WhatsApp",
@@ -588,19 +610,23 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetOptionalHint:
       "Opcional. Ya tiene al menos dos medios de contacto. Agregue una dirección solo si desea un respaldo.",
     streetTitle: "Dirección física de contacto",
-    streetAddress: "Dirección",
-    streetAddressPlaceholder: "Número de casa y nombre de la calle",
-    cityOrVillage: "Ciudad o aldea",
+    houseNumber: "Número de casa",
+    houseNumberPlaceholder: "p. ej. 42",
+    streetAddress: "Nombre de la calle",
+    streetAddressPlaceholder: "Nombre de la calle o camino",
+    cityOrVillage: "Ciudad, pueblo o aldea",
+    cityOrVillageOther: "Especifique ciudad, pueblo o aldea",
+    cityOrVillageOtherPlaceholder: "Escriba el nombre del lugar",
     district: "Distrito",
     selectDistrict: "Seleccione distrito",
+    selectDistrictFirst: "Seleccione el distrito primero",
     ctvPlaceholder: "Empiece a escribir una ciudad, pueblo o aldea",
     contactSummary: "Resumen de contacto",
     contactMeans: "medios de contacto",
     contactIncomplete: "incompleto",
     contactSuccess: (count) =>
       `Ha enviado ${count} medios de contacto. Revise cada detalle a continuación: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
-    contactWarning: (count, belize) =>
-      `Solo se ha enviado ${count} ${count === 1 ? "medio de contacto" : "medios de contacto"} hasta ahora. Necesitamos al menos dos medios de contacto por si uno falla${belize ? ", o una dirección física completa si vive en Belice" : ""}. Regrese y agregue otro método antes de confirmar. Asegúrese también de que cada detalle sea correcto: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
+    contactWarning: (_count, _belize) => "",
     contactVerifyNote:
       "Verifique que cada medio de contacto anterior sea exacto y esté actualizado. Si no podemos contactarlo, podría perder encuestas pagadas, sondeos y otras oportunidades de investigación.",
     contactConfirm:

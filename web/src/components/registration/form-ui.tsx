@@ -235,12 +235,15 @@ export function MultiSelect({
 export function Alert({
   variant,
   children,
+  formatBody = true,
 }: {
   variant: FeedbackTone;
   children: ReactNode;
+  /** When false, keep body copy as written (no title case). */
+  formatBody?: boolean;
 }) {
   return (
-    <BrandedAlert tone={variant} showIcon>
+    <BrandedAlert tone={variant} showIcon formatBody={formatBody}>
       {children}
     </BrandedAlert>
   );

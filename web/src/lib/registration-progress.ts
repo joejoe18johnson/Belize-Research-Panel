@@ -60,8 +60,6 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "proofOfBelizeResidenceFile",
   ],
   [
-    "ownsBusinessOrNgo",
-    "organisations",
     "firstName",
     "lastName",
     "sex",
@@ -87,7 +85,9 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "otherContactPlatform",
     "contact",
     "streetAddress",
+    "addressHouseNumber",
     "addressCityVillage",
+    "addressCityVillageOther",
     "addressDistrict",
     "contactDetailsConfirmed",
   ],
@@ -221,21 +221,10 @@ function collectPhaseErrors(
       delete allErrors.marketInterests;
     }
   }
-  if (phaseIndex === PROFILE_PHASE && form.ownsBusinessOrNgo !== "Yes") {
-    delete allErrors.organisations;
-    for (const key of Object.keys(allErrors)) {
-      if (key.startsWith("organisations.")) delete allErrors[key];
-    }
-  }
 
   const phaseErrors: FieldErrors = {};
   for (const key of keys) {
     if (allErrors[key]) phaseErrors[key] = allErrors[key];
-  }
-  if (phaseIndex === PROFILE_PHASE) {
-    for (const [key, message] of Object.entries(allErrors)) {
-      if (key.startsWith("organisations.")) phaseErrors[key] = message;
-    }
   }
   if (phaseIndex === CONTACT_PHASE && allErrors.contact) {
     phaseErrors.contact = allErrors.contact;

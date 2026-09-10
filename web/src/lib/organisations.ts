@@ -2,8 +2,10 @@ import type { RegistrationFormData } from "./registration-types";
 
 export type OrganisationEntry = {
   name: string;
+  houseNumber: string;
   streetAddress: string;
   cityVillage: string;
+  cityVillageOther: string;
   district: string;
   description: string;
   size: string;
@@ -16,8 +18,10 @@ export type OrganisationEntry = {
 export function emptyOrganisationEntry(): OrganisationEntry {
   return {
     name: "",
+    houseNumber: "",
     streetAddress: "",
     cityVillage: "",
+    cityVillageOther: "",
     district: "",
     description: "",
     size: "",
@@ -113,8 +117,9 @@ export function flattenFirstOrganisation(
   const first = firstOrganisationOrEmpty(organisations);
   return {
     orgName: first.name,
-    orgStreetAddress: first.streetAddress,
-    orgCityVillage: first.cityVillage,
+    orgStreetAddress: [first.houseNumber, first.streetAddress].filter(Boolean).join(" ").trim(),
+    orgCityVillage:
+      first.cityVillage === "Other" ? first.cityVillageOther || first.cityVillage : first.cityVillage,
     orgDistrict: first.district,
     orgDescription: first.description,
     orgSize: first.size,

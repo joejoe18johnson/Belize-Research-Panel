@@ -13,7 +13,6 @@ import {
   MultiSelect,
   SelectInput,
   siteRadioClass,
-  TextArea,
   TextInput,
 } from "./form-ui";
 import { DateOfBirthPicker } from "./DateOfBirthPicker";
@@ -37,14 +36,11 @@ import {
   MAX_HOUSEHOLD_SIZE,
   MARKET_INTERESTS,
   MAX_MARKET_INTERESTS,
-  ORG_OPERATION_SIZES,
-  ORG_OWNERSHIP_STRUCTURES,
   OTHER_CONTACT_PLATFORM_OPTIONS,
   PHOTO_ID_TYPES,
   SEX_OPTIONS,
   US_DIASPORA_REGIONS,
   VOTING_STATUS,
-  YES_NO_OPTIONS,
   getConstituencyOptions,
   getRegisteredCtvOptions,
   getResidenceOptions,
@@ -54,19 +50,11 @@ import {
   isUnitedStatesCountry,
   mustLiveAbroad,
   needsVoterRegistrationQuestion,
-  ownsBusinessOrNgo,
-  CITIZENSHIP_PANEL_INTRO,
 } from "@/lib/constants";
 import {
   initialRegistrationForm,
-  emptyOrganisationEntry,
-  type OrganisationEntry,
   type RegistrationFormData,
 } from "@/lib/registration-types";
-import {
-  ensureOrganisationsForOwnership,
-  organisationErrorKey,
-} from "@/lib/organisations";
 import { getPhoneNumberRule, phoneCountryCodeForCountry } from "@/lib/phone-codes";
 import {
   countAllContactMeans,
@@ -116,9 +104,6 @@ function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
 function findRegistrationErrorTarget(key: string): HTMLElement | null {
   const candidates = [key, `${key}-section`];
   if (key.startsWith("consent")) candidates.push("consent-section");
-  if (key === "ownsBusinessOrNgo" || key === "organisations" || key.startsWith("organisations.")) {
-    candidates.push("organisation-section");
-  }
   if (key === "contact") candidates.push("contact-section");
   if (key === "photoIdFile" || key === "photoIdType") candidates.push("photo-id-section");
   for (const id of candidates) {
@@ -225,7 +210,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     if (required) return;
     if (
       !form.streetAddress &&
+      !form.addressHouseNumber &&
       !form.addressCityVillage &&
+      !form.addressCityVillageOther &&
       !form.addressDistrict
     ) {
       return;
@@ -233,7 +220,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     setForm((prev) => ({
       ...prev,
       streetAddress: "",
+      addressHouseNumber: "",
       addressCityVillage: "",
+      addressCityVillageOther: "",
       addressDistrict: "",
     }));
   }, [
@@ -246,7 +235,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     form.tiktok,
     form.otherContact,
     form.streetAddress,
+    form.addressHouseNumber,
     form.addressCityVillage,
+    form.addressCityVillageOther,
     form.addressDistrict,
   ]);
 
@@ -314,60 +305,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           next.phoneCountryCode = suggestedCode;
         }
       }
-      if (key === "ownsBusinessOrNgo") {
-        next.organisations = ensureOrganisationsForOwnership(
-          ownsBusinessOrNgo(String(value)),
-          next.organisations
-        );
-      }
       return next;
     });
     setErrors((prev) => clearFieldError(prev, String(key)));
-  }, []);
-
-  const updateOrganisation = useCallback(
-    <K extends keyof OrganisationEntry>(index: number, field: K, value: OrganisationEntry[K]) => {
-      const errorKey = organisationErrorKey(index, field);
-      setForm((prev) => {
-        const organisations = prev.organisations.map((entry, i) => {
-          if (i !== index) return entry;
-          const next = { ...entry, [field]: value };
-          if (field === "ownershipStructure" && value !== "Other") {
-            next.ownershipStructureOther = "";
-          }
-          return next;
-        });
-        return { ...prev, organisations };
-      });
-      setErrors((prev) => clearFieldError(prev, errorKey));
-    },
-    []
-  );
-
-  const addOrganisation = useCallback(() => {
-    setForm((prev) => ({
-      ...prev,
-      organisations: [...prev.organisations, emptyOrganisationEntry()],
-    }));
-    setErrors((prev) => clearFieldError(prev, "organisations"));
-  }, []);
-
-  const removeOrganisation = useCallback((index: number) => {
-    setForm((prev) => {
-      const remaining = prev.organisations.filter((_, i) => i !== index);
-      return {
-        ...prev,
-        organisations: ensureOrganisationsForOwnership(true, remaining),
-      };
-    });
-    setErrors((prev) => {
-      const next = { ...prev };
-      delete next.organisations;
-      for (const key of Object.keys(next)) {
-        if (key.startsWith("organisations.")) delete next[key];
-      }
-      return next;
-    });
   }, []);
 
   const touch = (key: string) => setTouched((prev) => ({ ...prev, [key]: true }));
@@ -415,8 +355,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const contactCount = countContactMethods(form);
   const totalContactMeans = countAllContactMeans(form);
   const physicalAddressProvided = streetAddressPartsPresent({
+    addressHouseNumber: form.addressHouseNumber,
     streetAddress: form.streetAddress,
     addressCityVillage: form.addressCityVillage,
+    addressCityVillageOther: form.addressCityVillageOther,
     addressDistrict: form.addressDistrict,
   });
   const meetsContactMinimum = totalContactMeans >= 2;
@@ -427,7 +369,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : form.otherContactPlatform;
   const otherContactDisplay =
     [otherPlatform, form.otherContact].filter(Boolean).join(": ") || copy.notProvided;
-  const showOrgFields = ownsBusinessOrNgo(form.ownsBusinessOrNgo);
   const countryAbroadDisplay =
     form.countryIfAbroad === "Other"
       ? form.countryIfAbroadOther || form.countryIfAbroad
@@ -445,7 +386,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
     const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
     const addressAsked = streetAddressRequired || physicalAddressProvided;
-    const orgAsked = ownsBusinessOrNgo(form.ownsBusinessOrNgo);
     const rl = copy.reviewLabels;
 
     const cityValue =
@@ -486,38 +426,15 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       [rl.tiktok, asked(form.tiktok)],
       [rl.otherPlatform, asked(otherPlatform)],
       [rl.otherContact, asked(form.otherContact)],
-      [rl.streetAddress, addressAsked ? asked(form.streetAddress) : na],
-      [rl.cityOrVillage, addressAsked ? asked(form.addressCityVillage) : na],
+      [rl.streetAddress, addressAsked ? asked([form.addressHouseNumber, form.streetAddress].filter(Boolean).join(" ")) : na],
+      [rl.cityOrVillage, addressAsked ? asked(form.addressCityVillage === "Other" ? form.addressCityVillageOther : form.addressCityVillage) : na],
       [rl.addressDistrict, addressAsked ? asked(form.addressDistrict) : na],
       [rl.photoIdType, asked(form.photoIdType)],
       [
         rl.proofResidence,
         proofAsked ? asked(form.proofOfBelizeResidenceType) : na,
       ],
-      [rl.ownsBusinessOrNgo, asked(form.ownsBusinessOrNgo)],
     ];
-
-    if (orgAsked) {
-      form.organisations.forEach((org, index) => {
-        const labelPrefix =
-          form.organisations.length > 1 ? `${copy.organisationEntryTitle(index)} — ` : "";
-        const ownership =
-          org.ownershipStructure === "Other"
-            ? org.ownershipStructureOther || org.ownershipStructure
-            : org.ownershipStructure;
-        rows.push(
-          [`${labelPrefix}${rl.orgName}`, asked(org.name)],
-          [`${labelPrefix}${rl.orgStreetAddress}`, asked(org.streetAddress)],
-          [`${labelPrefix}${rl.orgCityVillage}`, asked(org.cityVillage)],
-          [`${labelPrefix}${rl.orgDistrict}`, asked(org.district)],
-          [`${labelPrefix}${rl.orgDescription}`, asked(org.description)],
-          [`${labelPrefix}${rl.orgSize}`, asked(org.size)],
-          [`${labelPrefix}${rl.orgOwnershipStructure}`, asked(ownership)],
-          [`${labelPrefix}${rl.orgYearStarted}`, asked(org.yearStarted)],
-          [`${labelPrefix}${rl.orgContactMeans}`, asked(org.contactMeans)]
-        );
-      });
-    }
 
     return rows;
   }, [
@@ -539,18 +456,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const fieldErrors = validateRegistrationForm(data, validationOptions);
     const message = fieldErrors[key as string];
     setErrors((prev) => (message ? { ...prev, [key]: message } : clearFieldError(prev, String(key))));
-  };
-
-  const validateOrganisationField = (index: number, field: keyof OrganisationEntry) => {
-    const key = organisationErrorKey(index, field);
-    const fieldErrors = validateRegistrationForm(form, validationOptions);
-    const message = fieldErrors[key];
-    setErrors((prev) => (message ? { ...prev, [key]: message } : clearFieldError(prev, key)));
-  };
-
-  const touchAndValidateOrganisation = (index: number, field: keyof OrganisationEntry) => {
-    touch(organisationErrorKey(index, field));
-    validateOrganisationField(index, field);
   };
 
   const touchAndValidate = (key: keyof RegistrationFormData) => {
@@ -785,10 +690,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ) : null}
       {activePhaseIndex === 0 ? (
         <FormSection step={1} title={copy.sections.verifyHow} id="photo-id-section">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            {copy.photoIdIntro}
-          </p>
-          <Alert variant="info">
+          <Alert variant="info" formatBody={false}>
             {copy.photoIdAlert}
           </Alert>
           <FieldGroup columns={2}>
@@ -829,7 +731,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         <>
       <div id="citizenship-section">
         <FormSection step={1} title={copy.sections.citizenship}>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{CITIZENSHIP_PANEL_INTRO}</p>
           <div className="flex flex-col gap-3">
             {CITIZENSHIP_STATUS.map((status) => (
               <label key={status} className={choiceBoxLabelClass}>
@@ -902,246 +803,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 2 ? (
         <>
-          <FormSection step={4} title={copy.sections.organisation} id="organisation-section">
-            <Field label={copy.ownsBusinessOrNgo} required error={fieldError("ownsBusinessOrNgo")} id="ownsBusinessOrNgo">
-              <SelectInput
-                id="ownsBusinessOrNgo"
-                value={form.ownsBusinessOrNgo}
-                onChange={(e) => update("ownsBusinessOrNgo", e.target.value)}
-                onBlur={() => touchAndValidate("ownsBusinessOrNgo")}
-                error={fieldError("ownsBusinessOrNgo")}
-              >
-                <option value="">{copy.selectYesNo}</option>
-                {YES_NO_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-
-            {showOrgFields ? (
-              <div className="space-y-6">
-                {fieldError("organisations") ? (
-                  <p className="text-sm text-red-600 dark:text-red-400">{fieldError("organisations")}</p>
-                ) : null}
-                {form.organisations.map((org, index) => {
-                  const nameKey = organisationErrorKey(index, "name");
-                  const streetKey = organisationErrorKey(index, "streetAddress");
-                  const cityKey = organisationErrorKey(index, "cityVillage");
-                  const districtKey = organisationErrorKey(index, "district");
-                  const descriptionKey = organisationErrorKey(index, "description");
-                  const sizeKey = organisationErrorKey(index, "size");
-                  const ownershipKey = organisationErrorKey(index, "ownershipStructure");
-                  const ownershipOtherKey = organisationErrorKey(index, "ownershipStructureOther");
-                  const yearKey = organisationErrorKey(index, "yearStarted");
-                  const contactKey = organisationErrorKey(index, "contactMeans");
-                  return (
-                    <div
-                      key={`organisation-${index}`}
-                      className="space-y-4 border-t border-zinc-100 pt-4 dark:border-zinc-800 first:border-t-0 first:pt-0"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-                          {copy.organisationEntryTitle(index)}
-                        </h3>
-                        {form.organisations.length > 1 ? (
-                          <button
-                            type="button"
-                            onClick={() => removeOrganisation(index)}
-                            className="text-sm font-medium text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
-                          >
-                            {copy.removeOrganisation}
-                          </button>
-                        ) : null}
-                      </div>
-
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="sm:col-span-2">
-                          <Field label={copy.orgName} required error={fieldError(nameKey)} id={nameKey}>
-                            <TextInput
-                              id={nameKey}
-                              value={org.name}
-                              onChange={(e) => updateOrganisation(index, "name", e.target.value)}
-                              onBlur={() => touchAndValidateOrganisation(index, "name")}
-                              error={fieldError(nameKey)}
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <StreetAddressFields
-                            streetAddress={org.streetAddress}
-                            addressCityVillage={org.cityVillage}
-                            addressDistrict={org.district}
-                            required
-                            title={null}
-                            hint={copy.orgLocationIntro}
-                            fieldIds={{
-                              streetAddress: streetKey,
-                              addressCityVillage: cityKey,
-                              addressDistrict: districtKey,
-                            }}
-                            errors={{
-                              streetAddress: fieldError(streetKey),
-                              addressCityVillage: fieldError(cityKey),
-                              addressDistrict: fieldError(districtKey),
-                            }}
-                            onChange={(field, value) => {
-                              if (field === "streetAddress") updateOrganisation(index, "streetAddress", value);
-                              else if (field === "addressCityVillage") {
-                                updateOrganisation(index, "cityVillage", value);
-                              } else updateOrganisation(index, "district", value);
-                            }}
-                            onBlurField={(field) => {
-                              const orgField =
-                                field === "streetAddress"
-                                  ? "streetAddress"
-                                  : field === "addressCityVillage"
-                                    ? "cityVillage"
-                                    : "district";
-                              touchAndValidateOrganisation(index, orgField);
-                            }}
-                          />
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <Field
-                            label={copy.orgDescription}
-                            required
-                            error={fieldError(descriptionKey)}
-                            id={descriptionKey}
-                          >
-                            <TextArea
-                              id={descriptionKey}
-                              value={org.description}
-                              onChange={(e) => updateOrganisation(index, "description", e.target.value)}
-                              onBlur={() => touchAndValidateOrganisation(index, "description")}
-                              error={fieldError(descriptionKey)}
-                              placeholder={copy.orgDescriptionPlaceholder}
-                              rows={3}
-                            />
-                          </Field>
-                        </div>
-
-                        <Field label={copy.orgSize} required error={fieldError(sizeKey)} id={sizeKey}>
-                          <SelectInput
-                            id={sizeKey}
-                            value={org.size}
-                            onChange={(e) => updateOrganisation(index, "size", e.target.value)}
-                            onBlur={() => touchAndValidateOrganisation(index, "size")}
-                            error={fieldError(sizeKey)}
-                          >
-                            <option value="">{copy.selectOrgSize}</option>
-                            {ORG_OPERATION_SIZES.map((size) => (
-                              <option key={size} value={size}>
-                                {size}
-                              </option>
-                            ))}
-                          </SelectInput>
-                        </Field>
-
-                        <Field
-                          label={copy.orgOwnershipStructure}
-                          required
-                          error={fieldError(ownershipKey)}
-                          id={ownershipKey}
-                        >
-                          <SelectInput
-                            id={ownershipKey}
-                            value={org.ownershipStructure}
-                            onChange={(e) =>
-                              updateOrganisation(index, "ownershipStructure", e.target.value)
-                            }
-                            onBlur={() => touchAndValidateOrganisation(index, "ownershipStructure")}
-                            error={fieldError(ownershipKey)}
-                          >
-                            <option value="">{copy.selectOrgOwnership}</option>
-                            {ORG_OWNERSHIP_STRUCTURES.map((structure) => (
-                              <option key={structure} value={structure}>
-                                {structure}
-                              </option>
-                            ))}
-                          </SelectInput>
-                        </Field>
-
-                        {org.ownershipStructure === "Other" ? (
-                          <div className="sm:col-span-2">
-                            <Field
-                              label={copy.orgOwnershipStructureOther}
-                              required
-                              error={fieldError(ownershipOtherKey)}
-                              id={ownershipOtherKey}
-                            >
-                              <TextInput
-                                id={ownershipOtherKey}
-                                value={org.ownershipStructureOther}
-                                onChange={(e) =>
-                                  updateOrganisation(index, "ownershipStructureOther", e.target.value)
-                                }
-                                onBlur={() =>
-                                  touchAndValidateOrganisation(index, "ownershipStructureOther")
-                                }
-                                error={fieldError(ownershipOtherKey)}
-                              />
-                            </Field>
-                          </div>
-                        ) : null}
-
-                        <Field label={copy.orgYearStarted} required error={fieldError(yearKey)} id={yearKey}>
-                          <TextInput
-                            id={yearKey}
-                            type="number"
-                            inputMode="numeric"
-                            min={1900}
-                            max={new Date().getFullYear()}
-                            step={1}
-                            value={org.yearStarted}
-                            onChange={(e) => updateOrganisation(index, "yearStarted", e.target.value)}
-                            onBlur={() => touchAndValidateOrganisation(index, "yearStarted")}
-                            error={fieldError(yearKey)}
-                          />
-                        </Field>
-
-                        <Field
-                          label={copy.orgContactMeans}
-                          required
-                          error={fieldError(contactKey)}
-                          id={contactKey}
-                        >
-                          <TextInput
-                            id={contactKey}
-                            value={org.contactMeans}
-                            onChange={(e) => updateOrganisation(index, "contactMeans", e.target.value)}
-                            onBlur={() => touchAndValidateOrganisation(index, "contactMeans")}
-                            error={fieldError(contactKey)}
-                          />
-                        </Field>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <button
-                  type="button"
-                  onClick={addOrganisation}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 text-sm font-semibold text-teal-800 shadow-sm transition-colors hover:border-teal-300 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:w-auto dark:border-teal-700 dark:bg-teal-950 dark:text-teal-100 dark:hover:border-teal-600 dark:hover:bg-teal-900/60"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-700 text-white dark:bg-teal-500"
-                  >
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" d="M12 5v14M5 12h14" />
-                    </svg>
-                  </span>
-                  {copy.addOrganisation}
-                </button>
-              </div>
-            ) : null}
-          </FormSection>
-
-          <FormSection step={5} title={copy.sections.name}>
+          <FormSection step={4} title={copy.sections.name}>
             <Alert variant="info">
               {copy.nameAlert}
             </Alert>
@@ -1155,7 +817,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </FieldGroup>
           </FormSection>
 
-          <FormSection step={6} title={copy.sections.demographics}>
+          <FormSection step={5} title={copy.sections.demographics}>
             <FieldGroup columns={2}>
               <Field label={copy.sex} required error={fieldError("sex")} id="sex">
                 <SelectInput id="sex" value={form.sex} onChange={(e) => update("sex", e.target.value)} onBlur={() => touchAndValidate("sex")} error={fieldError("sex")}>
@@ -1233,7 +895,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={7} title={copy.sections.residence}>
+          <FormSection step={6} title={copy.sections.residence}>
             {mustLiveAbroad(form.citizenshipStatus) ? (
               <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 {copy.abroadIntro}
@@ -1301,7 +963,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           </FormSection>
 
           {registeredVoter ? (
-            <FormSection step={8} title={copy.sections.constituency}>
+            <FormSection step={7} title={copy.sections.constituency}>
               <Field label={copy.constituencyQuestion} required error={fieldError("constituency")} id="constituency">
                 <SelectInput id="constituency" value={form.constituency} onChange={(e) => update("constituency", e.target.value)} onBlur={() => touchAndValidate("constituency")} error={fieldError("constituency")}>
                   <option value="">{copy.selectConstituency}</option>
@@ -1324,7 +986,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 3 ? (
         <>
           {skipsInterestsPhase(form.placeOfResidence) ? null : (
-            <FormSection step={9} title={copy.sections.marketInterests}>
+            <FormSection step={8} title={copy.sections.marketInterests}>
               <Field
                 label={copy.marketInterestsLabel}
                 required
@@ -1339,13 +1001,34 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 4 ? (
         <>
-          <FormSection step={10} title={copy.sections.contact} id="contact-section">
+          <FormSection step={9} title={copy.sections.contact} id="contact-section">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
               {copy.contactIntro}
             </p>
             <FieldGroup columns={2}>
-              <Field label={copy.email} hint={copy.emailHint} error={fieldError("email")} id="email">
-                <TextInput id="email" type="email" value={form.email} readOnly className="bg-zinc-50 dark:bg-zinc-950" error={fieldError("email")} />
+              <Field label={copy.email} error={fieldError("email")} id="email">
+                <div className="relative">
+                  <TextInput
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    readOnly
+                    className="bg-zinc-50 pr-[6.75rem] dark:bg-zinc-950"
+                    error={fieldError("email")}
+                    aria-describedby="email-verified-badge"
+                  />
+                  <span
+                    id="email-verified-badge"
+                    className="pointer-events-none absolute inset-y-0 right-2 flex items-center"
+                  >
+                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800">
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" />
+                      </svg>
+                      {copy.emailVerifiedBadge}
+                    </span>
+                  </span>
+                </div>
               </Field>
               <SocialContactField
                 platform="facebook"
@@ -1428,14 +1111,18 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
             {streetAddressRequired ? (
               <StreetAddressFields
+                addressHouseNumber={form.addressHouseNumber}
                 streetAddress={form.streetAddress}
                 addressCityVillage={form.addressCityVillage}
+                addressCityVillageOther={form.addressCityVillageOther}
                 addressDistrict={form.addressDistrict}
                 required
                 hint={copy.streetRequiredHint}
                 errors={{
+                  addressHouseNumber: fieldError("addressHouseNumber"),
                   streetAddress: fieldError("streetAddress"),
                   addressCityVillage: fieldError("addressCityVillage"),
+                  addressCityVillageOther: fieldError("addressCityVillageOther"),
                   addressDistrict: fieldError("addressDistrict"),
                 }}
                 onChange={(field, value) => update(field, value)}
@@ -1447,16 +1134,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={11} title={copy.sections.confirmContact}>
+          <FormSection step={10} title={copy.sections.confirmContact}>
             {meetsContactMinimum ? (
-              <Alert variant="success">
+              <Alert variant="success" formatBody={false}>
                 {copy.contactSuccess(totalContactMeans)}
               </Alert>
-            ) : (
-              <Alert variant="warning">
-                {copy.contactWarning(contactCount, livesInBelizeResidence(form.placeOfResidence))}
-              </Alert>
-            )}
+            ) : null}
 
             <div className="space-y-1 rounded-lg border border-teal-200/70 bg-gradient-to-br from-teal-50/90 to-sky-50/50 px-4 py-3 text-sm text-teal-950 dark:border-teal-800 dark:from-teal-950/40 dark:to-sky-950/20 dark:text-teal-100">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2 dark:border-teal-800">
@@ -1471,7 +1154,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   }`}
                 >
                   {copy.contactMeansOf(totalContactMeans)}
-                  {!meetsContactMinimum ? ` — ${copy.contactIncomplete}` : ""}
                 </p>
               </div>
               <p><strong>{copy.reviewLabels.accountEmail}:</strong> {form.email || copy.notProvided}</p>
@@ -1484,8 +1166,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 <p>
                   <strong>{copy.physicalAddress}:</strong>{" "}
                   {formatStreetAddressDisplay({
+                    addressHouseNumber: form.addressHouseNumber,
                     streetAddress: form.streetAddress,
                     addressCityVillage: form.addressCityVillage,
+                    addressCityVillageOther: form.addressCityVillageOther,
                     addressDistrict: form.addressDistrict,
                   })}
                 </p>
@@ -1513,7 +1197,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       {activePhaseIndex === 5 ? (
         <>
-          <FormSection step={12} title={copy.sections.consent} id="consent-section">
+          <FormSection step={11} title={copy.sections.consent} id="consent-section">
             <div className="space-y-4">
               <CheckboxField id="consentResearch" label={copy.consentResearch} checked={form.consentResearch} onChange={(c) => { update("consentResearch", c); touch("consentResearch"); validateField("consentResearch", c); }} error={fieldError("consentResearch")} />
               <CheckboxField id="consentContact" label={copy.consentContact} checked={form.consentContact} onChange={(c) => { update("consentContact", c); touch("consentContact"); validateField("consentContact", c); }} error={fieldError("consentContact")} />
@@ -1521,7 +1205,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             </div>
           </FormSection>
 
-          <FormSection step={13} title={copy.sections.review}>
+          <FormSection step={12} title={copy.sections.review}>
             <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 lg:hidden">
               {reviewRows.map(([label, value]) => (
                 <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">

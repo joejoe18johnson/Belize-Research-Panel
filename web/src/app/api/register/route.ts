@@ -4,7 +4,6 @@ import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
-import { emptyOrganisationEntry, type OrganisationEntry } from "@/lib/organisations";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -16,32 +15,6 @@ function parseJsonArray(value: FormDataEntryValue | null): string[] {
   try {
     const parsed = JSON.parse(String(value));
     return Array.isArray(parsed) ? parsed.map(String) : [];
-  } catch {
-    return [];
-  }
-}
-
-function parseOrganisations(value: FormDataEntryValue | null): OrganisationEntry[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(String(value));
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((entry) => {
-      const raw = entry && typeof entry === "object" ? (entry as Record<string, unknown>) : {};
-      return {
-        ...emptyOrganisationEntry(),
-        name: String(raw.name ?? ""),
-        streetAddress: String(raw.streetAddress ?? ""),
-        cityVillage: String(raw.cityVillage ?? ""),
-        district: String(raw.district ?? ""),
-        description: String(raw.description ?? ""),
-        size: String(raw.size ?? ""),
-        ownershipStructure: String(raw.ownershipStructure ?? ""),
-        ownershipStructureOther: String(raw.ownershipStructureOther ?? ""),
-        yearStarted: String(raw.yearStarted ?? ""),
-        contactMeans: String(raw.contactMeans ?? ""),
-      };
-    });
   } catch {
     return [];
   }
@@ -83,7 +56,9 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     otherContactPlatformCustom: String(formData.get("otherContactPlatformCustom") ?? ""),
     otherContact: String(formData.get("otherContact") ?? ""),
     streetAddress: String(formData.get("streetAddress") ?? ""),
+    addressHouseNumber: String(formData.get("addressHouseNumber") ?? ""),
     addressCityVillage: String(formData.get("addressCityVillage") ?? ""),
+    addressCityVillageOther: String(formData.get("addressCityVillageOther") ?? ""),
     addressDistrict: String(formData.get("addressDistrict") ?? ""),
     contactDetailsConfirmed: parseBoolean(formData.get("contactDetailsConfirmed")),
     photoIdType: String(formData.get("photoIdType") ?? ""),
@@ -104,8 +79,8 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     consentResearch: parseBoolean(formData.get("consentResearch")),
     consentContact: parseBoolean(formData.get("consentContact")),
     consentPrivacy: parseBoolean(formData.get("consentPrivacy")),
-    ownsBusinessOrNgo: String(formData.get("ownsBusinessOrNgo") ?? ""),
-    organisations: parseOrganisations(formData.get("organisations")),
+    ownsBusinessOrNgo: "",
+    organisations: [],
     finalReviewConfirmed: parseBoolean(formData.get("finalReviewConfirmed")),
   };
 }

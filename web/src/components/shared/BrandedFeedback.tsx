@@ -48,6 +48,7 @@ export function BrandedAlert({
   className = "",
   compact = false,
   showIcon = true,
+  formatBody = true,
 }: {
   tone?: FeedbackTone;
   title?: string;
@@ -55,6 +56,8 @@ export function BrandedAlert({
   className?: string;
   compact?: boolean;
   showIcon?: boolean;
+  /** When false, keep body copy as written (no title case). */
+  formatBody?: boolean;
 }) {
   return (
     <div
@@ -74,7 +77,7 @@ export function BrandedAlert({
           <div
             className={`${title ? "mt-1 space-y-2 leading-relaxed opacity-90" : "leading-relaxed"} [&_a]:inline-flex [&_p]:break-words`}
           >
-            {formatSiteText(children)}
+            {formatBody ? formatSiteText(children) : children}
           </div>
         </div>
       </div>

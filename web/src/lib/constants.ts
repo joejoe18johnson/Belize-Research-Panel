@@ -75,6 +75,14 @@ export function filterBelizeCtvs(query: string, limit = 12): string[] {
   return [...starts, ...contains].slice(0, limit);
 }
 
+/** CTV dropdown options for a Belize district (includes Other). */
+export function getCtvOptionsForDistrict(district: string): string[] {
+  const values = (CITY_TOWN_VILLAGE[district] ?? []).map((v) => v.trim()).filter(Boolean);
+  if (!values.length) return [];
+  const withOther = values.includes("Other") ? values : [...values, "Other"];
+  return sortDropdownOptions(withOther);
+}
+
 export function sortDropdownOptions(options: string[]): string[] {
   const cleaned = options.map((o) => o.trim()).filter(Boolean);
   const unique = [...new Set(cleaned)].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));

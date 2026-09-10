@@ -7,8 +7,6 @@ import {
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   MAX_MARKET_INTERESTS,
-  ORG_OPERATION_SIZES,
-  ORG_OWNERSHIP_STRUCTURES,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
   isHeadOfHousehold,
@@ -16,9 +14,7 @@ import {
   mustLiveAbroad,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
-  ownsBusinessOrNgo,
   US_DIASPORA_REGIONS,
-  YES_NO_OPTIONS,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
 import { validateStreetAddressParts } from "./street-address";
@@ -186,14 +182,16 @@ export function countAllContactMeans(
     | "tiktok"
     | "otherContact"
     | "streetAddress"
+    | "addressHouseNumber"
     | "addressCityVillage"
+    | "addressCityVillageOther"
     | "addressDistrict"
   >
 ): number {
   const digital = countContactMethods(data);
   const hasAddress =
     Boolean(cleanText(data.streetAddress)) &&
-    Boolean(cleanText(data.addressCityVillage)) &&
+    Boolean(cleanText(data.addressCityVillage === "Other" ? data.addressCityVillageOther : data.addressCityVillage)) &&
     Boolean(cleanText(data.addressDistrict));
   return digital + (hasAddress ? 1 : 0);
 }
@@ -514,8 +512,10 @@ export function validateRegistrationForm(
   const addressRequired = streetAddressRequiredForContacts(data.placeOfResidence, contactCount);
   const addressErrors = validateStreetAddressParts(
     {
+      addressHouseNumber: data.addressHouseNumber,
       streetAddress: data.streetAddress,
       addressCityVillage: data.addressCityVillage,
+      addressCityVillageOther: data.addressCityVillageOther,
       addressDistrict: data.addressDistrict,
     },
     { required: addressRequired }
@@ -593,60 +593,7 @@ export function validateRegistrationForm(
   if (!data.consentContact) errors.consentContact = "Contact consent is required.";
   if (!data.consentPrivacy) errors.consentPrivacy = "Privacy acknowledgement is required.";
 
-  if (!cleanText(data.ownsBusinessOrNgo)) {
-    errors.ownsBusinessOrNgo =
-      "Please indicate whether you are the majority owner of a private business or head of an NGO in Belize.";
-  } else if (!(YES_NO_OPTIONS as readonly string[]).includes(data.ownsBusinessOrNgo)) {
-    errors.ownsBusinessOrNgo = "Please select yes or no.";
-  } else if (ownsBusinessOrNgo(data.ownsBusinessOrNgo)) {
-    const organisations = Array.isArray(data.organisations) ? data.organisations : [];
-    if (organisations.length === 0) {
-      errors.organisations = "Add at least one business or organisation.";
-    }
-    const currentYear = new Date().getFullYear();
-    organisations.forEach((org, index) => {
-      const prefix = `organisations.${index}`;
-      if (!cleanText(org.name)) errors[`${prefix}.name`] = "Organisation / business name is required.";
-      const orgAddressErrors = validateStreetAddressParts(
-        {
-          streetAddress: org.streetAddress,
-          addressCityVillage: org.cityVillage,
-          addressDistrict: org.district,
-        },
-        { required: true }
-      );
-      if (orgAddressErrors.streetAddress) errors[`${prefix}.streetAddress`] = orgAddressErrors.streetAddress;
-      if (orgAddressErrors.addressCityVillage) errors[`${prefix}.cityVillage`] = orgAddressErrors.addressCityVillage;
-      if (orgAddressErrors.addressDistrict) errors[`${prefix}.district`] = orgAddressErrors.addressDistrict;
-      if (!cleanText(org.description)) {
-        errors[`${prefix}.description`] = "Please briefly describe the main products or services.";
-      }
-      if (!cleanText(org.size)) {
-        errors[`${prefix}.size`] = "Please select the size of your operation.";
-      } else if (!(ORG_OPERATION_SIZES as readonly string[]).includes(org.size)) {
-        errors[`${prefix}.size`] = "Please select a valid operation size.";
-      }
-      if (!cleanText(org.ownershipStructure)) {
-        errors[`${prefix}.ownershipStructure`] = "Please select the legal ownership structure.";
-      } else if (!(ORG_OWNERSHIP_STRUCTURES as readonly string[]).includes(org.ownershipStructure)) {
-        errors[`${prefix}.ownershipStructure`] = "Please select a valid ownership structure.";
-      } else if (org.ownershipStructure === "Other" && !cleanText(org.ownershipStructureOther)) {
-        errors[`${prefix}.ownershipStructureOther`] = "Please specify the ownership structure.";
-      }
-      const yearText = cleanText(org.yearStarted);
-      if (!/^\d{4}$/.test(yearText)) {
-        errors[`${prefix}.yearStarted`] = "Enter the four-digit year the operation started.";
-      } else {
-        const year = Number(yearText);
-        if (year < 1900 || year > currentYear) {
-          errors[`${prefix}.yearStarted`] = `Enter a year between 1900 and ${currentYear}.`;
-        }
-      }
-      if (!cleanText(org.contactMeans)) {
-        errors[`${prefix}.contactMeans`] = "Please provide means of contact for the organisation.";
-      }
-    });
-  }
+  // Business / organisation questions are deferred; keep fields empty for now.
 
   if (!data.finalReviewConfirmed) {
     errors.finalReviewConfirmed = "Please review and confirm the full registration form before submitting.";
@@ -752,8 +699,10 @@ export function validateProfileUpdateForm(
   const addressRequired = streetAddressRequiredForContacts(data.placeOfResidence, contactCount);
   const addressErrors = validateStreetAddressParts(
     {
+      addressHouseNumber: data.addressHouseNumber,
       streetAddress: data.streetAddress,
       addressCityVillage: data.addressCityVillage,
+      addressCityVillageOther: data.addressCityVillageOther,
       addressDistrict: data.addressDistrict,
     },
     { required: addressRequired }

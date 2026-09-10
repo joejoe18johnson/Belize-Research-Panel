@@ -465,8 +465,10 @@ export async function registerPanelist(
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
     street_address: composeStreetAddress({
+      addressHouseNumber: data.addressHouseNumber,
       streetAddress: data.streetAddress,
       addressCityVillage: data.addressCityVillage,
+      addressCityVillageOther: data.addressCityVillageOther,
       addressDistrict: data.addressDistrict,
     }),
     photo_id_type: data.photoIdType,
@@ -489,8 +491,10 @@ export async function registerPanelist(
       ? JSON.stringify(
           (Array.isArray(data.organisations) ? data.organisations : []).map((org) => ({
             name: cleanText(org.name),
+            houseNumber: cleanText(org.houseNumber),
             streetAddress: cleanText(org.streetAddress),
             cityVillage: cleanText(org.cityVillage),
+            cityVillageOther: cleanText(org.cityVillageOther),
             district: cleanText(org.district),
             description: cleanText(org.description),
             size: cleanText(org.size),
@@ -607,8 +611,10 @@ export async function updatePanelistProfile(
     other_contact: normalizeContactHandle(data.otherContact),
     other_contact_platform: normalizeContactPlatform(otherPlatform),
     street_address: composeStreetAddress({
+      addressHouseNumber: data.addressHouseNumber,
       streetAddress: data.streetAddress,
       addressCityVillage: data.addressCityVillage,
+      addressCityVillageOther: data.addressCityVillageOther,
       addressDistrict: data.addressDistrict,
     }),
     political_interests: data.politicalInterests.join("; "),

@@ -14,7 +14,9 @@ export interface ProfileUpdateFormData {
   otherContactPlatformCustom: string;
   otherContact: string;
   streetAddress: string;
+  addressHouseNumber: string;
   addressCityVillage: string;
+  addressCityVillageOther: string;
   addressDistrict: string;
   placeOfResidence: string;
   cityTownVillage: string;
@@ -41,7 +43,9 @@ export const initialProfileUpdateForm: ProfileUpdateFormData = {
   otherContactPlatformCustom: "",
   otherContact: "",
   streetAddress: "",
+  addressHouseNumber: "",
   addressCityVillage: "",
+  addressCityVillageOther: "",
   addressDistrict: "",
   placeOfResidence: "",
   cityTownVillage: "",

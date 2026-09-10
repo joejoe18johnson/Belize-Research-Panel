@@ -1,8 +1,10 @@
-import { BELIZE_DISTRICTS } from "./constants";
+import { BELIZE_DISTRICTS, getCtvOptionsForDistrict } from "./constants";
 
 export type StreetAddressParts = {
+  addressHouseNumber: string;
   streetAddress: string;
   addressCityVillage: string;
+  addressCityVillageOther: string;
   addressDistrict: string;
 };
 
@@ -27,78 +29,141 @@ function titleCaseStreetLine(address: string): string {
     .trim();
 }
 
-export function composeStreetAddress(parts: StreetAddressParts): string {
-  const street = titleCaseStreetLine(parts.streetAddress);
+export function resolvedAddressCityVillage(parts: Pick<StreetAddressParts, "addressCityVillage" | "addressCityVillageOther">): string {
   const city = trim(parts.addressCityVillage);
+  if (city === "Other") return trim(parts.addressCityVillageOther);
+  return city;
+}
+
+export function composeStreetAddress(parts: StreetAddressParts): string {
+  const house = trim(parts.addressHouseNumber);
+  const street = titleCaseStreetLine(parts.streetAddress);
+  const line = [house, street].filter(Boolean).join(" ");
+  const city = resolvedAddressCityVillage(parts);
   const district = trim(parts.addressDistrict);
-  return [street, city, district].filter(Boolean).join(", ");
+  return [line, city, district].filter(Boolean).join(", ");
 }
 
 export function formatStreetAddressDisplay(parts: StreetAddressParts): string {
   return composeStreetAddress(parts) || "Not provided";
 }
 
+function looksLikeHouseNumber(token: string): boolean {
+  return /^[0-9]+[A-Za-z]?([/-][0-9A-Za-z]+)?$/.test(token) || /^[A-Za-z]?[0-9]+[A-Za-z]?$/.test(token);
+}
+
 /** Split a stored `street_address` back into structured fields when possible. */
 export function parseStreetAddress(stored: string): StreetAddressParts {
+  const empty: StreetAddressParts = {
+    addressHouseNumber: "",
+    streetAddress: "",
+    addressCityVillage: "",
+    addressCityVillageOther: "",
+    addressDistrict: "",
+  };
   const value = trim(stored).replace(/\s*\n\s*/g, ", ");
-  if (!value) {
-    return { streetAddress: "", addressCityVillage: "", addressDistrict: "" };
-  }
+  if (!value) return empty;
 
   const districts = [...BELIZE_DISTRICTS].sort((a, b) => b.length - a.length);
-  for (const district of districts) {
-    const escaped = district.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  let streetLine = value;
+  let city = "";
+  let district = "";
+
+  for (const districtName of districts) {
+    const escaped = districtName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const match = value.match(new RegExp(`^(.*?),\\s*${escaped}\\s*$`, "i"));
     if (!match) continue;
 
     const beforeDistrict = trim(match[1]);
     const lastComma = beforeDistrict.lastIndexOf(",");
     if (lastComma >= 0) {
-      return {
-        streetAddress: trim(beforeDistrict.slice(0, lastComma)),
-        addressCityVillage: trim(beforeDistrict.slice(lastComma + 1)),
-        addressDistrict: district,
-      };
+      streetLine = trim(beforeDistrict.slice(0, lastComma));
+      city = trim(beforeDistrict.slice(lastComma + 1));
+    } else {
+      streetLine = beforeDistrict;
+      city = "";
     }
-    return {
-      streetAddress: beforeDistrict,
-      addressCityVillage: "",
-      addressDistrict: district,
-    };
+    district = districtName;
+    break;
+  }
+
+  let addressHouseNumber = "";
+  let streetAddress = streetLine;
+  const tokens = streetLine.split(/\s+/).filter(Boolean);
+  if (tokens.length >= 2 && looksLikeHouseNumber(tokens[0])) {
+    addressHouseNumber = tokens[0];
+    streetAddress = tokens.slice(1).join(" ");
+  }
+
+  let addressCityVillage = city;
+  let addressCityVillageOther = "";
+  if (city && district) {
+    const options = getCtvOptionsForDistrict(district);
+    if (city !== "Other" && !options.includes(city)) {
+      addressCityVillage = "Other";
+      addressCityVillageOther = city;
+    }
   }
 
   return {
-    streetAddress: value,
-    addressCityVillage: "",
-    addressDistrict: "",
+    addressHouseNumber,
+    streetAddress,
+    addressCityVillage,
+    addressCityVillageOther,
+    addressDistrict: district,
   };
 }
 
 export function streetAddressPartsPresent(parts: StreetAddressParts): boolean {
   return Boolean(
-    trim(parts.streetAddress) || trim(parts.addressCityVillage) || trim(parts.addressDistrict)
+    trim(parts.addressHouseNumber) ||
+      trim(parts.streetAddress) ||
+      trim(parts.addressCityVillage) ||
+      trim(parts.addressCityVillageOther) ||
+      trim(parts.addressDistrict)
   );
 }
 
 export function validateStreetAddressParts(
   parts: StreetAddressParts,
   options: { required: boolean }
-): Partial<Record<"streetAddress" | "addressCityVillage" | "addressDistrict", string>> {
-  const errors: Partial<Record<"streetAddress" | "addressCityVillage" | "addressDistrict", string>> = {};
+): Partial<
+  Record<
+    "addressHouseNumber" | "streetAddress" | "addressCityVillage" | "addressCityVillageOther" | "addressDistrict",
+    string
+  >
+> {
+  const errors: Partial<
+    Record<
+      "addressHouseNumber" | "streetAddress" | "addressCityVillage" | "addressCityVillageOther" | "addressDistrict",
+      string
+    >
+  > = {};
   const anyFilled = streetAddressPartsPresent(parts);
   if (!options.required && !anyFilled) return errors;
 
-  if (!trim(parts.streetAddress)) {
-    errors.streetAddress = "Street address is required.";
-  }
-  if (!trim(parts.addressCityVillage)) {
-    errors.addressCityVillage = "City or Village is required.";
-  }
   const district = trim(parts.addressDistrict);
   if (!district) {
     errors.addressDistrict = "District is required.";
   } else if (!BELIZE_DISTRICTS.includes(district)) {
     errors.addressDistrict = "Please select a Belize district.";
+  }
+
+  const city = trim(parts.addressCityVillage);
+  if (!city) {
+    errors.addressCityVillage = "City, town, or village is required.";
+  } else if (district) {
+    const options = getCtvOptionsForDistrict(district);
+    if (options.length && !options.includes(city)) {
+      errors.addressCityVillage = "Please select a city, town, or village in the chosen district.";
+    }
+  }
+  if (city === "Other" && !trim(parts.addressCityVillageOther)) {
+    errors.addressCityVillageOther = "Please specify the city, town, or village.";
+  }
+
+  if (!trim(parts.streetAddress)) {
+    errors.streetAddress = "Street name is required.";
   }
 
   return errors;
