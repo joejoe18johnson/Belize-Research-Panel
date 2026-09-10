@@ -7,6 +7,7 @@ import {
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   MAX_MARKET_INTERESTS,
+  OTHER_RESIDENCE_COUNTRIES,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
   isHeadOfHousehold,
@@ -144,6 +145,20 @@ export function streetAddressRequiredForContacts(placeOfResidence: string, conta
   return livesInBelizeResidence(placeOfResidence) && contactCount < 2;
 }
 
+/** True when street + city/town/village + district are all present (counts as a contact mean). */
+export function hasCompletePhysicalAddressContact(
+  data: Pick<
+    RegistrationFormData,
+    "streetAddress" | "addressCityVillage" | "addressCityVillageOther" | "addressDistrict"
+  >
+): boolean {
+  return (
+    Boolean(cleanText(data.streetAddress)) &&
+    Boolean(cleanText(data.addressCityVillage === "Other" ? data.addressCityVillageOther : data.addressCityVillage)) &&
+    Boolean(cleanText(data.addressDistrict))
+  );
+}
+
 function isValidHouseholdHeadAnswer(value: string): boolean {
   return (
     (HOUSEHOLD_HEAD_OPTIONS as readonly string[]).includes(value) ||
@@ -189,11 +204,7 @@ export function countAllContactMeans(
   >
 ): number {
   const digital = countContactMethods(data);
-  const hasAddress =
-    Boolean(cleanText(data.streetAddress)) &&
-    Boolean(cleanText(data.addressCityVillage === "Other" ? data.addressCityVillageOther : data.addressCityVillage)) &&
-    Boolean(cleanText(data.addressDistrict));
-  return digital + (hasAddress ? 1 : 0);
+  return digital + (hasCompletePhysicalAddressContact(data) ? 1 : 0);
 }
 
 export function validEmail(email: string): boolean {
@@ -480,8 +491,13 @@ export function validateRegistrationForm(
   if (data.placeOfResidence === "Abroad") {
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
-    } else if (data.countryIfAbroad === "Other" && !cleanText(data.countryIfAbroadOther)) {
-      errors.countryIfAbroadOther = "Please specify your country of residence.";
+    } else if (data.countryIfAbroad === "Other") {
+      const otherCountry = cleanText(data.countryIfAbroadOther);
+      if (!otherCountry) {
+        errors.countryIfAbroadOther = "Please specify your country of residence.";
+      } else if (!(OTHER_RESIDENCE_COUNTRIES as readonly string[]).includes(otherCountry)) {
+        errors.countryIfAbroadOther = "Please select your country of residence from the list.";
+      }
     }
     if (isUnitedStatesCountry(data.countryIfAbroad)) {
       if (!data.usDiasporaRegion) {
@@ -661,8 +677,13 @@ export function validateProfileUpdateForm(
   if (data.placeOfResidence === "Abroad") {
     if (!data.countryIfAbroad) {
       errors.countryIfAbroad = "Country of residence is required.";
-    } else if (data.countryIfAbroad === "Other" && !cleanText(data.countryIfAbroadOther)) {
-      errors.countryIfAbroadOther = "Please specify your country of residence.";
+    } else if (data.countryIfAbroad === "Other") {
+      const otherCountry = cleanText(data.countryIfAbroadOther);
+      if (!otherCountry) {
+        errors.countryIfAbroadOther = "Please specify your country of residence.";
+      } else if (!(OTHER_RESIDENCE_COUNTRIES as readonly string[]).includes(otherCountry)) {
+        errors.countryIfAbroadOther = "Please select your country of residence from the list.";
+      }
     }
     if (isUnitedStatesCountry(data.countryIfAbroad)) {
       if (!data.usDiasporaRegion) {

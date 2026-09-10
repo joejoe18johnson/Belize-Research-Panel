@@ -176,13 +176,11 @@ export type RegistrationCopy = {
   contactIncomplete: string;
   contactSuccess: (count: number) => string;
   contactWarning: (count: number, belize: boolean) => string;
-  contactVerifyNote: string;
   contactConfirm: string;
   physicalAddress: string;
   consentResearch: string;
   consentContact: string;
   consentPrivacy: string;
-  specifyCountryOther: string;
   countryOtherLabel: string;
   ownsBusinessOrNgo: string;
   orgName: string;
@@ -412,8 +410,6 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     contactSuccess: (count) =>
       `You have submitted ${count} means of contact. Please double-check every detail below — wrong contact information can mean you miss survey and research opportunities.`,
     contactWarning: (_count, _belize) => "",
-    contactVerifyNote:
-      "Please verify that every means of contact above is accurate and up to date. If we cannot reach you, you may miss out on paid surveys, polls, and other research opportunities.",
     contactConfirm:
       "I confirm that the contact information shown above is correct, and I understand I may miss opportunities if it is wrong. *",
     physicalAddress: "Physical address",
@@ -421,7 +417,6 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     consentContact: "I agree to be contacted using the contact details I provided. *",
     consentPrivacy:
       "I understand that my information should be kept confidential and used only for legitimate research-related purposes. *",
-    specifyCountryOther: "Please specify your country of residence",
     countryOtherLabel: "Country of residence (please specify)",
     ownsBusinessOrNgo:
       "Are you the majority owner of a private business(es) or head of a non-governmental organisation in Belize?",
@@ -635,8 +630,6 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     contactSuccess: (count) =>
       `Ha enviado ${count} medios de contacto. Revise cada detalle a continuación: si la información es incorrecta, podría perder oportunidades de encuestas e investigación.`,
     contactWarning: (_count, _belize) => "",
-    contactVerifyNote:
-      "Verifique que cada medio de contacto anterior sea exacto y esté actualizado. Si no podemos contactarlo, podría perder encuestas pagadas, sondeos y otras oportunidades de investigación.",
     contactConfirm:
       "Confirmo que la información de contacto mostrada arriba es correcta, y entiendo que podría perder oportunidades si es incorrecta. *",
     physicalAddress: "Dirección física",
@@ -645,7 +638,6 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     consentContact: "Acepto que me contacten con los datos de contacto que proporcioné. *",
     consentPrivacy:
       "Entiendo que mi información debe mantenerse confidencial y usarse solo para fines legítimos relacionados con la investigación. *",
-    specifyCountryOther: "Indique su país de residencia",
     countryOtherLabel: "País de residencia (especifique)",
     ownsBusinessOrNgo:
       "¿Es usted el propietario mayoritario de un negocio privado o el/la jefe(a) de una organización no gubernamental en Belice?",

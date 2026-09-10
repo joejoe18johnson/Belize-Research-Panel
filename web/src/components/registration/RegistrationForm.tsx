@@ -37,6 +37,7 @@ import {
   MARKET_INTERESTS,
   MAX_MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
+  OTHER_RESIDENCE_COUNTRIES,
   PHOTO_ID_TYPES,
   SEX_OPTIONS,
   US_DIASPORA_REGIONS,
@@ -61,6 +62,7 @@ import {
   countContactMethods,
   cleanText,
   getFullPhoneNumber,
+  hasCompletePhysicalAddressContact,
   livesInBelizeResidence,
   phoneLocalDigits,
   streetAddressRequiredForContacts,
@@ -69,7 +71,7 @@ import {
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
-import { formatStreetAddressDisplay, streetAddressPartsPresent } from "@/lib/street-address";
+import { formatStreetAddressDisplay } from "@/lib/street-address";
 import { formatDobDisplay } from "@/lib/dob";
 import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStickyChromeOffsets } from "@/lib/scroll-viewport";
 import {
@@ -207,7 +209,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   // Only collect street/house when address is required as a last-resort contact method.
   // District and CTV stay synced from residence details (step 6).
   useEffect(() => {
-    const required = streetAddressRequiredForContacts(form.placeOfResidence, countContactMethods(form));
+    const digitalCount = countContactMethods({
+      ...form,
+      email: cleanText(form.email) || cleanText(account.email),
+    });
+    const required = streetAddressRequiredForContacts(form.placeOfResidence, digitalCount);
     if (required) return;
     if (!form.streetAddress && !form.addressHouseNumber) return;
     setForm((prev) => ({
@@ -216,6 +222,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       addressHouseNumber: "",
     }));
   }, [
+    account.email,
     form.placeOfResidence,
     form.email,
     form.phoneCountryCode,
@@ -389,23 +396,29 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       ? CITY_TOWN_VILLAGE[form.placeOfResidence] ?? []
       : [];
   const ctvOptions = getRegisteredCtvOptions(form.constituency);
-  const contactCount = countContactMethods(form);
-  const totalContactMeans = countAllContactMeans(form);
-  const physicalAddressProvided = streetAddressPartsPresent({
-    addressHouseNumber: form.addressHouseNumber,
-    streetAddress: form.streetAddress,
-    addressCityVillage: form.addressCityVillage,
-    addressCityVillageOther: form.addressCityVillageOther,
-    addressDistrict: form.addressDistrict,
+  const contactCount = countContactMethods({
+    ...form,
+    email: cleanText(form.email) || cleanText(account.email),
   });
+  const totalContactMeans = countAllContactMeans({
+    ...form,
+    email: cleanText(form.email) || cleanText(account.email),
+  });
+  const physicalAddressComplete = hasCompletePhysicalAddressContact(form);
   const meetsContactMinimum = totalContactMeans >= 2;
-  const streetAddressRequired = streetAddressRequiredForContacts(form.placeOfResidence, contactCount);
+  /** Show physical address as a contact method when Belize resident has fewer than 2 digital means. */
+  const showPhysicalAddressContact = streetAddressRequiredForContacts(
+    form.placeOfResidence,
+    contactCount
+  );
+  const streetAddressRequired = showPhysicalAddressContact;
+  const phoneDisplay = getFullPhoneNumber(form);
   const otherPlatform =
     form.otherContactPlatform === "Other"
       ? form.otherContactPlatformCustom
       : form.otherContactPlatform;
   const otherContactDisplay =
-    [otherPlatform, form.otherContact].filter(Boolean).join(": ") || copy.notProvided;
+    [otherPlatform, form.otherContact].filter(Boolean).join(": ") || "";
   const countryAbroadDisplay =
     form.countryIfAbroad === "Other"
       ? form.countryIfAbroadOther || form.countryIfAbroad
@@ -422,7 +435,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const interestsAsked = !skipsInterestsPhase(form.placeOfResidence);
     const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
     const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
-    const addressAsked = streetAddressRequired || physicalAddressProvided;
+    const addressAsked = streetAddressRequired || physicalAddressComplete;
     const rl = copy.reviewLabels;
 
     const cityValue =
@@ -478,7 +491,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     form,
     otherPlatform,
     countryAbroadDisplay,
-    physicalAddressProvided,
+    physicalAddressComplete,
     account.email,
     registeredVoter,
     streetAddressRequired,
@@ -841,7 +854,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 2 ? (
         <>
           <FormSection step={4} title={copy.sections.name}>
-            <Alert variant="info">
+            <Alert variant="info" formatBody={false}>
               {copy.nameAlert}
             </Alert>
             <FieldGroup columns={2}>
@@ -962,14 +975,20 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                     error={fieldError("countryIfAbroadOther")}
                     id="countryIfAbroadOther"
                   >
-                    <TextInput
+                    <SelectInput
                       id="countryIfAbroadOther"
                       value={form.countryIfAbroadOther}
                       onChange={(e) => update("countryIfAbroadOther", e.target.value)}
                       onBlur={() => touchAndValidate("countryIfAbroadOther")}
                       error={fieldError("countryIfAbroadOther")}
-                      placeholder={copy.specifyCountryOther}
-                    />
+                    >
+                      <option value="">{copy.selectCountry}</option>
+                      {OTHER_RESIDENCE_COUNTRIES.map((country) => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </SelectInput>
                   </Field>
                 ) : null}
                 {isUnitedStatesCountry(form.countryIfAbroad) ? (
@@ -1039,34 +1058,79 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 4 ? (
         <>
           <FormSection step={9} title={copy.sections.contact} id="contact-section">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {copy.contactIntro}
             </p>
-            <FieldGroup columns={2}>
-              <Field label={copy.email} error={fieldError("email")} id="email">
-                <div className="relative">
-                  <TextInput
-                    id="email"
-                    type="email"
-                    value={form.email}
-                    readOnly
-                    className="bg-zinc-50 pr-[6.75rem] dark:bg-zinc-950"
-                    error={fieldError("email")}
-                    aria-describedby="email-verified-badge"
-                  />
-                  <span
-                    id="email-verified-badge"
-                    className="pointer-events-none absolute inset-y-0 right-2 flex items-center"
-                  >
-                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800">
-                      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" />
-                      </svg>
-                      {copy.emailVerifiedBadge}
-                    </span>
+            <Field label={copy.email} error={fieldError("email")} id="email">
+              <div className="relative">
+                <TextInput
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  readOnly
+                  className="bg-zinc-50 pr-[6.75rem] dark:bg-zinc-950"
+                  error={fieldError("email")}
+                  aria-describedby="email-verified-badge"
+                />
+                <span
+                  id="email-verified-badge"
+                  className="pointer-events-none absolute inset-y-0 right-2 flex items-center"
+                >
+                  <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" />
+                    </svg>
+                    {copy.emailVerifiedBadge}
                   </span>
-                </div>
-              </Field>
+                </span>
+              </div>
+            </Field>
+
+            {showPhysicalAddressContact ? (
+              <StreetAddressFields
+                addressHouseNumber={form.addressHouseNumber}
+                streetAddress={form.streetAddress}
+                addressCityVillage={form.addressCityVillage}
+                addressCityVillageOther={form.addressCityVillageOther}
+                addressDistrict={form.addressDistrict}
+                required
+                hint={copy.streetRequiredHint}
+                lockDistrictAndCtv
+                lockedNote={copy.streetLockedFromResidence}
+                onEditLockedSource={jumpToResidenceDetails}
+                editLockedSourceLabel={copy.streetEditResidence}
+                errors={{
+                  addressHouseNumber: fieldError("addressHouseNumber"),
+                  streetAddress: fieldError("streetAddress"),
+                  addressCityVillage: fieldError("addressCityVillage"),
+                  addressCityVillageOther: fieldError("addressCityVillageOther"),
+                  addressDistrict: fieldError("addressDistrict"),
+                }}
+                onChange={(field, value) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
+                  update(field, value);
+                }}
+                onBlurField={(field) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
+                  touch(field);
+                  validateField(field);
+                }}
+              />
+            ) : null}
+
+            <FieldGroup columns={2}>
               <SocialContactField
                 platform="facebook"
                 label={copy.facebook}
@@ -1146,49 +1210,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </FieldGroup>
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
-            {streetAddressRequired ? (
-              <StreetAddressFields
-                addressHouseNumber={form.addressHouseNumber}
-                streetAddress={form.streetAddress}
-                addressCityVillage={form.addressCityVillage}
-                addressCityVillageOther={form.addressCityVillageOther}
-                addressDistrict={form.addressDistrict}
-                required
-                hint={copy.streetRequiredHint}
-                lockDistrictAndCtv
-                lockedNote={copy.streetLockedFromResidence}
-                onEditLockedSource={jumpToResidenceDetails}
-                editLockedSourceLabel={copy.streetEditResidence}
-                errors={{
-                  addressHouseNumber: fieldError("addressHouseNumber"),
-                  streetAddress: fieldError("streetAddress"),
-                  addressCityVillage: fieldError("addressCityVillage"),
-                  addressCityVillageOther: fieldError("addressCityVillageOther"),
-                  addressDistrict: fieldError("addressDistrict"),
-                }}
-                onChange={(field, value) => {
-                  if (
-                    field === "addressDistrict" ||
-                    field === "addressCityVillage" ||
-                    field === "addressCityVillageOther"
-                  ) {
-                    return;
-                  }
-                  update(field, value);
-                }}
-                onBlurField={(field) => {
-                  if (
-                    field === "addressDistrict" ||
-                    field === "addressCityVillage" ||
-                    field === "addressCityVillageOther"
-                  ) {
-                    return;
-                  }
-                  touch(field);
-                  validateField(field);
-                }}
-              />
-            ) : null}
           </FormSection>
 
           <FormSection step={10} title={copy.sections.confirmContact}>
@@ -1213,29 +1234,52 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   {copy.contactMeansOf(totalContactMeans)}
                 </p>
               </div>
-              <p><strong>{copy.reviewLabels.accountEmail}:</strong> {form.email || copy.notProvided}</p>
-              <p><strong>{copy.reviewLabels.phone}:</strong> {getFullPhoneNumber(form) || copy.notProvided}</p>
-              <p><strong>{copy.reviewLabels.facebook}:</strong> {form.facebook || copy.notProvided}</p>
-              <p><strong>{copy.reviewLabels.instagram}:</strong> {form.instagram || copy.notProvided}</p>
-              <p><strong>{copy.reviewLabels.tiktok}:</strong> {form.tiktok || copy.notProvided}</p>
-              <p><strong>{copy.reviewLabels.otherContact}:</strong> {otherContactDisplay}</p>
-              {physicalAddressProvided ? (
+              {(cleanText(form.email) || cleanText(account.email)) ? (
+                <p>
+                  <strong>{copy.reviewLabels.accountEmail}:</strong>{" "}
+                  {form.email || account.email}
+                </p>
+              ) : null}
+              {phoneDisplay ? (
+                <p>
+                  <strong>{copy.reviewLabels.phone}:</strong> {phoneDisplay}
+                </p>
+              ) : null}
+              {cleanText(form.facebook) ? (
+                <p>
+                  <strong>{copy.reviewLabels.facebook}:</strong> {form.facebook}
+                </p>
+              ) : null}
+              {cleanText(form.instagram) ? (
+                <p>
+                  <strong>{copy.reviewLabels.instagram}:</strong> {form.instagram}
+                </p>
+              ) : null}
+              {cleanText(form.tiktok) ? (
+                <p>
+                  <strong>{copy.reviewLabels.tiktok}:</strong> {form.tiktok}
+                </p>
+              ) : null}
+              {otherContactDisplay ? (
+                <p>
+                  <strong>{copy.reviewLabels.otherContact}:</strong> {otherContactDisplay}
+                </p>
+              ) : null}
+              {showPhysicalAddressContact ? (
                 <p>
                   <strong>{copy.physicalAddress}:</strong>{" "}
-                  {formatStreetAddressDisplay({
-                    addressHouseNumber: form.addressHouseNumber,
-                    streetAddress: form.streetAddress,
-                    addressCityVillage: form.addressCityVillage,
-                    addressCityVillageOther: form.addressCityVillageOther,
-                    addressDistrict: form.addressDistrict,
-                  })}
+                  {physicalAddressComplete
+                    ? formatStreetAddressDisplay({
+                        addressHouseNumber: form.addressHouseNumber,
+                        streetAddress: form.streetAddress,
+                        addressCityVillage: form.addressCityVillage,
+                        addressCityVillageOther: form.addressCityVillageOther,
+                        addressDistrict: form.addressDistrict,
+                      })
+                    : copy.notProvided}
                 </p>
               ) : null}
             </div>
-
-            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-              {copy.contactVerifyNote}
-            </p>
 
             <CheckboxField
               id="contactDetailsConfirmed"
@@ -1248,8 +1292,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               }}
               error={fieldError("contactDetailsConfirmed")}
             />
-          </FormSection>
-        </>
+          </FormSection>        </>
       ) : null}
 
       {activePhaseIndex === 5 ? (

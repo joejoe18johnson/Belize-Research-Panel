@@ -25,6 +25,7 @@ import {
   MARKET_INTERESTS,
   MAX_MARKET_INTERESTS,
   OTHER_CONTACT_PLATFORM_OPTIONS,
+  OTHER_RESIDENCE_COUNTRIES,
   US_DIASPORA_REGIONS,
   VOTING_STATUS,
   CITY_TOWN_VILLAGE,
@@ -423,13 +424,19 @@ export function ProfileEditForm({
                   error={errors.countryIfAbroadOther}
                   id="countryIfAbroadOther"
                 >
-                  <TextInput
+                  <SelectInput
                     id="countryIfAbroadOther"
                     value={form.countryIfAbroadOther}
                     onChange={(e) => update("countryIfAbroadOther", e.target.value)}
                     error={errors.countryIfAbroadOther}
-                    placeholder="Please specify your country of residence"
-                  />
+                  >
+                    <option value="">Select country…</option>
+                    {OTHER_RESIDENCE_COUNTRIES.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </SelectInput>
                 </Field>
               ) : null}
               {isUnitedStatesCountry(form.countryIfAbroad) ? (

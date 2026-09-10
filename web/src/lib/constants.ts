@@ -1,4 +1,5 @@
 import raw from "./constants.json";
+import { WORLD_COUNTRIES } from "./world-countries";
 
 export type RegistrationMode = "Self-registration" | "Registration by authorised person";
 
@@ -94,6 +95,11 @@ export function sortDropdownOptions(options: string[]): string[] {
 
 export const COUNTRIES = sortDropdownOptions(raw.COUNTRIES as string[]);
 export const COMMONWEALTH_COUNTRIES = sortDropdownOptions(raw.COMMONWEALTH_COUNTRIES as string[]);
+
+/** Full country list for “Other” residence — excludes short COUNTRIES shortcuts. */
+export const OTHER_RESIDENCE_COUNTRIES = WORLD_COUNTRIES.filter(
+  (country) => !(raw.COUNTRIES as string[]).includes(country)
+);
 export const OTHER_CONTACT_PLATFORM_OPTIONS = raw.OTHER_CONTACT_PLATFORM_OPTIONS as string[];
 export const SEX_OPTIONS = raw.SEX_OPTIONS as string[];
 export const EDUCATION_LEVELS = raw.EDUCATION_LEVELS as string[];
