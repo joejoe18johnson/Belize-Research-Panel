@@ -158,6 +158,8 @@ export type RegistrationCopy = {
   streetRequiredHint: string;
   streetOptionalHint: string;
   streetTitle: string;
+  streetLockedFromResidence: string;
+  streetEditResidence: string;
   houseNumber: string;
   houseNumberPlaceholder: string;
   streetAddress: string;
@@ -390,6 +392,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetOptionalHint:
       "Optional. You already have at least two means of contact. Add an address only if you want a backup.",
     streetTitle: "Physical contact address",
+    streetLockedFromResidence:
+      "District and city / town / village come from the residence details you entered in step 6. To update them, use Change residence details.",
+    streetEditResidence: "Change residence details",
     houseNumber: "House number",
     houseNumberPlaceholder: "e.g. 42",
     streetAddress: "Street name",
@@ -610,6 +615,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetOptionalHint:
       "Opcional. Ya tiene al menos dos medios de contacto. Agregue una dirección solo si desea un respaldo.",
     streetTitle: "Dirección física de contacto",
+    streetLockedFromResidence:
+      "El distrito y la ciudad / pueblo / aldea vienen de los detalles de residencia que ingresó en el paso 6. Para actualizarlos, use Cambiar detalles de residencia.",
+    streetEditResidence: "Cambiar detalles de residencia",
     houseNumber: "Número de casa",
     houseNumberPlaceholder: "p. ej. 42",
     streetAddress: "Nombre de la calle",

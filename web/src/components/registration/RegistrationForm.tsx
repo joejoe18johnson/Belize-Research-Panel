@@ -204,26 +204,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }));
   }, [form.citizenshipStatus, form.placeOfResidence]);
 
-  // Only collect a home address when it is required as a last-resort contact method.
+  // Only collect street/house when address is required as a last-resort contact method.
+  // District and CTV stay synced from residence details (step 6).
   useEffect(() => {
     const required = streetAddressRequiredForContacts(form.placeOfResidence, countContactMethods(form));
     if (required) return;
-    if (
-      !form.streetAddress &&
-      !form.addressHouseNumber &&
-      !form.addressCityVillage &&
-      !form.addressCityVillageOther &&
-      !form.addressDistrict
-    ) {
-      return;
-    }
+    if (!form.streetAddress && !form.addressHouseNumber) return;
     setForm((prev) => ({
       ...prev,
       streetAddress: "",
       addressHouseNumber: "",
-      addressCityVillage: "",
-      addressCityVillageOther: "",
-      addressDistrict: "",
     }));
   }, [
     form.placeOfResidence,
@@ -236,9 +226,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     form.otherContact,
     form.streetAddress,
     form.addressHouseNumber,
-    form.addressCityVillage,
-    form.addressCityVillageOther,
-    form.addressDistrict,
   ]);
 
   useEffect(() => {
@@ -258,6 +245,34 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     });
   }, [account.email, draftFilesReady, form.photoIdFile, form.proofOfBelizeResidenceFile]);
 
+  // Keep contact-address district / CTV aligned with residence details (step 6).
+  useEffect(() => {
+    if (!livesInBelizeResidence(form.placeOfResidence)) return;
+    const nextDistrict = form.placeOfResidence;
+    const nextCity = form.cityTownVillage;
+    const nextCityOther = form.cityTownVillage === "Other" ? form.cityTownVillageOther : "";
+    if (
+      form.addressDistrict === nextDistrict &&
+      form.addressCityVillage === nextCity &&
+      form.addressCityVillageOther === nextCityOther
+    ) {
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      addressDistrict: nextDistrict,
+      addressCityVillage: nextCity,
+      addressCityVillageOther: nextCityOther,
+    }));
+  }, [
+    form.placeOfResidence,
+    form.cityTownVillage,
+    form.cityTownVillageOther,
+    form.addressDistrict,
+    form.addressCityVillage,
+    form.addressCityVillageOther,
+  ]);
+
   useEffect(() => {
     if (!skipsInterestsPhase(form.placeOfResidence)) return;
     if (activePhaseIndex !== 3) return;
@@ -269,6 +284,17 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     () => ({ accountBacked: true as const, accountEmail: account.email }),
     [account.email]
   );
+
+  const jumpToResidenceDetails = useCallback(() => {
+    scrollToTopAfterPhaseChange.current = false;
+    setPhaseAttempted(false);
+    setActivePhaseIndex(2);
+    setFurthestPhaseIndex((furthest) => Math.max(furthest, 2));
+    window.setTimeout(() => {
+      const el = document.getElementById("residence-section");
+      if (el) scrollElementToTop(el);
+    }, 50);
+  }, []);
 
   const update = useCallback(<K extends keyof RegistrationFormData>(key: K, value: RegistrationFormData[K]) => {
     setForm((prev) => {
@@ -283,16 +309,27 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         next.countryIfAbroadOther = "";
         next.usDiasporaRegion = "";
         if (typeof value === "string" && BELIZE_DISTRICTS.includes(value)) {
-          if (!next.addressDistrict || next.addressDistrict === prev.placeOfResidence) {
-            next.addressDistrict = value;
-          }
+          next.addressDistrict = value;
+          next.addressCityVillage = "";
+          next.addressCityVillageOther = "";
+        } else {
+          next.addressDistrict = "";
+          next.addressCityVillage = "";
+          next.addressCityVillageOther = "";
         }
       }
       if (key === "constituency") {
         next.registeredCtvArea = "";
       }
-      if (key === "cityTownVillage" && value !== "Other") {
-        next.cityTownVillageOther = "";
+      if (key === "cityTownVillage") {
+        next.addressCityVillage = String(value ?? "");
+        if (value !== "Other") {
+          next.cityTownVillageOther = "";
+          next.addressCityVillageOther = "";
+        }
+      }
+      if (key === "cityTownVillageOther") {
+        next.addressCityVillageOther = String(value ?? "");
       }
       if (key === "otherContactPlatform" && value !== "Other") {
         next.otherContactPlatformCustom = "";
@@ -895,7 +932,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={6} title={copy.sections.residence}>
+          <FormSection step={6} title={copy.sections.residence} id="residence-section">
             {mustLiveAbroad(form.citizenshipStatus) ? (
               <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                 {copy.abroadIntro}
@@ -1118,6 +1155,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 addressDistrict={form.addressDistrict}
                 required
                 hint={copy.streetRequiredHint}
+                lockDistrictAndCtv
+                lockedNote={copy.streetLockedFromResidence}
+                onEditLockedSource={jumpToResidenceDetails}
+                editLockedSourceLabel={copy.streetEditResidence}
                 errors={{
                   addressHouseNumber: fieldError("addressHouseNumber"),
                   streetAddress: fieldError("streetAddress"),
@@ -1125,8 +1166,24 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   addressCityVillageOther: fieldError("addressCityVillageOther"),
                   addressDistrict: fieldError("addressDistrict"),
                 }}
-                onChange={(field, value) => update(field, value)}
+                onChange={(field, value) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
+                  update(field, value);
+                }}
                 onBlurField={(field) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
                   touch(field);
                   validateField(field);
                 }}

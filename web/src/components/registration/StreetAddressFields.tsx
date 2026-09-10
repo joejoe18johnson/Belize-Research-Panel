@@ -33,6 +33,10 @@ export function StreetAddressFields({
   errors,
   onChange,
   onBlurField,
+  lockDistrictAndCtv = false,
+  lockedNote,
+  onEditLockedSource,
+  editLockedSourceLabel,
 }: {
   addressHouseNumber?: string;
   streetAddress: string;
@@ -47,12 +51,20 @@ export function StreetAddressFields({
   errors?: Partial<Record<AddressFieldKey, string>>;
   onChange: (field: AddressFieldKey, value: string) => void;
   onBlurField?: (field: AddressFieldKey) => void;
+  /** When true, district / CTV come from residence and cannot be edited here. */
+  lockDistrictAndCtv?: boolean;
+  lockedNote?: string;
+  onEditLockedSource?: () => void;
+  editLockedSourceLabel?: string;
 }) {
   const copy = useRegistrationCopy();
   const ids = { ...DEFAULT_FIELD_IDS, ...fieldIds };
   const sectionTitle = title === undefined ? copy.streetTitle : title;
   const ctvOptions = addressDistrict ? getCtvOptionsForDistrict(addressDistrict) : [];
   const showOtherCtv = addressCityVillage === "Other";
+  const lockedSelectClass = lockDistrictAndCtv
+    ? "bg-zinc-100 text-zinc-500 opacity-70 dark:bg-zinc-950 dark:text-zinc-400"
+    : "";
 
   return (
     <div className="space-y-4 rounded-xl border border-teal-800/10 bg-gradient-to-br from-teal-50/80 via-white to-sky-50/40 p-4 dark:border-teal-400/10 dark:from-teal-950/30 dark:via-zinc-900 dark:to-sky-950/20 sm:p-5">
@@ -67,11 +79,28 @@ export function StreetAddressFields({
         </div>
       ) : null}
 
+      {lockDistrictAndCtv && lockedNote ? (
+        <div className="rounded-lg border border-red-200/80 bg-red-50/90 px-3 py-2.5 dark:border-red-800 dark:bg-red-950/40">
+          <p className="text-xs font-semibold leading-relaxed text-red-700 dark:text-red-300">{lockedNote}</p>
+          {onEditLockedSource && editLockedSourceLabel ? (
+            <button
+              type="button"
+              onClick={onEditLockedSource}
+              className="mt-2 inline-flex min-h-9 items-center rounded-lg border border-teal-200 bg-teal-50 px-3 text-xs font-semibold text-teal-800 transition hover:bg-teal-100 dark:border-teal-700 dark:bg-teal-950 dark:text-teal-100 dark:hover:bg-teal-900/60"
+            >
+              {editLockedSourceLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={copy.district} required={required} error={errors?.addressDistrict} id={ids.addressDistrict}>
           <SelectInput
             id={ids.addressDistrict}
             value={addressDistrict}
+            disabled={lockDistrictAndCtv}
+            className={lockedSelectClass}
             onChange={(e) => {
               const nextDistrict = e.target.value;
               onChange("addressDistrict", nextDistrict);
@@ -104,7 +133,12 @@ export function StreetAddressFields({
           <SelectInput
             id={ids.addressCityVillage}
             value={addressCityVillage}
-            disabled={!addressDistrict}
+            disabled={lockDistrictAndCtv || !addressDistrict}
+            className={
+              lockDistrictAndCtv || !addressDistrict
+                ? "bg-zinc-100 text-zinc-500 opacity-70 dark:bg-zinc-950 dark:text-zinc-400"
+                : ""
+            }
             onChange={(e) => {
               const next = e.target.value;
               onChange("addressCityVillage", next);
@@ -133,6 +167,9 @@ export function StreetAddressFields({
               <TextInput
                 id={ids.addressCityVillageOther}
                 value={addressCityVillageOther}
+                readOnly={lockDistrictAndCtv}
+                tabIndex={lockDistrictAndCtv ? -1 : undefined}
+                className={lockedSelectClass}
                 onChange={(e) => onChange("addressCityVillageOther", e.target.value)}
                 onBlur={() => onBlurField?.("addressCityVillageOther")}
                 error={errors?.addressCityVillageOther}

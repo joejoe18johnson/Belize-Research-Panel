@@ -31,3 +31,12 @@ export const dashboardPrimaryButtonClass =
 
 export const dashboardSecondaryButtonClass =
   "inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-800 transition hover:border-teal-300 hover:bg-teal-50 dark:border-teal-800 dark:bg-zinc-900 dark:text-teal-200 dark:hover:border-teal-700 dark:hover:bg-teal-950";
+
+/** Public / portal site footer — branded turquoise surface (matches hero cards). */
+export const siteFooterClass =
+  "border-t border-teal-900/40 bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 text-white shadow-[0_-8px_24px_-12px_rgba(4,47,46,0.35)]";
+
+export const siteFooterLinkClass =
+  "text-teal-50 transition hover:text-white hover:underline";
+
+export const siteFooterMutedClass = "text-teal-100/85";
