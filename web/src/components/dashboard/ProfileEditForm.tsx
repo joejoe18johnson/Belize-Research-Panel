@@ -605,7 +605,7 @@ export function ProfileEditForm({
         <div className="mt-4 space-y-5">
             <Field
               label="Select up to 5 products and services you are interested in and are willing to give feedback on."
-              required
+              hint="Optional"
               error={errors.marketInterests}
             >
               <MultiSelect

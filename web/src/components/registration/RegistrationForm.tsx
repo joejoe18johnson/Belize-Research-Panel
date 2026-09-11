@@ -1045,7 +1045,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             <FormSection step={8} title={copy.sections.marketInterests}>
               <Field
                 label={copy.marketInterestsLabel}
-                required
+                hint={copy.optional}
                 error={fieldError("marketInterests")}
               >
                 <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} maxSelections={MAX_MARKET_INTERESTS} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />

@@ -519,9 +519,7 @@ export function validateRegistrationForm(
   if (registeredVoter && hasRegisteredCtvQuestion(data.constituency) && !cleanText(data.registeredCtvArea)) {
     errors.registeredCtvArea = "Village / town / city area of voter registration is required for registered voters.";
   }
-  if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
-    errors.marketInterests = "Please select at least one market research interest.";
-  } else if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
+  if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
     errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
@@ -711,9 +709,7 @@ export function validateProfileUpdateForm(
     errors.registeredCtvArea = "Village / town / city area of voter registration is required for registered voters.";
   }
 
-  if (data.placeOfResidence !== "Abroad" && data.placeOfResidence && data.marketInterests.length === 0) {
-    errors.marketInterests = "Please select at least one market research interest.";
-  } else if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
+  if (data.marketInterests.length > MAX_MARKET_INTERESTS) {
     errors.marketInterests = `Please select up to ${MAX_MARKET_INTERESTS} market research interests.`;
   }
 
