@@ -197,7 +197,13 @@ export function StreetAddressFields({
           />
         </Field>
 
-        <Field label={copy.streetAddress} required={required} error={errors?.streetAddress} id={ids.streetAddress}>
+        <Field
+          label={copy.streetAddress}
+          required={false}
+          hint={copy.optional}
+          error={errors?.streetAddress}
+          id={ids.streetAddress}
+        >
           <TextInput
             id={ids.streetAddress}
             value={streetAddress}
