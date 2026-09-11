@@ -199,8 +199,8 @@ export function StreetAddressFields({
 
         <Field
           label={copy.streetAddress}
-          required={false}
-          hint={copy.optional}
+          required
+          hint={copy.streetAddressHint}
           error={errors?.streetAddress}
           id={ids.streetAddress}
         >

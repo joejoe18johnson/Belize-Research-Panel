@@ -164,6 +164,7 @@ export type RegistrationCopy = {
   houseNumberPlaceholder: string;
   streetAddress: string;
   streetAddressPlaceholder: string;
+  streetAddressHint: string;
   cityOrVillage: string;
   cityOrVillageOther: string;
   cityOrVillageOtherPlaceholder: string;
@@ -397,6 +398,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     houseNumberPlaceholder: "e.g. 42",
     streetAddress: "Street name",
     streetAddressPlaceholder: "Street or road name",
+    streetAddressHint: "Required. Give a brief description of location if no street name",
     cityOrVillage: "City, town, or village",
     cityOrVillageOther: "Specify city, town, or village",
     cityOrVillageOtherPlaceholder: "Enter the place name",
@@ -617,6 +619,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     houseNumberPlaceholder: "p. ej. 42",
     streetAddress: "Nombre de la calle",
     streetAddressPlaceholder: "Nombre de la calle o camino",
+    streetAddressHint: "Obligatorio. Si no hay nombre de calle, dé una breve descripción de la ubicación",
     cityOrVillage: "Ciudad, pueblo o aldea",
     cityOrVillageOther: "Especifique ciudad, pueblo o aldea",
     cityOrVillageOtherPlaceholder: "Escriba el nombre del lugar",

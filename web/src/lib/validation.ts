@@ -145,7 +145,7 @@ export function streetAddressRequiredForContacts(placeOfResidence: string, conta
   return livesInBelizeResidence(placeOfResidence) && contactCount < 2;
 }
 
-/** True when city/town/village + district are present (street / house # optional). */
+/** True when street + city/town/village + district are all present (counts as a contact mean). */
 export function hasCompletePhysicalAddressContact(
   data: Pick<
     RegistrationFormData,
@@ -153,6 +153,7 @@ export function hasCompletePhysicalAddressContact(
   >
 ): boolean {
   return (
+    Boolean(cleanText(data.streetAddress)) &&
     Boolean(cleanText(data.addressCityVillage === "Other" ? data.addressCityVillageOther : data.addressCityVillage)) &&
     Boolean(cleanText(data.addressDistrict))
   );

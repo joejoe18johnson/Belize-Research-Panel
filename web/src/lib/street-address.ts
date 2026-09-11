@@ -162,7 +162,9 @@ export function validateStreetAddressParts(
     errors.addressCityVillageOther = "Please specify the city, town, or village.";
   }
 
-  // House number and street name are optional.
+  if (!trim(parts.streetAddress)) {
+    errors.streetAddress = "Street name or a brief location description is required.";
+  }
 
   return errors;
 }
