@@ -1061,76 +1061,31 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {copy.contactIntro}
             </p>
-            <Field label={copy.email} error={fieldError("email")} id="email">
-              <div className="relative">
-                <TextInput
-                  id="email"
-                  type="email"
-                  value={form.email}
-                  readOnly
-                  className="bg-zinc-50 pr-[6.75rem] dark:bg-zinc-950"
-                  error={fieldError("email")}
-                  aria-describedby="email-verified-badge"
-                />
-                <span
-                  id="email-verified-badge"
-                  className="pointer-events-none absolute inset-y-0 right-2 flex items-center"
-                >
-                  <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" />
-                    </svg>
-                    {copy.emailVerifiedBadge}
-                  </span>
-                </span>
-              </div>
-            </Field>
-
-            {showPhysicalAddressContact ? (
-              <StreetAddressFields
-                addressHouseNumber={form.addressHouseNumber}
-                streetAddress={form.streetAddress}
-                addressCityVillage={form.addressCityVillage}
-                addressCityVillageOther={form.addressCityVillageOther}
-                addressDistrict={form.addressDistrict}
-                required
-                hint={copy.streetRequiredHint}
-                lockDistrictAndCtv
-                lockedNote={copy.streetLockedFromResidence}
-                onEditLockedSource={jumpToResidenceDetails}
-                editLockedSourceLabel={copy.streetEditResidence}
-                errors={{
-                  addressHouseNumber: fieldError("addressHouseNumber"),
-                  streetAddress: fieldError("streetAddress"),
-                  addressCityVillage: fieldError("addressCityVillage"),
-                  addressCityVillageOther: fieldError("addressCityVillageOther"),
-                  addressDistrict: fieldError("addressDistrict"),
-                }}
-                onChange={(field, value) => {
-                  if (
-                    field === "addressDistrict" ||
-                    field === "addressCityVillage" ||
-                    field === "addressCityVillageOther"
-                  ) {
-                    return;
-                  }
-                  update(field, value);
-                }}
-                onBlurField={(field) => {
-                  if (
-                    field === "addressDistrict" ||
-                    field === "addressCityVillage" ||
-                    field === "addressCityVillageOther"
-                  ) {
-                    return;
-                  }
-                  touch(field);
-                  validateField(field);
-                }}
-              />
-            ) : null}
-
             <FieldGroup columns={2}>
+              <Field label={copy.email} error={fieldError("email")} id="email">
+                <div className="relative">
+                  <TextInput
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    readOnly
+                    className="bg-zinc-50 pr-[6.75rem] dark:bg-zinc-950"
+                    error={fieldError("email")}
+                    aria-describedby="email-verified-badge"
+                  />
+                  <span
+                    id="email-verified-badge"
+                    className="pointer-events-none absolute inset-y-0 right-2 flex items-center"
+                  >
+                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950 dark:text-teal-200 dark:ring-teal-800">
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" />
+                      </svg>
+                      {copy.emailVerifiedBadge}
+                    </span>
+                  </span>
+                </div>
+              </Field>
               <SocialContactField
                 platform="facebook"
                 label={copy.facebook}
@@ -1210,6 +1165,49 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </FieldGroup>
             {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
+            {showPhysicalAddressContact ? (
+              <StreetAddressFields
+                addressHouseNumber={form.addressHouseNumber}
+                streetAddress={form.streetAddress}
+                addressCityVillage={form.addressCityVillage}
+                addressCityVillageOther={form.addressCityVillageOther}
+                addressDistrict={form.addressDistrict}
+                required
+                hint={copy.streetRequiredHint}
+                lockDistrictAndCtv
+                lockedNote={copy.streetLockedFromResidence}
+                onEditLockedSource={jumpToResidenceDetails}
+                editLockedSourceLabel={copy.streetEditResidence}
+                errors={{
+                  addressHouseNumber: fieldError("addressHouseNumber"),
+                  streetAddress: fieldError("streetAddress"),
+                  addressCityVillage: fieldError("addressCityVillage"),
+                  addressCityVillageOther: fieldError("addressCityVillageOther"),
+                  addressDistrict: fieldError("addressDistrict"),
+                }}
+                onChange={(field, value) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
+                  update(field, value);
+                }}
+                onBlurField={(field) => {
+                  if (
+                    field === "addressDistrict" ||
+                    field === "addressCityVillage" ||
+                    field === "addressCityVillageOther"
+                  ) {
+                    return;
+                  }
+                  touch(field);
+                  validateField(field);
+                }}
+              />
+            ) : null}
           </FormSection>
 
           <FormSection step={10} title={copy.sections.confirmContact}>
