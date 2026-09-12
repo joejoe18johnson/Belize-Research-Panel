@@ -21,7 +21,7 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
-import { useRegistrationCopy } from "@/components/locale/LocaleProvider";
+import { useRegistrationCopy, useLocale } from "@/components/locale/LocaleProvider";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -71,6 +71,7 @@ import {
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
+import { localizeValidationMessage } from "@/lib/validation-i18n";
 import { formatStreetAddressDisplay } from "@/lib/street-address";
 import { formatDobDisplay } from "@/lib/dob";
 import { observeStickyChrome, scrollElementToTop, scrollViewportToTop, syncStickyChromeOffsets } from "@/lib/scroll-viewport";
@@ -169,6 +170,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const scrollToTopAfterPhaseChange = useRef(false);
   const pendingErrorScrollKeys = useRef<string[] | null>(null);
   const copy = useRegistrationCopy();
+  const locale = useLocale();
 
   useEffect(() => {
     let cancelled = false;
@@ -645,8 +647,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }
   };
 
-  const fieldError = (key: string) =>
-    touched[key] || phaseAttempted || Object.keys(errors).length > 0 ? errors[key] : undefined;
+  const fieldError = (key: string) => {
+    const raw =
+      touched[key] || phaseAttempted || Object.keys(errors).length > 0 ? errors[key] : undefined;
+    return raw ? localizeValidationMessage(raw, locale) : undefined;
+  };
 
   const handleNextPhase = async () => {
     setPhaseAttempted(true);
@@ -1164,7 +1169,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </Field>
               </div>
             </FieldGroup>
-            {errors.contact ? <Alert variant="error">{errors.contact}</Alert> : null}
+            {errors.contact ? (
+              <Alert variant="error">{localizeValidationMessage(errors.contact, locale)}</Alert>
+            ) : null}
             {showPhysicalAddressContact ? (
               <StreetAddressFields
                 addressHouseNumber={form.addressHouseNumber}
@@ -1335,7 +1342,9 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </>
       ) : null}
 
-      {errors.submit ? <Alert variant="error">{errors.submit}</Alert> : null}
+      {errors.submit ? (
+        <Alert variant="error">{localizeValidationMessage(errors.submit, locale)}</Alert>
+      ) : null}
 
       <RegistrationPhaseNav
         activePhaseIndex={activePhaseIndex}

@@ -420,7 +420,11 @@ export function validateRegistrationForm(
 ): FieldErrors {
   const errors: FieldErrors = {};
   const registeredVoter = isRegisteredVoter(data.citizenshipStatus, data.votingStatus);
-  const contactCount = countContactMethods(data);
+  const contactData =
+    options.accountBacked && options.accountEmail
+      ? { ...data, email: cleanText(data.email) || cleanText(options.accountEmail) }
+      : data;
+  const contactCount = countContactMethods(contactData);
   const cityFinal = data.cityTownVillage === "Other" ? data.cityTownVillageOther : data.cityTownVillage;
   const otherPlatform =
     data.otherContactPlatform === "Other" ? data.otherContactPlatformCustom : data.otherContactPlatform;
@@ -536,20 +540,20 @@ export function validateRegistrationForm(
   );
   Object.assign(errors, addressErrors);
 
-  const totalContactMeans = countAllContactMeans(data);
+  const totalContactMeans = countAllContactMeans(contactData);
   if (totalContactMeans < 2) {
     errors.contact = livesInBelizeResidence(data.placeOfResidence)
       ? "Please provide at least two ways to contact you. Add another method, or a street address if you live in Belize."
       : "Please provide at least two ways to contact you in case one fails.";
   }
 
-  if (data.email && !validEmail(data.email)) errors.email = "Please enter a valid email address.";
+  if (contactData.email && !validEmail(contactData.email)) errors.email = "Please enter a valid email address.";
   if (phoneLocalDigits(data.phoneLocalNumber)) {
     const phoneError = validatePhoneFields(data);
     if (phoneError) errors.phoneLocalNumber = phoneError;
   }
   if (options.accountBacked && options.accountEmail) {
-    if (cleanText(data.email).toLowerCase() !== cleanText(options.accountEmail).toLowerCase()) {
+    if (cleanText(contactData.email).toLowerCase() !== cleanText(options.accountEmail).toLowerCase()) {
       errors.email = "Contact email must match your account email.";
     }
   }
