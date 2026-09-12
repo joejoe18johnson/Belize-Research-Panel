@@ -143,13 +143,19 @@ export function CheckboxField({
   disabled?: boolean;
 }) {
   return (
-    <div>
+    <div id={`${id}-field`}>
       <label
         htmlFor={id}
-        className={`flex items-start gap-3 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-800 transition dark:border-zinc-700 dark:text-zinc-200 ${
+        className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm transition ${
+          error
+            ? "border-red-400 bg-red-50/80 text-zinc-800 dark:border-red-500 dark:bg-red-950/30 dark:text-zinc-200"
+            : "border-zinc-200 text-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
+        } ${
           disabled
             ? "cursor-not-allowed bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-500"
-            : `cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 ${checked ? "border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30" : ""}`
+            : `cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 ${
+                checked && !error ? "border-teal-600 bg-teal-50/50 dark:border-teal-600 dark:bg-teal-950/30" : ""
+              }`
         }`}
       >
         <input
@@ -159,10 +165,16 @@ export function CheckboxField({
           disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
           className={`${siteCheckboxClass} mt-0.5`}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
         />
         <span>{formatSentenceCase(label)}</span>
       </label>
-      {error ? <p className={`${errorClass} ml-2 mt-1.5`} role="alert">{formatSentenceCase(error)}</p> : null}
+      {error ? (
+        <p id={`${id}-error`} className={`${errorClass} ml-2 mt-1.5`} role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

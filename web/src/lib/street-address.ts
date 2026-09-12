@@ -139,8 +139,10 @@ export function validateStreetAddressParts(
       string
     >
   > = {};
-  const anyFilled = streetAddressPartsPresent(parts);
-  if (!options.required && !anyFilled) return errors;
+
+  // When address is not required as a contact method, synced district/CTV from residence
+  // must not force street / house validation (those fields are hidden).
+  if (!options.required) return errors;
 
   const district = trim(parts.addressDistrict);
   if (!district) {
@@ -153,8 +155,8 @@ export function validateStreetAddressParts(
   if (!city) {
     errors.addressCityVillage = "City, town, or village is required.";
   } else if (district) {
-    const options = getCtvOptionsForDistrict(district);
-    if (options.length && !options.includes(city)) {
+    const ctvOptions = getCtvOptionsForDistrict(district);
+    if (ctvOptions.length && !ctvOptions.includes(city)) {
       errors.addressCityVillage = "Please select a city, town, or village in the chosen district.";
     }
   }

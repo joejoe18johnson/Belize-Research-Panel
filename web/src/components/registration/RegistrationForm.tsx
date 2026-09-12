@@ -105,9 +105,11 @@ function clearFieldError(errors: FieldErrors, key: string): FieldErrors {
 }
 
 function findRegistrationErrorTarget(key: string): HTMLElement | null {
-  const candidates = [key, `${key}-section`];
+  const candidates = [key, `${key}-field`, `${key}-section`];
   if (key.startsWith("consent")) candidates.push("consent-section");
-  if (key === "contact") candidates.push("contact-section");
+  if (key === "contact" || key === "contactDetailsConfirmed") {
+    candidates.push("contact-section", "confirm-contact-section");
+  }
   if (key === "photoIdFile" || key === "photoIdType") candidates.push("photo-id-section");
   for (const id of candidates) {
     const el = document.getElementById(id);
@@ -739,8 +741,21 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
       <div id="registration-phase-content" className="space-y-6" key={activePhaseIndex} tabIndex={-1}>
       {showPhaseValidationAlert ? (
-        <Alert variant="error">
-          {copy.phaseFixAlert}
+        <Alert variant="error" formatBody={false}>
+          <p>{copy.phaseFixAlert}</p>
+          {(() => {
+            const firstKey = getOrderedErrorKeys({
+              ...currentPhaseErrors,
+              ...(errors.contact && activePhaseIndex === 4 ? { contact: errors.contact } : {}),
+            })[0];
+            const firstMessage = firstKey
+              ? localizeValidationMessage(
+                  (errors[firstKey] || currentPhaseErrors[firstKey]) ?? "",
+                  locale
+                )
+              : "";
+            return firstMessage ? <p className="mt-1.5 font-medium">{firstMessage}</p> : null;
+          })()}
         </Alert>
       ) : null}
       {activePhaseIndex === 0 ? (
@@ -1217,7 +1232,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             ) : null}
           </FormSection>
 
-          <FormSection step={10} title={copy.sections.confirmContact}>
+          <FormSection step={10} title={copy.sections.confirmContact} id="confirm-contact-section">
             {meetsContactMinimum ? (
               <Alert variant="success" formatBody={false}>
                 {copy.contactSuccess(totalContactMeans)}
