@@ -36,6 +36,8 @@ export type RegistrationCopy = {
   selectEthnicity: string;
   selectSex: string;
   selectYesNo: string;
+  yes: string;
+  no: string;
   selectEducation: string;
   selectPhotoId: string;
   selectProof: string;
@@ -44,6 +46,8 @@ export type RegistrationCopy = {
   selectVoterStatus: string;
   selectEducationShort: string;
   householdCountNote: string;
+  householdDefinition: string;
+  headOfHouseholdDefinition: string;
   finalReviewConfirm: string;
   reviewQuestion: string;
   reviewResponse: string;
@@ -254,6 +258,8 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectEthnicity: "Select ethnicity",
     selectSex: "Select sex",
     selectYesNo: "Select yes or no",
+    yes: "Yes",
+    no: "No",
     selectEducation: "Select education level",
     selectPhotoId: "Select photo ID type",
     selectProof: "Select proof type",
@@ -262,6 +268,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectVoterStatus: "Select voter status",
     selectEducationShort: "Select education",
     householdCountNote: "Count everyone regardless of age.",
+    householdDefinition:
+      "A household is a person or group of people living together in the same dwelling and sharing meals and other living arrangements, whether or not they are related.",
+    headOfHouseholdDefinition:
+      "The head of household is the person who is recognised by the household members as the main decision-maker or person primarily responsible for the household.",
     finalReviewConfirm:
       "I have reviewed the full form and confirm that the information is correct. *",
     reviewQuestion: "Question / field",
@@ -475,6 +485,8 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectEthnicity: "Seleccione etnia",
     selectSex: "Seleccione sexo",
     selectYesNo: "Seleccione sí o no",
+    yes: "Sí",
+    no: "No",
     selectEducation: "Seleccione nivel educativo",
     selectPhotoId: "Seleccione tipo de identificación",
     selectProof: "Seleccione tipo de comprobante",
@@ -483,6 +495,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     selectVoterStatus: "Seleccione estado electoral",
     selectEducationShort: "Seleccione educación",
     householdCountNote: "Cuente a todas las personas, sin importar la edad.",
+    householdDefinition:
+      "Un hogar es una persona o un grupo de personas que viven juntas en la misma vivienda y comparten las comidas y otros arreglos de vida, estén o no emparentadas.",
+    headOfHouseholdDefinition:
+      "El jefe o la jefa del hogar es la persona reconocida por los miembros del hogar como el principal tomador de decisiones o la persona principalmente responsable del hogar.",
     finalReviewConfirm:
       "He revisado el formulario completo y confirmo que la información es correcta. *",
     reviewQuestion: "Pregunta / campo",
@@ -664,4 +680,12 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
 
 export function getRegistrationPhases(locale: HomeLocale) {
   return REGISTRATION_COPY[locale].phases;
+}
+
+/** Display label for stored Yes/No values (English values stay in form data). */
+export function yesNoLabel(locale: HomeLocale, value: string): string {
+  const copy = REGISTRATION_COPY[locale];
+  if (value === "Yes") return copy.yes;
+  if (value === "No") return copy.no;
+  return value;
 }

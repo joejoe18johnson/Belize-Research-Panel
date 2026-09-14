@@ -22,6 +22,7 @@ import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
 import { useRegistrationCopy, useLocale, useSignupCopy } from "@/components/locale/LocaleProvider";
+import { yesNoLabel } from "@/lib/registration-locale";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -30,8 +31,6 @@ import {
   COUNTRIES,
   EDUCATION_LEVELS,
   ETHNICITY_OPTIONS,
-  HOUSEHOLD_DEFINITION,
-  HEAD_OF_HOUSEHOLD_DEFINITION,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_HOUSEHOLD_SIZE,
   MARKET_INTERESTS,
@@ -430,7 +429,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       : form.countryIfAbroad;
 
   const reviewRows = useMemo(() => {
-    const asked = (value: string) => (cleanText(value) ? value : copy.notProvided);
+    const asked = (value: string) => {
+      const cleaned = cleanText(value);
+      if (!cleaned) return copy.notProvided;
+      return yesNoLabel(locale, cleaned);
+    };
     const na = copy.notApplicable;
     const livingAbroad = form.placeOfResidence === "Abroad";
     const livingInBelize = livesInBelizeResidence(form.placeOfResidence);
@@ -501,6 +504,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     registeredVoter,
     streetAddressRequired,
     copy,
+    locale,
   ]);
 
   const validateField = <K extends keyof RegistrationFormData>(
@@ -849,7 +853,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           <Field label={copy.voterQuestion} required error={fieldError("votingStatus")} id="votingStatus">
             <SelectInput id="votingStatus" value={form.votingStatus} onChange={(e) => update("votingStatus", e.target.value)} onBlur={() => touchAndValidate("votingStatus")} error={fieldError("votingStatus")}>
               <option value="">{copy.selectVoterStatus}</option>
-              {VOTING_STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
+              {VOTING_STATUS.map((s) => (
+                <option key={s} value={s}>
+                  {yesNoLabel(locale, s)}
+                </option>
+              ))}
             </SelectInput>
           </Field>
         </FormSection>
@@ -911,10 +919,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </SelectInput>
             </Field>
             <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-              {HOUSEHOLD_DEFINITION}
+              {copy.householdDefinition}
             </p>
             <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {HEAD_OF_HOUSEHOLD_DEFINITION}
+              {copy.headOfHouseholdDefinition}
             </p>
             <Field
               label={copy.householdHead}
@@ -936,7 +944,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                       onBlur={() => touchAndValidate("householdHeadRelationship")}
                       className={siteRadioClass}
                     />
-                    <span>{option}</span>
+                    <span>{yesNoLabel(locale, option)}</span>
                   </label>
                 ))}
               </div>
