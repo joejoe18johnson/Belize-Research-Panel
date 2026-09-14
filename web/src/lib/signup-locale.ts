@@ -40,11 +40,52 @@ export type SignupCopy = {
   strengthModerate: string;
   strengthStrong: string;
   dobMinAgeHint: string;
+  dobMonthLabel: string;
+  dobDayLabel: string;
+  dobYearLabel: string;
+  dobMonthPlaceholder: string;
+  dobDayPlaceholder: string;
+  dobYearPlaceholder: string;
+  dobMonthNames: string[];
+  ageRequirementTitle: string;
+  ageRequirementBody: string;
+  invalidDobTitle: string;
+  invalidDobBody: string;
   citizenshipMetTitle: string;
   citizenshipMetBody: string;
   citizenshipNotMetTitle: string;
   citizenshipNotMetBody: string;
 };
+
+const MONTH_NAMES_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTH_NAMES_ES = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
 
 const CITIZENSHIP_LABELS_EN: Record<string, string> = {
   [CITIZENSHIP_BELIZEAN_IN_BELIZE]: "Belizean residing in Belize",
@@ -100,6 +141,17 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     strengthModerate: "Moderate",
     strengthStrong: "Strong",
     dobMinAgeHint: "You must be at least 18 years old.",
+    dobMonthLabel: "Month",
+    dobDayLabel: "Day",
+    dobYearLabel: "Year",
+    dobMonthPlaceholder: "Month",
+    dobDayPlaceholder: "Day",
+    dobYearPlaceholder: "Year",
+    dobMonthNames: MONTH_NAMES_EN,
+    ageRequirementTitle: "Age requirement not met",
+    ageRequirementBody: "You must be at least 18 years old to register for the panel.",
+    invalidDobTitle: "Invalid date of birth",
+    invalidDobBody: "Please select a valid month, day, and year.",
     citizenshipMetTitle: "Citizenship requirement met",
     citizenshipMetBody:
       "You can continue. Proof of citizenship or residency will be required during registration.",
@@ -145,6 +197,17 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     strengthModerate: "Moderada",
     strengthStrong: "Fuerte",
     dobMinAgeHint: "Debe tener al menos 18 años.",
+    dobMonthLabel: "Mes",
+    dobDayLabel: "Día",
+    dobYearLabel: "Año",
+    dobMonthPlaceholder: "Mes",
+    dobDayPlaceholder: "Día",
+    dobYearPlaceholder: "Año",
+    dobMonthNames: MONTH_NAMES_ES,
+    ageRequirementTitle: "Requisito de edad no cumplido",
+    ageRequirementBody: "Debe tener al menos 18 años para registrarse en el panel.",
+    invalidDobTitle: "Fecha de nacimiento no válida",
+    invalidDobBody: "Seleccione un mes, día y año válidos.",
     citizenshipMetTitle: "Requisito de ciudadanía cumplido",
     citizenshipMetBody:
       "Puede continuar. Se requerirá comprobante de ciudadanía o residencia durante el registro.",
@@ -153,6 +216,13 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
       "No puede continuar el registro. Elija otro estado de ciudadanía o vuelva al inicio.",
   },
 };
+
+export function monthOptionsForLocale(locale: HomeLocale): { value: string; label: string }[] {
+  return SIGNUP_COPY[locale].dobMonthNames.map((label, index) => ({
+    value: String(index + 1),
+    label,
+  }));
+}
 
 export function citizenshipLabelFor(locale: HomeLocale, status: string): string {
   return SIGNUP_COPY[locale].citizenshipLabels[status] ?? status;

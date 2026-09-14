@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Field, SelectInput } from "./form-ui";
+import { useSignupCopy, useLocale } from "@/components/locale/LocaleProvider";
 import {
-  MONTH_OPTIONS,
   composeDob,
   daysInMonth,
   getYearOptions,
   isValidDobString,
   parseDobParts,
 } from "@/lib/dob";
+import { monthOptionsForLocale } from "@/lib/signup-locale";
 import { meetsMinimumAge } from "@/lib/validation";
 
 interface DobParts {
@@ -37,8 +38,12 @@ export function DateOfBirthPicker({
   onBlur,
   error,
   compact = false,
-  minAgeHint = "You must be at least 18 years old.",
+  minAgeHint,
 }: DateOfBirthPickerProps) {
+  const copy = useSignupCopy();
+  const locale = useLocale();
+  const hint = minAgeHint ?? copy.dobMinAgeHint;
+  const monthOptions = useMemo(() => monthOptionsForLocale(locale), [locale]);
   const [parts, setParts] = useState<DobParts>(() =>
     value ? parseDobParts(value) : emptyParts()
   );
@@ -88,7 +93,7 @@ export function DateOfBirthPicker({
   return (
     <div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-        <Field label="Month" required id="dob-month">
+        <Field label={copy.dobMonthLabel} required id="dob-month">
           <SelectInput
             id="dob-month"
             value={month}
@@ -98,8 +103,8 @@ export function DateOfBirthPicker({
             className={selectClass}
             autoComplete="bday-month"
           >
-            <option value="">Month</option>
-            {MONTH_OPTIONS.map((m) => (
+            <option value="">{copy.dobMonthPlaceholder}</option>
+            {monthOptions.map((m) => (
               <option key={m.value} value={m.value}>
                 {m.label}
               </option>
@@ -107,7 +112,7 @@ export function DateOfBirthPicker({
           </SelectInput>
         </Field>
 
-        <Field label="Day" required id="dob-day">
+        <Field label={copy.dobDayLabel} required id="dob-day">
           <SelectInput
             id="dob-day"
             value={day}
@@ -117,7 +122,7 @@ export function DateOfBirthPicker({
             className={selectClass}
             autoComplete="bday-day"
           >
-            <option value="">Day</option>
+            <option value="">{copy.dobDayPlaceholder}</option>
             {dayOptions.map((d) => (
               <option key={d} value={String(d)}>
                 {d}
@@ -126,7 +131,7 @@ export function DateOfBirthPicker({
           </SelectInput>
         </Field>
 
-        <Field label="Year" required id="dob-year">
+        <Field label={copy.dobYearLabel} required id="dob-year">
           <SelectInput
             id="dob-year"
             value={year}
@@ -136,7 +141,7 @@ export function DateOfBirthPicker({
             className={selectClass}
             autoComplete="bday-year"
           >
-            <option value="">Year</option>
+            <option value="">{copy.dobYearPlaceholder}</option>
             {yearOptions.map((y) => (
               <option key={y} value={String(y)}>
                 {y}
@@ -146,7 +151,7 @@ export function DateOfBirthPicker({
         </Field>
       </div>
 
-      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{minAgeHint}</p>
+      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{hint}</p>
 
       {error ? (
         <p className="mt-3 text-sm text-red-600" role="alert">
@@ -159,6 +164,7 @@ export function DateOfBirthPicker({
           isComplete={isComplete}
           eligible={eligible}
           compact={compact}
+          copy={copy}
         />
       ) : null}
     </div>
@@ -169,10 +175,12 @@ function AgeEligibilityBanner({
   isComplete,
   eligible,
   compact = false,
+  copy,
 }: {
   isComplete: boolean;
   eligible: boolean;
   compact?: boolean;
+  copy: ReturnType<typeof useSignupCopy>;
 }) {
   const boxClass = compact
     ? "mt-3 rounded-lg border px-4 py-3 text-sm"
@@ -185,8 +193,8 @@ function AgeEligibilityBanner({
         role="alert"
         aria-live="polite"
       >
-        <p className="font-medium text-red-800">Invalid date of birth</p>
-        <p className="mt-1 text-red-800">Please select a valid month, day, and year.</p>
+        <p className="font-medium text-red-800">{copy.invalidDobTitle}</p>
+        <p className="mt-1 text-red-800">{copy.invalidDobBody}</p>
       </div>
     );
   }
@@ -201,8 +209,8 @@ function AgeEligibilityBanner({
       role="alert"
       aria-live="polite"
     >
-      <p className="font-medium text-red-800">Age requirement not met</p>
-      <p className="mt-1 text-red-800">You must be at least 18 years old to register for the panel.</p>
+      <p className="font-medium text-red-800">{copy.ageRequirementTitle}</p>
+      <p className="mt-1 text-red-800">{copy.ageRequirementBody}</p>
     </div>
   );
 }

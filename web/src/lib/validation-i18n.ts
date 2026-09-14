@@ -8,6 +8,12 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Please select a valid date of birth.": "Seleccione una fecha de nacimiento válida.",
   "You are not eligible to register. Participants must be 18 years or older.":
     "No es elegible para registrarse. Los participantes deben tener 18 años o más.",
+  "Age requirement not met": "Requisito de edad no cumplido",
+  "You must be at least 18 years old to register for the panel.":
+    "Debe tener al menos 18 años para registrarse en el panel.",
+  "You must be at least 18 years old.": "Debe tener al menos 18 años.",
+  "Invalid date of birth": "Fecha de nacimiento no válida",
+  "Please select a valid month, day, and year.": "Seleccione un mes, día y año válidos.",
   "Please select your citizenship / residency status.":
     "Seleccione su estado de ciudadanía / residencia.",
   "You are not eligible to register under this citizenship / residency status.":
