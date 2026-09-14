@@ -21,6 +21,8 @@ export function FacebookAuthButton({
   mode = "login",
   eligibility,
   className = "",
+  label: labelOverride,
+  connectingLabel,
 }: {
   nextPath?: string;
   mode?: "login" | "signup";
@@ -30,19 +32,24 @@ export function FacebookAuthButton({
     dob?: string;
   };
   className?: string;
+  label?: string;
+  connectingLabel?: string;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const enabled = isFacebookLoginConfigured();
 
+  const connecting = connectingLabel ?? "Connecting Facebook…";
   const label =
-    mode === "signup"
+    labelOverride ??
+    (mode === "signup"
       ? submitting
-        ? "Connecting Facebook…"
+        ? connecting
         : "Sign up with Facebook"
       : submitting
-        ? "Connecting Facebook…"
-        : "Continue with Facebook";
+        ? connecting
+        : "Continue with Facebook");
+  const displayLabel = submitting && connectingLabel ? connectingLabel : label;
 
   const startFacebook = async () => {
     setError("");
@@ -90,7 +97,7 @@ export function FacebookAuthButton({
         className="inline-flex w-full min-h-12 items-center justify-center gap-2.5 rounded-xl bg-[#1877F2] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166FE5] disabled:opacity-60"
       >
         <FacebookGlyph />
-        {formatSiteCase(label)}
+        {formatSiteCase(displayLabel)}
       </button>
       {!enabled ? (
         <p className="mt-2 text-center text-xs text-zinc-500">

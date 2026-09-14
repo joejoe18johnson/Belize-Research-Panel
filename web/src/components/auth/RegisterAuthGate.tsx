@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AuthPageShell } from "./AuthPageShell";
-import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
 import { RegistrationLanguageStep } from "@/components/registration/RegistrationLanguageStep";
 import {
   REGISTER_GATE_COPY,
@@ -57,6 +56,8 @@ export function RegisterAuthGate({ nextPath = "/register" }: { nextPath?: string
   if (step === "language") {
     return (
       <AuthPageShell
+        locale={locale}
+        onLocaleChange={handleLocaleChange}
         title={copy.languageStep.titleBilingual}
         subtitle={copy.languageStep.subtitle}
         formatTitle={false}
@@ -71,10 +72,13 @@ export function RegisterAuthGate({ nextPath = "/register" }: { nextPath?: string
   }
 
   return (
-    <AuthPageShell title={t(copy.title)} subtitle={t(copy.subtitle)}>
-      <div className="mb-5 flex justify-end">
-        <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />
-      </div>
+    <AuthPageShell
+      locale={locale}
+      onLocaleChange={handleLocaleChange}
+      title={t(copy.title)}
+      subtitle={t(copy.subtitle)}
+      formatTitle={false}
+    >
       <div className="space-y-5 text-sm text-zinc-700 dark:text-zinc-300">
         <ol className="list-decimal space-y-2 pl-5">
           {copy.steps.map((stepText) => (

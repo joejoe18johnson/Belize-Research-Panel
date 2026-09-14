@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { HomeLocale } from "@/lib/home-locale";
 import { REGISTRATION_COPY, type RegistrationCopy } from "@/lib/registration-locale";
+import { SIGNUP_COPY, type SignupCopy } from "@/lib/signup-locale";
 
 const LocaleContext = createContext<HomeLocale>("en");
 
@@ -22,6 +23,10 @@ export function useLocale(): HomeLocale {
 
 export function useRegistrationCopy(): RegistrationCopy {
   return REGISTRATION_COPY[useLocale()];
+}
+
+export function useSignupCopy(): SignupCopy {
+  return SIGNUP_COPY[useLocale()];
 }
 
 /** English title-case for EN only; leave Spanish strings as authored. */

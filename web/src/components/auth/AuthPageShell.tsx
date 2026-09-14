@@ -1,12 +1,19 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { LanguageSwitcher } from "@/components/home/LanguageSwitcher";
+import { LocaleProvider } from "@/components/locale/LocaleProvider";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
 import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import { portalStickyHeaderClass } from "@/lib/brand";
 import { AUTH_CONTENT_MAX, pageRootClass } from "@/lib/layout-widths";
-import { formatHeadingCase, formatSiteCase } from "@/lib/sentence-case";
+import {
+  readStoredHomeLocale,
+  storeHomeLocale,
+  type HomeLocale,
+} from "@/lib/home-locale";
+import { formatSiteCase } from "@/lib/sentence-case";
 
 export function AuthPageShell({
   title,
@@ -14,44 +21,72 @@ export function AuthPageShell({
   children,
   footer,
   formatTitle = true,
+  locale: controlledLocale,
+  onLocaleChange,
 }: {
   title: string;
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
   formatTitle?: boolean;
+  /** When provided with onLocaleChange, shell is controlled by the parent. */
+  locale?: HomeLocale;
+  onLocaleChange?: (locale: HomeLocale) => void;
 }) {
+  const [internalLocale, setInternalLocale] = useState<HomeLocale>("en");
+  const locale = controlledLocale ?? internalLocale;
+
+  useEffect(() => {
+    if (controlledLocale != null) return;
+    const stored = readStoredHomeLocale();
+    setInternalLocale(stored);
+    document.documentElement.lang = stored;
+  }, [controlledLocale]);
+
+  const handleLocaleChange = (next: HomeLocale) => {
+    storeHomeLocale(next);
+    if (onLocaleChange) onLocaleChange(next);
+    else setInternalLocale(next);
+  };
+
+  const displayTitle = formatTitle && locale === "en" ? formatSiteCase(title) : title;
+  const displaySubtitle =
+    subtitle && formatTitle && locale === "en" ? formatSiteCase(subtitle) : subtitle;
+
   return (
-    <div className={`${pageRootClass} flex flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]`}>
-      <header className={portalStickyHeaderClass}>
-        <div className={`mx-auto ${AUTH_CONTENT_MAX}`}>
-          <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">
-            <BrpLogoLink href="/" variant="light" />
-            <ThemeIconButton />
-          </div>
-        </div>
-      </header>
-      <main className="flex flex-1 items-start justify-center px-3 py-8 sm:items-center sm:px-4 sm:py-16">
-        <div className={`w-full ${AUTH_CONTENT_MAX}`}>
-          <div className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.04] dark:border-teal-900/50 dark:bg-zinc-900 dark:shadow-black/20 sm:p-8">
-            <h1 className="text-xl font-bold text-teal-950 dark:text-teal-100 sm:text-2xl">
-              {formatTitle ? formatSiteCase(title) : title}
-            </h1>
-            {subtitle ? (
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                {formatTitle ? formatSiteCase(subtitle) : subtitle}
-              </p>
-            ) : null}
-            <div className="mt-6">{children}</div>
-            {footer ? (
-              <div className="mt-6 border-t border-zinc-100 pt-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-                {footer}
+    <LocaleProvider locale={locale}>
+      <div
+        className={`${pageRootClass} flex flex-col bg-[linear-gradient(180deg,#f0fdfa_0%,#f4f4f5_14rem,#f4f4f5_100%)] dark:bg-[linear-gradient(180deg,#042f2e_0%,#09090b_14rem,#09090b_100%)]`}
+      >
+        <header className={portalStickyHeaderClass}>
+          <div className={`mx-auto ${AUTH_CONTENT_MAX}`}>
+            <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">
+              <BrpLogoLink href="/" variant="light" />
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher locale={locale} onChange={handleLocaleChange} variant="light" />
+                <ThemeIconButton />
               </div>
-            ) : null}
+            </div>
           </div>
-        </div>
-      </main>
-      <BackToTopButton />
-    </div>
+        </header>
+        <main className="flex flex-1 items-start justify-center px-3 py-8 sm:items-center sm:px-4 sm:py-16">
+          <div className={`w-full ${AUTH_CONTENT_MAX}`}>
+            <div className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm shadow-teal-950/[0.04] dark:border-teal-900/50 dark:bg-zinc-900 dark:shadow-black/20 sm:p-8">
+              <h1 className="text-xl font-bold text-teal-950 dark:text-teal-100 sm:text-2xl">{displayTitle}</h1>
+              {displaySubtitle ? (
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{displaySubtitle}</p>
+              ) : null}
+              <div className="mt-6">{children}</div>
+              {footer ? (
+                <div className="mt-6 border-t border-zinc-100 pt-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+                  {footer}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </main>
+        <BackToTopButton />
+      </div>
+    </LocaleProvider>
   );
 }

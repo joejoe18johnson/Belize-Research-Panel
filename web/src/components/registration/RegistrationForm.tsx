@@ -21,7 +21,7 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
-import { useRegistrationCopy, useLocale } from "@/components/locale/LocaleProvider";
+import { useRegistrationCopy, useLocale, useSignupCopy } from "@/components/locale/LocaleProvider";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -172,6 +172,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const scrollToTopAfterPhaseChange = useRef(false);
   const pendingErrorScrollKeys = useRef<string[] | null>(null);
   const copy = useRegistrationCopy();
+  const signupCopy = useSignupCopy();
   const locale = useLocale();
 
   useEffect(() => {
@@ -836,6 +837,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             onChange={updateDob}
             onBlur={() => touchAndValidate("dob")}
             error={fieldError("dob")}
+            minAgeHint={signupCopy.dobMinAgeHint}
           />
         </div>
         </FormSection>

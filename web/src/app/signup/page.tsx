@@ -1,6 +1,4 @@
-import { AuthPageShell } from "@/components/auth/AuthPageShell";
-import { SignedInBanner } from "@/components/auth/SignedInBanner";
-import { SignupForm } from "@/components/auth/SignupForm";
+import { SignupPageClient } from "@/components/auth/SignupPageClient";
 import { getSessionAccount } from "@/lib/auth";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -20,13 +18,5 @@ export default async function SignupPage({
   const account = await getSessionAccount();
   const destination = nextPath ?? "/register";
 
-  return (
-    <AuthPageShell
-      title="Create your account"
-      subtitle="Confirm eligibility, then create your account with Facebook or email. Prefer WhatsApp or social contact if you do not use email."
-    >
-      {account ? <SignedInBanner account={account} nextPath={destination} /> : null}
-      <SignupForm nextPath={destination} />
-    </AuthPageShell>
-  );
+  return <SignupPageClient account={account} destination={destination} />;
 }

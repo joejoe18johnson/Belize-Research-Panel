@@ -64,6 +64,14 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Agregue un correo de registro válido en la sección de Contacto para usarlo como nombre de usuario.",
   "Your registration email cannot be used as a username. The part before @ must be 4–20 letters, numbers, underscores, hyphens, or periods.":
     "Su correo de registro no puede usarse como nombre de usuario. La parte antes de @ debe tener de 4 a 20 letras, números, guiones bajos, guiones o puntos.",
+  "Last name(s) is required.": "El apellido / los apellidos son obligatorios.",
+  "Email address is required.": "El correo electrónico es obligatorio.",
+  "Please confirm your password.": "Confirme su contraseña.",
+  "Passwords do not match.": "Las contraseñas no coinciden.",
+  "Could not create account.": "No se pudo crear la cuenta.",
+  "Network error. Please try again.": "Error de red. Inténtelo de nuevo.",
+  "This email address looks automated or suspicious. Use a personal email you check regularly.":
+    "Esta dirección de correo parece automatizada o sospechosa. Use un correo personal que revise con regularidad.",
   "Please confirm that your contact information is correct. Wrong details can mean missed research opportunities.":
     "Confirme que su información de contacto es correcta. Datos incorrectos pueden hacerle perder oportunidades de investigación.",
   "Photo ID type is required.": "El tipo de identificación con foto es obligatorio.",

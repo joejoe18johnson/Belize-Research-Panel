@@ -24,13 +24,21 @@ interface DateOfBirthPickerProps {
   onBlur?: () => void;
   error?: string;
   compact?: boolean;
+  minAgeHint?: string;
 }
 
 function emptyParts(): DobParts {
   return { day: "", month: "", year: "" };
 }
 
-export function DateOfBirthPicker({ value, onChange, onBlur, error, compact = false }: DateOfBirthPickerProps) {
+export function DateOfBirthPicker({
+  value,
+  onChange,
+  onBlur,
+  error,
+  compact = false,
+  minAgeHint = "You must be at least 18 years old.",
+}: DateOfBirthPickerProps) {
   const [parts, setParts] = useState<DobParts>(() =>
     value ? parseDobParts(value) : emptyParts()
   );
@@ -138,9 +146,7 @@ export function DateOfBirthPicker({ value, onChange, onBlur, error, compact = fa
         </Field>
       </div>
 
-      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-        You must be at least 18 years old.
-      </p>
+      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{minAgeHint}</p>
 
       {error ? (
         <p className="mt-3 text-sm text-red-600" role="alert">
