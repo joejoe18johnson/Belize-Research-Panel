@@ -186,6 +186,8 @@ export function MultiSelect({
   error,
   id,
   maxSelections,
+  labelFor,
+  selectionSummary,
 }: {
   options: string[];
   values: string[];
@@ -193,6 +195,9 @@ export function MultiSelect({
   error?: string;
   id?: string;
   maxSelections?: number;
+  /** Optional display label; stored values remain the English option strings. */
+  labelFor?: (option: string) => string;
+  selectionSummary?: string;
 }) {
   const atLimit = typeof maxSelections === "number" && values.length >= maxSelections;
 
@@ -209,13 +214,14 @@ export function MultiSelect({
     <div id={id}>
       {typeof maxSelections === "number" ? (
         <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
-          {values.length} of {maxSelections} selected
+          {selectionSummary ?? `${values.length} of ${maxSelections} selected`}
         </p>
       ) : null}
       <div className={`grid gap-3 lg:grid-cols-2 ${error ? "rounded-lg ring-2 ring-red-500/30 p-2" : ""}`}>
         {options.map((option) => {
           const selected = values.includes(option);
           const disabled = atLimit && !selected;
+          const label = labelFor ? labelFor(option) : formatSentenceCase(option);
           return (
           <label
             key={option}
@@ -234,7 +240,7 @@ export function MultiSelect({
               onChange={() => toggle(option)}
               className={siteCheckboxClass}
             />
-            <span>{formatSentenceCase(option)}</span>
+            <span>{label}</span>
           </label>
           );
         })}

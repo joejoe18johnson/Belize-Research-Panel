@@ -22,7 +22,7 @@ import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
 import { useRegistrationCopy, useLocale, useSignupCopy } from "@/components/locale/LocaleProvider";
-import { yesNoLabel } from "@/lib/registration-locale";
+import { yesNoLabel, marketInterestLabel } from "@/lib/registration-locale";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -475,7 +475,11 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       [rl.registeredCtv, ctvAsked ? asked(form.registeredCtvArea) : na],
       [
         rl.marketInterests,
-        interestsAsked ? asked(form.marketInterests.join(", ")) : na,
+        interestsAsked
+          ? asked(
+              form.marketInterests.map((interest) => marketInterestLabel(locale, interest)).join(", ")
+            )
+          : na,
       ],
       [rl.accountEmail, asked(account.email)],
       [rl.phone, asked(getFullPhoneNumber(form))],
@@ -1078,7 +1082,20 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 hint={copy.optional}
                 error={fieldError("marketInterests")}
               >
-                <MultiSelect id="marketInterests" options={MARKET_INTERESTS} values={form.marketInterests} maxSelections={MAX_MARKET_INTERESTS} onChange={(values) => { update("marketInterests", values); touch("marketInterests"); validateField("marketInterests", values); }} error={fieldError("marketInterests")} />
+                <MultiSelect
+                  id="marketInterests"
+                  options={MARKET_INTERESTS}
+                  values={form.marketInterests}
+                  maxSelections={MAX_MARKET_INTERESTS}
+                  labelFor={(option) => marketInterestLabel(locale, option)}
+                  selectionSummary={copy.selectedOfMax(form.marketInterests.length, MAX_MARKET_INTERESTS)}
+                  onChange={(values) => {
+                    update("marketInterests", values);
+                    touch("marketInterests");
+                    validateField("marketInterests", values);
+                  }}
+                  error={fieldError("marketInterests")}
+                />
               </Field>
             </FormSection>
           )}

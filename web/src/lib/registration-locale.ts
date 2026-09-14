@@ -141,6 +141,8 @@ export type RegistrationCopy = {
   constituencyQuestion: string;
   registeredCtvQuestion: (constituency: string) => string;
   marketInterestsLabel: string;
+  marketInterestLabels: Record<string, string>;
+  selectedOfMax: (count: number, max: number) => string;
   contactIntro: string;
   email: string;
   emailHint: string;
@@ -377,6 +379,21 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       `Where in the ${constituency} constituency were you living at the time you registered to vote there?`,
     marketInterestsLabel:
       "Select up to 5 products and services you are interested in and are willing to give feedback on.",
+    marketInterestLabels: {
+      Banking: "Banking",
+      Electronics: "Electronics",
+      "Household Goods": "Household Goods",
+      Insurance: "Insurance",
+      "Online Shopping": "Online Shopping",
+      "Real Estate": "Real Estate",
+      "Restaurants & Food": "Restaurants & Food",
+      "Supermarkets & Groceries": "Supermarkets & Groceries",
+      Telecommunications: "Telecommunications",
+      Travel: "Travel",
+      Utilities: "Utilities",
+      Vehicles: "Vehicles",
+    },
+    selectedOfMax: (count, max) => `${count} of ${max} selected`,
     contactIntro:
       "We need at least two means of contact in case one fails. If you live in Belize and do not have two other means of contact, please provide your complete street address.",
     email: "Email address",
@@ -604,6 +621,21 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       `¿Dónde en la circunscripción de ${constituency} vivía cuando se registró para votar allí?`,
     marketInterestsLabel:
       "Seleccione hasta 5 productos y servicios sobre los que le interesa dar su opinión.",
+    marketInterestLabels: {
+      Banking: "Banca",
+      Electronics: "Electrónica",
+      "Household Goods": "Artículos para el hogar",
+      Insurance: "Seguros",
+      "Online Shopping": "Compras en línea",
+      "Real Estate": "Bienes raíces",
+      "Restaurants & Food": "Restaurantes y comida",
+      "Supermarkets & Groceries": "Supermercados y abarrotes",
+      Telecommunications: "Telecomunicaciones",
+      Travel: "Viajes",
+      Utilities: "Servicios públicos",
+      Vehicles: "Vehículos",
+    },
+    selectedOfMax: (count, max) => `${count} de ${max} seleccionados`,
     contactIntro:
       "Necesitamos al menos dos medios de contacto por si uno falla. Si vive en Belice y no tiene dos otros medios de contacto, proporcione su dirección completa.",
     email: "Correo electrónico",
@@ -688,4 +720,9 @@ export function yesNoLabel(locale: HomeLocale, value: string): string {
   if (value === "Yes") return copy.yes;
   if (value === "No") return copy.no;
   return value;
+}
+
+/** Display label for a stored market interest value. */
+export function marketInterestLabel(locale: HomeLocale, value: string): string {
+  return REGISTRATION_COPY[locale].marketInterestLabels[value] ?? value;
 }
