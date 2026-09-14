@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useAuthCopy } from "@/components/locale/LocaleProvider";
 import {
   getSocialPlatformLabel,
   resolveSocialProfileUrl,
@@ -27,6 +28,7 @@ export function SocialProfilePreview({
   platform: SocialPlatform;
   value: string;
 }) {
+  const copy = useAuthCopy();
   const base = useMemo(() => resolveSocialProfileUrl(platform, value), [platform, value]);
   const [remoteName, setRemoteName] = useState<string | null>(null);
 
@@ -91,11 +93,11 @@ export function SocialProfilePreview({
           rel="noopener noreferrer"
           className="inline-flex shrink-0 items-center justify-center rounded-lg bg-teal-700 px-3 py-2 text-xs font-semibold text-white hover:bg-teal-800"
         >
-          View profile
+          {copy.socialViewProfile}
         </a>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-        Open the profile and confirm this is your {platformLabel} account before continuing.
+        {copy.socialConfirmProfile.replace("{platform}", platformLabel)}
       </p>
     </div>
   );

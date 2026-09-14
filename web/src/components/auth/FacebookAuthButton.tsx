@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useAuthCopy, useLocale } from "@/components/locale/LocaleProvider";
 import {
   FACEBOOK_ELIGIBILITY_STORAGE_KEY,
   isFacebookLoginConfigured,
 } from "@/lib/facebook-auth";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { localizeValidationMessage } from "@/lib/validation-i18n";
 import { formatSiteCase } from "@/lib/sentence-case";
 
 function FacebookGlyph({ className = "h-5 w-5" }: { className?: string }) {
@@ -35,28 +37,21 @@ export function FacebookAuthButton({
   label?: string;
   connectingLabel?: string;
 }) {
+  const copy = useAuthCopy();
+  const locale = useLocale();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const enabled = isFacebookLoginConfigured();
 
-  const connecting = connectingLabel ?? "Connecting Facebook…";
-  const label =
-    labelOverride ??
-    (mode === "signup"
-      ? submitting
-        ? connecting
-        : "Sign up with Facebook"
-      : submitting
-        ? connecting
-        : "Continue with Facebook");
-  const displayLabel = submitting && connectingLabel ? connectingLabel : label;
+  const connecting = connectingLabel ?? copy.facebookConnecting;
+  const defaultIdle = mode === "signup" ? copy.facebookSignup : copy.facebookContinue;
+  const label = labelOverride ?? (submitting ? connecting : defaultIdle);
+  const displayLabel = submitting ? connecting : label;
 
   const startFacebook = async () => {
     setError("");
     if (!enabled) {
-      setError(
-        "Facebook login will be available after Meta app verification and enabling Facebook in Supabase Auth."
-      );
+      setError(copy.facebookNotEnabled);
       return;
     }
 
@@ -79,11 +74,13 @@ export function FacebookAuthButton({
       });
 
       if (oauthError) {
-        setError(oauthError.message);
+        setError(localizeValidationMessage(oauthError.message, locale));
         setSubmitting(false);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start Facebook sign-in.");
+      const message =
+        err instanceof Error ? err.message : copy.facebookCouldNotStart;
+      setError(localizeValidationMessage(message, locale));
       setSubmitting(false);
     }
   };
@@ -97,24 +94,25 @@ export function FacebookAuthButton({
         className="inline-flex w-full min-h-12 items-center justify-center gap-2.5 rounded-xl bg-[#1877F2] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166FE5] disabled:opacity-60"
       >
         <FacebookGlyph />
-        {formatSiteCase(displayLabel)}
+        {locale === "en" ? formatSiteCase(displayLabel) : displayLabel}
       </button>
       {!enabled ? (
-        <p className="mt-2 text-center text-xs text-zinc-500">
-          Facebook sign-in is ready in the app. Enable the Facebook provider in Supabase after your Meta app is
-          verified.
-        </p>
+        <p className="mt-2 text-center text-xs text-zinc-500">{copy.facebookReadyHint}</p>
       ) : null}
       {error ? (
         <p className="mt-2 text-center text-sm text-red-600" role="alert">
-          {formatSiteCase(error)}
+          {locale === "en" ? formatSiteCase(error) : error}
         </p>
       ) : null}
     </div>
   );
 }
 
-export function AuthMethodDivider({ label = "or continue with email" }: { label?: string }) {
+export function AuthMethodDivider({ label }: { label?: string }) {
+  const copy = useAuthCopy();
+  const locale = useLocale();
+  const text = label ?? copy.orContinueWithEmail;
+
   return (
     <div className="relative my-5">
       <div className="absolute inset-0 flex items-center" aria-hidden>
@@ -122,7 +120,7 @@ export function AuthMethodDivider({ label = "or continue with email" }: { label?
       </div>
       <div className="relative flex justify-center text-xs uppercase tracking-wide">
         <span className="bg-white px-3 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
-          {formatSiteCase(label)}
+          {locale === "en" ? formatSiteCase(text) : text}
         </span>
       </div>
     </div>

@@ -5,9 +5,16 @@ import { useSearchParams } from "next/navigation";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { AuthPageSkeleton } from "@/components/shared/PageSkeletons";
+import { AUTH_COPY } from "@/lib/auth-locale";
 import { FACEBOOK_ELIGIBILITY_STORAGE_KEY } from "@/lib/facebook-auth";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import {
+  readStoredHomeLocale,
+  storeHomeLocale,
+  type HomeLocale,
+} from "@/lib/home-locale";
 import { safeAppNextPath } from "@/lib/login-redirect";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { localizeValidationMessage } from "@/lib/validation-i18n";
 
 type EligibilityPayload = {
   citizenshipStatus?: string;
@@ -18,8 +25,18 @@ type EligibilityPayload = {
 function AuthCallbackInner() {
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
+  const [locale, setLocale] = useState<HomeLocale>("en");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const stored = readStoredHomeLocale();
+    setLocale(stored);
+    document.documentElement.lang = stored;
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
     let cancelled = false;
 
     const finish = async () => {
@@ -105,24 +122,34 @@ function AuthCallbackInner() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams]);
+  }, [searchParams, ready]);
+
+  if (!ready) return null;
+
+  const copy = AUTH_COPY[locale];
 
   return (
-    <AuthPageShell title="Facebook sign-in" subtitle="Connecting your Facebook account to the Belize Research Panel.">
+    <AuthPageShell
+      locale={locale}
+      onLocaleChange={(next) => {
+        storeHomeLocale(next);
+        setLocale(next);
+      }}
+      formatTitle={false}
+      title={copy.facebookPageTitle}
+      subtitle={copy.facebookPageSubtitle}
+    >
       {error ? (
-        <BrandedAlert tone="error" title="Could not sign in with Facebook" showIcon>
-          <p>{error}</p>
-          <p className="mt-2 text-sm">
-            If Meta / Facebook Login is still pending verification, finish setup in the Meta Developer Console and enable
-            the Facebook provider in Supabase Auth, then try again.
-          </p>
+        <BrandedAlert tone="error" title={copy.facebookCouldNotSignIn} showIcon formatBody={false}>
+          <p>{localizeValidationMessage(error, locale)}</p>
+          <p className="mt-2 text-sm">{copy.facebookSetupHelp}</p>
           <a href="/login" className="mt-3 inline-block font-semibold text-teal-800 underline">
-            Back to login
+            {copy.backToLogin}
           </a>
         </BrandedAlert>
       ) : (
-        <BrandedAlert tone="info" title="Please wait" showIcon>
-          Finishing Facebook sign-in…
+        <BrandedAlert tone="info" title={copy.facebookPleaseWait} showIcon formatBody={false}>
+          {copy.facebookFinishing}
         </BrandedAlert>
       )}
     </AuthPageShell>

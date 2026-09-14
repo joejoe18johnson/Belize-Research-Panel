@@ -18,6 +18,8 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Seleccione su estado de ciudadanía / residencia.",
   "You are not eligible to register under this citizenship / residency status.":
     "No es elegible para registrarse con este estado de ciudadanía / residencia.",
+  "You are not eligible to join the Belize Research Panel.":
+    "No es elegible para unirse al Belize Research Panel.",
   "Please indicate your voter registration status.":
     "Indique su estado de registro como votante.",
   "Please provide proof of residence in Belize for Commonwealth citizens.":
@@ -76,8 +78,57 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Passwords do not match.": "Las contraseñas no coinciden.",
   "Could not create account.": "No se pudo crear la cuenta.",
   "Network error. Please try again.": "Error de red. Inténtelo de nuevo.",
+  "An account with this email already exists. Try logging in instead.":
+    "Ya existe una cuenta con este correo. Intente iniciar sesión.",
+  "Another account already uses this email with that password. Choose a different password so you can sign in to this new account.":
+    "Otra cuenta ya usa este correo con esa contraseña. Elija una contraseña diferente para iniciar sesión en esta cuenta nueva.",
+  "Account storage is not configured on this server. The site administrator must add Supabase environment variables in the hosting dashboard.":
+    "El almacenamiento de cuentas no está configurado en este servidor. El administrador del sitio debe agregar las variables de entorno de Supabase en el panel de alojamiento.",
+  "Account storage is not configured. Add Supabase environment variables in the hosting dashboard.":
+    "El almacenamiento de cuentas no está configurado. Agregue las variables de entorno de Supabase en el panel de alojamiento.",
+  "Disposable or temporary email addresses cannot be used to join the panel.":
+    "No se pueden usar correos desechables o temporales para unirse al panel.",
   "This email address looks automated or suspicious. Use a personal email you check regularly.":
     "Esta dirección de correo parece automatizada o sospechosa. Use un correo personal que revise con regularidad.",
+  "Verification email could not be sent.": "No se pudo enviar el correo de verificación.",
+  "Sign in to resend the verification email.":
+    "Inicie sesión para reenviar el correo de verificación.",
+  "Your email is already verified.": "Su correo ya está verificado.",
+  "Please wait a minute before requesting another verification email.":
+    "Espere un minuto antes de solicitar otro correo de verificación.",
+  "Could not resend verification email.": "No se pudo reenviar el correo de verificación.",
+  "Could not resend the email.": "No se pudo reenviar el correo.",
+  "We sent a new verification link. Check your inbox and spam folder.":
+    "Enviamos un nuevo enlace de verificación. Revise su bandeja de entrada y el correo no deseado.",
+  "We could not send the email. Use the verification link on this page.":
+    "No pudimos enviar el correo. Use el enlace de verificación en esta página.",
+  "Check your inbox for a new link.": "Revise su bandeja de entrada para un nuevo enlace.",
+  "Invalid email or password.": "Correo o contraseña no válidos.",
+  "Login failed.": "Error al iniciar sesión.",
+  "Facebook login is not configured on this site yet.":
+    "El inicio de sesión con Facebook aún no está configurado en este sitio.",
+  "Missing Facebook session.": "Falta la sesión de Facebook.",
+  "Could not verify Facebook sign-in.": "No se pudo verificar el inicio de sesión con Facebook.",
+  "Facebook user id was not returned.": "No se devolvió el identificador de usuario de Facebook.",
+  "Facebook session was not created. Try again.":
+    "No se creó la sesión de Facebook. Inténtelo de nuevo.",
+  "Could not complete Facebook sign-in.": "No se pudo completar el inicio de sesión con Facebook.",
+  "Facebook sign-in failed.": "Falló el inicio de sesión con Facebook.",
+  "Could not start Facebook sign-in.": "No se pudo iniciar el acceso con Facebook.",
+  "Facebook login will be available after Meta app verification and enabling Facebook in Supabase Auth.":
+    "El inicio de sesión con Facebook estará disponible después de la verificación de la app de Meta y de habilitar Facebook en Supabase Auth.",
+  "You must be logged in to register.": "Debe iniciar sesión para registrarse.",
+  "Verify your email before completing registration.":
+    "Verifique su correo antes de completar el registro.",
+  "You have already completed panelist registration.":
+    "Ya completó el registro como panelista.",
+  "Account not found.": "Cuenta no encontrada.",
+  "We could not upload your identification documents. Try smaller JPG or PDF files, or try again in a moment.":
+    "No pudimos subir sus documentos de identificación. Pruebe con archivos JPG o PDF más pequeños, o inténtelo de nuevo en un momento.",
+  "Registration storage is not configured on this server. Please contact support or try again later.":
+    "El almacenamiento de registro no está configurado en este servidor. Contacte a soporte o inténtelo más tarde.",
+  "Registration could not be completed. Please try again or contact support if the problem continues.":
+    "No se pudo completar el registro. Inténtelo de nuevo o contacte a soporte si el problema continúa.",
   "Please confirm that your contact information is correct. Wrong details can mean missed research opportunities.":
     "Confirme que su información de contacto es correcta. Datos incorrectos pueden hacerle perder oportunidades de investigación.",
   "Photo ID type is required.": "El tipo de identificación con foto es obligatorio.",
@@ -128,6 +179,76 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Error de red. Revise su conexión e inténtelo de nuevo.",
   "Please fix the highlighted fields before continuing.":
     "Corrija los campos resaltados antes de continuar.",
+  "Argentina numbers use 10 digits.": "Los números de Argentina usan 10 dígitos.",
+  "Australia numbers use 9 digits (without the leading 0).":
+    "Los números de Australia usan 9 dígitos (sin el 0 inicial).",
+  "Bahamas numbers use 7 digits after +1 242.":
+    "Los números de Bahamas usan 7 dígitos después de +1 242.",
+  "Barbados numbers use 7 digits after +1 246.":
+    "Los números de Barbados usan 7 dígitos después de +1 246.",
+  "Belize mobile / WhatsApp numbers use exactly 7 digits and start with 6.":
+    "Los números móviles / WhatsApp de Belice usan exactamente 7 dígitos y empiezan con 6.",
+  "Brazil numbers use 10–11 digits (including area code).":
+    "Los números de Brasil usan 10–11 dígitos (incluido el código de área).",
+  "Chile numbers use 9 digits.": "Los números de Chile usan 9 dígitos.",
+  "China mobile numbers use 11 digits.": "Los números móviles de China usan 11 dígitos.",
+  "Colombia numbers use 10 digits.": "Los números de Colombia usan 10 dígitos.",
+  "Costa Rica numbers use 8 digits.": "Los números de Costa Rica usan 8 dígitos.",
+  "Cuba numbers use 8 digits.": "Los números de Cuba usan 8 dígitos.",
+  "Ecuador numbers use 9 digits.": "Los números de Ecuador usan 9 dígitos.",
+  "El Salvador numbers use 8 digits.": "Los números de El Salvador usan 8 dígitos.",
+  "UAE numbers use 9 digits (without the leading 0).":
+    "Los números de EAU usan 9 dígitos (sin el 0 inicial).",
+  "France numbers use 9 digits (without the leading 0).":
+    "Los números de Francia usan 9 dígitos (sin el 0 inicial).",
+  "Germany numbers usually use 10–11 digits (without the leading 0).":
+    "Los números de Alemania suelen usar 10–11 dígitos (sin el 0 inicial).",
+  "Guatemala numbers use 8 digits.": "Los números de Guatemala usan 8 dígitos.",
+  "Hong Kong numbers use 8 digits.": "Los números de Hong Kong usan 8 dígitos.",
+  "Honduras numbers use 8 digits.": "Los números de Honduras usan 8 dígitos.",
+  "India mobile numbers use 10 digits.": "Los números móviles de India usan 10 dígitos.",
+  "Ireland numbers use 9 digits (without the leading 0).":
+    "Los números de Irlanda usan 9 dígitos (sin el 0 inicial).",
+  "Italy mobile numbers usually use 9–10 digits.":
+    "Los números móviles de Italia suelen usar 9–10 dígitos.",
+  "Jamaica numbers use 7 digits after +1 876.":
+    "Los números de Jamaica usan 7 dígitos después de +1 876.",
+  "Japan mobile numbers use 10 digits (without the leading 0).":
+    "Los números móviles de Japón usan 10 dígitos (sin el 0 inicial).",
+  "Mexico numbers use 10 digits.": "Los números de México usan 10 dígitos.",
+  "Netherlands numbers use 9 digits (without the leading 0).":
+    "Los números de Países Bajos usan 9 dígitos (sin el 0 inicial).",
+  "New Zealand numbers usually use 8–10 digits (without the leading 0).":
+    "Los números de Nueva Zelanda suelen usar 8–10 dígitos (sin el 0 inicial).",
+  "Nigeria numbers use 10 digits (without the leading 0).":
+    "Los números de Nigeria usan 10 dígitos (sin el 0 inicial).",
+  "Nicaragua numbers use 8 digits.": "Los números de Nicaragua usan 8 dígitos.",
+  "Panama numbers use 8 digits.": "Los números de Panamá usan 8 dígitos.",
+  "Philippines mobile numbers use 10 digits.":
+    "Los números móviles de Filipinas usan 10 dígitos.",
+  "Peru numbers use 9 digits.": "Los números de Perú usan 9 dígitos.",
+  "Saudi Arabia numbers use 9 digits (without the leading 0).":
+    "Los números de Arabia Saudita usan 9 dígitos (sin el 0 inicial).",
+  "Singapore numbers use 8 digits.": "Los números de Singapur usan 8 dígitos.",
+  "South Africa numbers use 9 digits (without the leading 0).":
+    "Los números de Sudáfrica usan 9 dígitos (sin el 0 inicial).",
+  "South Korea numbers usually use 9–10 digits (without the leading 0).":
+    "Los números de Corea del Sur suelen usar 9–10 dígitos (sin el 0 inicial).",
+  "Spain numbers use 9 digits.": "Los números de España usan 9 dígitos.",
+  "Sweden numbers use 9 digits (without the leading 0).":
+    "Los números de Suecia usan 9 dígitos (sin el 0 inicial).",
+  "Switzerland numbers use 9 digits (without the leading 0).":
+    "Los números de Suiza usan 9 dígitos (sin el 0 inicial).",
+  "Taiwan mobile numbers use 9 digits.": "Los números móviles de Taiwán usan 9 dígitos.",
+  "Trinidad and Tobago numbers use 7 digits after +1 868.":
+    "Los números de Trinidad y Tobago usan 7 dígitos después de +1 868.",
+  "US / Canada numbers use 10 digits (area code + number).":
+    "Los números de EE. UU. / Canadá usan 10 dígitos (código de área + número).",
+  "UK numbers use 10 digits (without the leading 0).":
+    "Los números del Reino Unido usan 10 dígitos (sin el 0 inicial).",
+  "Venezuela numbers use 10 digits.": "Los números de Venezuela usan 10 dígitos.",
+  "Enter the phone number without the country code.":
+    "Ingrese el número de teléfono sin el código de país.",
 };
 
 const PHONE_EXACT_RE =
@@ -140,6 +261,8 @@ const PHONE_PREFIX_RE = /^(.+) phone numbers must start with (.+)\.$/;
 const HOUSEHOLD_MAX_RE =
   /^Please enter a household size of (\d+) or fewer, or contact us if this is a larger household\.$/;
 const MARKET_MAX_RE = /^Please select up to (\d+) market research interests\.$/;
+const DRAFT_RESTORE_RE = /^Your saved answers were restored\. Please re-upload: (.+)\.$/;
+const REGISTRATION_DETAIL_RE = /^Registration could not be completed: (.+)$/;
 
 /** Translate a validation / form error string for the active locale. */
 export function localizeValidationMessage(message: string, locale: HomeLocale): string {
@@ -172,6 +295,14 @@ export function localizeValidationMessage(message: string, locale: HomeLocale): 
   match = text.match(MARKET_MAX_RE);
   if (match) {
     return `Seleccione hasta ${match[1]} intereses de investigación de mercado.`;
+  }
+  match = text.match(DRAFT_RESTORE_RE);
+  if (match) {
+    return `Se restauraron sus respuestas guardadas. Vuelva a subir: ${match[1]}.`;
+  }
+  match = text.match(REGISTRATION_DETAIL_RE);
+  if (match) {
+    return `No se pudo completar el registro: ${match[1]}`;
   }
 
   return text;

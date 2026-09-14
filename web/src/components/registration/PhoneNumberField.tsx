@@ -1,8 +1,10 @@
 "use client";
 
+import { useAuthCopy, useLocale } from "@/components/locale/LocaleProvider";
 import { getPhoneNumberRule, PHONE_COUNTRY_CODES } from "@/lib/phone-codes";
 import { phoneLocalDigits } from "@/lib/validation";
-import { Field, SelectInput, TextInput } from "./form-ui";
+import { localizeValidationMessage } from "@/lib/validation-i18n";
+import { SelectInput, TextInput } from "./form-ui";
 
 export function PhoneNumberField({
   countryCode,
@@ -21,6 +23,8 @@ export function PhoneNumberField({
   error?: string;
   id?: string;
 }) {
+  const copy = useAuthCopy();
+  const locale = useLocale();
   const rule = getPhoneNumberRule(countryCode);
 
   const handleLocalChange = (value: string) => {
@@ -33,14 +37,14 @@ export function PhoneNumberField({
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start">
         <div className="sm:w-52 sm:shrink-0">
           <label htmlFor="phoneCountryCode" className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
-            Country code
+            {copy.phoneCountryCode}
           </label>
           <SelectInput
             id="phoneCountryCode"
             value={countryCode}
             onChange={(e) => onCountryCodeChange(e.target.value)}
             onBlur={onBlur}
-            aria-label="Country code"
+            aria-label={copy.phoneCountryCode}
           >
             {PHONE_COUNTRY_CODES.map((entry) => (
               <option key={entry.code} value={entry.code}>
@@ -51,7 +55,7 @@ export function PhoneNumberField({
         </div>
         <div className="min-w-0 flex-1">
           <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
-            Phone number
+            {copy.phoneNumber}
           </label>
           <TextInput
             id={id}
@@ -67,7 +71,11 @@ export function PhoneNumberField({
           />
         </div>
       </div>
-      {!error ? <p className="text-xs text-zinc-500 dark:text-zinc-400">{rule.hint}</p> : null}
+      {!error ? (
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          {localizeValidationMessage(rule.hint, locale)}
+        </p>
+      ) : null}
     </div>
   );
 }

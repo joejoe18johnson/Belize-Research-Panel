@@ -728,8 +728,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       />
 
       {draftNotice ? (
-        <Alert variant="info">
-          {draftNotice}
+        <Alert variant="info" formatBody={false}>
+          {localizeValidationMessage(draftNotice, locale)}
           <button
             type="button"
             className="ml-2 font-medium underline"

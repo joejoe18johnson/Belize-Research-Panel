@@ -1,7 +1,4 @@
-import { AuthPageShell } from "@/components/auth/AuthPageShell";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { SignedInBanner } from "@/components/auth/SignedInBanner";
-import { BrandedAlert } from "@/components/shared/BrandedFeedback";
+import { LoginPageClient } from "@/components/auth/LoginPageClient";
 import { getSessionAccount } from "@/lib/auth";
 import { safeAppNextPath } from "@/lib/login-redirect";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -31,17 +28,11 @@ export default async function LoginPage({
   }
 
   return (
-    <AuthPageShell
-      title="Panelist login"
-      subtitle="Sign in with Facebook or with the email and password you used when creating your account."
-    >
-      {verified === "1" ? (
-        <BrandedAlert tone="success" title="Congratulations, your email has been verified" className="mb-6" showIcon>
-          Please log in to continue with account registration.
-        </BrandedAlert>
-      ) : null}
-      {account ? <SignedInBanner account={account} nextPath={destination} /> : null}
-      <LoginForm nextPath={destination} initialEmail={initialEmail ?? ""} />
-    </AuthPageShell>
+    <LoginPageClient
+      account={account}
+      destination={destination}
+      initialEmail={initialEmail ?? ""}
+      verified={verified === "1"}
+    />
   );
 }

@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AuthPageShell } from "@/components/auth/AuthPageShell";
+import { VerifyEmailClient } from "./VerifyEmailClient";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
@@ -22,98 +21,24 @@ export default async function VerifyEmailPage({
   }
 
   if (verified === "1") {
-    return (
-      <AuthPageShell
-        title="Congratulations, your email has been verified"
-        subtitle="Please log in to continue with account registration."
-      >
-        <div className="flex flex-col gap-3">
-          <Link
-            href="/login?next=/register&verified=1"
-            className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/"
-            className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            Back to home
-          </Link>
-        </div>
-      </AuthPageShell>
-    );
+    return <VerifyEmailClient state={{ kind: "verified" }} />;
   }
 
   if (purpose === "email-change" && token) {
-    return (
-      <AuthPageShell
-        title="Administrator approval required"
-        subtitle="Email address changes are reviewed by our team. If you recently requested a new email, your account stays on hold until an administrator approves the change."
-      >
-        <Link
-          href="/dashboard/account-on-hold"
-          className="inline-block rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800"
-        >
-          View account status
-        </Link>
-      </AuthPageShell>
-    );
+    return <VerifyEmailClient state={{ kind: "email-change" }} />;
   }
 
   if (error === "missing") {
-    return (
-      <AuthPageShell title="Invalid verification link" subtitle="This verification link is missing or incomplete.">
-        <Link href="/signup" className="inline-block rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800">
-          Create account
-        </Link>
-      </AuthPageShell>
-    );
+    return <VerifyEmailClient state={{ kind: "missing" }} />;
   }
 
   if (error === "expired") {
-    return (
-      <AuthPageShell title="Verification link expired" subtitle="This link may have already been used or is no longer valid.">
-        <div className="flex flex-col gap-3">
-          <Link href="/login" className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800">
-            Log in
-          </Link>
-          <Link href="/signup" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
-            Create a new account
-          </Link>
-        </div>
-      </AuthPageShell>
-    );
+    return <VerifyEmailClient state={{ kind: "expired" }} />;
   }
 
   if (error === "failed") {
-    return (
-      <AuthPageShell title="Verification failed" subtitle="We could not verify your email right now. Try again or log in if you already verified.">
-        <div className="flex flex-col gap-3">
-          <Link href="/login" className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800">
-            Log in
-          </Link>
-          <Link href="/signup" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
-            Create account
-          </Link>
-        </div>
-      </AuthPageShell>
-    );
+    return <VerifyEmailClient state={{ kind: "failed" }} />;
   }
 
-  return (
-    <AuthPageShell
-      title="Check your email"
-      subtitle="Open the verification link we sent to your inbox to continue panelist registration."
-    >
-      <div className="flex flex-col gap-3">
-        <Link href="/signup/check-email" className="rounded-xl bg-teal-700 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-800">
-          Go to verification help
-        </Link>
-        <Link href="/login" className="rounded-xl border border-zinc-300 px-5 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950">
-          Log in
-        </Link>
-      </div>
-    </AuthPageShell>
-  );
+  return <VerifyEmailClient state={{ kind: "default" }} />;
 }
