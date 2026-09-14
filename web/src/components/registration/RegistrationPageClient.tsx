@@ -45,7 +45,7 @@ function RegistrationVerifiedShell({
               <LanguageSwitcher locale={locale} onChange={onLocaleChange} variant="light" />
               <Link
                 href="/account/delete"
-                className="hidden text-xs font-medium text-zinc-500 hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-200 lg:inline"
+                className="hidden min-h-11 items-center rounded-xl border border-red-500 px-3 text-xs font-semibold text-red-700 hover:bg-red-50 dark:border-red-500 dark:text-red-300 dark:hover:bg-red-950/40 lg:inline-flex"
               >
                 {display(copy.deleteAccount, formatHeadingCase)}
               </Link>
