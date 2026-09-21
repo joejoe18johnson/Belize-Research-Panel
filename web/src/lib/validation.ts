@@ -5,7 +5,6 @@ import {
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
   HOUSEHOLD_HEAD_OPTIONS,
-  MAX_HOUSEHOLD_SIZE,
   MAX_MARKET_INTERESTS,
   OTHER_RESIDENCE_COUNTRIES,
   hasRegisteredCtvQuestion,
@@ -487,8 +486,8 @@ export function validateRegistrationForm(
       const size = Number(householdSizeText);
       if (size < 1) {
         errors.householdSize = "Household size must include at least yourself.";
-      } else if (size > MAX_HOUSEHOLD_SIZE) {
-        errors.householdSize = `Please enter a household size of ${MAX_HOUSEHOLD_SIZE} or fewer, or contact us if this is a larger household.`;
+      } else if (size > 9) {
+        errors.householdSize = "Please ensure that you have entered the correct household size.";
       }
     }
   }

@@ -1012,7 +1012,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   max={MAX_HOUSEHOLD_SIZE}
                   step={1}
                   value={form.householdSize}
-                  onChange={(e) => update("householdSize", e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    update("householdSize", value);
+                    touch("householdSize");
+                    validateField("householdSize", value);
+                  }}
                   onBlur={() => touchAndValidate("householdSize")}
                   onKeyDown={(e) => {
                     if (e.key !== "Enter") return;

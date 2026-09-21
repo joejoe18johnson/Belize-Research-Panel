@@ -43,6 +43,8 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Indique cuántas personas viven en su hogar, incluyéndose a usted.",
   "Household size must include at least yourself.":
     "El tamaño del hogar debe incluir al menos a usted.",
+  "Please ensure that you have entered the correct household size.":
+    "Asegúrese de haber ingresado el tamaño de hogar correcto.",
   "Residence selection is required.": "La selección de residencia es obligatoria.",
   "Country of residence is required.": "El país de residencia es obligatorio.",
   "Please specify your country of residence.": "Especifique su país de residencia.",
