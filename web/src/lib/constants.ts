@@ -136,7 +136,7 @@ export const HOUSEHOLD_DEFINITION =
   "A household is a person or group of people living together in the same dwelling and sharing meals and other living arrangements, whether or not they are related.";
 export const HEAD_OF_HOUSEHOLD_DEFINITION =
   "The head of household is the person who is recognised by the household members as the main decision-maker or person primarily responsible for the household.";
-export const MAX_HOUSEHOLD_SIZE = 50;
+export const MAX_HOUSEHOLD_SIZE = 20;
 
 export function isHeadOfHousehold(relationship: string): boolean {
   return relationship === HOUSEHOLD_HEAD_YES || relationship === "I am the head of my household";

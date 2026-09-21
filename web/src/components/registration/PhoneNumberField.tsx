@@ -1,7 +1,11 @@
 "use client";
 
 import { useAuthCopy, useLocale } from "@/components/locale/LocaleProvider";
-import { getPhoneNumberRule, PHONE_COUNTRY_CODES } from "@/lib/phone-codes";
+import {
+  formatPhoneLocalDisplay,
+  getPhoneNumberRule,
+  PHONE_COUNTRY_CODES,
+} from "@/lib/phone-codes";
 import { phoneLocalDigits } from "@/lib/validation";
 import { localizeValidationMessage } from "@/lib/validation-i18n";
 import { SelectInput, TextInput } from "./form-ui";
@@ -26,6 +30,8 @@ export function PhoneNumberField({
   const copy = useAuthCopy();
   const locale = useLocale();
   const rule = getPhoneNumberRule(countryCode);
+  const displayValue = formatPhoneLocalDisplay(localNumber, countryCode);
+  const maxDisplayLength = rule.maxLength + Math.max(0, rule.displayGroups.length - 1);
 
   const handleLocalChange = (value: string) => {
     const digits = phoneLocalDigits(value).slice(0, rule.maxLength);
@@ -61,13 +67,13 @@ export function PhoneNumberField({
             id={id}
             type="tel"
             inputMode="numeric"
-            value={localNumber}
+            value={displayValue}
             onChange={(e) => handleLocalChange(e.target.value)}
             onBlur={onBlur}
             placeholder={rule.example}
             error={error}
             autoComplete="tel-national"
-            maxLength={rule.maxLength}
+            maxLength={maxDisplayLength}
           />
         </div>
       </div>

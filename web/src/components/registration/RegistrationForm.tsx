@@ -21,8 +21,9 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
-import { useRegistrationCopy, useLocale, useSignupCopy } from "@/components/locale/LocaleProvider";
+import { useRegistrationCopy, useLocale } from "@/components/locale/LocaleProvider";
 import { yesNoLabel, marketInterestLabel } from "@/lib/registration-locale";
+import { citizenshipLabelFor } from "@/lib/signup-locale";
 import {
   BELIZE_DISTRICTS,
   CITIZENSHIP_STATUS,
@@ -146,12 +147,34 @@ function buildInitialForm(account: RegistrationAccountContext): RegistrationForm
   };
 }
 
+function withAccountCitizenshipLock(
+  form: RegistrationFormData,
+  account: RegistrationAccountContext
+): RegistrationFormData {
+  const locked = cleanText(account.citizenshipStatus);
+  if (!locked) return form;
+  return {
+    ...form,
+    citizenshipStatus: locked,
+    commonwealthCountry: isCommonwealthCitizenInBelize(locked)
+      ? form.commonwealthCountry || account.commonwealthCountry || ""
+      : "",
+    placeOfResidence: mustLiveAbroad(locked)
+      ? "Abroad"
+      : form.placeOfResidence === "Abroad"
+        ? ""
+        : form.placeOfResidence,
+  };
+}
+
 export function RegistrationForm({ account }: { account: RegistrationAccountContext }) {
   const router = useRouter();
+  const citizenshipLocked = Boolean(cleanText(account.citizenshipStatus));
   const [form, setForm] = useState<RegistrationFormData>(() => {
     const base = buildInitialForm(account);
     const draft = loadRegistrationDraft(account.email);
-    return draft ? mergeDraftIntoForm(base, draft) : base;
+    const merged = draft ? mergeDraftIntoForm(base, draft) : base;
+    return withAccountCitizenshipLock(merged, account);
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -171,7 +194,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const scrollToTopAfterPhaseChange = useRef(false);
   const pendingErrorScrollKeys = useRef<string[] | null>(null);
   const copy = useRegistrationCopy();
-  const signupCopy = useSignupCopy();
   const locale = useLocale();
 
   useEffect(() => {
@@ -365,6 +387,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   };
 
   const updateCitizenship = (citizenshipStatus: string) => {
+    if (citizenshipLocked) return;
     setForm((prev) => ({
       ...prev,
       citizenshipStatus,
@@ -811,19 +834,37 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       <div id="citizenship-section">
         <FormSection step={1} title={copy.sections.citizenship}>
           <div className="flex flex-col gap-3">
-            {CITIZENSHIP_STATUS.map((status) => (
-              <label key={status} className={choiceBoxLabelClass}>
-                <input
-                  type="radio"
-                  name="citizenshipStatus"
-                  checked={form.citizenshipStatus === status}
-                  onChange={() => updateCitizenship(status)}
-                  className={siteRadioClass}
-                />
-                <span>{status}</span>
-              </label>
-            ))}
+            {CITIZENSHIP_STATUS.map((status) => {
+              const selected = form.citizenshipStatus === status;
+              return (
+                <label
+                  key={status}
+                  className={`${choiceBoxLabelClass}${
+                    selected
+                      ? " border-teal-600 bg-teal-50/50 dark:border-teal-500 dark:bg-teal-950/30"
+                      : ""
+                  }${citizenshipLocked ? " cursor-default" : ""}${
+                    citizenshipLocked && !selected ? " opacity-55" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="citizenshipStatus"
+                    checked={selected}
+                    disabled={citizenshipLocked}
+                    onChange={() => updateCitizenship(status)}
+                    className={siteRadioClass}
+                  />
+                  <span className={selected ? "font-medium" : undefined}>
+                    {citizenshipLabelFor(locale, status)}
+                  </span>
+                </label>
+              );
+            })}
           </div>
+          {citizenshipLocked ? (
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{copy.citizenshipLockedNote}</p>
+          ) : null}
           {citizenshipIneligible ? (
             <Alert variant="error">
               {copy.citizenshipIneligible}
@@ -845,7 +886,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             onChange={updateDob}
             onBlur={() => touchAndValidate("dob")}
             error={fieldError("dob")}
-            minAgeHint={signupCopy.dobMinAgeHint}
           />
         </div>
         </FormSection>
@@ -967,12 +1007,26 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   id="householdSize"
                   type="number"
                   inputMode="numeric"
+                  enterKeyHint="go"
                   min={1}
                   max={MAX_HOUSEHOLD_SIZE}
                   step={1}
                   value={form.householdSize}
                   onChange={(e) => update("householdSize", e.target.value)}
                   onBlur={() => touchAndValidate("householdSize")}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return;
+                    e.preventDefault();
+                    (e.currentTarget as HTMLInputElement).blur();
+                    const next = document.getElementById("residence-section");
+                    if (next instanceof HTMLElement) {
+                      next.scrollIntoView({ behavior: "smooth", block: "start" });
+                      const focusable = next.querySelector<HTMLElement>(
+                        "input:not([type='hidden']), select, textarea, button"
+                      );
+                      focusable?.focus();
+                    }
+                  }}
                   error={fieldError("householdSize")}
                 />
               </Field>

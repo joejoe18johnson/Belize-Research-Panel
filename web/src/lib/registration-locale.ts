@@ -120,6 +120,7 @@ export type RegistrationCopy = {
   photoIdUpload: string;
   commonwealthCountry: string;
   citizenshipIneligible: string;
+  citizenshipLockedNote: string;
   voterQuestion: string;
   proofAlert: string;
   proofType: string;
@@ -231,9 +232,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     logOut: "Log out",
     loggingOut: "Logging out…",
     dismiss: "Dismiss",
-    exclusiveTitle: "Exclusive Belize Research Panel",
+    exclusiveTitle: "Thank you for joining the Belize Research Panel!",
     exclusiveBody:
-      "Complete registration to join the panel. Your information is kept confidential and used only for legitimate research.",
+      "Please take care to provide accurate and complete information. Your input is important and helps us produce high-quality research that is useful and reliable.",
     phaseFixAlert: "Please fix the highlighted fields in this section before continuing.",
     stepOf: (current, total) => `Step ${current} of ${total}`,
     progressAria: "Registration progress",
@@ -354,13 +355,15 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     commonwealthCountry: "Commonwealth country of citizenship",
     citizenshipIneligible:
       "You are not eligible to register under this citizenship / residency status. Choose a qualifying option or return home.",
+    citizenshipLockedNote:
+      "Confirmed when you created your account. It cannot be changed here.",
     voterQuestion: "Are you registered to vote in Belize?",
     proofAlert:
       "Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.",
     proofType: "Proof of residence in Belize",
     proofUpload: "Upload proof of Belize residence",
     nameAlert:
-      "Enter your first name and last name(s) exactly as they appear on your government-issued photo ID. If you have more than one last name, include all of them.",
+      "Enter your name exactly as it appears on the Belize voters list if you are a registered voter. If you are not a registered voter in Belize, enter your name exactly as it appears on the photo ID attached to this form.",
     firstName: "First name",
     lastName: "Last name(s)",
     sex: "Sex",
@@ -473,9 +476,9 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     logOut: "Cerrar sesión",
     loggingOut: "Cerrando sesión…",
     dismiss: "Cerrar",
-    exclusiveTitle: "Panel exclusivo de investigación de Belice",
+    exclusiveTitle: "¡Gracias por unirse al Belize Research Panel!",
     exclusiveBody:
-      "Complete el registro para unirse al panel. Su información se mantiene confidencial y se usa solo para investigación legítima.",
+      "Tenga cuidado de proporcionar información precisa y completa. Su aporte es importante y nos ayuda a producir investigación de alta calidad, útil y confiable.",
     phaseFixAlert: "Corrija los campos resaltados en esta sección antes de continuar.",
     stepOf: (current, total) => `Paso ${current} de ${total}`,
     progressAria: "Progreso del registro",
@@ -596,13 +599,15 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     commonwealthCountry: "País de ciudadanía de la Commonwealth",
     citizenshipIneligible:
       "No es elegible para registrarse con este estado de ciudadanía / residencia. Elija una opción válida o vuelva al inicio.",
+    citizenshipLockedNote:
+      "Confirmado al crear su cuenta. No se puede cambiar aquí.",
     voterQuestion: "¿Está registrado para votar en Belice?",
     proofAlert:
       "Los ciudadanos de la Commonwealth deben presentar comprobante de que actualmente residen en Belice. Esto protege la integridad del panel.",
     proofType: "Comprobante de residencia en Belice",
     proofUpload: "Subir comprobante de residencia en Belice",
     nameAlert:
-      "Escriba su nombre y apellido(s) exactamente como aparecen en su identificación con foto emitida por el gobierno. Si tiene más de un apellido, inclúyalos todos.",
+      "Escriba su nombre exactamente como aparece en la lista de votantes de Belice si está registrado para votar. Si no está registrado para votar en Belice, escriba su nombre exactamente como aparece en la identificación con foto adjunta a este formulario.",
     firstName: "Nombre",
     lastName: "Apellido(s)",
     sex: "Sexo",

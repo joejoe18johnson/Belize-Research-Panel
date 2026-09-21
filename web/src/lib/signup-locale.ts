@@ -106,11 +106,9 @@ const CITIZENSHIP_LABELS_ES: Record<string, string> = {
 export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
   en: {
     pageTitle: "Create your account",
-    pageSubtitle:
-      "Confirm eligibility, then create your account with Facebook or email. Prefer WhatsApp or social contact if you do not use email.",
+    pageSubtitle: "Confirm eligibility",
     citizenshipLabel: "Citizenship / residency status",
-    citizenshipIntro:
-      "Choose the option that best describes your citizenship and where you live. The panel is open to Belizeans in Belize, Belizeans abroad (diaspora), Commonwealth citizens residing in Belize, and other foreigners permanently residing in Belize.",
+    citizenshipIntro: "Choose the option that best describes your citizenship and where you live.",
     citizenshipProofNote:
       "You will be required to provide proof of your citizenship or residency during panelist registration.",
     citizenshipLabels: CITIZENSHIP_LABELS_EN,
@@ -140,7 +138,7 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     strengthWeak: "Weak",
     strengthModerate: "Moderate",
     strengthStrong: "Strong",
-    dobMinAgeHint: "You must be at least 18 years old.",
+    dobMinAgeHint: "",
     dobMonthLabel: "Month",
     dobDayLabel: "Day",
     dobYearLabel: "Year",
@@ -161,11 +159,9 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
   },
   es: {
     pageTitle: "Cree su cuenta",
-    pageSubtitle:
-      "Confirme su elegibilidad y luego cree su cuenta con Facebook o correo electrónico. Prefiera WhatsApp u otro contacto social si no usa correo.",
+    pageSubtitle: "Confirme la elegibilidad",
     citizenshipLabel: "Estado de ciudadanía / residencia",
-    citizenshipIntro:
-      "Elija la opción que mejor describa su ciudadanía y dónde vive. El panel está abierto a beliceños en Belice, beliceños en el extranjero (diáspora), ciudadanos de la Commonwealth residentes en Belice y otros extranjeros residentes permanentes en Belice.",
+    citizenshipIntro: "Elija la opción que mejor describa su ciudadanía y dónde vive.",
     citizenshipProofNote:
       "Deberá presentar comprobante de ciudadanía o residencia durante el registro como panelista.",
     citizenshipLabels: CITIZENSHIP_LABELS_ES,
@@ -196,7 +192,7 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     strengthWeak: "Débil",
     strengthModerate: "Moderada",
     strengthStrong: "Fuerte",
-    dobMinAgeHint: "Debe tener al menos 18 años.",
+    dobMinAgeHint: "",
     dobMonthLabel: "Mes",
     dobDayLabel: "Día",
     dobYearLabel: "Año",

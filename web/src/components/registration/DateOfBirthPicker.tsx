@@ -42,7 +42,7 @@ export function DateOfBirthPicker({
 }: DateOfBirthPickerProps) {
   const copy = useSignupCopy();
   const locale = useLocale();
-  const hint = minAgeHint ?? copy.dobMinAgeHint;
+  const hint = (minAgeHint ?? copy.dobMinAgeHint).trim();
   const monthOptions = useMemo(() => monthOptionsForLocale(locale), [locale]);
   const [parts, setParts] = useState<DobParts>(() =>
     value ? parseDobParts(value) : emptyParts()
@@ -151,7 +151,7 @@ export function DateOfBirthPicker({
         </Field>
       </div>
 
-      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{hint}</p>
+      {hint ? <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{hint}</p> : null}
 
       {error ? (
         <p className="mt-3 text-sm text-red-600" role="alert">

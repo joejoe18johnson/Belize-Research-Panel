@@ -239,5 +239,23 @@
     "dob": "1968-07-06",
     "account_status": "active",
     "hold_reason": ""
+  },
+  {
+    "id": "af5ac6ef-3fbd-4722-8550-6b0866b51fad",
+    "first_name": "Kareem",
+    "last_name": "Abdul",
+    "email": "joejoe18johnson@gmail.com",
+    "password_salt": "fcc0ae670f23456484b804f7a0105e4f",
+    "password_hash": "69e53d26ea4b848c27e29e65ddd0c67f7e1854e0d9ebf737f2670dec6d459bd5",
+    "email_verified": "true",
+    "verification_token": "",
+    "verification_sent_at": "2026-09-20T13:14:04.862Z",
+    "created_at": "2026-09-20T13:14:04.862Z",
+    "panelist_registered": "false",
+    "citizenship_status": "Belizean residing in Belize",
+    "commonwealth_country": "",
+    "dob": "2000-09-09",
+    "account_status": "active",
+    "hold_reason": ""
   }
 ]

@@ -205,7 +205,6 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
               onChange={(dob) => update("dob", dob)}
               error={tError(errors.dob)}
               compact
-              minAgeHint={copy.dobMinAgeHint}
             />
           </Field>
         ) : null}
