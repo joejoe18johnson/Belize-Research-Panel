@@ -1,6 +1,6 @@
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
-import { validateNationalPhoneNumber } from "./phone-codes";
+import { formatPhoneLocalDisplay, validateNationalPhoneNumber } from "./phone-codes";
 import {
   EDUCATION_LEVELS,
   ELIGIBLE_CITIZENSHIP_STATUSES,
@@ -82,10 +82,12 @@ export function phoneLocalDigits(localNumber: string): string {
 }
 
 export function composePhoneNumber(countryCode: string, localNumber: string): string {
-  const codeDigits = countryCode.replace(/\D/g, "");
+  const normalizedCode = countryCode.startsWith("+") ? countryCode : `+${countryCode.replace(/\D/g, "")}`;
+  const codeDigits = normalizedCode.replace(/\D/g, "");
   const localDigits = phoneLocalDigits(localNumber);
   if (!localDigits) return "";
-  return `+${codeDigits} ${localDigits}`;
+  const localDisplay = formatPhoneLocalDisplay(localDigits, normalizedCode);
+  return `+${codeDigits} ${localDisplay}`;
 }
 
 export function formatPhoneNumber(phone: string): string {
