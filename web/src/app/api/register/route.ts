@@ -35,6 +35,7 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     ethnicity: String(formData.get("ethnicity") ?? ""),
     householdHeadRelationship: String(formData.get("householdHeadRelationship") ?? ""),
     householdSize: String(formData.get("householdSize") ?? ""),
+    householdSizeConfirmed: parseBoolean(formData.get("householdSizeConfirmed")),
     placeOfResidence: String(formData.get("placeOfResidence") ?? ""),
     cityTownVillage: String(formData.get("cityTownVillage") ?? ""),
     cityTownVillageOther: String(formData.get("cityTownVillageOther") ?? ""),

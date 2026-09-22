@@ -18,6 +18,8 @@ export interface RegistrationFormData {
   ethnicity: string;
   householdHeadRelationship: string;
   householdSize: string;
+  /** Required when household size is greater than 9. */
+  householdSizeConfirmed: boolean;
   placeOfResidence: string;
   cityTownVillage: string;
   cityTownVillageOther: string;
@@ -75,6 +77,7 @@ export const initialRegistrationForm: RegistrationFormData = {
   ethnicity: "",
   householdHeadRelationship: "",
   householdSize: "",
+  householdSizeConfirmed: false,
   placeOfResidence: "",
   cityTownVillage: "",
   cityTownVillageOther: "",

@@ -133,6 +133,7 @@ export type RegistrationCopy = {
   ethnicity: string;
   householdHead: string;
   householdSize: string;
+  householdSizeConfirm: string;
   abroadIntro: string;
   districtLive: string;
   countryOfResidence: string;
@@ -371,6 +372,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     ethnicity: "Ethnicity",
     householdHead: "Are you the head of your household?",
     householdSize: "Including yourself, how many persons live in your household?",
+    householdSizeConfirm: "Please tick this box if the household size you entered is correct.",
     abroadIntro: "You selected Belizean residing abroad. Tell us the country where you currently live.",
     districtLive: "District where you currently live",
     countryOfResidence: "Country of residence",
@@ -615,6 +617,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     ethnicity: "Etnia",
     householdHead: "¿Es usted el jefe o la jefa de su hogar?",
     householdSize: "Incluyéndose a usted, ¿cuántas personas viven en su hogar?",
+    householdSizeConfirm: "Marque esta casilla si el tamaño de hogar que ingresó es correcto.",
     abroadIntro: "Seleccionó beliceño residente en el extranjero. Indíquenos el país donde vive actualmente.",
     districtLive: "Distrito donde vive actualmente",
     countryOfResidence: "País de residencia",

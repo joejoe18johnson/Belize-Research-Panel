@@ -150,7 +150,7 @@
       "Other",
       "San Antonio",
       "San Marcos",
-      "Santa Elena Town",
+      "Santa Elena (SISE)",
       "Santa Teresita",
       "Selena",
       "Seven Miles",
@@ -164,7 +164,7 @@
       "Paslow Falls",
       "Providencien",
       "Ramonal",
-      "San Ignacio Town"
+      "San Ignacio (SISE)"
     ],
     "Cayo North East": [
       "Billy White",
@@ -177,7 +177,7 @@
       "Los Tambos",
       "Other",
       "Red Creek",
-      "San Ignacio Town",
+      "San Ignacio (SISE)",
       "San Miguel",
       "Santa Familia",
       "Spanish Lookout"
@@ -288,9 +288,7 @@
     "Orange Walk Central": [
       "Orange Walk Town",
       "Other",
-      "Petville",
-      "San Estevan",
-      "San Lorenzo Housing Site"
+      "San Estevan"
     ],
     "Orange Walk East": [
       "Carmelita",
@@ -478,6 +476,7 @@
   },
   "CITY_TOWN_VILLAGE": {
     "Belize District": [
+      "Ambergris Caye",
       "Belize City",
       "Bermudian Landing",
       "Biscayne",
@@ -502,7 +501,6 @@
       "Maskall",
       "Rancho Dolores",
       "Rhaburn Ridge",
-      "Ambergris Caye",
       "Sand Hill",
       "Santana",
       "Scotland Half Moon",
@@ -590,6 +588,7 @@
       "Douglas",
       "Guinea Grass",
       "Indian Church",
+      "Indian Creek",
       "Nuevo San Juan",
       "Orange Walk Town",
       "San Antonio (Rio Hondo)",

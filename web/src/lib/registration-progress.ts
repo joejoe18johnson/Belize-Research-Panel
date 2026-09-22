@@ -67,6 +67,7 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "ethnicity",
     "householdHeadRelationship",
     "householdSize",
+    "householdSizeConfirmed",
     "placeOfResidence",
     "countryIfAbroad",
     "countryIfAbroadOther",
@@ -193,6 +194,7 @@ function collectPhaseErrors(
   }
   if (phaseIndex === PROFILE_PHASE && !isHeadOfHousehold(form.householdHeadRelationship)) {
     delete allErrors.householdSize;
+    delete allErrors.householdSizeConfirmed;
   }
   if (phaseIndex === PROFILE_PHASE && !isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
     delete allErrors.constituency;

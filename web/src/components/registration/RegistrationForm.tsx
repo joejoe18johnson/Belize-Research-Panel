@@ -334,6 +334,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       const next = { ...prev, [key]: value };
       if (key === "householdHeadRelationship" && !isHeadOfHousehold(String(value))) {
         next.householdSize = "";
+        next.householdSizeConfirmed = false;
+      }
+      if (key === "householdSize") {
+        next.householdSizeConfirmed = false;
       }
       if (key === "placeOfResidence") {
         next.cityTownVillage = "";
@@ -994,47 +998,118 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               </div>
             </Field>
             {isHeadOfHousehold(form.householdHeadRelationship) ? (
-              <Field
-                label={copy.householdSize}
-                required
-                error={fieldError("householdSize")}
-                id="householdSize"
-              >
-                <p className="mb-1.5 text-sm text-zinc-600 dark:text-zinc-400">
-                  {copy.householdCountNote}
-                </p>
-                <TextInput
-                  id="householdSize"
-                  type="number"
-                  inputMode="numeric"
-                  enterKeyHint="go"
-                  min={1}
-                  max={MAX_HOUSEHOLD_SIZE}
-                  step={1}
-                  value={form.householdSize}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    update("householdSize", value);
-                    touch("householdSize");
-                    validateField("householdSize", value);
-                  }}
-                  onBlur={() => touchAndValidate("householdSize")}
-                  onKeyDown={(e) => {
-                    if (e.key !== "Enter") return;
-                    e.preventDefault();
-                    (e.currentTarget as HTMLInputElement).blur();
-                    const next = document.getElementById("residence-section");
-                    if (next instanceof HTMLElement) {
-                      next.scrollIntoView({ behavior: "smooth", block: "start" });
-                      const focusable = next.querySelector<HTMLElement>(
-                        "input:not([type='hidden']), select, textarea, button"
-                      );
-                      focusable?.focus();
-                    }
-                  }}
+              <div className="space-y-3">
+                <Field
+                  label={copy.householdSize}
+                  required
                   error={fieldError("householdSize")}
-                />
-              </Field>
+                  id="householdSize"
+                >
+                  <p className="mb-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+                    {copy.householdCountNote}
+                  </p>
+                  <TextInput
+                    id="householdSize"
+                    type="number"
+                    inputMode="numeric"
+                    enterKeyHint="go"
+                    min={1}
+                    max={MAX_HOUSEHOLD_SIZE}
+                    step={1}
+                    value={form.householdSize}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      update("householdSize", value);
+                      touch("householdSize");
+                      touch("householdSizeConfirmed");
+                      const data = {
+                        ...form,
+                        householdSize: value,
+                        householdSizeConfirmed: false,
+                      };
+                      const fieldErrors = validateRegistrationForm(data, validationOptions);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (fieldErrors.householdSize) next.householdSize = fieldErrors.householdSize;
+                        else delete next.householdSize;
+                        if (fieldErrors.householdSizeConfirmed) {
+                          next.householdSizeConfirmed = fieldErrors.householdSizeConfirmed;
+                        } else {
+                          delete next.householdSizeConfirmed;
+                        }
+                        return next;
+                      });
+                    }}
+                    onBlur={() => {
+                      touch("householdSize");
+                      touch("householdSizeConfirmed");
+                      const data = {
+                        ...form,
+                        householdSize: form.householdSize,
+                        householdSizeConfirmed: form.householdSizeConfirmed,
+                      };
+                      const fieldErrors = validateRegistrationForm(data, validationOptions);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        if (fieldErrors.householdSize) next.householdSize = fieldErrors.householdSize;
+                        else delete next.householdSize;
+                        if (fieldErrors.householdSizeConfirmed) {
+                          next.householdSizeConfirmed = fieldErrors.householdSizeConfirmed;
+                        } else {
+                          delete next.householdSizeConfirmed;
+                        }
+                        return next;
+                      });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") return;
+                      e.preventDefault();
+                      (e.currentTarget as HTMLInputElement).blur();
+                      const next = document.getElementById("residence-section");
+                      if (next instanceof HTMLElement) {
+                        next.scrollIntoView({ behavior: "smooth", block: "start" });
+                        const focusable = next.querySelector<HTMLElement>(
+                          "input:not([type='hidden']), select, textarea, button"
+                        );
+                        focusable?.focus();
+                      }
+                    }}
+                    error={fieldError("householdSize")}
+                  />
+                </Field>
+                {/^\d+$/.test(form.householdSize) && Number(form.householdSize) > 9 ? (
+                  <div
+                    id="householdSizeConfirmed-field"
+                    className={`rounded-lg border px-4 py-3 ${
+                      fieldError("householdSizeConfirmed")
+                        ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
+                        : "border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/60"
+                    }`}
+                  >
+                    <CheckboxField
+                      id="householdSizeConfirmed"
+                      label={copy.householdSizeConfirm}
+                      checked={form.householdSizeConfirmed}
+                      onChange={(checked) => {
+                        setForm((prev) => ({ ...prev, householdSizeConfirmed: checked }));
+                        touch("householdSizeConfirmed");
+                        const data = { ...form, householdSizeConfirmed: checked };
+                        const fieldErrors = validateRegistrationForm(data, validationOptions);
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          if (fieldErrors.householdSizeConfirmed) {
+                            next.householdSizeConfirmed = fieldErrors.householdSizeConfirmed;
+                          } else {
+                            delete next.householdSizeConfirmed;
+                          }
+                          return next;
+                        });
+                      }}
+                      error={fieldError("householdSizeConfirmed")}
+                    />
+                  </div>
+                ) : null}
+              </div>
             ) : null}
           </FormSection>
 

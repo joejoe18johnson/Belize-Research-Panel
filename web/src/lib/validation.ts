@@ -486,8 +486,9 @@ export function validateRegistrationForm(
       const size = Number(householdSizeText);
       if (size < 1) {
         errors.householdSize = "Household size must include at least yourself.";
-      } else if (size > 9) {
-        errors.householdSize = "Please ensure that you have entered the correct household size.";
+      } else if (size > 9 && !data.householdSizeConfirmed) {
+        errors.householdSizeConfirmed =
+          "Please tick this box if the household size you entered is correct.";
       }
     }
   }
