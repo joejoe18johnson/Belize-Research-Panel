@@ -162,10 +162,10 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Please select a valid country code.": "Seleccione un código de país válido.",
   "Belize mobile / WhatsApp numbers must start with 6 (7 digits total, e.g. 6123456).":
     "Los números móviles / WhatsApp de Belice deben empezar con 6 (7 dígitos en total, p. ej. 6123456).",
-  "United States phone numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
-    "Los números de teléfono de Estados Unidos deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
-  "Canada phone numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
-    "Los números de teléfono de Canadá deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
+  "United States mobile numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
+    "Los números móviles de Estados Unidos deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
+  "Canada mobile numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
+    "Los números móviles de Canadá deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
   "Enter a password to see strength.": "Ingrese una contraseña para ver su fortaleza.",
   "Password must be at least 8 characters long.":
     "La contraseña debe tener al menos 8 caracteres.",
@@ -187,85 +187,64 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Error de red. Revise su conexión e inténtelo de nuevo.",
   "Please fix the highlighted fields before continuing.":
     "Corrija los campos resaltados antes de continuar.",
-  "Argentina numbers use 10 digits.": "Los números de Argentina usan 10 dígitos.",
-  "Australia numbers use 9 digits (without the leading 0).":
-    "Los números de Australia usan 9 dígitos (sin el 0 inicial).",
-  "Bahamas numbers use 7 digits after +1 242 and start with 2–9.":
-    "Los números de Bahamas usan 7 dígitos después de +1 242 y empiezan con 2–9.",
-  "Barbados numbers use 7 digits after +1 246 and start with 2–9.":
-    "Los números de Barbados usan 7 dígitos después de +1 246 y empiezan con 2–9.",
-  "Belize mobile / WhatsApp numbers use exactly 7 digits and start with 6.":
-    "Los números móviles / WhatsApp de Belice usan exactamente 7 dígitos y empiezan con 6.",
-  "Brazil numbers use 10–11 digits (including area code).":
-    "Los números de Brasil usan 10–11 dígitos (incluido el código de área).",
-  "Chile numbers use 9 digits.": "Los números de Chile usan 9 dígitos.",
-  "China mobile numbers use 11 digits.": "Los números móviles de China usan 11 dígitos.",
-  "Colombia numbers use 10 digits.": "Los números de Colombia usan 10 dígitos.",
-  "Costa Rica numbers use 8 digits.": "Los números de Costa Rica usan 8 dígitos.",
-  "Cuba numbers use 8 digits.": "Los números de Cuba usan 8 dígitos.",
-  "Ecuador numbers use 9 digits.": "Los números de Ecuador usan 9 dígitos.",
-  "El Salvador numbers use 8 digits.": "Los números de El Salvador usan 8 dígitos.",
-  "UAE numbers use 9 digits (without the leading 0).":
-    "Los números de EAU usan 9 dígitos (sin el 0 inicial).",
-  "France numbers use 9 digits (without the leading 0).":
-    "Los números de Francia usan 9 dígitos (sin el 0 inicial).",
-  "Germany numbers usually use 10–11 digits (without the leading 0).":
-    "Los números de Alemania suelen usar 10–11 dígitos (sin el 0 inicial).",
-  "Guatemala numbers use 8 digits.": "Los números de Guatemala usan 8 dígitos.",
-  "Hong Kong numbers use 8 digits.": "Los números de Hong Kong usan 8 dígitos.",
-  "Honduras numbers use 8 digits.": "Los números de Honduras usan 8 dígitos.",
-  "India mobile numbers use 10 digits.": "Los números móviles de India usan 10 dígitos.",
-  "Ireland numbers use 9 digits (without the leading 0).":
-    "Los números de Irlanda usan 9 dígitos (sin el 0 inicial).",
-  "Italy mobile numbers usually use 9–10 digits.":
-    "Los números móviles de Italia suelen usar 9–10 dígitos.",
-  "Jamaica numbers use 7 digits after +1 876 and start with 2–9.":
-    "Los números de Jamaica usan 7 dígitos después de +1 876 y empiezan con 2–9.",
-  "Japan mobile numbers use 10 digits (without the leading 0).":
-    "Los números móviles de Japón usan 10 dígitos (sin el 0 inicial).",
-  "Mexico numbers use 10 digits.": "Los números de México usan 10 dígitos.",
-  "Netherlands numbers use 9 digits (without the leading 0).":
-    "Los números de Países Bajos usan 9 dígitos (sin el 0 inicial).",
-  "New Zealand numbers usually use 8–10 digits (without the leading 0).":
-    "Los números de Nueva Zelanda suelen usar 8–10 dígitos (sin el 0 inicial).",
-  "Nigeria numbers use 10 digits (without the leading 0).":
-    "Los números de Nigeria usan 10 dígitos (sin el 0 inicial).",
-  "Nicaragua numbers use 8 digits.": "Los números de Nicaragua usan 8 dígitos.",
-  "Panama numbers use 8 digits.": "Los números de Panamá usan 8 dígitos.",
-  "Philippines mobile numbers use 10 digits.":
-    "Los números móviles de Filipinas usan 10 dígitos.",
-  "Peru numbers use 9 digits.": "Los números de Perú usan 9 dígitos.",
-  "Saudi Arabia numbers use 9 digits (without the leading 0).":
-    "Los números de Arabia Saudita usan 9 dígitos (sin el 0 inicial).",
-  "Singapore numbers use 8 digits.": "Los números de Singapur usan 8 dígitos.",
-  "South Africa numbers use 9 digits (without the leading 0).":
-    "Los números de Sudáfrica usan 9 dígitos (sin el 0 inicial).",
-  "South Korea numbers usually use 9–10 digits (without the leading 0).":
-    "Los números de Corea del Sur suelen usar 9–10 dígitos (sin el 0 inicial).",
-  "Spain numbers use 9 digits.": "Los números de España usan 9 dígitos.",
-  "Sweden numbers use 9 digits (without the leading 0).":
-    "Los números de Suecia usan 9 dígitos (sin el 0 inicial).",
-  "Switzerland numbers use 9 digits (without the leading 0).":
-    "Los números de Suiza usan 9 dígitos (sin el 0 inicial).",
-  "Taiwan mobile numbers use 9 digits.": "Los números móviles de Taiwán usan 9 dígitos.",
-  "Trinidad and Tobago numbers use 7 digits after +1 868 and start with 2–9.":
-    "Los números de Trinidad y Tobago usan 7 dígitos después de +1 868 y empiezan con 2–9.",
-  "US and Canada numbers use 10 digits and start with 2–9 (area code + number).":
-    "Los números de EE. UU. y Canadá usan 10 dígitos y empiezan con 2–9 (código de área + número).",
-  "UK numbers use 10 digits (without the leading 0).":
-    "Los números del Reino Unido usan 10 dígitos (sin el 0 inicial).",
-  "Venezuela numbers use 10 digits.": "Los números de Venezuela usan 10 dígitos.",
-  "Enter the phone number without the country code.":
-    "Ingrese el número de teléfono sin el código de país.",
+  "Argentina mobile (e.g. 911-234-5678).": "Argentina móvil (p. ej. 911-234-5678).",
+  "Australia mobile — omit the leading 0 (e.g. 412-345-678).": "Australia móvil — omita el 0 inicial (p. ej. 412-345-678).",
+  "Bahamas mobile after +1 242 (e.g. 359-1234).": "Bahamas móvil después de +1 242 (p. ej. 359-1234).",
+  "Barbados mobile after +1 246 (e.g. 430-1234).": "Barbados móvil después de +1 246 (p. ej. 430-1234).",
+  "Belize mobile / WhatsApp (e.g. 612-3456).": "Belice móvil / WhatsApp (p. ej. 612-3456).",
+  "Brazil mobile (e.g. 11-98765-4321).": "Brasil móvil (p. ej. 11-98765-4321).",
+  "Chile mobile (e.g. 912-345-678).": "Chile móvil (p. ej. 912-345-678).",
+  "China mobile (e.g. 138-1234-5678).": "China móvil (p. ej. 138-1234-5678).",
+  "Colombia mobile (e.g. 300-123-4567).": "Colombia móvil (p. ej. 300-123-4567).",
+  "Costa Rica mobile (e.g. 8312-3456).": "Costa Rica móvil (p. ej. 8312-3456).",
+  "Cuba mobile (e.g. 5123-4567).": "Cuba móvil (p. ej. 5123-4567).",
+  "Ecuador mobile (e.g. 991-234-567).": "Ecuador móvil (p. ej. 991-234-567).",
+  "El Salvador mobile (e.g. 7012-3456).": "El Salvador móvil (p. ej. 7012-3456).",
+  "UAE mobile — omit the leading 0 (e.g. 50-123-4567).": "EAU móvil — omita el 0 inicial (p. ej. 50-123-4567).",
+  "France mobile — omit the leading 0 (e.g. 6-12-34-56-78).": "Francia móvil — omita el 0 inicial (p. ej. 6-12-34-56-78).",
+  "Germany mobile — omit the leading 0 (e.g. 151-2345-6789).": "Alemania móvil — omita el 0 inicial (p. ej. 151-2345-6789).",
+  "Guatemala mobile (e.g. 5123-4567).": "Guatemala móvil (p. ej. 5123-4567).",
+  "Hong Kong mobile (e.g. 9123-4567).": "Hong Kong móvil (p. ej. 9123-4567).",
+  "Honduras mobile (e.g. 9123-4567).": "Honduras móvil (p. ej. 9123-4567).",
+  "India mobile — omit the leading 0 (e.g. 98765-43210).": "India móvil — omita el 0 inicial (p. ej. 98765-43210).",
+  "Ireland mobile — omit the leading 0 (e.g. 85-123-4567).": "Irlanda móvil — omita el 0 inicial (p. ej. 85-123-4567).",
+  "Italy mobile (e.g. 312-345-6789).": "Italia móvil (p. ej. 312-345-6789).",
+  "Jamaica mobile after +1 876 (e.g. 210-1234).": "Jamaica móvil después de +1 876 (p. ej. 210-1234).",
+  "Japan mobile — omit the leading 0 (e.g. 90-1234-5678).": "Japón móvil — omita el 0 inicial (p. ej. 90-1234-5678).",
+  "Mexico mobile (e.g. 55-1234-5678).": "México móvil (p. ej. 55-1234-5678).",
+  "Netherlands mobile — omit the leading 0 (e.g. 6-1234-5678).": "Países Bajos móvil — omita el 0 inicial (p. ej. 6-1234-5678).",
+  "New Zealand mobile — omit the leading 0 (e.g. 21-123-4567).": "Nueva Zelanda móvil — omita el 0 inicial (p. ej. 21-123-4567).",
+  "Nigeria mobile — omit the leading 0 (e.g. 801-234-5678).": "Nigeria móvil — omita el 0 inicial (p. ej. 801-234-5678).",
+  "Nicaragua mobile (e.g. 8123-4567).": "Nicaragua móvil (p. ej. 8123-4567).",
+  "Panama mobile (e.g. 6123-4567).": "Panamá móvil (p. ej. 6123-4567).",
+  "Philippines mobile (e.g. 917-123-4567).": "Filipinas móvil (p. ej. 917-123-4567).",
+  "Peru mobile (e.g. 912-345-678).": "Perú móvil (p. ej. 912-345-678).",
+  "Saudi Arabia mobile — omit the leading 0 (e.g. 512-345-678).": "Arabia Saudita móvil — omita el 0 inicial (p. ej. 512-345-678).",
+  "Singapore mobile (e.g. 8123-4567).": "Singapur móvil (p. ej. 8123-4567).",
+  "South Africa mobile — omit the leading 0 (e.g. 82-123-4567).": "Sudáfrica móvil — omita el 0 inicial (p. ej. 82-123-4567).",
+  "South Korea mobile — omit the leading 0 (e.g. 10-1234-5678).": "Corea del Sur móvil — omita el 0 inicial (p. ej. 10-1234-5678).",
+  "Spain mobile (e.g. 612-345-678).": "España móvil (p. ej. 612-345-678).",
+  "Sweden mobile — omit the leading 0 (e.g. 70-123-4567).": "Suecia móvil — omita el 0 inicial (p. ej. 70-123-4567).",
+  "Switzerland mobile — omit the leading 0 (e.g. 79-123-4567).": "Suiza móvil — omita el 0 inicial (p. ej. 79-123-4567).",
+  "Taiwan mobile (e.g. 912-345-678).": "Taiwán móvil (p. ej. 912-345-678).",
+  "Trinidad and Tobago mobile after +1 868 (e.g. 620-1234).":
+    "Trinidad y Tobago móvil después de +1 868 (p. ej. 620-1234).",
+  "US / Canada mobile (e.g. 202-555-0123).": "EE. UU. / Canadá móvil (p. ej. 202-555-0123).",
+  "UK mobile — omit the leading 0 (e.g. 7400-123456).": "Reino Unido móvil — omita el 0 inicial (p. ej. 7400-123456).",
+  "Venezuela mobile (e.g. 412-123-4567).": "Venezuela móvil (p. ej. 412-123-4567).",
+  "Enter your mobile / WhatsApp number.": "Ingrese su número móvil / WhatsApp.",
 };
 
 const PHONE_EXACT_RE =
-  /^(.+) phone numbers must be exactly (\d+) digits \(without the country code\)\.$/;
+  /^(.+) mobile numbers must be exactly (\d+) digits \(without the country code\)\.$/;
 const PHONE_MIN_RE =
-  /^(.+) phone numbers need at least (\d+) digits \(without the country code\)\.$/;
+  /^(.+) mobile numbers need at least (\d+) digits \(without the country code\)\.$/;
 const PHONE_MAX_RE =
-  /^(.+) phone numbers can have at most (\d+) digits \(without the country code\)\.$/;
-const PHONE_PREFIX_RE = /^(.+) phone numbers must start with (.+)\.$/;
+  /^(.+) mobile numbers can have at most (\d+) digits \(without the country code\)\.$/;
+const PHONE_PREFIX_RE = /^(.+) mobile numbers must start with (.+)\.$/;
+const PHONE_SUBSCRIBER_RE =
+  /^(.+) mobile numbers must start with (.+) after the area code\.$/;
+const PHONE_VALID_RE = /^Please enter a valid (.+) mobile \/ WhatsApp number\.$/;
 const HOUSEHOLD_MAX_RE =
   /^Please enter a household size of (\d+) or fewer, or contact us if this is a larger household\.$/;
 const MARKET_MAX_RE = /^Please select up to (\d+) market research interests\.$/;
@@ -282,19 +261,27 @@ export function localizeValidationMessage(message: string, locale: HomeLocale): 
 
   let match = text.match(PHONE_EXACT_RE);
   if (match) {
-    return `Los números de teléfono de ${match[1]} deben tener exactamente ${match[2]} dígitos (sin el código de país).`;
+    return `Los números móviles de ${match[1]} deben tener exactamente ${match[2]} dígitos (sin el código de país).`;
   }
   match = text.match(PHONE_MIN_RE);
   if (match) {
-    return `Los números de teléfono de ${match[1]} necesitan al menos ${match[2]} dígitos (sin el código de país).`;
+    return `Los números móviles de ${match[1]} necesitan al menos ${match[2]} dígitos (sin el código de país).`;
   }
   match = text.match(PHONE_MAX_RE);
   if (match) {
-    return `Los números de teléfono de ${match[1]} pueden tener como máximo ${match[2]} dígitos (sin el código de país).`;
+    return `Los números móviles de ${match[1]} pueden tener como máximo ${match[2]} dígitos (sin el código de país).`;
+  }
+  match = text.match(PHONE_SUBSCRIBER_RE);
+  if (match) {
+    return `Los números móviles de ${match[1]} deben empezar con ${match[2]} después del código de área.`;
   }
   match = text.match(PHONE_PREFIX_RE);
   if (match) {
-    return `Los números de teléfono de ${match[1]} deben empezar con ${match[2]}.`;
+    return `Los números móviles de ${match[1]} deben empezar con ${match[2]}.`;
+  }
+  match = text.match(PHONE_VALID_RE);
+  if (match) {
+    return `Ingrese un número móvil / WhatsApp válido de ${match[1]}.`;
   }
   match = text.match(HOUSEHOLD_MAX_RE);
   if (match) {

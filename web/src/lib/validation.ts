@@ -3,6 +3,8 @@ import type { ProfileUpdateFormData } from "./profile-update-types";
 import {
   formatPhoneLocalDisplay,
   resolvePhoneDialCode,
+  splitStoredPhoneNumber,
+  toSignificantNationalDigits,
   validateNationalPhoneNumber,
 } from "./phone-codes";
 import {
@@ -90,9 +92,9 @@ export function composePhoneNumber(countryCode: string, localNumber: string): st
     : `+${countryCode.replace(/\D/g, "")}`;
   const dialCode = resolvePhoneDialCode(normalizedSelection);
   const codeDigits = dialCode.replace(/\D/g, "");
-  const localDigits = phoneLocalDigits(localNumber);
-  if (!localDigits) return "";
-  const localDisplay = formatPhoneLocalDisplay(localDigits, dialCode);
+  const significant = toSignificantNationalDigits(normalizedSelection, localNumber);
+  if (!significant) return "";
+  const localDisplay = formatPhoneLocalDisplay(significant, normalizedSelection);
   return `+${codeDigits} ${localDisplay}`;
 }
 
@@ -121,28 +123,16 @@ export function parseStoredPhoneNumber(phone: string): {
   phoneCountryCode: string;
   phoneLocalNumber: string;
 } {
-  const value = cleanText(phone);
-  if (!value) {
-    return { phoneCountryCode: "+501", phoneLocalNumber: "" };
-  }
-
-  const international = value.match(/^\+(\d{1,4})\s*(.+)$/);
-  if (international) {
-    return {
-      phoneCountryCode: `+${international[1]}`,
-      phoneLocalNumber: phoneLocalDigits(international[2]),
-    };
-  }
-
-  return { phoneCountryCode: "+501", phoneLocalNumber: phoneLocalDigits(value) };
+  return splitStoredPhoneNumber(phone);
 }
 
 export function validatePhoneFields(
-  data: Pick<RegistrationFormData, "phoneCountryCode" | "phoneLocalNumber">
+  data: Pick<RegistrationFormData, "phoneCountryCode" | "phoneLocalNumber">,
+  options?: { soft?: boolean }
 ): string | null {
   const localDigits = phoneLocalDigits(data.phoneLocalNumber);
   if (!localDigits) return null;
-  return validateNationalPhoneNumber(data.phoneCountryCode, localDigits);
+  return validateNationalPhoneNumber(data.phoneCountryCode, localDigits, options);
 }
 
 export function livesInBelizeResidence(placeOfResidence: string): boolean {

@@ -68,6 +68,7 @@ import {
   streetAddressRequiredForContacts,
   isEligibleCitizenship,
   isRegisteredVoter,
+  validatePhoneFields,
   validateRegistrationForm,
   type FieldErrors,
 } from "@/lib/validation";
@@ -543,6 +544,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     nextValue?: RegistrationFormData[K]
   ) => {
     const data = nextValue === undefined ? form : { ...form, [key]: nextValue };
+    if (key === "phoneLocalNumber" || key === "phoneCountryCode") {
+      const message = validatePhoneFields(
+        {
+          phoneCountryCode: data.phoneCountryCode,
+          phoneLocalNumber: data.phoneLocalNumber,
+        },
+        { soft: true }
+      );
+      setErrors((prev) =>
+        message ? { ...prev, phoneLocalNumber: message } : clearFieldError(prev, "phoneLocalNumber")
+      );
+      return;
+    }
     const fieldErrors = validateRegistrationForm(data, validationOptions);
     const message = fieldErrors[key as string];
     setErrors((prev) => (message ? { ...prev, [key]: message } : clearFieldError(prev, String(key))));
@@ -1293,13 +1307,13 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                       phoneLocalNumber: trimmed,
                     }));
                     touch("phoneLocalNumber");
-                    const fieldErrors = validateRegistrationForm(
-                      { ...form, phoneCountryCode: code, phoneLocalNumber: trimmed },
-                      validationOptions
+                    const message = validatePhoneFields(
+                      { phoneCountryCode: code, phoneLocalNumber: trimmed },
+                      { soft: true }
                     );
                     setErrors((prev) =>
-                      fieldErrors.phoneLocalNumber
-                        ? { ...prev, phoneLocalNumber: fieldErrors.phoneLocalNumber }
+                      message
+                        ? { ...prev, phoneLocalNumber: message }
                         : clearFieldError(prev, "phoneLocalNumber")
                     );
                   }}
