@@ -80,7 +80,7 @@ export function RegistrationProgress({
                   phase.status === "complete"
                     ? "cursor-pointer border-teal-700 bg-teal-700 text-white hover:bg-teal-800"
                     : isCurrent
-                      ? "border-teal-700 bg-teal-50 text-teal-800 ring-2 ring-teal-300/60 dark:text-teal-200"
+                      ? "border-teal-700 bg-teal-50 text-teal-900 ring-2 ring-teal-300/60 dark:border-teal-300 dark:bg-teal-50 dark:text-teal-950 dark:ring-teal-400/50"
                       : reachable
                         ? "cursor-pointer border-teal-600 bg-white text-teal-800 hover:bg-teal-50 dark:border-teal-500 dark:bg-zinc-900 dark:text-teal-200 dark:hover:bg-teal-950"
                         : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-500"
