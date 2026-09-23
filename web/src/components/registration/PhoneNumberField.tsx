@@ -53,7 +53,7 @@ export function PhoneNumberField({
             aria-label={copy.phoneCountryCode}
           >
             {PHONE_COUNTRY_CODES.map((entry) => (
-              <option key={entry.code} value={entry.code}>
+              <option key={entry.id} value={entry.id}>
                 {entry.label}
               </option>
             ))}

@@ -1,4 +1,10 @@
 export interface PhoneCountryCode {
+  /**
+   * Unique select value. Usually equals `code`; when two countries share a dial
+   * code (US / Canada both +1), this distinguishes them in the dropdown.
+   */
+  id: string;
+  /** E.164 country calling code used when composing the stored number. */
   code: string;
   country: string;
   label: string;
@@ -20,6 +26,9 @@ export interface PhoneNumberRule {
 }
 
 export const DEFAULT_PHONE_COUNTRY_CODE = "+501";
+
+/** NANP area/exchange codes never start with 0 or 1. */
+const NANP_LEADING_DIGITS = ["2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
 /**
  * National (local) number rules by dialing code.
@@ -43,14 +52,16 @@ export const PHONE_NUMBER_RULES: Record<string, PhoneNumberRule> = {
   "+1242": {
     minLength: 7,
     maxLength: 7,
-    hint: "Bahamas numbers use 7 digits after +1 242.",
+    startsWith: NANP_LEADING_DIGITS,
+    hint: "Bahamas numbers use 7 digits after +1 242 and start with 2–9.",
     example: "359-1234",
     displayGroups: [3, 4],
   },
   "+1246": {
     minLength: 7,
     maxLength: 7,
-    hint: "Barbados numbers use 7 digits after +1 246.",
+    startsWith: NANP_LEADING_DIGITS,
+    hint: "Barbados numbers use 7 digits after +1 246 and start with 2–9.",
     example: "430-1234",
     displayGroups: [3, 4],
   },
@@ -184,7 +195,8 @@ export const PHONE_NUMBER_RULES: Record<string, PhoneNumberRule> = {
   "+1876": {
     minLength: 7,
     maxLength: 7,
-    hint: "Jamaica numbers use 7 digits after +1 876.",
+    startsWith: NANP_LEADING_DIGITS,
+    hint: "Jamaica numbers use 7 digits after +1 876 and start with 2–9.",
     example: "210-1234",
     displayGroups: [3, 4],
   },
@@ -310,14 +322,16 @@ export const PHONE_NUMBER_RULES: Record<string, PhoneNumberRule> = {
   "+1868": {
     minLength: 7,
     maxLength: 7,
-    hint: "Trinidad and Tobago numbers use 7 digits after +1 868.",
+    startsWith: NANP_LEADING_DIGITS,
+    hint: "Trinidad and Tobago numbers use 7 digits after +1 868 and start with 2–9.",
     example: "620-1234",
     displayGroups: [3, 4],
   },
   "+1": {
     minLength: 10,
     maxLength: 10,
-    hint: "US / Canada numbers use 10 digits (area code + number).",
+    startsWith: NANP_LEADING_DIGITS,
+    hint: "US and Canada numbers use 10 digits and start with 2–9 (area code + number).",
     example: "202-555-0123",
     displayGroups: [3, 3, 4],
   },
@@ -347,61 +361,70 @@ const DEFAULT_PHONE_RULE: PhoneNumberRule = {
 
 /** Sorted alphabetically by country name for easier lookup. */
 export const PHONE_COUNTRY_CODES: PhoneCountryCode[] = [
-  { code: "+54", country: "Argentina", label: "Argentina (+54)" },
-  { code: "+61", country: "Australia", label: "Australia (+61)" },
-  { code: "+1242", country: "Bahamas", label: "Bahamas (+1 242)" },
-  { code: "+1246", country: "Barbados", label: "Barbados (+1 246)" },
-  { code: "+501", country: "Belize", label: "Belize (+501)" },
-  { code: "+55", country: "Brazil", label: "Brazil (+55)" },
-  { code: "+56", country: "Chile", label: "Chile (+56)" },
-  { code: "+86", country: "China", label: "China (+86)" },
-  { code: "+57", country: "Colombia", label: "Colombia (+57)" },
-  { code: "+506", country: "Costa Rica", label: "Costa Rica (+506)" },
-  { code: "+53", country: "Cuba", label: "Cuba (+53)" },
-  { code: "+593", country: "Ecuador", label: "Ecuador (+593)" },
-  { code: "+503", country: "El Salvador", label: "El Salvador (+503)" },
-  { code: "+971", country: "United Arab Emirates", label: "United Arab Emirates (+971)" },
-  { code: "+33", country: "France", label: "France (+33)" },
-  { code: "+49", country: "Germany", label: "Germany (+49)" },
-  { code: "+502", country: "Guatemala", label: "Guatemala (+502)" },
-  { code: "+852", country: "Hong Kong", label: "Hong Kong (+852)" },
-  { code: "+504", country: "Honduras", label: "Honduras (+504)" },
-  { code: "+91", country: "India", label: "India (+91)" },
-  { code: "+353", country: "Ireland", label: "Ireland (+353)" },
-  { code: "+39", country: "Italy", label: "Italy (+39)" },
-  { code: "+1876", country: "Jamaica", label: "Jamaica (+1 876)" },
-  { code: "+81", country: "Japan", label: "Japan (+81)" },
-  { code: "+52", country: "Mexico", label: "Mexico (+52)" },
-  { code: "+31", country: "Netherlands", label: "Netherlands (+31)" },
-  { code: "+64", country: "New Zealand", label: "New Zealand (+64)" },
-  { code: "+234", country: "Nigeria", label: "Nigeria (+234)" },
-  { code: "+505", country: "Nicaragua", label: "Nicaragua (+505)" },
-  { code: "+507", country: "Panama", label: "Panama (+507)" },
-  { code: "+63", country: "Philippines", label: "Philippines (+63)" },
-  { code: "+51", country: "Peru", label: "Peru (+51)" },
-  { code: "+966", country: "Saudi Arabia", label: "Saudi Arabia (+966)" },
-  { code: "+65", country: "Singapore", label: "Singapore (+65)" },
-  { code: "+27", country: "South Africa", label: "South Africa (+27)" },
-  { code: "+82", country: "South Korea", label: "South Korea (+82)" },
-  { code: "+34", country: "Spain", label: "Spain (+34)" },
-  { code: "+46", country: "Sweden", label: "Sweden (+46)" },
-  { code: "+41", country: "Switzerland", label: "Switzerland (+41)" },
-  { code: "+886", country: "Taiwan", label: "Taiwan (+886)" },
-  { code: "+1868", country: "Trinidad and Tobago", label: "Trinidad and Tobago (+1 868)" },
-  { code: "+1", country: "United States", label: "United States / Canada (+1)" },
-  { code: "+44", country: "United Kingdom", label: "United Kingdom (+44)" },
-  { code: "+58", country: "Venezuela", label: "Venezuela (+58)" },
+  { id: "+54", code: "+54", country: "Argentina", label: "Argentina (+54)" },
+  { id: "+61", code: "+61", country: "Australia", label: "Australia (+61)" },
+  { id: "+1242", code: "+1242", country: "Bahamas", label: "Bahamas (+1 242)" },
+  { id: "+1246", code: "+1246", country: "Barbados", label: "Barbados (+1 246)" },
+  { id: "+501", code: "+501", country: "Belize", label: "Belize (+501)" },
+  { id: "+55", code: "+55", country: "Brazil", label: "Brazil (+55)" },
+  { id: "+1-CA", code: "+1", country: "Canada", label: "Canada (+1)" },
+  { id: "+56", code: "+56", country: "Chile", label: "Chile (+56)" },
+  { id: "+86", code: "+86", country: "China", label: "China (+86)" },
+  { id: "+57", code: "+57", country: "Colombia", label: "Colombia (+57)" },
+  { id: "+506", code: "+506", country: "Costa Rica", label: "Costa Rica (+506)" },
+  { id: "+53", code: "+53", country: "Cuba", label: "Cuba (+53)" },
+  { id: "+593", code: "+593", country: "Ecuador", label: "Ecuador (+593)" },
+  { id: "+503", code: "+503", country: "El Salvador", label: "El Salvador (+503)" },
+  { id: "+971", code: "+971", country: "United Arab Emirates", label: "United Arab Emirates (+971)" },
+  { id: "+33", code: "+33", country: "France", label: "France (+33)" },
+  { id: "+49", code: "+49", country: "Germany", label: "Germany (+49)" },
+  { id: "+502", code: "+502", country: "Guatemala", label: "Guatemala (+502)" },
+  { id: "+852", code: "+852", country: "Hong Kong", label: "Hong Kong (+852)" },
+  { id: "+504", code: "+504", country: "Honduras", label: "Honduras (+504)" },
+  { id: "+91", code: "+91", country: "India", label: "India (+91)" },
+  { id: "+353", code: "+353", country: "Ireland", label: "Ireland (+353)" },
+  { id: "+39", code: "+39", country: "Italy", label: "Italy (+39)" },
+  { id: "+1876", code: "+1876", country: "Jamaica", label: "Jamaica (+1 876)" },
+  { id: "+81", code: "+81", country: "Japan", label: "Japan (+81)" },
+  { id: "+52", code: "+52", country: "Mexico", label: "Mexico (+52)" },
+  { id: "+31", code: "+31", country: "Netherlands", label: "Netherlands (+31)" },
+  { id: "+64", code: "+64", country: "New Zealand", label: "New Zealand (+64)" },
+  { id: "+234", code: "+234", country: "Nigeria", label: "Nigeria (+234)" },
+  { id: "+505", code: "+505", country: "Nicaragua", label: "Nicaragua (+505)" },
+  { id: "+507", code: "+507", country: "Panama", label: "Panama (+507)" },
+  { id: "+63", code: "+63", country: "Philippines", label: "Philippines (+63)" },
+  { id: "+51", code: "+51", country: "Peru", label: "Peru (+51)" },
+  { id: "+966", code: "+966", country: "Saudi Arabia", label: "Saudi Arabia (+966)" },
+  { id: "+65", code: "+65", country: "Singapore", label: "Singapore (+65)" },
+  { id: "+27", code: "+27", country: "South Africa", label: "South Africa (+27)" },
+  { id: "+82", code: "+82", country: "South Korea", label: "South Korea (+82)" },
+  { id: "+34", code: "+34", country: "Spain", label: "Spain (+34)" },
+  { id: "+46", code: "+46", country: "Sweden", label: "Sweden (+46)" },
+  { id: "+41", code: "+41", country: "Switzerland", label: "Switzerland (+41)" },
+  { id: "+886", code: "+886", country: "Taiwan", label: "Taiwan (+886)" },
+  { id: "+1868", code: "+1868", country: "Trinidad and Tobago", label: "Trinidad and Tobago (+1 868)" },
+  { id: "+1", code: "+1", country: "United States", label: "United States (+1)" },
+  { id: "+44", code: "+44", country: "United Kingdom", label: "United Kingdom (+44)" },
+  { id: "+58", code: "+58", country: "Venezuela", label: "Venezuela (+58)" },
 ];
 
-export function getPhoneNumberRule(countryCode: string): PhoneNumberRule {
-  return PHONE_NUMBER_RULES[countryCode] ?? DEFAULT_PHONE_RULE;
+/** Resolve a select id or dial code to the E.164 dialing code used in stored numbers. */
+export function resolvePhoneDialCode(countryCodeOrId: string): string {
+  const match = PHONE_COUNTRY_CODES.find(
+    (entry) => entry.id === countryCodeOrId || entry.code === countryCodeOrId
+  );
+  return match?.code ?? countryCodeOrId;
+}
+
+export function getPhoneNumberRule(countryCodeOrId: string): PhoneNumberRule {
+  return PHONE_NUMBER_RULES[resolvePhoneDialCode(countryCodeOrId)] ?? DEFAULT_PHONE_RULE;
 }
 
 /** Format national digits with hyphens using the country display groups. */
-export function formatPhoneLocalDisplay(digits: string, countryCode: string): string {
+export function formatPhoneLocalDisplay(digits: string, countryCodeOrId: string): string {
   const clean = digits.replace(/\D/g, "");
   if (!clean) return "";
-  const groups = getPhoneNumberRule(countryCode).displayGroups;
+  const groups = getPhoneNumberRule(countryCodeOrId).displayGroups;
   const parts: string[] = [];
   let index = 0;
   for (const size of groups) {
@@ -418,7 +441,6 @@ export function formatPhoneLocalDisplay(digits: string, countryCode: string): st
 const COUNTRY_ALIASES: Record<string, string> = {
   USA: "United States",
   "United States of America": "United States",
-  Canada: "United States",
   UK: "United Kingdom",
   "Great Britain": "United Kingdom",
   "Trinidad & Tobago": "Trinidad and Tobago",
@@ -429,27 +451,40 @@ export function phoneCountryCodeForCountry(country: string): string | null {
   const match = PHONE_COUNTRY_CODES.find(
     (entry) => entry.country.toLowerCase() === normalized.toLowerCase()
   );
-  return match?.code ?? null;
+  return match?.id ?? null;
 }
 
 export function isValidPhoneCountryCode(code: string): boolean {
-  return PHONE_COUNTRY_CODES.some((entry) => entry.code === code);
+  return PHONE_COUNTRY_CODES.some((entry) => entry.id === code || entry.code === code);
 }
 
-export function getPhoneCountryLabel(countryCode: string): string {
-  return PHONE_COUNTRY_CODES.find((entry) => entry.code === countryCode)?.country ?? "selected country";
+export function getPhoneCountryLabel(countryCodeOrId: string): string {
+  const byId = PHONE_COUNTRY_CODES.find((entry) => entry.id === countryCodeOrId);
+  if (byId) return byId.country;
+  const byCode = PHONE_COUNTRY_CODES.find((entry) => entry.code === countryCodeOrId);
+  return byCode?.country ?? "selected country";
+}
+
+function formatAllowedPrefixes(prefixes: readonly string[]): string {
+  if (prefixes.length >= 2 && prefixes.every((prefix) => /^\d$/.test(prefix))) {
+    const nums = prefixes.map(Number).sort((a, b) => a - b);
+    const contiguous = nums.every((n, i) => i === 0 || n === nums[i - 1] + 1);
+    if (contiguous) return `${nums[0]}–${nums[nums.length - 1]}`;
+  }
+  return prefixes.join(" or ");
 }
 
 /** Validate national digits for a country code. Empty input is allowed (optional field). */
-export function validateNationalPhoneNumber(countryCode: string, localDigits: string): string | null {
+export function validateNationalPhoneNumber(countryCodeOrId: string, localDigits: string): string | null {
   const digits = String(localDigits || "").replace(/\D/g, "");
   if (!digits) return null;
-  if (!isValidPhoneCountryCode(countryCode)) {
+  if (!isValidPhoneCountryCode(countryCodeOrId)) {
     return "Please select a valid country code.";
   }
 
-  const rule = getPhoneNumberRule(countryCode);
-  const country = getPhoneCountryLabel(countryCode);
+  const dialCode = resolvePhoneDialCode(countryCodeOrId);
+  const rule = getPhoneNumberRule(countryCodeOrId);
+  const country = getPhoneCountryLabel(countryCodeOrId);
   const exact = rule.minLength === rule.maxLength;
 
   if (digits.length < rule.minLength) {
@@ -467,10 +502,13 @@ export function validateNationalPhoneNumber(countryCode: string, localDigits: st
   if (rule.startsWith?.length) {
     const ok = rule.startsWith.some((prefix) => digits.startsWith(prefix));
     if (!ok) {
-      if (countryCode === "+501") {
+      if (dialCode === "+501") {
         return "Belize mobile / WhatsApp numbers must start with 6 (7 digits total, e.g. 6123456).";
       }
-      const prefixes = rule.startsWith.join(" or ");
+      if (dialCode === "+1") {
+        return `${country} phone numbers must start with 2–9 (10 digits total, e.g. 2025550123).`;
+      }
+      const prefixes = formatAllowedPrefixes(rule.startsWith);
       return `${country} phone numbers must start with ${prefixes}.`;
     }
   }

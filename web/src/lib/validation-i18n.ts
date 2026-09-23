@@ -162,6 +162,10 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Please select a valid country code.": "Seleccione un código de país válido.",
   "Belize mobile / WhatsApp numbers must start with 6 (7 digits total, e.g. 6123456).":
     "Los números móviles / WhatsApp de Belice deben empezar con 6 (7 dígitos en total, p. ej. 6123456).",
+  "United States phone numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
+    "Los números de teléfono de Estados Unidos deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
+  "Canada phone numbers must start with 2–9 (10 digits total, e.g. 2025550123).":
+    "Los números de teléfono de Canadá deben empezar con 2–9 (10 dígitos en total, p. ej. 2025550123).",
   "Enter a password to see strength.": "Ingrese una contraseña para ver su fortaleza.",
   "Password must be at least 8 characters long.":
     "La contraseña debe tener al menos 8 caracteres.",
@@ -186,10 +190,10 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Argentina numbers use 10 digits.": "Los números de Argentina usan 10 dígitos.",
   "Australia numbers use 9 digits (without the leading 0).":
     "Los números de Australia usan 9 dígitos (sin el 0 inicial).",
-  "Bahamas numbers use 7 digits after +1 242.":
-    "Los números de Bahamas usan 7 dígitos después de +1 242.",
-  "Barbados numbers use 7 digits after +1 246.":
-    "Los números de Barbados usan 7 dígitos después de +1 246.",
+  "Bahamas numbers use 7 digits after +1 242 and start with 2–9.":
+    "Los números de Bahamas usan 7 dígitos después de +1 242 y empiezan con 2–9.",
+  "Barbados numbers use 7 digits after +1 246 and start with 2–9.":
+    "Los números de Barbados usan 7 dígitos después de +1 246 y empiezan con 2–9.",
   "Belize mobile / WhatsApp numbers use exactly 7 digits and start with 6.":
     "Los números móviles / WhatsApp de Belice usan exactamente 7 dígitos y empiezan con 6.",
   "Brazil numbers use 10–11 digits (including area code).":
@@ -215,8 +219,8 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Los números de Irlanda usan 9 dígitos (sin el 0 inicial).",
   "Italy mobile numbers usually use 9–10 digits.":
     "Los números móviles de Italia suelen usar 9–10 dígitos.",
-  "Jamaica numbers use 7 digits after +1 876.":
-    "Los números de Jamaica usan 7 dígitos después de +1 876.",
+  "Jamaica numbers use 7 digits after +1 876 and start with 2–9.":
+    "Los números de Jamaica usan 7 dígitos después de +1 876 y empiezan con 2–9.",
   "Japan mobile numbers use 10 digits (without the leading 0).":
     "Los números móviles de Japón usan 10 dígitos (sin el 0 inicial).",
   "Mexico numbers use 10 digits.": "Los números de México usan 10 dígitos.",
@@ -244,10 +248,10 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
   "Switzerland numbers use 9 digits (without the leading 0).":
     "Los números de Suiza usan 9 dígitos (sin el 0 inicial).",
   "Taiwan mobile numbers use 9 digits.": "Los números móviles de Taiwán usan 9 dígitos.",
-  "Trinidad and Tobago numbers use 7 digits after +1 868.":
-    "Los números de Trinidad y Tobago usan 7 dígitos después de +1 868.",
-  "US / Canada numbers use 10 digits (area code + number).":
-    "Los números de EE. UU. / Canadá usan 10 dígitos (código de área + número).",
+  "Trinidad and Tobago numbers use 7 digits after +1 868 and start with 2–9.":
+    "Los números de Trinidad y Tobago usan 7 dígitos después de +1 868 y empiezan con 2–9.",
+  "US and Canada numbers use 10 digits and start with 2–9 (area code + number).":
+    "Los números de EE. UU. y Canadá usan 10 dígitos y empiezan con 2–9 (código de área + número).",
   "UK numbers use 10 digits (without the leading 0).":
     "Los números del Reino Unido usan 10 dígitos (sin el 0 inicial).",
   "Venezuela numbers use 10 digits.": "Los números de Venezuela usan 10 dígitos.",
