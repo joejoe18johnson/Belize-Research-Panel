@@ -59,7 +59,7 @@ export function RegistrationPhaseNav({
           type="button"
           onClick={onNext}
           disabled={nextDisabled}
-          className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 disabled:shadow-none disabled:hover:bg-zinc-300`}
+          className={`${navButtonClass} bg-teal-700 text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:hover:bg-zinc-300 dark:disabled:bg-zinc-700 dark:disabled:text-zinc-400 dark:disabled:hover:bg-zinc-700`}
         >
           {copy.next}
         </button>
