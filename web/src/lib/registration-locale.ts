@@ -140,6 +140,7 @@ export type RegistrationCopy = {
   usRegion: string;
   usRegionHint: string;
   cityTownVillage: (district: string) => string;
+  cityTownVillageOther: string;
   constituencyQuestion: string;
   registeredCtvQuestion: (constituency: string) => string;
   marketInterestsLabel: string;
@@ -379,6 +380,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     usRegion: "Region of country",
     usRegionHint: "Required for United States residents. US Census regions.",
     cityTownVillage: (district) => `City / town / village in ${district} where you currently live`,
+    cityTownVillageOther: "Please specify.",
     constituencyQuestion: "In which constituency are you registered to vote?",
     registeredCtvQuestion: (constituency) =>
       `Where in the ${constituency} constituency were you living at the time you registered to vote there?`,
@@ -432,7 +434,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetAddressPlaceholder: "Street or road name",
     streetAddressHint: "Required. Give a brief description of location if no street name",
     cityOrVillage: "City, town, or village",
-    cityOrVillageOther: "Specify city, town, or village",
+    cityOrVillageOther: "Please specify.",
     cityOrVillageOtherPlaceholder: "Enter the place name",
     district: "District",
     selectDistrict: "Select district",
@@ -624,6 +626,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     usRegion: "Región del país",
     usRegionHint: "Obligatorio para residentes de Estados Unidos. Regiones del censo de EE. UU.",
     cityTownVillage: (district) => `Ciudad / pueblo / aldea en ${district} donde vive actualmente`,
+    cityTownVillageOther: "Por favor especifique.",
     constituencyQuestion: "¿En qué circunscripción está registrado para votar?",
     registeredCtvQuestion: (constituency) =>
       `¿Dónde en la circunscripción de ${constituency} vivía cuando se registró para votar allí?`,
@@ -677,7 +680,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     streetAddressPlaceholder: "Nombre de la calle o camino",
     streetAddressHint: "Obligatorio. Si no hay nombre de calle, dé una breve descripción de la ubicación",
     cityOrVillage: "Ciudad, pueblo o aldea",
-    cityOrVillageOther: "Especifique ciudad, pueblo o aldea",
+    cityOrVillageOther: "Por favor especifique.",
     cityOrVillageOtherPlaceholder: "Escriba el nombre del lugar",
     district: "Distrito",
     selectDistrict: "Seleccione distrito",

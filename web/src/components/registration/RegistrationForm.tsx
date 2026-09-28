@@ -1192,7 +1192,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   </SelectInput>
                 </Field>
                 {form.cityTownVillage === "Other" ? (
-                  <Field label={copy.cityTownVillage(form.placeOfResidence)} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
+                  <Field label={copy.cityTownVillageOther} required error={fieldError("cityTownVillageOther")} id="cityTownVillageOther">
                     <TextInput id="cityTownVillageOther" value={form.cityTownVillageOther} onChange={(e) => update("cityTownVillageOther", e.target.value)} onBlur={() => touchAndValidate("cityTownVillageOther")} error={fieldError("cityTownVillageOther")} />
                   </Field>
                 ) : null}

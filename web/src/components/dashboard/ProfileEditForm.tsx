@@ -489,7 +489,7 @@ export function ProfileEditForm({
               </Field>
               {form.cityTownVillage === "Other" ? (
                 <Field
-                  label={cityTownVillageQuestionLabel(form.placeOfResidence)}
+                  label="Please specify."
                   required
                   error={errors.cityTownVillageOther}
                   id="cityTownVillageOther"

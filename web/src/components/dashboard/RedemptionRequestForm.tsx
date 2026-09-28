@@ -519,7 +519,7 @@ function BankPayoutLocationFields({
 
       {cityTownVillage === "Other" ? (
         <Field
-          label={district ? `Specify city / town / village in ${district}` : "Specify city / town / village"}
+          label="Please specify."
           required
           error={errors.cityTownVillageOther}
           id="redemption-cityTownVillageOther"
