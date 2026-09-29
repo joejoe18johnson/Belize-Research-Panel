@@ -448,7 +448,11 @@ export async function registerPanelist(
         : "",
     residence_region: data.placeOfResidence === "Abroad" ? cleanText(data.usDiasporaRegion) : "",
     constituency: registeredVoter ? data.constituency : "",
-    registered_ctv_area: registeredVoter ? cleanText(data.registeredCtvArea) : "",
+    registered_ctv_area: registeredVoter
+      ? cleanText(
+          data.registeredCtvArea === "Other" ? data.registeredCtvAreaOther : data.registeredCtvArea
+        )
+      : "",
     sex: data.sex,
     education: data.education,
     ethnicity: data.ethnicity,
@@ -594,7 +598,11 @@ export async function updatePanelistProfile(
     voting_status: votingStatus,
     voter_status: voterStatus,
     constituency: registeredVoter ? data.constituency : "",
-    registered_ctv_area: registeredVoter ? cleanText(data.registeredCtvArea) : "",
+    registered_ctv_area: registeredVoter
+      ? cleanText(
+          data.registeredCtvArea === "Other" ? data.registeredCtvAreaOther : data.registeredCtvArea
+        )
+      : "",
     place_of_residence: data.placeOfResidence,
     district: data.placeOfResidence === "Abroad" ? "" : data.placeOfResidence,
     city_town_village: cleanText(cityFinal),

@@ -7,6 +7,7 @@ export interface ProfileUpdateFormData {
   votingStatus: string;
   constituency: string;
   registeredCtvArea: string;
+  registeredCtvAreaOther: string;
   facebook: string;
   instagram: string;
   tiktok: string;
@@ -36,6 +37,7 @@ export const initialProfileUpdateForm: ProfileUpdateFormData = {
   votingStatus: "",
   constituency: "",
   registeredCtvArea: "",
+  registeredCtvAreaOther: "",
   facebook: "",
   instagram: "",
   tiktok: "",

@@ -21,6 +21,7 @@ function parseProfileUpdateBody(body: unknown): ProfileUpdateFormData | null {
     votingStatus: String(data.votingStatus ?? ""),
     constituency: String(data.constituency ?? ""),
     registeredCtvArea: String(data.registeredCtvArea ?? ""),
+    registeredCtvAreaOther: String(data.registeredCtvAreaOther ?? ""),
     facebook: String(data.facebook ?? ""),
     instagram: String(data.instagram ?? ""),
     tiktok: String(data.tiktok ?? ""),

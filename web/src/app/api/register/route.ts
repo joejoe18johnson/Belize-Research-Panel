@@ -44,6 +44,7 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     usDiasporaRegion: String(formData.get("usDiasporaRegion") ?? ""),
     constituency: String(formData.get("constituency") ?? ""),
     registeredCtvArea: String(formData.get("registeredCtvArea") ?? ""),
+    registeredCtvAreaOther: String(formData.get("registeredCtvAreaOther") ?? ""),
     politicalInterests: parseJsonArray(formData.get("politicalInterests")),
     marketInterests: parseJsonArray(formData.get("marketInterests")),
     civicInterests: parseJsonArray(formData.get("civicInterests")),

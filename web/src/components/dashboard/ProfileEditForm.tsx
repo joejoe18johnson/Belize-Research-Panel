@@ -136,6 +136,7 @@ export function ProfileEditForm({
         next.votingStatus = "";
         next.constituency = "";
         next.registeredCtvArea = "";
+        next.registeredCtvAreaOther = "";
         next.placeOfResidence = mustLiveAbroad(String(value)) ? "Abroad" : "";
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
@@ -146,9 +147,14 @@ export function ProfileEditForm({
       if (key === "votingStatus") {
         next.constituency = "";
         next.registeredCtvArea = "";
+        next.registeredCtvAreaOther = "";
       }
       if (key === "constituency") {
         next.registeredCtvArea = "";
+        next.registeredCtvAreaOther = "";
+      }
+      if (key === "registeredCtvArea" && value !== "Other") {
+        next.registeredCtvAreaOther = "";
       }
       if (key === "placeOfResidence") {
         next.cityTownVillage = "";
@@ -347,26 +353,43 @@ export function ProfileEditForm({
                 </SelectInput>
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
-                <Field
-                  label={`Where in the ${form.constituency} constituency were you living when you registered to vote?`}
-                  required
-                  error={errors.registeredCtvArea}
-                  id="registeredCtvArea"
-                >
-                  <SelectInput
-                    id="registeredCtvArea"
-                    value={form.registeredCtvArea}
-                    onChange={(e) => update("registeredCtvArea", e.target.value)}
+                <>
+                  <Field
+                    label={`Where in the ${form.constituency} constituency were you living when you registered to vote?`}
+                    required
                     error={errors.registeredCtvArea}
+                    id="registeredCtvArea"
                   >
-                    <option value="">Select area…</option>
-                    {ctvOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </SelectInput>
-                </Field>
+                    <SelectInput
+                      id="registeredCtvArea"
+                      value={form.registeredCtvArea}
+                      onChange={(e) => update("registeredCtvArea", e.target.value)}
+                      error={errors.registeredCtvArea}
+                    >
+                      <option value="">Select area…</option>
+                      {ctvOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
+                  </Field>
+                  {form.registeredCtvArea === "Other" ? (
+                    <Field
+                      label="Please specify."
+                      required
+                      error={errors.registeredCtvAreaOther}
+                      id="registeredCtvAreaOther"
+                    >
+                      <TextInput
+                        id="registeredCtvAreaOther"
+                        value={form.registeredCtvAreaOther}
+                        onChange={(e) => update("registeredCtvAreaOther", e.target.value)}
+                        error={errors.registeredCtvAreaOther}
+                      />
+                    </Field>
+                  ) : null}
+                </>
               ) : null}
             </>
           ) : null}

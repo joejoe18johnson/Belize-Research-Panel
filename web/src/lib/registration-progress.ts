@@ -1,5 +1,10 @@
 import type { RegistrationFormData } from "./registration-types";
-import { isCommonwealthCitizenInBelize, isHeadOfHousehold, isUnitedStatesCountry } from "./constants";
+import {
+  hasRegisteredCtvQuestion,
+  isCommonwealthCitizenInBelize,
+  isHeadOfHousehold,
+  isUnitedStatesCountry,
+} from "./constants";
 import {
   isEligibleCitizenship,
   isRegisteredVoter,
@@ -76,6 +81,7 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
     "cityTownVillageOther",
     "constituency",
     "registeredCtvArea",
+    "registeredCtvAreaOther",
   ],
   ["marketInterests"],
   [
@@ -199,6 +205,18 @@ function collectPhaseErrors(
   if (phaseIndex === PROFILE_PHASE && !isRegisteredVoter(form.citizenshipStatus, form.votingStatus)) {
     delete allErrors.constituency;
     delete allErrors.registeredCtvArea;
+    delete allErrors.registeredCtvAreaOther;
+  }
+  if (
+    phaseIndex === PROFILE_PHASE &&
+    isRegisteredVoter(form.citizenshipStatus, form.votingStatus) &&
+    !hasRegisteredCtvQuestion(form.constituency)
+  ) {
+    delete allErrors.registeredCtvArea;
+    delete allErrors.registeredCtvAreaOther;
+  }
+  if (phaseIndex === PROFILE_PHASE && form.registeredCtvArea !== "Other") {
+    delete allErrors.registeredCtvAreaOther;
   }
   if (phaseIndex === PROFILE_PHASE && form.placeOfResidence === "Abroad") {
     delete allErrors.cityTownVillage;

@@ -356,8 +356,17 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           next.addressCityVillageOther = "";
         }
       }
+      if (key === "votingStatus") {
+        next.constituency = "";
+        next.registeredCtvArea = "";
+        next.registeredCtvAreaOther = "";
+      }
       if (key === "constituency") {
         next.registeredCtvArea = "";
+        next.registeredCtvAreaOther = "";
+      }
+      if (key === "registeredCtvArea" && value !== "Other") {
+        next.registeredCtvAreaOther = "";
       }
       if (key === "cityTownVillage") {
         next.addressCityVillage = String(value ?? "");
@@ -406,6 +415,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       usDiasporaRegion: "",
       constituency: "",
       registeredCtvArea: "",
+      registeredCtvAreaOther: "",
       proofOfBelizeResidenceType: "",
       proofOfBelizeResidenceFile: null,
     }));
@@ -500,7 +510,16 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       [rl.countryAbroad, livingAbroad ? asked(countryAbroadDisplay) : na],
       [rl.usRegion, usRegionAsked ? asked(form.usDiasporaRegion) : na],
       [rl.constituency, registeredVoter ? asked(form.constituency) : na],
-      [rl.registeredCtv, ctvAsked ? asked(form.registeredCtvArea) : na],
+      [
+        rl.registeredCtv,
+        ctvAsked
+          ? asked(
+              form.registeredCtvArea === "Other"
+                ? form.registeredCtvAreaOther
+                : form.registeredCtvArea
+            )
+          : na,
+      ],
       [
         rl.marketInterests,
         interestsAsked
@@ -1209,12 +1228,19 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 </SelectInput>
               </Field>
               {hasRegisteredCtvQuestion(form.constituency) ? (
-                <Field label={copy.registeredCtvQuestion(form.constituency)} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
-                  <SelectInput id="registeredCtvArea" value={form.registeredCtvArea} onChange={(e) => update("registeredCtvArea", e.target.value)} onBlur={() => touchAndValidate("registeredCtvArea")} error={fieldError("registeredCtvArea")}>
-                    <option value="">{copy.selectCtv}</option>
-                    {ctvOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </SelectInput>
-                </Field>
+                <>
+                  <Field label={copy.registeredCtvQuestion(form.constituency)} required error={fieldError("registeredCtvArea")} id="registeredCtvArea">
+                    <SelectInput id="registeredCtvArea" value={form.registeredCtvArea} onChange={(e) => update("registeredCtvArea", e.target.value)} onBlur={() => touchAndValidate("registeredCtvArea")} error={fieldError("registeredCtvArea")}>
+                      <option value="">{copy.selectCtv}</option>
+                      {ctvOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </SelectInput>
+                  </Field>
+                  {form.registeredCtvArea === "Other" ? (
+                    <Field label={copy.cityTownVillageOther} required error={fieldError("registeredCtvAreaOther")} id="registeredCtvAreaOther">
+                      <TextInput id="registeredCtvAreaOther" value={form.registeredCtvAreaOther} onChange={(e) => update("registeredCtvAreaOther", e.target.value)} onBlur={() => touchAndValidate("registeredCtvAreaOther")} error={fieldError("registeredCtvAreaOther")} />
+                    </Field>
+                  ) : null}
+                </>
               ) : null}
             </FormSection>
           ) : null}

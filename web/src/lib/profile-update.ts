@@ -1,6 +1,7 @@
 import {
   CITY_TOWN_VILLAGE,
   OTHER_CONTACT_PLATFORM_OPTIONS,
+  getRegisteredCtvOptions,
 } from "./constants";
 import type { PanelistRow } from "./panelists";
 import type { ProfileUpdateFormData } from "./profile-update-types";
@@ -29,6 +30,16 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     }
   }
 
+  const constituency = row.constituency ?? "";
+  const ctvStored = cleanText(row.registered_ctv_area);
+  const ctvOptions = getRegisteredCtvOptions(constituency);
+  let registeredCtvArea = ctvStored;
+  let registeredCtvAreaOther = "";
+  if (ctvStored && !ctvOptions.includes(ctvStored)) {
+    registeredCtvArea = "Other";
+    registeredCtvAreaOther = ctvStored;
+  }
+
   const otherPlatform = cleanText(row.other_contact_platform);
   const isKnownPlatform = OTHER_CONTACT_PLATFORM_OPTIONS.includes(otherPlatform);
 
@@ -37,8 +48,9 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     citizenshipStatus: row.citizenship_status ?? "",
     commonwealthCountry: row.commonwealth_country ?? "",
     votingStatus: row.voting_status ?? "",
-    constituency: row.constituency ?? "",
-    registeredCtvArea: row.registered_ctv_area ?? "",
+    constituency,
+    registeredCtvArea,
+    registeredCtvAreaOther,
     facebook: row.facebook ?? "",
     instagram: row.instagram ?? "",
     tiktok: row.tiktok ?? "",

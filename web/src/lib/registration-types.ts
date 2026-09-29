@@ -28,6 +28,7 @@ export interface RegistrationFormData {
   usDiasporaRegion: string;
   constituency: string;
   registeredCtvArea: string;
+  registeredCtvAreaOther: string;
   politicalInterests: string[];
   marketInterests: string[];
   civicInterests: string[];
@@ -86,6 +87,7 @@ export const initialRegistrationForm: RegistrationFormData = {
   usDiasporaRegion: "",
   constituency: "",
   registeredCtvArea: "",
+  registeredCtvAreaOther: "",
   politicalInterests: [],
   marketInterests: [],
   civicInterests: [],
