@@ -13,6 +13,7 @@ import {
   ADMIN_REQUIREMENT_FIELDS,
   allAdminRequirementsApproved,
   canApprovePanelistVerification,
+  phoneNumberOnFile,
   readAdminRequirementDecision,
   verificationStatusFromRequirementApprovals,
 } from "@/lib/panelist-requirements";
@@ -48,11 +49,8 @@ export async function PATCH(
   if (body.email && !validEmail(body.email)) {
     errors.push("Please enter a valid email address.");
   }
-  if (body.phone_whatsapp) {
-    const digits = body.phone_whatsapp.replace(/\D/g, "");
-    if (digits.length !== 10) {
-      errors.push("Phone / WhatsApp number must contain exactly 10 digits.");
-    }
+  if (body.phone_whatsapp && !phoneNumberOnFile(body.phone_whatsapp)) {
+    errors.push("Enter a phone number with its country code (for example +501 622-3344).");
   }
   if (errors.length > 0) {
     return NextResponse.json({ ok: false, message: errors.join(" ") }, { status: 400 });

@@ -43,6 +43,15 @@ function phoneDigits(value: string): string {
   return cleanText(value).replace(/\D/g, "");
 }
 
+/**
+ * A phone is on file when a real number was stored.
+ * Digit length is not fixed: Belize (+501) is 10 digits, US/Canada (+1) is 11, UK (+44) is 12.
+ */
+export function phoneNumberOnFile(phone: string): boolean {
+  const digits = phoneDigits(phone);
+  return digits.length >= 7 && digits.length <= 15;
+}
+
 function photoIdOnFile(panelist: PanelistRow, context: RequirementContext): boolean {
   const photoIdType = cleanText(panelist.photo_id_type);
   const authorisedRegistration = parseAuthorisedRegistration(panelist).isAuthorised;
@@ -103,7 +112,7 @@ function assessEmail(panelist: PanelistRow, context: RequirementContext): Requir
 
 function assessPhone(panelist: PanelistRow, context: RequirementContext): RequirementItem {
   const phone = cleanText(panelist.phone_whatsapp);
-  const onFile = phoneDigits(phone).length === 10;
+  const onFile = phoneNumberOnFile(phone);
   const status = resolveRequirementStatus(
     onFile,
     readAdminDecision(panelist, ADMIN_REQUIREMENT_FIELDS.phone),
@@ -158,7 +167,7 @@ export function requirementOnFile(
     return Boolean(email && validEmail(email));
   }
   if (key === "phone") {
-    return phoneDigits(cleanText(panelist.phone_whatsapp)).length === 10;
+    return phoneNumberOnFile(panelist.phone_whatsapp ?? "");
   }
   return photoIdOnFile(panelist, context);
 }
