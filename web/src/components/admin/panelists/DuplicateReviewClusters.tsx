@@ -136,10 +136,18 @@ function DuplicateRecordCard({
   requirements?: { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus };
 }) {
   const isFlagged = isFlaggedPanelist(record);
-  const busy = actions.flaggingEmail === record.email || actions.deletingEmail === record.email;
+  const busy = Boolean(cleanText(record.email)) && (actions.flaggingEmail === record.email || actions.deletingEmail === record.email);
 
   return (
-    <div className="flex min-w-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+    <div
+      className="flex min-w-0 cursor-pointer flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700"
+      onClick={(event) => {
+        if (busy) return;
+        const target = event.target;
+        if (target instanceof Element && target.closest("button, a, input, select, textarea, label")) return;
+        actions.onEdit(record.email);
+      }}
+    >
       <div className="flex items-start justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-teal-700">
@@ -218,12 +226,12 @@ function RecordActionButtons({
   actions: RowActions;
   flagged?: boolean;
 }) {
-  const busy = actions.flaggingEmail === email || actions.deletingEmail === email;
+  const busy = Boolean(cleanText(email)) && (actions.flaggingEmail === email || actions.deletingEmail === email);
 
   return (
     <div className="flex shrink-0 items-center gap-0.5">
-      <IconButton label="Edit record" onClick={() => actions.onEdit(email)} disabled={busy}>
-        <EditIcon />
+      <IconButton label="View record" onClick={() => actions.onEdit(email)} disabled={busy}>
+        <ViewIcon />
       </IconButton>
       <IconButton
         label="Flag as possible duplicate"
@@ -276,11 +284,11 @@ function IconButton({
   );
 }
 
-function EditIcon() {
+function ViewIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }

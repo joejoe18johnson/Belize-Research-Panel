@@ -257,15 +257,9 @@ export function AdminPanelistsClient({
 
   const editingEmail = editingRow?.email ?? null;
 
-  const openEdit = (email: string) => {
+  const openRecord = (row: PanelistRow) => {
     setMessage("");
     setError("");
-    const row = rows.find((item) => item.email === email);
-    if (!row) {
-      setEditingRow(null);
-      setEditState(null);
-      return;
-    }
 
     const emailKey = cleanText(row.email).toLowerCase();
     const derived = requirementByEmail[emailKey];
@@ -292,6 +286,16 @@ export function AdminPanelistsClient({
       admin_phone_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.phone, derived?.phone === "approved"),
       admin_photo_id_approved: readDecision(ADMIN_REQUIREMENT_FIELDS.photoId, derived?.photoId === "approved"),
     });
+  };
+
+  const openEdit = (email: string) => {
+    const row = rows.find((item) => item.email === email);
+    if (!row) {
+      setEditingRow(null);
+      setEditState(null);
+      return;
+    }
+    openRecord(row);
   };
 
   useEffect(() => {
@@ -518,7 +522,7 @@ export function AdminPanelistsClient({
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel register</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
         <p className="mt-2 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-          Browse, filter, edit, flag, and delete panelist records. Use row actions on each record.
+          Browse, filter, and open panelist records. Click a row or View record to open someone. Flag and delete stay in the actions column.
         </p>
       </div>
 
@@ -702,6 +706,7 @@ export function AdminPanelistsClient({
                   rows={flaggedPagination.paginatedRows}
                   columns={TABLE_COLUMNS}
                   actions={rowActions}
+                  onOpen={openRecord}
                   requirementByEmail={requirementByEmail}
                   sortKey={sortKey}
                   sortDirection={sortDirection}
@@ -732,7 +737,9 @@ export function AdminPanelistsClient({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("All panelists")}</h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Edit, flag, or delete from the actions column.</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                Click a row to open it. View record stays on screen while the other columns scroll.
+              </p>
             </div>
             <button
               type="button"
@@ -754,6 +761,7 @@ export function AdminPanelistsClient({
               rows={allPagination.paginatedRows}
               columns={TABLE_COLUMNS}
               actions={rowActions}
+              onOpen={openRecord}
               requirementByEmail={requirementByEmail}
               sortKey={sortKey}
               sortDirection={sortDirection}
@@ -887,7 +895,7 @@ function PanelistEditModal({
       open
       onClose={onClose}
       title={label}
-      eyebrow="Edit panelist"
+      eyebrow="View record"
       footer={
         <>
           <button
@@ -1039,13 +1047,10 @@ function RowActionButtons({
   flagged?: boolean;
   photoDocumentUrl?: string;
 }) {
-  const busy = actions.flaggingEmail === email || actions.deletingEmail === email;
+  const busy = Boolean(cleanText(email)) && (actions.flaggingEmail === email || actions.deletingEmail === email);
 
   return (
     <div className="flex items-center gap-0.5">
-      <IconButton label="Edit record" onClick={() => actions.onEdit(email)} disabled={busy}>
-        <EditIcon />
-      </IconButton>
       {photoDocumentUrl ? (
         <a
           href={photoDocumentUrl}
@@ -1113,6 +1118,7 @@ function DataTable({
   rows,
   columns,
   actions,
+  onOpen,
   requirementByEmail,
   sortKey,
   sortDirection,
@@ -1121,6 +1127,7 @@ function DataTable({
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
   actions?: RowActions;
+  onOpen?: (row: PanelistRow) => void;
   requirementByEmail: Record<
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
@@ -1131,6 +1138,10 @@ function DataTable({
 }) {
   const [openedColumn, ...restColumns] = columns;
   const headerClass = "whitespace-nowrap px-3 py-2 font-semibold";
+  const openedStickyClass =
+    "sticky left-0 z-10 w-[10.5rem] min-w-[10.5rem] max-w-[10.5rem] bg-zinc-50 dark:bg-zinc-950";
+  const viewStickyClass =
+    "sticky left-[10.5rem] z-20 bg-zinc-50 dark:bg-zinc-950 lg:shadow-[4px_0_10px_-6px_rgba(0,0,0,0.45)]";
 
   return (
     <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm lg:min-w-[1100px]`}>
@@ -1143,8 +1154,11 @@ function DataTable({
               sortKey={sortKey}
               sortDirection={sortDirection}
               onSort={onSort}
-              className={`sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-950 ${headerClass}`}
+              className={`${openedStickyClass} ${headerClass}`}
             />
+          ) : null}
+          {actions ? (
+            <th className={`${viewStickyClass} ${headerClass}`}>View</th>
           ) : null}
           {actions ? (
             <th className={`bg-zinc-50 dark:bg-zinc-950 ${headerClass}`}>Actions</th>
@@ -1181,7 +1195,7 @@ function DataTable({
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length + (actions ? 3 : 2)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
+            <td colSpan={columns.length + (actions ? 4 : 2)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
               No matching panelists.
             </td>
           </tr>
@@ -1190,17 +1204,39 @@ function DataTable({
             const isFlagged = isFlaggedPanelist(row);
             const requirements = requirementByEmail[cleanText(row.email).toLowerCase()];
             const openedLabel = COLUMN_LABELS[openedColumn] ?? "Account opened";
+            const rowBusy =
+              Boolean(cleanText(row.email)) &&
+              (actions?.flaggingEmail === row.email || actions?.deletingEmail === row.email);
+            const rowBg = isFlagged
+              ? "bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:hover:bg-amber-900"
+              : "bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800";
             return (
               <tr
                 key={`${row.email}-${index}`}
-                className={`border-b border-zinc-100 dark:border-zinc-800 ${isFlagged ? "bg-amber-50/80" : ""}`}
+                onClick={(event) => {
+                  if (!onOpen || rowBusy) return;
+                  const target = event.target;
+                  if (target instanceof Element && target.closest("button, a, input, select, textarea, label")) {
+                    return;
+                  }
+                  onOpen(row);
+                }}
+                className={`border-b border-zinc-100 dark:border-zinc-800 ${onOpen ? "cursor-pointer" : ""} ${rowBg}`}
               >
                 {openedColumn ? (
                   <td
                     data-label={openedLabel}
-                    className="sticky left-0 z-10 bg-inherit px-3 py-2 whitespace-nowrap tabular-nums text-zinc-800 dark:text-zinc-200"
+                    className="sticky left-0 z-10 w-[10.5rem] min-w-[10.5rem] max-w-[10.5rem] bg-inherit px-3 py-2 whitespace-nowrap tabular-nums text-zinc-800 dark:text-zinc-200"
                   >
                     {formatAccountOpenedAt(row[openedColumn] ?? "")}
+                  </td>
+                ) : null}
+                {actions ? (
+                  <td
+                    data-label="View"
+                    className="sticky left-[10.5rem] z-20 bg-inherit px-2 py-2 lg:shadow-[4px_0_10px_-6px_rgba(0,0,0,0.45)]"
+                  >
+                    <ViewRecordButton disabled={rowBusy || !onOpen} onClick={() => onOpen?.(row)} />
                   </td>
                 ) : null}
                 {actions ? (
@@ -1302,12 +1338,26 @@ function IdDocumentIcon() {
   );
 }
 
-function EditIcon() {
+function ViewRecordButton({
+  disabled,
+  onClick,
+}: {
+  disabled?: boolean;
+  onClick: () => void;
+}) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-    </svg>
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-lg bg-teal-700 px-2.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-40"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+      View record
+    </button>
   );
 }
 
