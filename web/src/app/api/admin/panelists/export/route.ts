@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     district: url.searchParams.getAll("district"),
     constituency: url.searchParams.getAll("constituency"),
     voterStatus: url.searchParams.getAll("voterStatus"),
+    query: url.searchParams.get("q") ?? "",
   };
 
   const rows = await loadPanelists();

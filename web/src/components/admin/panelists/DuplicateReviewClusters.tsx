@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { DuplicateReviewCluster } from "@/lib/admin-panelists";
-import { isFlaggedPanelist, type AdminPanelistPublicRow } from "@/lib/admin-panelists";
+import { formatAccountOpenedAt, isFlaggedPanelist, type AdminPanelistPublicRow } from "@/lib/admin-panelists";
 import { formatDobDisplay } from "@/lib/dob";
 import { formatAdminLabel } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
@@ -18,7 +18,7 @@ type RowActions = {
 };
 
 const COMPARE_FIELDS = [
-  { key: "registration_date", label: "Registered" },
+  { key: "account_opened_at", label: "Account opened" },
   { key: "username", label: "Username" },
   { key: "email", label: "Email" },
   { key: "phone_whatsapp", label: "Phone" },
@@ -32,6 +32,7 @@ const COMPARE_FIELDS = [
 ] as const;
 
 function fieldValue(row: AdminPanelistPublicRow, key: string): string {
+  if (key === "account_opened_at") return formatAccountOpenedAt(row.account_opened_at ?? row.registration_date ?? "");
   return cleanText(row[key] ?? "") || "—";
 }
 

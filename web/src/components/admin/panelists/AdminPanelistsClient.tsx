@@ -1,17 +1,20 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PANELIST_STATUS, VERIFICATION_STATUS } from "@/lib/admin-constants";
 import {
   applyAdminPanelistFilters,
   countPanelistsByField,
+  formatAccountOpenedAt,
   getDuplicateReviewRows,
   getFlaggedPanelists,
   groupDuplicateReviewClusters,
   isFlaggedPanelist,
   panelistDisplayLabel,
+  panelistMatchesAdminSearch,
+  sortPanelistRows,
   type AdminPanelistPublicRow,
 } from "@/lib/admin-panelists";
 import { formatAuthorisedByLabel, parseAuthorisedRegistration } from "@/lib/authorised-registrars";
@@ -21,7 +24,7 @@ import { SiteSelect, mapStringOptions } from "@/components/shared/SiteSelect";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { cleanText } from "@/lib/validation";
 import { buildPanelistDeleteCode } from "@/lib/admin-delete-confirmation";
-import { FilterMultiSelect, adminResponsiveTableClass } from "@/components/admin/shared/AdminUi";
+import { FilterMultiSelect, adminFieldLabelClass, adminResponsiveTableClass } from "@/components/admin/shared/AdminUi";
 import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteConfirmDialog";
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
@@ -42,7 +45,7 @@ import {
 } from "@/lib/panelist-document-view";
 
 const TABLE_COLUMNS = [
-  "registration_date",
+  "account_opened_at",
   "first_name",
   "last_name",
   "email",
@@ -53,6 +56,21 @@ const TABLE_COLUMNS = [
   "verification_status",
   "status",
 ] as const;
+
+const COLUMN_LABELS: Record<string, string> = {
+  account_opened_at: "Account opened",
+  first_name: "First name",
+  last_name: "Last name",
+  email: "Email",
+  phone_whatsapp: "Phone",
+  district: "District",
+  constituency: "Constituency",
+  voter_status: "Voter status",
+  verification_status: "Verification",
+  status: "Status",
+  requirements: "Email · Phone · ID",
+  authorised_by: "Authorised by",
+};
 
 interface EditState {
   verification_status: string;
@@ -111,6 +129,9 @@ export function AdminPanelistsClient({
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = useState("account_opened_at");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [verificationFilter, setVerificationFilter] = useState<string[]>([]);
   const [districtFilter, setDistrictFilter] = useState<string[]>([]);
   const [constituencyFilter, setConstituencyFilter] = useState<string[]>([]);
@@ -136,12 +157,18 @@ export function AdminPanelistsClient({
         district: districtFilter,
         constituency: constituencyFilter,
         voterStatus: voterFilter,
+        query: searchQuery,
       }),
-    [rows, verificationFilter, districtFilter, constituencyFilter, voterFilter]
+    [rows, verificationFilter, districtFilter, constituencyFilter, voterFilter, searchQuery]
   );
 
   const duplicateRows = useMemo(() => getDuplicateReviewRows(rows), [rows]);
-  const duplicateClusters = useMemo(() => groupDuplicateReviewClusters(rows), [rows]);
+  const duplicateClusters = useMemo(() => {
+    const clusters = groupDuplicateReviewClusters(rows);
+    const query = searchQuery.trim();
+    if (!query) return clusters;
+    return clusters.filter((cluster) => cluster.records.some((row) => panelistMatchesAdminSearch(row, query)));
+  }, [rows, searchQuery]);
   const flaggedRows = useMemo(
     () =>
       applyAdminPanelistFilters(getFlaggedPanelists(rows), {
@@ -149,8 +176,9 @@ export function AdminPanelistsClient({
         district: districtFilter,
         constituency: constituencyFilter,
         voterStatus: voterFilter,
+        query: searchQuery,
       }),
-    [rows, verificationFilter, districtFilter, constituencyFilter, voterFilter]
+    [rows, verificationFilter, districtFilter, constituencyFilter, voterFilter, searchQuery]
   );
 
   const verificationCounts = useMemo(
@@ -170,9 +198,57 @@ export function AdminPanelistsClient({
     [rows, filterOptions.voterStatus]
   );
 
-  const allPagination = useTablePagination(filteredRows);
-  const duplicatePagination = useTablePagination(duplicateClusters);
-  const flaggedPagination = useTablePagination(flaggedRows);
+  const sortValue = useCallback((row: PanelistRow, key: string) => {
+    if (key === "requirements") {
+      const requirement = requirementByEmail[cleanText(row.email).toLowerCase()];
+      if (!requirement) return "";
+      return [requirement.email, requirement.phone, requirement.photoId].join(" ");
+    }
+    if (key === "authorised_by") {
+      return formatAuthorisedByLabel({
+        notes: row.notes,
+        authorised_verification_code: row.authorised_verification_code,
+        authorised_registrar_name: row.authorised_registrar_name,
+      });
+    }
+    return row[key] ?? "";
+  }, [requirementByEmail]);
+
+  const sortedRows = useMemo(
+    () => sortPanelistRows(filteredRows, sortKey, sortDirection, sortValue),
+    [filteredRows, sortKey, sortDirection, sortValue]
+  );
+  const sortedFlaggedRows = useMemo(
+    () => sortPanelistRows(flaggedRows, sortKey, sortDirection, sortValue),
+    [flaggedRows, sortKey, sortDirection, sortValue]
+  );
+  const sortedDuplicateClusters = useMemo(() => {
+    const sortable = duplicateClusters.flatMap((cluster) => {
+      const record = cluster.records[0];
+      if (!record) return [];
+      const { duplicate_name_dob_flag: _ignored, ...rest } = record;
+      return [{ ...rest, __clusterId: cluster.id }];
+    });
+    return sortPanelistRows(sortable, sortKey, sortDirection, sortValue)
+      .map((row) => duplicateClusters.find((cluster) => cluster.id === row.__clusterId))
+      .filter((cluster): cluster is (typeof duplicateClusters)[number] => Boolean(cluster));
+  }, [duplicateClusters, sortKey, sortDirection, sortValue]);
+
+  const allPagination = useTablePagination(sortedRows);
+  const duplicatePagination = useTablePagination(sortedDuplicateClusters);
+  const flaggedPagination = useTablePagination(sortedFlaggedRows);
+
+  const onSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDirection(key === "account_opened_at" ? "desc" : "asc");
+    }
+    allPagination.setPage(1);
+    flaggedPagination.setPage(1);
+    duplicatePagination.setPage(1);
+  };
 
   const cityOptions =
     editState?.district && editState.district in CITY_TOWN_VILLAGE
@@ -294,6 +370,7 @@ export function AdminPanelistsClient({
     districtFilter.forEach((value) => params.append("district", value));
     constituencyFilter.forEach((value) => params.append("constituency", value));
     voterFilter.forEach((value) => params.append("voterStatus", value));
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
     window.location.assign(`/api/admin/panelists/export?${params.toString()}`);
   };
 
@@ -419,7 +496,7 @@ export function AdminPanelistsClient({
 
   const TABS = [
     { id: "all" as const, label: "All panelists", count: filteredRows.length },
-    { id: "flagged" as const, label: "Flagged", count: getFlaggedPanelists(rows).length },
+    { id: "flagged" as const, label: "Flagged", count: flaggedRows.length },
     { id: "duplicates" as const, label: "Duplicate review", count: duplicateClusters.length },
   ];
 
@@ -459,6 +536,24 @@ export function AdminPanelistsClient({
 
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Filters")}</h2>
+        <div className="mt-4">
+          <label htmlFor="panelist-search" className={adminFieldLabelClass}>
+            Search
+          </label>
+          <input
+            id="panelist-search"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => {
+              setSearchQuery(event.target.value);
+              allPagination.setPage(1);
+              flaggedPagination.setPage(1);
+              duplicatePagination.setPage(1);
+            }}
+            placeholder="Search name, username, email, or phone…"
+            className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+          />
+        </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FilterMultiSelect
             label="Verification status"
@@ -575,7 +670,9 @@ export function AdminPanelistsClient({
           ) : (
             <div className="mt-3">
               <BrandedAlert tone="success" compact showIcon>
-                No records share the same name and exact date of birth.
+                {searchQuery.trim()
+                  ? "No duplicate clusters match that search."
+                  : "No records share the same name and exact date of birth."}
               </BrandedAlert>
             </div>
           )}
@@ -606,6 +703,9 @@ export function AdminPanelistsClient({
                   columns={TABLE_COLUMNS}
                   actions={rowActions}
                   requirementByEmail={requirementByEmail}
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={onSort}
                 />
               </div>
               <TablePagination
@@ -620,7 +720,9 @@ export function AdminPanelistsClient({
           ) : (
             <div className="mt-3">
               <BrandedAlert tone="success" compact showIcon>
-                No panelists are currently flagged as Possible Duplicate.
+                {searchQuery.trim()
+                  ? "No flagged panelists match that search."
+                  : "No panelists are currently flagged as Possible Duplicate."}
               </BrandedAlert>
             </div>
           )}
@@ -653,6 +755,9 @@ export function AdminPanelistsClient({
               columns={TABLE_COLUMNS}
               actions={rowActions}
               requirementByEmail={requirementByEmail}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+              onSort={onSort}
             />
           </div>
           <TablePagination
@@ -1009,6 +1114,9 @@ function DataTable({
   columns,
   actions,
   requirementByEmail,
+  sortKey,
+  sortDirection,
+  onSort,
 }: {
   rows: Array<PanelistRow | AdminPanelistPublicRow>;
   columns: readonly string[];
@@ -1017,41 +1125,86 @@ function DataTable({
     string,
     { email: RequirementApprovalStatus; phone: RequirementApprovalStatus; photoId: RequirementApprovalStatus }
   >;
+  sortKey: string;
+  sortDirection: "asc" | "desc";
+  onSort: (key: string) => void;
 }) {
+  const [openedColumn, ...restColumns] = columns;
+  const headerClass = "whitespace-nowrap px-3 py-2 font-semibold";
+
   return (
     <table className={`${adminResponsiveTableClass} w-full text-left text-xs sm:text-sm lg:min-w-[1100px]`}>
       <thead>
-        <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-          {actions ? (
-            <th className="sticky left-0 z-10 whitespace-nowrap bg-zinc-50 dark:bg-zinc-950 px-2 py-2 font-semibold">Actions</th>
+        <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
+          {openedColumn ? (
+            <SortableHeader
+              columnKey={openedColumn}
+              label={COLUMN_LABELS[openedColumn] ?? openedColumn}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+              onSort={onSort}
+              className={`sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-950 ${headerClass}`}
+            />
           ) : null}
-          {columns.map((column) => (
-            <th key={column} className="whitespace-nowrap px-3 py-2 font-semibold">
-              {column.replace(/_/g, " ")}
-            </th>
+          {actions ? (
+            <th className={`bg-zinc-50 dark:bg-zinc-950 ${headerClass}`}>Actions</th>
+          ) : null}
+          {restColumns.map((column) => (
+            <SortableHeader
+              key={column}
+              columnKey={column}
+              label={COLUMN_LABELS[column] ?? column.replace(/_/g, " ")}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+              onSort={onSort}
+              className={headerClass}
+            />
           ))}
-          <th className="whitespace-nowrap px-3 py-2 font-semibold">Email · Phone · ID</th>
-          <th className="whitespace-nowrap px-3 py-2 font-semibold">Authorised by</th>
+          <SortableHeader
+            columnKey="requirements"
+            label={COLUMN_LABELS.requirements}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSort={onSort}
+            className={headerClass}
+          />
+          <SortableHeader
+            columnKey="authorised_by"
+            label={COLUMN_LABELS.authorised_by}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSort={onSort}
+            className={headerClass}
+          />
         </tr>
       </thead>
       <tbody>
         {rows.length === 0 ? (
           <tr>
             <td colSpan={columns.length + (actions ? 3 : 2)} data-label="" className="admin-table-empty px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
-              No records on this page.
+              No matching panelists.
             </td>
           </tr>
         ) : (
           rows.map((row, index) => {
             const isFlagged = isFlaggedPanelist(row);
             const requirements = requirementByEmail[cleanText(row.email).toLowerCase()];
+            const openedLabel = COLUMN_LABELS[openedColumn] ?? "Account opened";
             return (
               <tr
                 key={`${row.email}-${index}`}
                 className={`border-b border-zinc-100 dark:border-zinc-800 ${isFlagged ? "bg-amber-50/80" : ""}`}
               >
+                {openedColumn ? (
+                  <td
+                    data-label={openedLabel}
+                    className="sticky left-0 z-10 bg-inherit px-3 py-2 whitespace-nowrap tabular-nums text-zinc-800 dark:text-zinc-200"
+                  >
+                    {formatAccountOpenedAt(row[openedColumn] ?? "")}
+                  </td>
+                ) : null}
                 {actions ? (
-                  <td data-label="Actions" className="sticky left-0 z-10 bg-inherit px-2 py-2 md:sticky">
+                  <td data-label="Actions" className="bg-inherit px-2 py-2">
                     <RowActionButtons
                       email={row.email}
                       actions={actions}
@@ -1062,16 +1215,16 @@ function DataTable({
                     />
                   </td>
                 ) : null}
-                {columns.map((column) => (
+                {restColumns.map((column) => (
                   <td
                     key={column}
-                    data-label={column.replace(/_/g, " ")}
+                    data-label={COLUMN_LABELS[column] ?? column.replace(/_/g, " ")}
                     className="max-w-none px-3 py-2 text-zinc-700 dark:text-zinc-300 md:max-w-[14rem] md:truncate md:whitespace-nowrap"
                   >
                     {row[column] ?? ""}
                   </td>
                 ))}
-                <td data-label="Email · Phone · ID" className="px-3 py-2 md:whitespace-nowrap">
+                <td data-label={COLUMN_LABELS.requirements} className="px-3 py-2 md:whitespace-nowrap">
                   {requirements ? (
                     <RequirementStatusGroup
                       email={requirements.email}
@@ -1083,7 +1236,7 @@ function DataTable({
                     "—"
                   )}
                 </td>
-                <td data-label="Authorised by" className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                <td data-label={COLUMN_LABELS.authorised_by} className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
                   {formatAuthorisedByLabel({
                     notes: row.notes,
                     authorised_verification_code: row.authorised_verification_code,
@@ -1096,6 +1249,46 @@ function DataTable({
         )}
       </tbody>
     </table>
+  );
+}
+
+function SortableHeader({
+  columnKey,
+  label,
+  sortKey,
+  sortDirection,
+  onSort,
+  className,
+}: {
+  columnKey: string;
+  label: string;
+  sortKey: string;
+  sortDirection: "asc" | "desc";
+  onSort: (key: string) => void;
+  className?: string;
+}) {
+  const active = sortKey === columnKey;
+  const directionLabel = sortDirection === "asc" ? "ascending" : "descending";
+  const tooltip = active
+    ? `${label}, sorted ${directionLabel}. Click to reverse.`
+    : `Sort by ${label}`;
+  return (
+    <th
+      aria-sort={active ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+      className={className}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(columnKey)}
+        data-tooltip={tooltip}
+        className="inline-flex items-center gap-1 font-semibold text-inherit hover:text-teal-800 dark:hover:text-teal-200"
+      >
+        {label}
+        <span aria-hidden className={active ? "text-teal-700 dark:text-teal-300" : "text-zinc-400"}>
+          {active ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}
+        </span>
+      </button>
+    </th>
   );
 }
 

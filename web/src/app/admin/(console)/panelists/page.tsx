@@ -81,9 +81,15 @@ export default async function AdminPanelistsPage({
     if (email) emailVerifiedByAccount[email] = account.email_verified === "true";
   }
 
+  const rowsWithOpenedAt = rows.map((row) => {
+    const email = cleanText(row.email).toLowerCase();
+    const openedAt = cleanText(accountsByEmail.get(email)?.created_at) || cleanText(row.registration_date);
+    return { ...row, account_opened_at: openedAt };
+  });
+
   return (
     <AdminPanelistsClient
-      rows={rows}
+      rows={rowsWithOpenedAt}
       requirementByEmail={requirementByEmail}
       emailVerifiedByAccount={emailVerifiedByAccount}
       initialEmail={params.email}

@@ -6,6 +6,7 @@ import { NetlifyDeployBanner } from "@/components/NetlifyDeployBanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteFooterGate } from "@/components/SiteFooterGate";
 import { ScrollToTopOnNavigate } from "@/components/shared/ScrollToTopOnNavigate";
+import { SiteTooltips } from "@/components/shared/SiteTooltips";
 import { ThemeInitScript } from "@/components/theme/ThemeInitScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { getSessionAccount } from "@/lib/auth";
@@ -39,6 +40,7 @@ export default async function RootLayout({
       <body className="flex min-h-full min-w-0 max-w-full flex-col overflow-x-clip bg-background font-sans text-foreground">
         <ThemeInitScript />
         <ThemeProvider>
+          <SiteTooltips />
           <ScrollToTopOnNavigate />
           <NetlifyDeployBanner />
           <div className="flex min-h-0 flex-1 flex-col pb-[var(--brp-mobile-bottom-nav-offset,0px)] lg:pb-0">

@@ -14,6 +14,33 @@ export interface AdminPanelistFilters {
   district?: string[];
   constituency?: string[];
   voterStatus?: string[];
+  query?: string;
+}
+
+/** Match a panelist by name, username, email, or phone. */
+export function panelistMatchesAdminSearch(row: PanelistRow, query: string): boolean {
+  const needle = cleanText(query).toLowerCase();
+  if (!needle) return true;
+
+  const haystack = [
+    row.first_name,
+    row.last_name,
+    `${row.first_name ?? ""} ${row.last_name ?? ""}`,
+    row.username,
+    row.email,
+    row.phone_whatsapp,
+  ]
+    .map((value) => cleanText(value).toLowerCase())
+    .join(" ");
+
+  if (haystack.includes(needle)) return true;
+
+  const phoneNeedle = needle.replace(/\D/g, "");
+  if (phoneNeedle.length >= 3) {
+    return normalizePhoneForComparison(row.phone_whatsapp ?? "").includes(phoneNeedle);
+  }
+
+  return false;
 }
 
 export type AdminPanelistPublicRow = PanelistRow & {
@@ -291,6 +318,9 @@ export function applyAdminPanelistFilters(
   if (filters.voterStatus?.length) {
     filtered = filtered.filter((row) => filters.voterStatus!.includes(cleanText(row.voter_status)));
   }
+  if (cleanText(filters.query)) {
+    filtered = filtered.filter((row) => panelistMatchesAdminSearch(row, filters.query ?? ""));
+  }
 
   const keyCounts = buildDuplicateNameDobKeyCounts(rows);
   return enrichRowsWithDuplicateFlags(filtered, keyCounts);
@@ -316,6 +346,88 @@ export function getUniqueFilterValues(rows: PanelistRow[], field: keyof Panelist
     if (value) values.add(value);
   }
   return [...values].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+}
+
+const BELIZE_TIME_ZONE = "America/Belize";
+const TIMESTAMP_SORT_KEYS = new Set(["account_opened_at", "registration_date"]);
+
+/** Parse an account-opened or registration value into epoch ms. Belize local when the string has no zone. */
+export function parsePanelistTimestamp(value: string): number | null {
+  const raw = cleanText(value);
+  if (!raw) return null;
+
+  if (/[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) || raw.includes("T")) {
+    const ms = Date.parse(raw);
+    return Number.isNaN(ms) ? null : ms;
+  }
+
+  const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (dmy) {
+    const day = dmy[1].padStart(2, "0");
+    const month = dmy[2].padStart(2, "0");
+    const year = dmy[3];
+    const hour = (dmy[4] ?? "0").padStart(2, "0");
+    const minute = (dmy[5] ?? "0").padStart(2, "0");
+    const ms = Date.parse(`${year}-${month}-${day}T${hour}:${minute}:00-06:00`);
+    return Number.isNaN(ms) ? null : ms;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const ms = Date.parse(`${raw}T00:00:00-06:00`);
+    return Number.isNaN(ms) ? null : ms;
+  }
+
+  const ms = Date.parse(raw);
+  return Number.isNaN(ms) ? null : ms;
+}
+
+/** Date and time in Belize, for example 30/09/2026 16:39. Date-only values stay date-only. */
+export function formatAccountOpenedAt(value: string): string {
+  const raw = cleanText(value);
+  if (!raw) return "—";
+  const ms = parsePanelistTimestamp(raw);
+  if (ms == null) return raw;
+
+  const hasTime = /T\d{2}:\d{2}|[ T]\d{1,2}:\d{2}/.test(raw);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: BELIZE_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    ...(hasTime ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" as const } : {}),
+  }).formatToParts(new Date(ms));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? "";
+  const date = `${part("day")}/${part("month")}/${part("year")}`;
+  if (!hasTime) return date;
+  return `${date} ${part("hour")}:${part("minute")}`;
+}
+
+export function sortPanelistRows<T extends PanelistRow>(
+  rows: T[],
+  key: string,
+  direction: "asc" | "desc",
+  valueOf: (row: T, key: string) => string = (row, sortKey) => row[sortKey] ?? ""
+): T[] {
+  const factor = direction === "asc" ? 1 : -1;
+  const byTime = TIMESTAMP_SORT_KEYS.has(key);
+
+  return [...rows].sort((a, b) => {
+    if (byTime) {
+      const aTime = parsePanelistTimestamp(valueOf(a, key));
+      const bTime = parsePanelistTimestamp(valueOf(b, key));
+      if (aTime == null && bTime == null) return 0;
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+      return factor * (aTime - bTime);
+    }
+
+    const aValue = cleanText(valueOf(a, key)).toLowerCase();
+    const bValue = cleanText(valueOf(b, key)).toLowerCase();
+    if (!aValue && !bValue) return 0;
+    if (!aValue) return 1;
+    if (!bValue) return -1;
+    return factor * aValue.localeCompare(bValue, undefined, { numeric: true, sensitivity: "base" });
+  });
 }
 
 export function panelistDisplayLabel(row: PanelistRow): string {
