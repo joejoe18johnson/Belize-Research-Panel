@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { getSiteUrl } from "@/lib/seo/site-config";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 import type { EmailTemplateId } from "./email-templates";
 
 export type UnsubscribeScope = "outreach" | "all";
@@ -160,7 +161,7 @@ export async function unsubscribeClosedAccount(email: string): Promise<void> {
   try {
     await unsubscribeEmail(email, { scope: "all", reason: "account_closed" });
   } catch (error) {
-    console.error("[email] could not record account-close unsubscribe", error);
+    logServerError("[email] could not record account-close unsubscribe", error);
   }
 }
 

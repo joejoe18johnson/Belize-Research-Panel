@@ -11,6 +11,7 @@ import {
   type AuthorisedRegistrar,
   type AuthorisedRegistrarStore,
 } from "./authorised-registrars";
+import { logServerError } from "./safe-log";
 import { cleanText } from "./validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "authorised-registrars.json");
@@ -96,7 +97,7 @@ export async function loadAuthorisedRegistrars(): Promise<AuthorisedRegistrarSto
       try {
         await supabaseSaveAuthorisedRegistrars(store);
       } catch (error) {
-        console.error("Could not persist authorised registrars to Supabase:", error);
+        logServerError("Could not persist authorised registrars to Supabase", error);
       }
     }
   } else {
@@ -137,7 +138,7 @@ async function markCodesUsedByExistingPanelists(
   try {
     return await saveAuthorisedRegistrars({ registrars: next });
   } catch (error) {
-    console.error("Could not mark used authorisation codes:", error);
+    logServerError("Could not mark used authorisation codes", error);
     return { registrars: next };
   }
 }

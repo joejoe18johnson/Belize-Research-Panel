@@ -292,15 +292,15 @@ async function main() {
   for (const user of STAFF_USERS) {
     console.log(`  ${user.email} — ${user.role}`);
   }
-  console.log(`Staff password: ${STAFF_PASSWORD}`);
+  console.log("Staff password is set in this script and is not printed.");
   console.log("\nPanelist personas (public /login):");
   for (const persona of PANELIST_PERSONAS) {
     console.log(`  ${persona.email}`);
   }
-  console.log(`Panelist password: ${PANELIST_PASSWORD}`);
+  console.log("Panelist password is set in this script and is not printed.");
 }
 
 main().catch((error) => {
-  console.error(error);
+  console.error(error instanceof Error ? error.message : "Seed failed.");
   process.exit(1);
 });

@@ -6,6 +6,7 @@ import { sendSupportReplyEmail } from "@/lib/email/process-emails";
 import { appendSupportReply, markSupportMessageRead } from "@/lib/support-messages";
 import { sessionCanAccessModule } from "@/lib/staff-roles";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 
 export async function POST(request: NextRequest) {
   if (!(await isAdminSessionActive())) {
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/admin", "layout");
     return NextResponse.json({ ok: true, message: updated });
   } catch (error) {
-    console.error("[support] admin update failed", error);
+    logServerError("[support] admin update failed", error);
     return NextResponse.json({ message: "Could not update support message." }, { status: 500 });
   }
 }

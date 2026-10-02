@@ -103,10 +103,10 @@ async function main() {
   for (const account of DEMO_ACCOUNTS) {
     console.log(`  ${account.email} (${account.panelist_registered === "true" ? "registered panelist" : "ready for /register"})`);
   }
-  console.log(`Password: ${DEMO_PASSWORD}`);
+  console.log("Password is set in this script and is not printed.");
 }
 
 main().catch((error) => {
-  console.error(error);
+  console.error(error instanceof Error ? error.message : "Seed failed.");
   process.exit(1);
 });

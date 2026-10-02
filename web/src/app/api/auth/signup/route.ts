@@ -5,6 +5,7 @@ import { sendSignupAdminNotificationEmail, sendSignupVerifyEmail } from "@/lib/e
 import type { SignupFormData } from "@/lib/auth-types";
 import { isSignupEligible, validateSignupForm } from "@/lib/signup-validation";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     try {
       await setSessionCookie(result.account.id);
     } catch (error) {
-      console.error("Signup session cookie failed:", error);
+      logServerError("Signup session cookie failed", error);
     }
 
     const origin = resolveRequestOrigin(request);
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       email: result.account.email,
       origin,
     }).catch((error) => {
-      console.error("Signup admin notification failed:", error);
+      logServerError("Signup admin notification failed", error);
     });
 
     try {
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
       emailSent = delivery.sent;
       emailError = delivery.sent ? undefined : delivery.error;
     } catch (error) {
-      console.error("Signup verification email failed:", error);
+      logServerError("Signup verification email failed", error);
       emailError = error instanceof Error ? error.message : "Verification email could not be sent.";
     }
 
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
       verifyUrl: emailSent ? undefined : verifyUrl,
     });
   } catch (error) {
-    console.error("Signup failed:", error);
+    logServerError("Signup failed", error);
     return NextResponse.json({ message: "Could not create account." }, { status: 500 });
   }
 }

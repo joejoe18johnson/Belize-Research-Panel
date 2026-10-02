@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerError } from "@/lib/safe-log";
 
 export function pdfResponse(bytes: Uint8Array, filename: string, download = false): NextResponse {
   const safeName = filename.replace(/[^\w.-]+/g, "-");
@@ -16,6 +17,6 @@ export function pdfResponse(bytes: Uint8Array, filename: string, download = fals
 }
 
 export function pdfGenerationErrorResponse(error: unknown, context: string): NextResponse {
-  console.error(`[pdf] ${context} failed`, error);
+  logServerError(`[pdf] ${context} failed`, error);
   return NextResponse.json({ message: "Could not create this PDF. Please try again." }, { status: 500 });
 }

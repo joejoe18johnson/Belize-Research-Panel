@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { cleanText } from "./validation";
+import { logServerError } from "./safe-log";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ACCOUNTS_FILE = path.join(DATA_DIR, "accounts.json");
@@ -97,6 +98,6 @@ export async function deletePanelistRelatedData(email: string, username: string)
       removeAccountByEmail(email),
     ]);
   } catch (error) {
-    console.error("Panelist related-data cleanup failed:", error);
+    logServerError("Panelist related-data cleanup failed", error);
   }
 }

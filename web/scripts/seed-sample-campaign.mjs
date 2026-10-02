@@ -81,13 +81,13 @@ async function main() {
   console.log("Sample on-site campaign ready:", SAMPLE_CAMPAIGN.title);
   console.log("\nPanelist login:");
   console.log(`  Email: ${TARGET_EMAIL}`);
-  console.log("  Password: DemoPass1!");
+  console.log("  Password is set in this script and is not printed.");
   console.log("\nOpen Dashboard → Surveys → Start survey (on-site, no external link).");
   console.log(`Take survey: /dashboard/surveys/${CAMPAIGN_ID}`);
   console.log(`Admin builder: /admin/surveys`);
 }
 
 main().catch((error) => {
-  console.error(error);
+  console.error(error instanceof Error ? error.message : "Seed failed.");
   process.exit(1);
 });

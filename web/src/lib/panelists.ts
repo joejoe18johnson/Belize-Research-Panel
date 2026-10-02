@@ -20,6 +20,7 @@ import { composeStreetAddress } from "./street-address";
 import type { RegistrationFormData } from "./registration-types";
 import type { ProfileUpdateFormData } from "./profile-update-types";
 import { authorisedRegistrationNotes } from "./authorised-registrars";
+import { logServerError } from "./safe-log";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PANELISTS_FILE = path.join(DATA_DIR, "panelists.csv");
@@ -413,7 +414,7 @@ export async function registerPanelist(
         );
       }
     } catch (error) {
-      console.error("Panelist document upload failed:", error);
+      logServerError("Panelist document upload failed", error);
       throw new Error("document_upload_failed");
     }
   } else {

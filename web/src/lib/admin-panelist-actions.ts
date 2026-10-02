@@ -6,6 +6,7 @@ import { findPanelistByEmail, loadPanelists, savePanelists, updatePanelistAdminF
 import { getSiteUrl } from "./seo/site-config";
 import { cleanText } from "./validation";
 import { deletePanelistRelatedData } from "./admin-panelist-delete";
+import { logServerError } from "./safe-log";
 
 async function notifyFraudHold(email: string): Promise<void> {
   const account = await findAccountByEmail(email);
@@ -90,7 +91,7 @@ export async function deletePanelistByEmail(email: string): Promise<boolean> {
       try {
         await supabaseDeletePanelistStorage(account.id);
       } catch (error) {
-        console.error("Panelist storage delete failed:", error);
+        logServerError("Panelist storage delete failed", error);
       }
     }
 

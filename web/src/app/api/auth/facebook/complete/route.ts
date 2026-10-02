@@ -3,6 +3,7 @@ import { createOrLinkFacebookAccount } from "@/lib/accounts";
 import { setSessionCookie } from "@/lib/auth";
 import { isFacebookLoginConfigured } from "@/lib/facebook-auth";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { logServerError } from "@/lib/safe-log";
 import { cleanText } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-    console.error("Facebook complete failed:", error);
+    logServerError("Facebook complete failed", error);
     return NextResponse.json(
       { ok: false, message: error instanceof Error ? error.message : "Facebook sign-in failed." },
       { status: 500 }

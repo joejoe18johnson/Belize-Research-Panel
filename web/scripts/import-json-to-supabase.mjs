@@ -980,6 +980,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("\nImport failed:", error.message ?? error);
+  console.error("\nImport failed:", error instanceof Error ? error.message : "Import failed.");
   process.exit(1);
 });

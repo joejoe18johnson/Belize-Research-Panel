@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { issueEmailVerificationToken } from "@/lib/accounts";
 import { buildVerificationUrl, getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendSignupVerifyEmail } from "@/lib/email/process-emails";
+import { logServerError } from "@/lib/safe-log";
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
         : "We could not send the email. Use the verification link on this page.",
     });
   } catch (error) {
-    console.error("Resend verification failed:", error);
+    logServerError("Resend verification failed", error);
     return NextResponse.json({ message: "Could not resend verification email." }, { status: 500 });
   }
 }

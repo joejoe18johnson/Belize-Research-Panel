@@ -4,6 +4,7 @@ import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
 import type { RegistrationFormData } from "@/lib/registration-types";
+import { logServerError } from "@/lib/safe-log";
 import { deriveAccountUsername, validateRegistrationForm } from "@/lib/validation";
 
 function parseBoolean(value: FormDataEntryValue | null): boolean {
@@ -174,7 +175,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-    console.error("Registration failed:", error);
+    logServerError("Registration failed", error);
     const detail = error instanceof Error ? error.message : "Unknown error";
     const isDev = process.env.NODE_ENV !== "production";
     return NextResponse.json(

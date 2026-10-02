@@ -11,6 +11,7 @@ import { sendEmailChangeApprovedEmail } from "@/lib/email/process-emails";
 import { updatePanelistEmail } from "@/lib/panelists";
 import { adminNotificationId, markAdminNotificationsRead } from "@/lib/admin-read-state";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
   if (await isAdminSessionActive()) return true;
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
         panelistNote = "Their surveys and profile now use the new address.";
       }
     } catch (error) {
-      console.error("[approve-email-change] panelist retarget failed", error);
+      logServerError("[approve-email-change] panelist retarget failed", error);
       panelistNote =
         error instanceof Error
           ? `The login email was updated, but the panelist profile could not be moved (${error.message}). Open the panelist record and set the email to ${pendingEmail}.`
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
       message,
     });
   } catch (error) {
-    console.error("[approve-email-change]", error);
+    logServerError("[approve-email-change]", error);
     const detail = error instanceof Error ? error.message : "";
     return NextResponse.json(
       {

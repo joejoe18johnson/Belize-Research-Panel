@@ -8,6 +8,7 @@ import {
   templateOffersUnsubscribe,
 } from "./unsubscribe";
 import { getSignupNotifyEmail, shouldSendSignupAdminNotification } from "@/lib/signup-notify";
+import { logServerError } from "@/lib/safe-log";
 
 export async function sendTemplateEmail(input: {
   templateId: EmailTemplateId;
@@ -50,7 +51,7 @@ export async function sendTemplateEmail(input: {
       error: result.error,
     };
   } catch (error) {
-    console.error("[email] template send failed", input.templateId, error);
+    logServerError(`[email] template send failed: ${input.templateId}`, error);
     return {
       sent: false,
       logged: false,

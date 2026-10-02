@@ -8,6 +8,7 @@ import {
   setAuthorisedRegistrarActive,
 } from "@/lib/authorised-registrars-store";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 
 function persistFailureMessage(error: unknown, fallback: string): string {
   const message = error instanceof Error ? error.message : "";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true, registrar: result.registrar });
   } catch (error) {
-    console.error("Create authorised registrar failed:", error);
+    logServerError("Create authorised registrar failed", error);
     return NextResponse.json(
       { ok: false, message: persistFailureMessage(error, "Could not create the authorisation code.") },
       { status: 500 }
@@ -74,7 +75,7 @@ export async function PATCH(request: Request) {
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true, registrar: updated });
   } catch (error) {
-    console.error("Update authorised registrar failed:", error);
+    logServerError("Update authorised registrar failed", error);
     return NextResponse.json(
       { ok: false, message: persistFailureMessage(error, "Could not update the authorisation code.") },
       { status: 500 }
@@ -101,7 +102,7 @@ export async function DELETE(request: Request) {
     revalidatePath("/admin/authorised-registrars");
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Delete authorised registrar failed:", error);
+    logServerError("Delete authorised registrar failed", error);
     return NextResponse.json(
       { ok: false, message: persistFailureMessage(error, "Could not delete the authorisation code.") },
       { status: 500 }

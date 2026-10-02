@@ -20,6 +20,7 @@ import {
 } from "../platform-testing-settings";
 import { cleanText, deriveAccountUsername, deriveUsernameFromEmail } from "../validation";
 import { getSupabaseAdmin } from "./server";
+import { logServerError } from "../safe-log";
 import { normalizePanelistEmail, resolveDbAssignmentId } from "./assignment-id";
 import {
   accountRecordToRow,
@@ -1348,7 +1349,7 @@ export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistra
     await saveAuthorisedRegistrarsBlob(store);
   } catch (error) {
     blobError = error;
-    console.error("Supabase authorised registrar file save failed:", error);
+    logServerError("Supabase authorised registrar file save failed", error);
   }
 
   try {
@@ -1356,7 +1357,7 @@ export async function supabaseSaveAuthorisedRegistrars(store: AuthorisedRegistra
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (!message.toLowerCase().includes("authorised_registrars")) {
-      console.error("Supabase authorised registrar table save failed:", error);
+      logServerError("Supabase authorised registrar table save failed", error);
     }
   }
 

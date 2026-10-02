@@ -4,6 +4,7 @@ import { sendSupportContactEmails } from "@/lib/email/process-emails";
 import { createSupportMessage } from "@/lib/support-messages";
 import { getSupportInboxEmail, isSupportTopicId } from "@/lib/support-contact";
 import { cleanText } from "@/lib/validation";
+import { logServerError } from "@/lib/safe-log";
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       message: `Your message has been sent. We will reply to ${record.email} within 1–2 business days.`,
     });
   } catch (error) {
-    console.error("[support] contact form failed", error);
+    logServerError("[support] contact form failed", error);
     return NextResponse.json({ message: "Could not send your message." }, { status: 500 });
   }
 }

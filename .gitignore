@@ -1,6 +1,11 @@
 .DS_Store
 *.DS_Store
 
+# Local secrets. Example files stay committable.
+.env
+.env.*
+!.env.example
+
 # Local Streamlit prototype — not deployed from this repo
 appfiles/
 

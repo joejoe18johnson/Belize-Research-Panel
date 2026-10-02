@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { Resend } from "resend";
+import { logServerError } from "@/lib/safe-log";
 import { cleanText } from "@/lib/validation";
 
 const DATA_FILE = path.join(process.cwd(), "data", "outbound-messages.json");
@@ -45,7 +46,7 @@ async function logOutboundMessage(input: Omit<OutboundMessageRecord, "id" | "sen
     await saveMessages(messages.slice(0, 500));
     return true;
   } catch (error) {
-    console.error("[email] could not persist outbound message log", error);
+    logServerError("[email] could not persist outbound message log", error);
     return false;
   }
 }
@@ -65,8 +66,8 @@ export function resolveResendFromAddress(raw = process.env.RESEND_FROM_EMAIL): s
   const value = raw?.trim() ?? "";
   const email = value.match(FROM_EMAIL_RE)?.[0] ?? FROM_FALLBACK_EMAIL;
   if (value && !FROM_EMAIL_RE.test(value)) {
-    console.error(
-      "[email] RESEND_FROM_EMAIL has no valid address. Set it to a plain email on your verified domain, e.g. noreply@info.dashboardresearch.com"
+    logServerError(
+      "[email] RESEND_FROM_EMAIL has no valid address. Set it to a plain email on your verified domain."
     );
   }
   return `${FROM_DISPLAY_NAME} <${email}>`;
@@ -114,7 +115,7 @@ export async function sendTransactionalEmail(input: {
       if (result.error) {
         deliveryStatus = "failed";
         errorMessage = result.error.message;
-        console.error("[email]", context, result.error.message);
+        logServerError(`[email] ${context} send failed`, result.error.message);
       } else {
         deliveryStatus = "sent";
         resendId = result.data?.id;
@@ -122,7 +123,7 @@ export async function sendTransactionalEmail(input: {
     } catch (error) {
       deliveryStatus = "failed";
       errorMessage = error instanceof Error ? error.message : "Email provider request failed.";
-      console.error("[email]", context, error);
+      logServerError(`[email] ${context} send failed`, error);
     }
   }
 

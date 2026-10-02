@@ -12,6 +12,7 @@ import { findAssignmentForAccount } from "./survey-assignment-lookup";
 import type { PanelistSurveyRecord } from "./panelist-surveys-types";
 import { assertCanPersistData, useSupabase } from "./supabase/data-source";
 import { cleanText } from "./validation";
+import { logServerError } from "./safe-log";
 
 const DATA_FILE = path.join(process.cwd(), "data", "survey-responses.json");
 
@@ -133,7 +134,7 @@ export async function saveSurveyProgress(input: {
       completedDate: null,
     });
   } catch (error) {
-    console.error("[survey] assignment progress could not be updated", error);
+    logServerError("[survey] assignment progress could not be updated", error);
   }
 
   return { response, progressPercent };
@@ -180,7 +181,7 @@ export async function submitSurveyResponse(input: {
   try {
     await recordCompletionPoints(assignment, email);
   } catch (error) {
-    console.error("[survey] completion points could not be recorded", error);
+    logServerError("[survey] completion points could not be recorded", error);
   }
 
   return { response, points: assignment.points };
