@@ -199,14 +199,12 @@ export function DashboardAccountMenu({
                             <span className="min-w-0 flex-1">{formatHeadingCase(item.label)}</span>
                             {badgeText ? (
                               <span
-                                className={`inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none ${
+                                className={`inline-flex min-h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none ${
                                   badgeKey === "newSurveys"
-                                    ? active
-                                      ? "bg-amber-300 text-amber-950"
-                                      : "bg-amber-500 text-white"
+                                    ? "bg-amber-300 text-amber-950"
                                     : active
-                                      ? "bg-white/20 text-white"
-                                      : "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100"
+                                      ? "bg-white text-teal-900"
+                                      : "bg-teal-700 text-white dark:bg-teal-300 dark:text-teal-950"
                                 }`}
                               >
                                 {badgeText}

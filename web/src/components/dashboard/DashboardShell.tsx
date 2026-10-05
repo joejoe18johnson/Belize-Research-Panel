@@ -43,9 +43,19 @@ export function DashboardShell({
     <div className={`${dashboardShellClass} w-full max-w-full overflow-x-clip`}>
       <header className={`${dashboardHeaderClass} w-full max-w-full overflow-x-clip`}>
         <div className={`${CONTENT_CLASS} py-2.5 sm:py-3`}>
-          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
-            <BrpLogoLink href="/dashboard" variant="light" className="min-w-0 shrink" logoClassName="sm:text-base" />
-            <div className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1.5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5">
+            <BrpLogoLink
+              href="/dashboard"
+              variant="light"
+              nowrap
+              className="order-1 mr-auto min-w-0 lg:mr-0"
+              logoClassName="text-sm sm:text-base"
+            />
+            <LogoutButton
+              showIcon
+              className={`${dashboardSecondaryButtonClass} order-2 min-h-10 shrink-0 gap-1.5 px-3 text-sm lg:order-3 lg:min-h-11 lg:px-4`}
+            />
+            <div className="order-3 flex w-full items-center gap-3 lg:order-2 lg:ml-auto lg:w-auto">
               <PointsBalanceLink availablePoints={badges.availablePoints} />
               <NotificationBellLink unreadCount={badges.unreadNotifications} />
               <DashboardAccountMenu
@@ -53,10 +63,6 @@ export function DashboardShell({
                 firstName={firstName}
                 lastName={lastName}
                 badges={badges}
-              />
-              <LogoutButton
-                showIcon
-                className={`${dashboardSecondaryButtonClass} hidden min-h-10 gap-1.5 px-3 lg:inline-flex lg:min-h-11 lg:px-4`}
               />
             </div>
           </div>

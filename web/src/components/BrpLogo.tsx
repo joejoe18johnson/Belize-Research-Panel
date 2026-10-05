@@ -24,15 +24,19 @@ function logoSrc(variant: BrpLogoVariant): string {
 export function BrpLogoText({
   variant = "light",
   className = "",
+  nowrap = false,
 }: {
   variant?: BrpLogoVariant;
   className?: string;
+  nowrap?: boolean;
 }) {
   const isDark = variant === "dark";
 
   return (
     <span
-      className={`inline-flex max-w-[11.5rem] flex-wrap items-baseline gap-x-1 text-[0.8125rem] font-bold leading-tight tracking-tight lg:max-w-none lg:text-base ${className}`.trim()}
+      className={`inline-flex items-baseline gap-x-1 text-[0.8125rem] font-bold leading-tight tracking-tight lg:text-base ${
+        nowrap ? "whitespace-nowrap" : "max-w-[11.5rem] flex-wrap lg:max-w-none lg:flex-nowrap"
+      } ${className}`.trim()}
       aria-label="Belize Research Panel"
     >
       <span className={isDark ? "text-teal-200" : "text-teal-700 dark:text-teal-300"}>Belize</span>
@@ -46,6 +50,7 @@ export function BrpLogo({
   src,
   className = "",
   priority = false,
+  nowrap = false,
 }: {
   /** `light` = light page background; `dark` = dark page background */
   variant?: BrpLogoVariant;
@@ -53,9 +58,10 @@ export function BrpLogo({
   src?: string;
   className?: string;
   priority?: boolean;
+  nowrap?: boolean;
 }) {
   if (USE_TEXT_LOGO) {
-    return <BrpLogoText variant={variant} className={className} />;
+    return <BrpLogoText variant={variant} className={className} nowrap={nowrap} />;
   }
 
   if (variant === "light") {
@@ -113,6 +119,7 @@ export function BrpLogoLink({
   className = "",
   logoClassName = "",
   priority = false,
+  nowrap = false,
 }: {
   href?: string;
   variant?: BrpLogoVariant;
@@ -120,6 +127,7 @@ export function BrpLogoLink({
   className?: string;
   logoClassName?: string;
   priority?: boolean;
+  nowrap?: boolean;
 }) {
   return (
     <Link href={href} className={`min-w-0 ${className}`.trim()}>
@@ -129,6 +137,7 @@ export function BrpLogoLink({
           src={src}
           priority={USE_TEXT_LOGO ? false : priority}
           className={logoClassName}
+          nowrap={nowrap}
         />
       </span>
     </Link>
