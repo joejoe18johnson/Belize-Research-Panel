@@ -2,12 +2,12 @@ import type { SessionAccount } from "./auth-types";
 import type { PanelistRow } from "./panelists";
 import { panelistHasUpload } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
-import { isPanelistVerified } from "./verification-status";
 import { parseAuthorisedRegistration } from "./authorised-registrars";
 import { isCommonwealthCitizenInBelize } from "./constants";
+import { assessPanelistRequirements, type RequirementApprovalStatus } from "./panelist-requirements";
 import { cleanText } from "./validation";
 
-export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing";
+export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing" | "denied";
 
 export interface VerificationItem {
   id: "email" | "phone" | "photo_id" | "proof_of_residence";
@@ -37,8 +37,23 @@ function statusLabel(status: VerificationItemStatus): string {
       return formatHeadingCase("Pending approval");
     case "missing":
       return formatHeadingCase("Action required");
+    case "denied":
+      return formatHeadingCase("Denied");
     default:
       return formatHeadingCase("Unknown");
+  }
+}
+
+function requirementItemStatus(status: RequirementApprovalStatus): VerificationItemStatus {
+  switch (status) {
+    case "approved":
+      return "verified";
+    case "denied":
+      return "denied";
+    case "missing":
+      return "missing";
+    default:
+      return "under_review";
   }
 }
 
@@ -69,10 +84,17 @@ export async function buildVerificationCenterSummary(
   ]);
 
   const phonePending = Boolean(account.pendingPhone?.trim());
-  const phoneOnFile = Boolean(phone);
   const photoDeclared = Boolean(photoIdType);
   const photoOnFile = photoDeclared || authorisedRegistration.isAuthorised;
   const residenceOnFile = hasResidenceUpload;
+  const requirements = assessPanelistRequirements(panelist, {
+    emailVerified: account.emailVerified,
+    pendingPhone: phonePending,
+    hasPhotoUpload,
+  });
+  const phoneRequirement = requirements.items.find((item) => item.key === "phone");
+  const photoRequirement = requirements.items.find((item) => item.key === "photo_id");
+  const emailRequirement = requirements.items.find((item) => item.key === "email");
 
   const email = cleanText(account.email);
   const items: VerificationItem[] = [
@@ -83,7 +105,7 @@ export async function buildVerificationCenterSummary(
         "Your email address was confirmed before you could open this page. It is used to sign in and receive panel updates."
       ),
       valueOnFile: email || formatHeadingCase("Not provided"),
-      status: "verified",
+      status: emailRequirement ? requirementItemStatus(emailRequirement.status) : "verified",
       statusLabel: "",
       essential: true,
     },
@@ -94,9 +116,11 @@ export async function buildVerificationCenterSummary(
         "Your WhatsApp or mobile number is used to confirm identity and reach you for survey invitations."
       ),
       valueOnFile: phone || formatHeadingCase("Not provided"),
-      status: isVerified
-        ? "verified"
-        : itemStatusWhenAccountPending(phoneOnFile, phonePending),
+      status: phonePending
+        ? "pending_approval"
+        : phoneRequirement
+          ? requirementItemStatus(phoneRequirement.status)
+          : itemStatusWhenAccountPending(Boolean(phone), phonePending),
       statusLabel: "",
       essential: true,
     },
@@ -118,7 +142,9 @@ export async function buildVerificationCenterSummary(
             ? `${photoIdType} — ${formatHeadingCase("used for verification only; not stored in our files")}`
             : `${photoIdType} — ${formatHeadingCase("type declared; document not stored in our files")}`
         : formatHeadingCase("Not provided"),
-      status: isVerified ? "verified" : itemStatusWhenAccountPending(photoOnFile),
+      status: photoRequirement
+        ? requirementItemStatus(photoRequirement.status)
+        : itemStatusWhenAccountPending(photoOnFile),
       statusLabel: "",
       essential: true,
     },

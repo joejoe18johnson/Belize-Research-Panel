@@ -5,6 +5,7 @@ import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { BrpLogoLink } from "@/components/BrpLogo";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { ThemeIconButton } from "@/components/theme/ThemeToggle";
 import {
   dashboardCardClass,
   dashboardHeaderClass,
@@ -51,10 +52,13 @@ export function DashboardShell({
               className="order-1 mr-auto min-w-0 lg:mr-0"
               logoClassName="text-sm sm:text-base"
             />
-            <LogoutButton
-              showIcon
-              className={`${dashboardSecondaryButtonClass} order-2 min-h-10 shrink-0 gap-1.5 px-3 text-sm lg:order-3 lg:min-h-11 lg:px-4`}
-            />
+            <div className="order-2 flex shrink-0 items-center gap-1.5 lg:order-3">
+              <ThemeIconButton className="lg:hidden" />
+              <LogoutButton
+                showIcon
+                className={`${dashboardSecondaryButtonClass} min-h-10 shrink-0 gap-1.5 px-3 text-sm lg:min-h-11 lg:px-4`}
+              />
+            </div>
             <div className="order-3 flex w-full items-center lg:order-2 lg:ml-auto lg:w-auto lg:gap-3">
               <PointsBalanceLink availablePoints={badges.availablePoints} />
               <div className="ml-auto flex items-center gap-0.5 sm:gap-1 lg:ml-0">

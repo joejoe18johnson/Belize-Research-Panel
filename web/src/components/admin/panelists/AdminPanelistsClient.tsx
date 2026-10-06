@@ -335,8 +335,8 @@ export function AdminPanelistsClient({
     };
   }, [editingRow, photoUploadUsernames, residenceUploadUsernames, emailVerifiedByAccount]);
 
-  const applyRequirementDecision = (key: "email" | "phone" | "photoId", decision: "true" | "false") => {
-    if (!editState || !editingRow) return;
+  const applyRequirementDecision = async (key: "email" | "phone" | "photoId", decision: "true" | "false") => {
+    if (!editState || !editingRow || !editingEmail || saving) return;
 
     const field =
       key === "email"
@@ -366,6 +366,30 @@ export function AdminPanelistsClient({
     );
 
     setEditState(next);
+    setSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/panelists/${encodeURIComponent(editingEmail)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(next),
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string };
+      if (!res.ok) {
+        setEditState(editState);
+        setError(data.message ?? "Could not save this check.");
+        return;
+      }
+      setEditingRow(mergedRow);
+      setMessage(data.message ?? "Record updated successfully.");
+      router.refresh();
+    } catch {
+      setEditState(editState);
+      setError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const exportCsv = () => {
@@ -929,7 +953,8 @@ function PanelistEditModal({
           <p className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Required checks")}</p>
           <p className="mt-1 text-xs text-teal-900/80">
             Email is verified automatically when the panelist confirms it from their inbox. Verify or deny phone
-            and photo ID below. When all three are verified, the panelist becomes fully verified.
+            and photo ID below — each choice saves immediately and notifies the panelist. When all three are
+            verified, the panelist becomes fully verified.
           </p>
           <div className="mt-3">
             <RequirementReviewControls

@@ -6,6 +6,7 @@ import { DEFAULT_REWARD_SETTINGS, type RewardSettings } from "./reward-settings"
 import { redemptionNotificationId } from "./payout-panelist-notify";
 import { payoutShortId } from "./admin-payout-display";
 import type { PanelistRow } from "./panelists";
+import type { RequirementApprovalStatus } from "./panelist-requirements";
 import { formatHeadingCase } from "./sentence-case";
 import { cleanText } from "./validation";
 import type { PanelistSurvey } from "./panelist-surveys-types";
@@ -240,6 +241,13 @@ export function buildRedemptionNotifications(
     .filter((notification): notification is DashboardNotification => notification !== null);
 }
 
+export interface VerificationRequirementNotices {
+  phone: RequirementApprovalStatus;
+  photoId: RequirementApprovalStatus;
+  phoneDetail: string;
+  photoDetail: string;
+}
+
 export function buildDashboardNotifications(
   profile: PanelistDashboardProfile,
   options: {
@@ -247,6 +255,7 @@ export function buildDashboardNotifications(
     readState?: NotificationReadState;
     redemptionRequests?: RedemptionRequest[];
     inboxSurveys?: PanelistSurvey[];
+    requirements?: VerificationRequirementNotices;
   } = {}
 ): DashboardNotification[] {
   const notifications: DashboardNotification[] = [];
@@ -285,6 +294,51 @@ export function buildDashboardNotifications(
     priority: verified ? "normal" : "high",
     unread: isUnread("verification", !verified),
   });
+
+  const requirements = options.requirements;
+  if (requirements?.phone === "approved") {
+    notifications.push({
+      id: "verification-phone",
+      title: "Phone number verified",
+      body: `Your phone number ${requirements.phoneDetail} has been verified.`,
+      dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
+      priority: "high",
+      unread: isUnread("verification-phone", true),
+    });
+  } else if (requirements?.phone === "denied") {
+    notifications.push({
+      id: "verification-phone-denied",
+      title: "Phone number not approved",
+      body: `The phone number ${requirements.phoneDetail} was not approved. Contact the panel team if you need to submit it again.`,
+      dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
+      priority: "high",
+      unread: isUnread("verification-phone-denied", true),
+    });
+  }
+
+  if (requirements?.photoId === "approved") {
+    notifications.push({
+      id: "verification-photo-id",
+      title: "Photo identification verified",
+      body: `Your photo identification (${requirements.photoDetail}) has been verified.`,
+      dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
+      priority: "high",
+      unread: isUnread("verification-photo-id", true),
+    });
+  } else if (requirements?.photoId === "denied") {
+    notifications.push({
+      id: "verification-photo-id-denied",
+      title: "Photo identification not approved",
+      body: `Your photo identification (${requirements.photoDetail}) was not approved. Contact the panel team if you need to submit it again.`,
+      dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
+      priority: "high",
+      unread: isUnread("verification-photo-id-denied", true),
+    });
+  }
 
   const surveyInvitationNotifications = buildSurveyInvitationNotifications(inboxSurveys, readState);
   notifications.push(...surveyInvitationNotifications);

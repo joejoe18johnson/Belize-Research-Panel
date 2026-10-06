@@ -27,6 +27,7 @@ export type EmailTemplateId =
   | "phone-change-requested"
   | "phone-change-approved"
   | "phone-change-denied"
+  | "requirement-verified"
   | "survey-invitation"
   | "survey-reminder"
   | "survey-completed"
@@ -147,6 +148,13 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     description: "Tells the panelist the requested phone change was not approved.",
     category: "verification",
     trigger: "When an administrator denies a phone change",
+  },
+  {
+    id: "requirement-verified",
+    name: "Verification item approved",
+    description: "Tells the panelist a single check, such as their phone number, has been verified.",
+    category: "verification",
+    trigger: "When an administrator verifies phone or photo ID before the whole account is verified",
   },
   {
     id: "survey-invitation",
@@ -298,6 +306,12 @@ export const EMAIL_TEMPLATE_SAMPLE_DATA: Record<EmailTemplateId, Record<string, 
     firstName: "Maria",
     deniedPhone: "+501 612-3456",
     dashboardUrl: "https://panel.example.com/dashboard",
+  },
+  "requirement-verified": {
+    firstName: "Maria",
+    itemLabel: "phone number",
+    detail: "+501 637-2877",
+    dashboardUrl: "https://panel.example.com/dashboard/verification",
   },
   "survey-invitation": {
     firstName: "Maria",
@@ -562,6 +576,21 @@ function renderPhoneChangeApproved(data: Record<string, string>): RenderedEmail 
   return finish("Phone change approved", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
 }
 
+function renderRequirementVerified(data: Record<string, string>): RenderedEmail {
+  const firstName = pick(data, "firstName", "there");
+  const itemLabel = pick(data, "itemLabel", "verification item");
+  const detail = pick(data, "detail", "");
+  const dashboardUrl = pick(data, "dashboardUrl", "#");
+  const bodyHtml = [
+    paragraph(`Hi ${firstName},`),
+    paragraph(`Your ${itemLabel} has been verified.`),
+    detail ? detailLine([["On file", detail]]) : "",
+    paragraph("You can see this on your verification page. Other checks may still be under review."),
+  ].join("");
+  const subjectLabel = itemLabel.charAt(0).toUpperCase() + itemLabel.slice(1);
+  return finish(`${subjectLabel} verified`, bodyHtml, { label: "View verification", href: dashboardUrl });
+}
+
 function renderPhoneChangeDenied(data: Record<string, string>): RenderedEmail {
   const firstName = pick(data, "firstName", "there");
   const deniedPhone = pick(data, "deniedPhone", "the requested number");
@@ -810,6 +839,7 @@ const RENDERERS: Record<EmailTemplateId, (data: Record<string, string>) => Rende
   "phone-change-requested": renderPhoneChangeRequested,
   "phone-change-approved": renderPhoneChangeApproved,
   "phone-change-denied": renderPhoneChangeDenied,
+  "requirement-verified": renderRequirementVerified,
   "survey-invitation": renderSurveyInvitation,
   "survey-reminder": renderSurveyReminder,
   "survey-completed": renderSurveyCompleted,

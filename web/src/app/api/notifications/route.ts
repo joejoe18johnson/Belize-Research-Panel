@@ -14,6 +14,9 @@ import {
   setNotificationRead,
 } from "@/lib/notification-state";
 import { cleanText } from "@/lib/validation";
+import { requirementNoticesForPanelist } from "@/lib/verification-notices";
+import type { SessionAccount } from "@/lib/auth-types";
+import type { PanelistRow } from "@/lib/panelists";
 
 async function requireRegisteredPanelist() {
   const session = await getSessionAccount();
@@ -28,6 +31,14 @@ async function requireRegisteredPanelist() {
     return { error: NextResponse.json({ message: "Panelist profile not found." }, { status: 404 }) };
   }
   return { session, panelist };
+}
+
+function requirementNotices(session: SessionAccount, panelist: PanelistRow) {
+  return requirementNoticesForPanelist(panelist, {
+    emailVerified: session.emailVerified,
+    pendingPhone: Boolean(session.pendingPhone?.trim()),
+    hasPhotoUpload: Boolean(cleanText(panelist.photo_id_path) || cleanText(panelist.photo_id_type)),
+  });
 }
 
 export async function PATCH(request: NextRequest) {
@@ -45,7 +56,12 @@ export async function PATCH(request: NextRequest) {
     const readState = await loadNotificationReadState(result.session.email);
     const redemptionRequests = await loadRedemptionRequests(result.session.email);
     const { inbox } = await getPanelistSurveys(result.session.email);
-    const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests, inboxSurveys: inbox });
+    const notifications = buildDashboardNotifications(profile, {
+      readState,
+      redemptionRequests,
+      inboxSurveys: inbox,
+      requirements: requirementNotices(result.session, result.panelist),
+    });
 
     if (body.markAllRead) {
       await markAllNotificationsRead(
@@ -71,6 +87,7 @@ export async function PATCH(request: NextRequest) {
       readState: updatedReadState,
       redemptionRequests,
       inboxSurveys: inbox,
+      requirements: requirementNotices(result.session, result.panelist),
     });
 
     return NextResponse.json({ ok: true, notifications: updatedNotifications });

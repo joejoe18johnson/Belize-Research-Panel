@@ -234,6 +234,25 @@ export async function sendPhoneChangeRequestedEmail(input: {
   });
 }
 
+export async function sendRequirementVerifiedEmail(input: {
+  to: string;
+  firstName: string;
+  itemLabel: string;
+  detail: string;
+  origin: string;
+}): Promise<{ sent: boolean; logged: boolean; resendId?: string; error?: string }> {
+  return sendTemplateEmail({
+    templateId: "requirement-verified",
+    to: input.to,
+    data: {
+      firstName: panelistFirstName(input.firstName),
+      itemLabel: input.itemLabel,
+      detail: input.detail,
+      dashboardUrl: originDashboard(input.origin, "/dashboard/verification"),
+    },
+  });
+}
+
 export async function sendPhoneChangeApprovedEmail(input: {
   to: string;
   firstName: string;

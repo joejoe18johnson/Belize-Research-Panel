@@ -4,6 +4,10 @@ import { deletePanelistByEmail, syncAccountHoldForVerificationStatus } from "@/l
 import { isAdminSessionActive } from "@/lib/admin-auth";
 import { approveAccountPhoneChange, findAccountByEmail, setAccountEmailVerifiedByAdmin } from "@/lib/accounts";
 import { sendPanelistVerifiedEmail } from "@/lib/email/process-emails";
+import {
+  emailNewlyVerifiedRequirements,
+  markRequirementVerifiedEmailsSent,
+} from "@/lib/verification-notices";
 import { resolveRequestOrigin } from "@/lib/auth";
 import {
   buildPanelistDeleteCode,
@@ -136,26 +140,45 @@ export async function PATCH(
 
   const fullyVerified = verificationStatus === "Verified";
   const wasVerified = cleanText(panelist.verification_status) === "Verified";
+  const notifyEmail = lookupEmail || accountEmail;
+  const origin = resolveRequestOrigin(request);
+  const noticeNotes: string[] = [];
 
   if (fullyVerified && !wasVerified) {
-    const origin = resolveRequestOrigin(request);
     void sendPanelistVerifiedEmail({
-      to: lookupEmail || accountEmail,
+      to: notifyEmail,
       firstName: panelist.first_name,
       origin,
     });
+    await markRequirementVerifiedEmailsSent(notifyEmail);
+  } else {
+    noticeNotes.push(
+      ...(await emailNewlyVerifiedRequirements({
+        to: notifyEmail,
+        firstName: panelist.first_name,
+        origin,
+        before: panelist,
+        after: { ...merged, verification_status: verificationStatus },
+        context: requirementContext,
+      }))
+    );
   }
 
   revalidatePath("/admin", "layout");
   revalidatePath("/admin/panelists");
   revalidatePath("/admin/under-review");
   revalidatePath("/admin/notifications");
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/dashboard/verification");
+  revalidatePath("/dashboard/notifications");
 
   return NextResponse.json({
     ok: true,
-    message: fullyVerified
-      ? "Record updated. Email, phone, and ID are verified — panelist is now fully verified."
-      : "Record updated successfully.",
+    message: noticeNotes[0]
+      ? noticeNotes.join(" ")
+      : fullyVerified
+        ? "Record updated. Email, phone, and ID are verified — panelist is now fully verified."
+        : "Record updated successfully.",
   });
 }
 

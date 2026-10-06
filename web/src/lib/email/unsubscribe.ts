@@ -24,6 +24,8 @@ const REQUIRED_TEMPLATES = new Set<EmailTemplateId>([
   "staff-password-reset",
   "signup-admin-notification",
   "support-inbox-notification",
+  "requirement-verified",
+  "panelist-verified",
 ]);
 
 const OUTREACH_TEMPLATES = new Set<EmailTemplateId>([

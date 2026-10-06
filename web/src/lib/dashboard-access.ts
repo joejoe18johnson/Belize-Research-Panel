@@ -12,12 +12,19 @@ import {
   type PanelistDashboardProfile,
 } from "./panelist-dashboard";
 import { getPanelistSurveys } from "./panelist-surveys";
+import { findAccountByEmail } from "./accounts";
 import { findPanelistByEmail } from "./panelists";
+import { requirementContextFromAccount } from "./panelist-requirements";
 import { loadNotificationReadState } from "./notification-state";
 import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
 import { isPanelistVerified } from "./verification-status";
 import { countUnreadSurveyInvitations } from "./survey-notifications";
+import {
+  emailApprovedRequirementsIfUnsent,
+  requirementNoticesForPanelist,
+} from "./verification-notices";
+import { cleanText } from "./validation";
 
 export interface DashboardNavBadges {
   unreadNotifications: number;
@@ -78,11 +85,17 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   const readState = await loadNotificationReadState(account.email);
   const redemptionRequests = await loadRedemptionRequests(account.email);
   const { inbox } = await getPanelistSurveys(account.email);
+  const requirementContext = {
+    emailVerified: account.emailVerified,
+    pendingPhone: Boolean(account.pendingPhone?.trim()),
+    hasPhotoUpload: Boolean(cleanText(panelist.photo_id_path) || cleanText(panelist.photo_id_type)),
+  };
   const notifications = buildDashboardNotifications(profile, {
     welcome: options.welcome,
     readState,
     redemptionRequests,
     inboxSurveys: inbox,
+    requirements: requirementNoticesForPanelist(panelist, requirementContext),
   });
 
   return { account, profile, rewards, notifications };
@@ -99,7 +112,25 @@ export async function getDashboardNavBadges(email: string, accountId?: string): 
   const readState = await loadNotificationReadState(email);
   const redemptionRequests = await loadRedemptionRequests(email);
   const { inbox } = await getPanelistSurveys(email);
-  const notifications = buildDashboardNotifications(profile, { readState, redemptionRequests, inboxSurveys: inbox });
+  const account = await findAccountByEmail(email);
+  const requirementContext = {
+    ...requirementContextFromAccount(account ?? undefined),
+    hasPhotoUpload: Boolean(cleanText(panelist.photo_id_path) || cleanText(panelist.photo_id_type)),
+  };
+  if (!isPanelistVerified(panelist.verification_status)) {
+    await emailApprovedRequirementsIfUnsent({
+      to: email,
+      firstName: panelist.first_name,
+      panelist,
+      context: requirementContext,
+    });
+  }
+  const notifications = buildDashboardNotifications(profile, {
+    readState,
+    redemptionRequests,
+    inboxSurveys: inbox,
+    requirements: requirementNoticesForPanelist(panelist, requirementContext),
+  });
   const newSurveys = countUnreadSurveyInvitations(notifications);
 
   return {

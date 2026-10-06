@@ -29,6 +29,7 @@ function itemStatusClass(status: VerificationItemStatus): string {
     case "pending_approval":
       return "border-amber-300 bg-amber-50/70 dark:border-amber-700 dark:bg-amber-950!";
     case "missing":
+    case "denied":
       return "border-red-300 bg-red-50/80 dark:border-red-800 dark:bg-red-950!";
     default:
       return "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900";
@@ -75,7 +76,7 @@ function VerificationItemCard({
   layout: ViewLayout;
 }) {
   const statusBadge =
-    item.status === "missing" ? (
+    item.status === "missing" || item.status === "denied" ? (
       <span className="inline-flex shrink-0 items-center rounded-full border border-red-800 bg-red-200 px-3 py-1 text-xs font-semibold text-red-950">
         {item.statusLabel}
       </span>
@@ -137,6 +138,11 @@ function VerificationItemCard({
                 {formatHeadingCase(
                   "A phone number change is waiting for administrator approval before it can be verified."
                 )}
+              </p>
+            ) : null}
+            {item.status === "denied" ? (
+              <p className="mt-2 text-sm text-red-900 dark:text-red-100">
+                {formatHeadingCase("This check was not approved. Contact the panel team if you need to submit it again.")}
               </p>
             ) : null}
             {item.status === "missing" ? (

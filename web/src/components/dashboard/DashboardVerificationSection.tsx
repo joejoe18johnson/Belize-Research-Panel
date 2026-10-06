@@ -5,6 +5,24 @@ import { DashboardVerificationItems } from "./DashboardVerificationItems";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
+function verificationProgressCopy(summary: VerificationCenterSummary): string {
+  const phone = summary.items.find((item) => item.id === "phone");
+  const photo = summary.items.find((item) => item.id === "photo_id");
+  const phoneCopy =
+    phone?.status === "verified"
+      ? "Your phone number is verified."
+      : phone?.status === "denied"
+        ? "Your phone number was not approved."
+        : "Your phone number is still under review.";
+  const photoCopy =
+    photo?.status === "verified"
+      ? "Your photo identification is verified."
+      : photo?.status === "denied"
+        ? "Your photo identification was not approved."
+        : "Your photo identification is still under review.";
+  return `Your email is already verified. ${phoneCopy} ${photoCopy} Commonwealth citizens in Belize may also need proof of residence.`;
+}
+
 export function DashboardVerificationSection({ summary }: { summary: VerificationCenterSummary }) {
   return (
     <div className="space-y-6">
@@ -32,11 +50,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
             {formatHeadingCase("Submitted")}: {summary.registrationDate}
           </p>
           {!summary.isVerified ? (
-            <p>
-              {formatHeadingCase(
-                "Your email is already verified. Phone number and photo ID are still reviewed. Commonwealth citizens in Belize may also need proof of residence."
-              )}
-            </p>
+            <p>{formatHeadingCase(verificationProgressCopy(summary))}</p>
           ) : null}
         </div>
       </DashboardCard>
