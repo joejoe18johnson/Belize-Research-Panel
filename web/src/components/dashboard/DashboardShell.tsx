@@ -22,6 +22,7 @@ import { NotificationBellLink } from "./NotificationBellLink";
 import { NewSurveyAlertBanner } from "./NewSurveyAlertBanner";
 import { PointsBalanceLink } from "./PointsBalanceLink";
 import { BackToTopButton } from "@/components/shared/BackToTopButton";
+import { DashboardIncomingToasts } from "./DashboardIncomingToasts";
 
 const CONTENT_CLASS = appContentFrameClass;
 
@@ -75,6 +76,7 @@ export function DashboardShell({
         </div>
         <DashboardNav badges={badges} />
       </header>
+      <DashboardIncomingToasts />
       <NewSurveyAlertBanner newSurveyCount={badges.newSurveys} />
       <main className={`${CONTENT_CLASS} relative z-0 py-5 sm:py-8`}>
         {verificationStatus && !isAccountVerified(verificationStatus) ? (

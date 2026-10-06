@@ -241,6 +241,36 @@ export function buildRedemptionNotifications(
     .filter((notification): notification is DashboardNotification => notification !== null);
 }
 
+const VERIFICATION_ACTION_TOAST_IDS = new Set([
+  "verification-phone",
+  "verification-phone-denied",
+  "verification-photo-id",
+  "verification-photo-id-denied",
+]);
+
+export function verificationActionToasts(notifications: DashboardNotification[]): Array<{
+  id: string;
+  title: string;
+  body: string;
+  tone: "success" | "warning" | "info";
+  href: string;
+}> {
+  return notifications
+    .filter(
+      (notification) =>
+        notification.unread &&
+        (VERIFICATION_ACTION_TOAST_IDS.has(notification.id) ||
+          (notification.id === "verification" && notification.title === "Account verified"))
+    )
+    .map((notification) => ({
+      id: notification.id,
+      title: notification.title,
+      body: notification.body,
+      tone: notification.id.endsWith("-denied") ? "warning" : "success",
+      href: "/dashboard/notifications",
+    }));
+}
+
 export interface VerificationRequirementNotices {
   phone: RequirementApprovalStatus;
   photoId: RequirementApprovalStatus;

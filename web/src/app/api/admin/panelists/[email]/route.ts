@@ -164,6 +164,16 @@ export async function PATCH(
     );
   }
 
+  const denialNotes: Array<[keyof typeof ADMIN_REQUIREMENT_FIELDS, string]> = [
+    ["phone", "Phone number was not approved. The panelist will see this in their alerts."],
+    ["photoId", "Photo identification was not approved. The panelist will see this in their alerts."],
+  ];
+  for (const [key, note] of denialNotes) {
+    const beforeDecision = readAdminRequirementDecision(panelist, key);
+    const afterDecision = readAdminRequirementDecision(merged, key);
+    if (beforeDecision !== "false" && afterDecision === "false") noticeNotes.push(note);
+  }
+
   revalidatePath("/admin", "layout");
   revalidatePath("/admin/panelists");
   revalidatePath("/admin/under-review");

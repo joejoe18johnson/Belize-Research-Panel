@@ -29,6 +29,12 @@ import { AdminDeleteConfirmDialog } from "@/components/admin/shared/AdminDeleteC
 import { RequirementStatusGroup } from "@/components/admin/shared/RequirementStatusBadges";
 import { TablePagination, useTablePagination } from "@/components/admin/shared/TablePagination";
 import { BrandedAlert, BrandedModal } from "@/components/shared/BrandedFeedback";
+import { useToast } from "@/components/shared/ToastProvider";
+
+function requirementToastTitle(key: "email" | "phone" | "photoId", decision: "true" | "false"): string {
+  const item = key === "phone" ? "Phone number" : key === "photoId" ? "Photo identification" : "Email";
+  return decision === "true" ? `${item} verified` : `${item} not approved`;
+}
 import { DuplicateReviewClusters } from "./DuplicateReviewClusters";
 import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
@@ -128,6 +134,7 @@ export function AdminPanelistsClient({
   returnTo?: string;
 }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState("account_opened_at");
@@ -377,16 +384,27 @@ export function AdminPanelistsClient({
       });
       const data = (await res.json()) as { ok?: boolean; message?: string };
       if (!res.ok) {
+        const failure = data.message ?? "Could not save this check.";
         setEditState(editState);
-        setError(data.message ?? "Could not save this check.");
+        setError(failure);
+        showToast({ tone: "error", title: "Check not saved", body: failure });
         return;
       }
+      const success = data.message ?? "Record updated successfully.";
+      const tellsThePanelist = /panelist/i.test(success);
+      const fullyVerified = /fully verified/i.test(success);
       setEditingRow(mergedRow);
-      setMessage(data.message ?? "Record updated successfully.");
+      setMessage(success);
+      showToast({
+        tone: decision === "true" ? "success" : "warning",
+        title: fullyVerified ? "Account verified" : requirementToastTitle(key, decision),
+        body: tellsThePanelist ? success : "Saved. The panelist will see this in their alerts.",
+      });
       router.refresh();
     } catch {
       setEditState(editState);
       setError("Network error. Please try again.");
+      showToast({ tone: "error", title: "Check not saved", body: "Network error. Please try again." });
     } finally {
       setSaving(false);
     }
@@ -501,14 +519,18 @@ export function AdminPanelistsClient({
       });
       const data = (await res.json()) as { ok?: boolean; message?: string };
       if (!res.ok) {
-        setError(data.message ?? "Could not save changes.");
+        const failure = data.message ?? "Could not save changes.";
+        setError(failure);
+        showToast({ tone: "error", title: "Changes not saved", body: failure });
         return;
       }
       setMessage("Record updated successfully.");
+      showToast({ tone: "success", title: "Record updated", body: data.message ?? "Record updated successfully." });
       closeEdit();
       router.refresh();
     } catch {
       setError("Network error. Please try again.");
+      showToast({ tone: "error", title: "Changes not saved", body: "Network error. Please try again." });
     } finally {
       setSaving(false);
     }

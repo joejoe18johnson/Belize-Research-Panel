@@ -4,6 +4,7 @@ import { getSessionAccount } from "@/lib/auth";
 import {
   buildDashboardNotifications,
   panelistRowToDashboardProfile,
+  verificationActionToasts,
 } from "@/lib/panelist-dashboard";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { loadRedemptionRequests } from "@/lib/redemption-requests";
@@ -39,6 +40,24 @@ function requirementNotices(session: SessionAccount, panelist: PanelistRow) {
     pendingPhone: Boolean(session.pendingPhone?.trim()),
     hasPhotoUpload: Boolean(cleanText(panelist.photo_id_path) || cleanText(panelist.photo_id_type)),
   });
+}
+
+export async function GET() {
+  const result = await requireRegisteredPanelist();
+  if ("error" in result) return result.error;
+
+  const profile = panelistRowToDashboardProfile(result.panelist);
+  const readState = await loadNotificationReadState(result.session.email);
+  const redemptionRequests = await loadRedemptionRequests(result.session.email);
+  const { inbox } = await getPanelistSurveys(result.session.email);
+  const notifications = buildDashboardNotifications(profile, {
+    readState,
+    redemptionRequests,
+    inboxSurveys: inbox,
+    requirements: requirementNotices(result.session, result.panelist),
+  });
+
+  return NextResponse.json({ toasts: verificationActionToasts(notifications) });
 }
 
 export async function PATCH(request: NextRequest) {

@@ -8,6 +8,7 @@ import { SiteFooterGate } from "@/components/SiteFooterGate";
 import { ScrollToTopOnNavigate } from "@/components/shared/ScrollToTopOnNavigate";
 import { SiteTooltips } from "@/components/shared/SiteTooltips";
 import { ThemeInitScript } from "@/components/theme/ThemeInitScript";
+import { ToastProvider } from "@/components/shared/ToastProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { getSessionAccount } from "@/lib/auth";
 import { rootMetadata } from "@/lib/seo/metadata";
@@ -40,20 +41,22 @@ export default async function RootLayout({
       <body className="flex min-h-full min-w-0 max-w-full flex-col overflow-x-clip bg-background font-sans text-foreground">
         <ThemeInitScript />
         <ThemeProvider>
-          <SiteTooltips />
-          <ScrollToTopOnNavigate />
-          <NetlifyDeployBanner />
-          <div className="flex min-h-0 flex-1 flex-col pb-[var(--brp-mobile-bottom-nav-offset,0px)] lg:pb-0">
-            {children}
-            <SiteFooterGate>
-              <SiteFooter />
-            </SiteFooterGate>
-          </div>
-          <CookieNotice />
-          <PublicMobileBottomNav
-            signedIn={Boolean(session)}
-            panelistRegistered={Boolean(session?.panelistRegistered)}
-          />
+          <ToastProvider>
+            <SiteTooltips />
+            <ScrollToTopOnNavigate />
+            <NetlifyDeployBanner />
+            <div className="flex min-h-0 flex-1 flex-col pb-[var(--brp-mobile-bottom-nav-offset,0px)] lg:pb-0">
+              {children}
+              <SiteFooterGate>
+                <SiteFooter />
+              </SiteFooterGate>
+            </div>
+            <CookieNotice />
+            <PublicMobileBottomNav
+              signedIn={Boolean(session)}
+              panelistRegistered={Boolean(session?.panelistRegistered)}
+            />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
