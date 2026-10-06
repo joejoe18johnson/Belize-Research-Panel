@@ -10,7 +10,7 @@ import { cleanText } from "./validation";
 export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing";
 
 export interface VerificationItem {
-  id: "phone" | "photo_id" | "proof_of_residence";
+  id: "email" | "phone" | "photo_id" | "proof_of_residence";
   label: string;
   description: string;
   valueOnFile: string;
@@ -74,7 +74,19 @@ export async function buildVerificationCenterSummary(
   const photoOnFile = photoDeclared || authorisedRegistration.isAuthorised;
   const residenceOnFile = hasResidenceUpload;
 
+  const email = cleanText(account.email);
   const items: VerificationItem[] = [
+    {
+      id: "email",
+      label: formatHeadingCase("Email"),
+      description: formatHeadingCase(
+        "Your email address was confirmed before you could open this page. It is used to sign in and receive panel updates."
+      ),
+      valueOnFile: email || formatHeadingCase("Not provided"),
+      status: "verified",
+      statusLabel: "",
+      essential: true,
+    },
     {
       id: "phone",
       label: formatHeadingCase("Phone number"),

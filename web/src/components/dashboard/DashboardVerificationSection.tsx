@@ -34,7 +34,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
           {!summary.isVerified ? (
             <p>
               {formatHeadingCase(
-                "Phone number and photo ID are required for verification. Commonwealth citizens in Belize may also need proof of residence."
+                "Your email is already verified. Phone number and photo ID are still reviewed. Commonwealth citizens in Belize may also need proof of residence."
               )}
             </p>
           ) : null}
