@@ -99,10 +99,10 @@ export function DashboardPageHeader({
   return (
     <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-between">
       <div className="min-w-0 flex-1 border-l-4 border-teal-600 pl-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Belize Research Panel</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-800 dark:text-teal-200">Belize Research Panel</p>
         <div className="mt-1 flex items-start gap-3">
           {icon ? (
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-900 ring-1 ring-teal-200 dark:bg-teal-800 dark:text-teal-50 dark:ring-teal-700">
               {icon}
             </span>
           ) : null}
@@ -111,7 +111,7 @@ export function DashboardPageHeader({
               {formatHeadingCase(title)}
             </h1>
             {description ? (
-              <p className={`mt-2 ${MEDIUM_CONTENT_MAX} text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500`}>
+              <p className={`mt-2 ${MEDIUM_CONTENT_MAX} text-sm leading-relaxed text-zinc-600 dark:text-zinc-300`}>
                 {formatHeadingCase(description)}
               </p>
             ) : null}
@@ -169,7 +169,7 @@ export function SectionHeading({
 
 export function DashboardInfoNote({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-lg border border-teal-100 dark:border-teal-900/60 bg-teal-50/60 px-4 py-3 text-sm leading-relaxed text-teal-900/80">
+    <p className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm leading-relaxed text-teal-950 dark:border-teal-700 dark:bg-teal-950 dark:text-teal-50">
       {typeof children === "string" ? formatHeadingCase(children) : children}
     </p>
   );
@@ -200,12 +200,12 @@ export function StatusBadge({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-teal-300 bg-teal-50 text-teal-800 dark:text-teal-200"
+      ? "border-emerald-800 bg-emerald-300 text-emerald-950"
       : tone === "warning"
-        ? "border-teal-300/70 bg-teal-50 text-teal-800 dark:text-teal-200"
+        ? "border-teal-800 bg-teal-200 text-teal-950"
         : tone === "info"
-          ? "border-teal-200 bg-teal-50 text-teal-800 dark:text-teal-200"
-          : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300";
+          ? "border-sky-800 bg-sky-200 text-sky-950"
+          : "border-zinc-500 bg-zinc-200 text-zinc-950";
 
   return (
     <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${toneClass}`}>
@@ -253,9 +253,9 @@ export function StatCard({
             </span>
           ) : null}
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(label)}</p>
+            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{formatHeadingCase(label)}</p>
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{value}</p>
-            {hint ? <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(hint)}</p> : null}
+            {hint ? <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-300">{formatHeadingCase(hint)}</p> : null}
           </div>
         </div>
       </div>
@@ -273,7 +273,7 @@ export function StatCard({
         ) : null}
       </div>
       <p className="mt-3 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{value}</p>
-      {hint ? <p className="mt-1.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(hint)}</p> : null}
+      {hint ? <p className="mt-1.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{formatHeadingCase(hint)}</p> : null}
     </div>
   );
 }
@@ -284,7 +284,7 @@ export function ProfileField({ label, value }: { label: string; value: string })
   return (
     <div>
       <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{formatHeadingCase(label)}</dt>
-      <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{value}</dd>
+      <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{value}</dd>
     </div>
   );
 }
@@ -299,7 +299,7 @@ export function InterestList({ title, items }: { title: string; items: string[] 
         {items.map((item) => (
           <span
             key={item}
-            className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-900 dark:text-teal-100"
+            className="rounded-full border border-teal-700 bg-teal-200 px-3 py-1 text-xs font-medium text-teal-950"
           >
             {item}
           </span>
@@ -331,12 +331,12 @@ export function QuickLinkCard({
         href={href}
         className="group flex h-full items-center gap-3 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-900 ring-1 ring-teal-200 dark:bg-teal-800 dark:text-teal-50 dark:ring-teal-700">
           {icon}
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-teal-800 dark:text-teal-200 group-hover:text-teal-950 dark:text-teal-100">{formatHeadingCase(label)}</p>
-          <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
+          <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{formatHeadingCase(description)}</p>
         </div>
       </Link>
     );
@@ -348,12 +348,12 @@ export function QuickLinkCard({
         href={href}
         className="group flex h-full flex-col rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40 hover:shadow-md hover:shadow-teal-950/10 sm:p-5"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800 dark:text-teal-200">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-900 ring-1 ring-teal-200 transition group-hover:bg-teal-200 dark:bg-teal-800 dark:text-teal-50 dark:ring-teal-700 dark:group-hover:bg-teal-700">
           {icon}
         </span>
         <div className="mt-3 min-w-0 flex-1">
           <p className="text-sm font-semibold text-teal-800 dark:text-teal-200 group-hover:text-teal-950 dark:text-teal-100">{formatHeadingCase(label)}</p>
-          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{formatHeadingCase(description)}</p>
         </div>
       </Link>
     );
@@ -365,12 +365,12 @@ export function QuickLinkCard({
       className="group flex h-full rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-5 shadow-sm shadow-teal-950/[0.03] transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-950/40 hover:shadow-md hover:shadow-teal-950/10"
     >
       <div className="flex min-w-0 items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:text-teal-800 dark:text-teal-200">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-900 ring-1 ring-teal-200 transition group-hover:bg-teal-200 dark:bg-teal-800 dark:text-teal-50 dark:ring-teal-700 dark:group-hover:bg-teal-700">
           {icon}
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-teal-800 dark:text-teal-200 group-hover:text-teal-950 dark:text-teal-100">{formatHeadingCase(label)}</p>
-          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{formatHeadingCase(description)}</p>
         </div>
       </div>
     </Link>

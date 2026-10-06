@@ -156,7 +156,7 @@ export function DashboardAccountMenu({
                     <UserAvatar firstName={firstName} email={email} />
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-teal-950 dark:text-teal-50">{displayName}</p>
-                      <p className="truncate text-sm text-teal-900/70 dark:text-teal-200/80">{email}</p>
+                      <p className="truncate text-sm text-teal-900 dark:text-teal-100">{email}</p>
                     </div>
                   </div>
                 </div>

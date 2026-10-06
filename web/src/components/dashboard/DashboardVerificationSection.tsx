@@ -8,7 +8,7 @@ import { formatHeadingCase } from "@/lib/sentence-case";
 export function DashboardVerificationSection({ summary }: { summary: VerificationCenterSummary }) {
   return (
     <div className="space-y-6">
-      <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0">
+      <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0 dark:border-teal-800 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900">
         <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 dark:border-teal-900/60 bg-teal-700 px-5 py-5 text-white sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -22,12 +22,12 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
                     )}
               </p>
             </div>
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20">
               <ShieldCheckIcon className="h-6 w-6" />
             </span>
           </div>
         </div>
-        <div className="space-y-2 px-5 py-4 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 sm:px-6">
+        <div className="space-y-2 px-5 py-4 text-sm text-zinc-600 dark:text-zinc-300 sm:px-6">
           <p>
             {formatHeadingCase("Submitted")}: {summary.registrationDate}
           </p>
@@ -46,7 +46,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
       {!summary.isVerified ? (
         <DashboardCard>
           <SectionHeading as="h3">{formatHeadingCase("Need to update something?")}</SectionHeading>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
             {formatHeadingCase(
               "Contact details such as phone number can be updated from your profile. Photo ID changes require support from the panel team."
             )}

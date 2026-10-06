@@ -33,12 +33,12 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
         ) : null}
 
         {pendingEmail ? (
-          <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 px-4 py-3 text-sm">
-            <p className="font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Email change")}</p>
-            <p className="mt-1 text-teal-900/80">
+          <div className="rounded-xl border border-teal-700 bg-teal-100 px-4 py-3 text-sm text-teal-950 dark:bg-teal-950 dark:text-teal-50">
+            <p className="font-semibold text-teal-950 dark:text-teal-50">{formatHeadingCase("Email change")}</p>
+            <p className="mt-1">
               Requested address: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingEmail}</span>
             </p>
-            <p className="mt-2 text-teal-900/80">
+            <p className="mt-2">
               An administrator will approve or deny this change before your account is reactivated. Your login email
               stays <span className="font-medium">{account.email}</span> until then.
             </p>
@@ -46,12 +46,12 @@ export function AccountOnHoldView({ account }: { account: SessionAccount }) {
         ) : null}
 
         {pendingPhone ? (
-          <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 px-4 py-3 text-sm">
-            <p className="font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Phone change")}</p>
-            <p className="mt-1 text-teal-900/80">
+          <div className="rounded-xl border border-teal-700 bg-teal-100 px-4 py-3 text-sm text-teal-950 dark:bg-teal-950 dark:text-teal-50">
+            <p className="font-semibold text-teal-950 dark:text-teal-50">{formatHeadingCase("Phone change")}</p>
+            <p className="mt-1">
               Requested number: <span className="font-medium text-teal-950 dark:text-teal-100">{pendingPhone}</span>
             </p>
-            <p className="mt-2 text-teal-900/80">
+            <p className="mt-2">
               An administrator will approve or deny this change before your account is reactivated. Current number on
               file remains active until then.
             </p>

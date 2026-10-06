@@ -364,7 +364,7 @@ export function TakeSurveyClient({
         surveyBy={assignment.surveyBy ?? ""}
       />
 
-      <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/50 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
+      <div className="rounded-xl border border-teal-700 bg-teal-100 px-4 py-3 text-sm text-teal-950 dark:bg-teal-950 dark:text-teal-50">
         <strong>+{assignment.points} points</strong> · Complete by {assignment.completeByDate}
       </div>
 
@@ -445,7 +445,7 @@ export function TakeSurveyClient({
                 {question.required ? <span className="text-red-600"> *</span> : null}
               </label>
               {question.description ? (
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">{question.description}</p>
               ) : null}
               {invalid ? (
                 <p id={`survey-error-${question.id}`} className="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
@@ -484,7 +484,7 @@ export function TakeSurveyClient({
           </button>
         </div>
       ) : (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+        <div className="rounded-2xl border border-emerald-700 bg-emerald-100 px-5 py-4 text-sm text-emerald-950 dark:bg-emerald-950 dark:text-emerald-50">
           {formatHeadingCase("Thank you — your responses have been recorded.")}
         </div>
       )}

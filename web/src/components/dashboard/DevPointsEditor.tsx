@@ -70,7 +70,7 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
           <SectionHeading as="h3" className="mt-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">
             Adjust test points
           </SectionHeading>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
             Override your point balance to preview redemption tiers and forms. Only available in development.
           </p>
         </div>
@@ -83,14 +83,14 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
 
       <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm">
-          <p className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Calculated balance")}</p>
+          <p className="text-zinc-500 dark:text-zinc-300">{formatHeadingCase("Calculated balance")}</p>
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{calculated} pts</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatBz(pointsToBz(calculated))}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-300">{formatBz(pointsToBz(calculated))}</p>
         </div>
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm">
-          <p className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Total points to date")}</p>
+          <p className="text-zinc-500 dark:text-zinc-300">{formatHeadingCase("Total points to date")}</p>
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate} pts</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatBz(pointsToBz(rewards.totalPointsToDate))}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-300">{formatBz(pointsToBz(rewards.totalPointsToDate))}</p>
         </div>
         <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm">
           <p className="text-teal-700">{formatHeadingCase("Displayed balance")}</p>

@@ -15,24 +15,24 @@ type HistoryFilter = "all" | "earned" | "withdrawals";
 function statusTone(status: NonNullable<RewardsHistoryEntry["status"]>): string {
   switch (status) {
     case "fulfilled":
-      return "bg-emerald-50 text-emerald-800 border-emerald-200";
+      return "border border-emerald-800 bg-emerald-300 text-emerald-950";
     case "approved":
-      return "bg-teal-50 text-teal-800 dark:text-teal-200 border-teal-200";
+      return "border border-teal-800 bg-teal-200 text-teal-950";
     case "rejected":
-      return "bg-red-50 text-red-800 border-red-200";
+      return "border border-red-800 bg-red-200 text-red-950";
     default:
-      return "bg-amber-50 text-amber-800 border-amber-200";
+      return "border border-amber-800 bg-amber-300 text-amber-950";
   }
 }
 
 function pointsTone(points: number): string {
-  return points >= 0 ? "text-emerald-700" : "text-amber-800";
+  return points >= 0 ? "text-emerald-800 dark:text-emerald-300" : "text-amber-900 dark:text-amber-200";
 }
 
 function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
   if (kind === "withdrawal") {
     return (
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-200 text-amber-950 dark:bg-amber-800 dark:text-amber-50">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
@@ -41,7 +41,7 @@ function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
   }
 
   return (
-    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-200 text-emerald-950 dark:bg-emerald-800 dark:text-emerald-50">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.172-.879-1.172-2.303 0-3.182C10.464 7.781 11.232 7.562 12 7.562c.768 0 1.536.219 2.121.659ZM12 6V4.5m0 0V3.75m0 1.5h.008v.008H12V6Z" />
       </svg>
@@ -57,9 +57,9 @@ function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layou
           <HistoryIcon kind={entry.kind} />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(entry.title)}</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{entry.detail}</p>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{entry.detail}</p>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{entry.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-300">{entry.dateLabel}</p>
               <span className={`text-sm font-bold tabular-nums ${pointsTone(entry.points)}`}>
                 {entry.points >= 0 ? "+" : "−"}
                 {Math.abs(entry.points)} pts
@@ -78,8 +78,8 @@ function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layou
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(entry.title)}</p>
-            <p className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{entry.detail}</p>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-300">{entry.detail}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-300">
               <span>{entry.dateLabel}</span>
               {entry.referenceId ? <span>Ref {entry.referenceId}</span> : null}
               {entry.amountBz ? <span>{formatBz(entry.amountBz)}</span> : null}
@@ -126,7 +126,7 @@ export function RewardsHistory({
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
         <div>
           <SectionHeading as="h3">{variant === "earnings" ? "Earnings history" : "Rewards history"}</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
             {variant === "earnings"
               ? "Points earned from registration, verification, and surveys."
               : "Points earned and withdrawal requests on your account."}
@@ -168,7 +168,7 @@ export function RewardsHistory({
               ? formatHeadingCase("No withdrawal requests yet")
               : formatHeadingCase("No rewards activity yet")}
           </p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
             {filter === "withdrawals"
               ? "When you redeem points, your withdrawal requests will appear here with live status updates."
               : variant === "earnings"

@@ -16,14 +16,14 @@ export const filterOptionHoverClass = "hover:bg-teal-50/60 dark:hover:bg-teal-95
 export const progressTrackClass = "bg-teal-50 dark:bg-teal-950/60";
 
 export const statusPillClass = {
-  success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
-  warning: "bg-amber-100 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200",
-  info: "bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-200",
-  neutral: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  draft: "bg-amber-100 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200",
-  published: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
-  closed: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  active: "bg-teal-100 text-teal-900 dark:bg-teal-950/50 dark:text-teal-200",
+  success: "bg-emerald-300 text-emerald-950",
+  warning: "bg-amber-300 text-amber-950",
+  info: "bg-sky-200 text-sky-950",
+  neutral: "bg-zinc-200 text-zinc-950",
+  draft: "bg-amber-300 text-amber-950",
+  published: "bg-emerald-300 text-emerald-950",
+  closed: "bg-zinc-200 text-zinc-950",
+  active: "bg-teal-200 text-teal-950",
 } as const;
 
 export const iconMetricToneClass = {

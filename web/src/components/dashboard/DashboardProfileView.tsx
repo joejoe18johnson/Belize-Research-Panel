@@ -100,7 +100,7 @@ export function DashboardProfileView({
           <StatusBadge label={profile.verificationStatus} tone={verificationBadgeTone(profile.verificationStatus)} />
           <StatusBadge label={profile.panelistStatus} tone="info" />
           {profile.registrationDate !== "Not provided" ? (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Registered {profile.registrationDate}</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-300">Registered {profile.registrationDate}</span>
           ) : null}
         </div>
         <button
@@ -117,7 +117,7 @@ export function DashboardProfileView({
       <div className="grid gap-6 lg:grid-cols-2">
         <DashboardCard>
           <ProfileCardHeader title="Personal details" onEdit={() => onEditSection("personal")} />
-          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-300">
             Name, date of birth, sex, ethnicity, and household details cannot be changed online. Education can be
             updated when you edit your profile.
           </p>

@@ -226,41 +226,41 @@ export function ProfileEditForm({
         className="scroll-mt-24 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-5 sm:p-6"
       >
         <SectionHeading as="h3">Biographical details</SectionHeading>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
           Name, date of birth, sex, ethnicity, and household details cannot be changed online. You may update your education level if it
           changes.
         </p>
         <dl className="mt-4 grid gap-4 lg:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">First name</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.firstName}</dd>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.firstName}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Last name(s)</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.lastName}</dd>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.lastName}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Date of birth</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.dob}</dd>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.dob}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Sex</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.sex}</dd>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.sex}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Ethnicity</dt>
-            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.ethnicity}</dd>
+            <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.ethnicity}</dd>
           </div>
           {profile.householdHeadRelationship && profile.householdHeadRelationship !== "Not provided" ? (
             <div>
               <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Head of household</dt>
-              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.householdHeadRelationship}</dd>
+              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.householdHeadRelationship}</dd>
             </div>
           ) : null}
           {profile.householdSize && profile.householdSize !== "Not provided" ? (
             <div>
               <dt className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Household size</dt>
-              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{profile.householdSize}</dd>
+              <dd className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{profile.householdSize}</dd>
             </div>
           ) : null}
         </dl>

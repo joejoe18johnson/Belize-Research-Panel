@@ -29,8 +29,8 @@ function SurveyProgressBar({
   return (
     <div>
       <div className={`mb-1.5 flex items-center justify-between gap-2 font-medium ${compact ? "text-[11px]" : "text-xs"}`}>
-        <span className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(completed ? "Completed" : "Progress")}</span>
-        <span className={completed ? "text-emerald-700" : "text-teal-800 dark:text-teal-200"}>{percent}%</span>
+        <span className="text-zinc-600 dark:text-zinc-300">{formatHeadingCase(completed ? "Completed" : "Progress")}</span>
+        <span className={completed ? "text-emerald-800 dark:text-emerald-300" : "text-teal-800 dark:text-teal-200"}>{percent}%</span>
       </div>
       <div
         className={`overflow-hidden rounded-full bg-zinc-200 ${compact ? "h-1.5" : "h-2"}`}
@@ -185,7 +185,7 @@ export function SurveyCard({
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-300">
                   {style.icon} {formatHeadingCase(style.label)}
                 </p>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2">
@@ -194,11 +194,11 @@ export function SurveyCard({
                 </div>
                 <SurveyByCredit name={survey.surveyBy} compact className="mt-0.5" />
               </div>
-              <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
+              <span className="rounded-full bg-teal-200 px-2.5 py-1 text-xs font-semibold text-teal-950">
                 +{survey.points} pts
               </span>
             </div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="text-xs text-zinc-600 dark:text-zinc-300">
               {formatHeadingCase(completed ? "Completed on" : "Due")}{" "}
               <span className={overdue && !completed ? "font-medium text-red-600" : "font-medium text-zinc-800 dark:text-zinc-200"}>
                 {completed ? survey.completedDateLabel : survey.completeByDateLabel}
@@ -218,7 +218,7 @@ export function SurveyCard({
   return (
     <DashboardCard className={`overflow-hidden p-0 ${locked ? "opacity-50 grayscale" : ""}`}>
       {locked ? (
-        <div className="rounded-t-2xl border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 px-5 py-2 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <div className="rounded-t-2xl border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 px-5 py-2 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-300">
           Unavailable until account is verified
         </div>
       ) : null}
@@ -257,19 +257,19 @@ export function SurveyCard({
           <SurveyByCredit name={survey.surveyBy} className="mt-1" />
           <dl className="mt-3 grid gap-2 text-sm">
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
-              <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Survey date")}</dt>
+              <dt className="text-zinc-500 dark:text-zinc-300">{formatHeadingCase("Survey date")}</dt>
               <dd className="font-medium text-zinc-800 dark:text-zinc-200 sm:text-right">{survey.assignedDateLabel}</dd>
             </div>
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
-              <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(completed ? "Completed on" : "Complete by")}</dt>
+              <dt className="text-zinc-500 dark:text-zinc-300">{formatHeadingCase(completed ? "Completed on" : "Complete by")}</dt>
               <dd className={`font-medium sm:text-right ${overdue && !completed ? "text-red-600" : "text-zinc-800 dark:text-zinc-200"}`}>
                 {completed ? survey.completedDateLabel : survey.completeByDateLabel}
                 {overdue && !completed ? " (overdue)" : ""}
               </dd>
             </div>
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
-              <dt className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Reward")}</dt>
-              <dd className="font-semibold text-teal-800 dark:text-teal-200 sm:text-right">+{survey.points} points</dd>
+              <dt className="text-zinc-500 dark:text-zinc-300">{formatHeadingCase("Reward")}</dt>
+              <dd className="font-semibold text-teal-900 dark:text-teal-100 sm:text-right">+{survey.points} points</dd>
             </div>
           </dl>
         </div>

@@ -232,7 +232,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard>
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
-        <p className={`text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${standalone ? "" : "mt-2"}`}>
+        <p className={`text-sm text-zinc-600 dark:text-zinc-300 ${standalone ? "" : "mt-2"}`}>
           Your account is on hold until contact verification is complete. You can still view redemption options on
           rewards, but requests are disabled for now.
         </p>
@@ -244,7 +244,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard className="border-dashed border-zinc-300 bg-zinc-50/80">
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
-        <p className={`text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${standalone ? "" : "mt-2"}`}>
+        <p className={`text-sm leading-relaxed text-zinc-600 dark:text-zinc-300 ${standalone ? "" : "mt-2"}`}>
           Redemption unlocks at <strong>{rewardSettings.redemptionMinimumPoints} points ({formatBz(redemptionMinimumBz(rewardSettings))})</strong>. You currently
           have <strong>{totalPoints} points</strong> ({formatBz(pointsToBz(totalPoints, rewardSettings))}). {redemptionRateLabel(rewardSettings)} —
           return to rewards to see what you can redeem and how many points each amount needs.
@@ -257,7 +257,7 @@ export function RedemptionRequestForm({
     return (
       <DashboardCard>
         <SectionHeading as="h3">Redeem points</SectionHeading>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
           You have reached the first redemption milestone, but your available balance is{" "}
           <strong>{availablePoints} points</strong> ({formatBz(pointsToBz(availablePoints, rewardSettings))})
           {requests.some((request) => request.status === "pending" || request.status === "approved")
@@ -277,7 +277,7 @@ export function RedemptionRequestForm({
       {!standalone ? (
         <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
           <SectionHeading as="h3">Redeem points</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
             {redemptionRateLabel(rewardSettings)}. Submit your details for the reward you want — requests are reviewed before payout.
           </p>
         </div>
@@ -551,7 +551,7 @@ function OptionSummary({
   rewardSettings: RewardSettings;
 }) {
   return (
-    <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
+    <div className="rounded-xl border border-teal-700 bg-teal-100 px-4 py-3 text-sm text-teal-950 dark:bg-teal-950 dark:text-teal-50">
       <p className="font-semibold">{option.label}</p>
       <p className="mt-1 text-teal-800 dark:text-teal-200">
         {formatBz(amountBz)} · {points} points will be reserved from your balance ({availablePoints} pts /{" "}

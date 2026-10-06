@@ -68,7 +68,7 @@ export function NewSurveyAlertBanner({ newSurveyCount }: { newSurveyCount: numbe
           <button
             type="button"
             onClick={dismiss}
-            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-amber-300 bg-white/80 px-3 text-sm font-semibold text-amber-900 transition hover:bg-white dark:bg-zinc-900"
+            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-amber-800 bg-amber-200 px-3 text-sm font-semibold text-amber-950 transition hover:bg-amber-300"
             aria-label="Dismiss new survey alert"
           >
             {formatHeadingCase("Dismiss")}

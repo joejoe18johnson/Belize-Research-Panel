@@ -102,7 +102,7 @@ export function ProfileContactChangePanel({
       <h3 className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
         {formatHeadingCase("Email and phone")}
       </h3>
-      <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+      <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
         Your email counts as one way to contact you. Changing your email or phone puts your account on hold until an
         administrator approves or denies the update.
       </p>
@@ -130,7 +130,7 @@ export function ProfileContactChangePanel({
       <div className="mt-5 space-y-6">
         <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
           <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current email</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{account.email}</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{account.email}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field label="New email address" error={errors.newEmail ?? errors.emailChange} id="newEmail">
@@ -151,14 +151,14 @@ export function ProfileContactChangePanel({
               >
                 {emailSubmitting ? "Submitting…" : "Request email change (admin approval)"}
               </button>
-              {emailMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{emailMessage}</p> : null}
+              {emailMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-300">{emailMessage}</p> : null}
             </div>
           ) : null}
         </div>
 
         <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
           <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current phone / WhatsApp</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{contact.phone || "Not provided"}</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{contact.phone || "Not provided"}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field
@@ -183,7 +183,7 @@ export function ProfileContactChangePanel({
               >
                 {phoneSubmitting ? "Submitting…" : "Request phone change (admin approval)"}
               </button>
-              {phoneMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{phoneMessage}</p> : null}
+              {phoneMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-300">{phoneMessage}</p> : null}
             </div>
           ) : null}
         </div>

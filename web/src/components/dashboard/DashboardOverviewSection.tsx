@@ -44,7 +44,7 @@ function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; i
             </span>
           ) : null}
         </div>
-        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-300">
           {inProgress
             ? formatHeadingCase(`${survey.progressPercent}% complete`)
             : formatHeadingCase("Not started")}
@@ -55,10 +55,10 @@ function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; i
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
+        <span className="rounded-full bg-teal-200 px-2.5 py-1 text-xs font-semibold text-teal-950">
           +{survey.points} pts
         </span>
-        <ChevronRightIcon className="h-4 w-4 text-zinc-400 dark:text-zinc-500 transition group-hover:text-teal-700" />
+        <ChevronRightIcon className="h-4 w-4 text-zinc-500 transition group-hover:text-teal-800 dark:text-zinc-300 dark:group-hover:text-teal-200" />
       </div>
     </a>
   );
@@ -166,17 +166,17 @@ export function DashboardOverviewSection({
         <DashboardCard>
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100 text-teal-900 dark:bg-teal-800 dark:text-teal-50">
                 <ClipboardIcon className="h-4 w-4" />
               </span>
               <div>
                 <SectionHeading as="h3">Active surveys</SectionHeading>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{inboxSurveys.length} waiting in your inbox</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-300">{inboxSurveys.length} waiting in your inbox</p>
               </div>
             </div>
             <Link
               href="/dashboard/surveys"
-              className="text-sm font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
+              className="text-sm font-semibold text-teal-800 hover:text-teal-950 dark:text-teal-200 dark:hover:text-white"
             >
               {formatHeadingCase("View all")}
             </Link>

@@ -82,9 +82,9 @@ function NotificationCard({
               <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(notification.title)}</h3>
               {notification.unread ? <span className={brandedNotificationBadgeClass}>{formatHeadingCase("New")}</span> : null}
             </div>
-            <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(notification.body)}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-300">{formatHeadingCase(notification.body)}</p>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{notification.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-300">{notification.dateLabel}</p>
               {action}
             </div>
           </div>
@@ -117,12 +117,12 @@ function NotificationCard({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                 {formatHeadingCase(notification.body)}
               </p>
             </div>
             <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 sm:w-auto sm:flex-col sm:items-end">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{notification.dateLabel}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-300">{notification.dateLabel}</p>
               {action}
             </div>
           </div>
@@ -189,7 +189,7 @@ export function DashboardNotificationsClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
           {unreadCount > 0 ? (
             <>
               {formatHeadingCase("You have")}{" "}

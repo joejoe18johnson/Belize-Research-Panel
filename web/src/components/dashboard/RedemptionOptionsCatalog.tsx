@@ -29,15 +29,15 @@ import { DashboardCard, SectionHeading } from "./DashboardShell";
 const REDEMPTION_OPTION_ICONS: Record<RedemptionOption["id"], { icon: ReactNode; tone: string }> = {
   mobile_top_up: {
     icon: <PhoneIcon className="h-5 w-5" />,
-    tone: "bg-teal-100 text-teal-800 dark:text-teal-200",
+    tone: "bg-teal-200 text-teal-950 dark:bg-teal-800 dark:text-teal-50",
   },
   bank_transfer: {
     icon: <BuildingLibraryIcon className="h-5 w-5" />,
-    tone: "bg-sky-100 text-sky-800",
+    tone: "bg-sky-200 text-sky-950 dark:bg-sky-800 dark:text-sky-50",
   },
   utility_credit: {
     icon: <BoltIcon className="h-5 w-5" />,
-    tone: "bg-violet-100 text-violet-800",
+    tone: "bg-violet-200 text-violet-950 dark:bg-violet-800 dark:text-violet-50",
   },
 };
 
@@ -99,13 +99,13 @@ function RedemptionOptionCard({
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{option.description}</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{option.description}</p>
           <p className="mt-1 text-xs font-medium text-teal-800 dark:text-teal-200">{option.incrementLabel}</p>
         </div>
         <div className={`flex shrink-0 flex-col gap-2 ${layout === "list" ? "items-end" : "w-full sm:w-auto sm:items-end"}`}>
           <div className="text-left sm:text-right">
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{minPoints} pts</p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">from {formatBz(option.minAmountBz)}</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-300">from {formatBz(option.minAmountBz)}</p>
           </div>
           {unlocked ? (
             <Link
@@ -126,8 +126,8 @@ function RedemptionOptionCard({
                 key={tier.amountBz}
                 className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${
                   availablePoints >= tier.points
-                    ? "border-teal-200 bg-teal-50 text-teal-800 dark:text-teal-200"
-                    : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"
+                    ? "border-teal-800 bg-teal-200 text-teal-950"
+                    : "border-zinc-400 bg-zinc-200 text-zinc-950"
                 }`}
               >
                 {tier.label}
@@ -136,12 +136,12 @@ function RedemptionOptionCard({
           </div>
 
           <div className="mt-4">
-            <div className="mb-1.5 flex items-center justify-between gap-2 text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <div className="mb-1.5 flex items-center justify-between gap-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">
               <span>{formatHeadingCase("Progress to minimum")}</span>
               <span>{Math.min(progressPercent, 100)}%</span>
             </div>
             <div
-              className="h-2 overflow-hidden rounded-full bg-zinc-200"
+              className="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700"
               role="progressbar"
               aria-valuenow={Math.min(progressPercent, 100)}
               aria-valuemin={0}
@@ -197,7 +197,7 @@ export function RedemptionOptionsCatalog({
       <div className="flex flex-col gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4 lg:flex-row lg:items-start lg:justify-between lg:gap-3">
         <div className="min-w-0 flex-1">
           <SectionHeading as="h3">Redemption options</SectionHeading>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
             {redemptionRateLabel(rewardSettings)}.{" "}
             {unlocked
               ? formatHeadingCase("Choose a reward below when you have enough available points.")

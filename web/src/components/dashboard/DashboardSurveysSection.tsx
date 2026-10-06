@@ -82,12 +82,12 @@ export function DashboardSurveysSection({
           className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition lg:flex-none lg:px-4 ${
             tab === "inbox"
               ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
-              : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
+              : "text-zinc-600 dark:text-zinc-300 hover:text-teal-800 dark:text-teal-200"
           } disabled:cursor-not-allowed`}
         >
           {formatHeadingCase("Inbox")}
           {inbox.length > 0 ? (
-            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "inbox" ? "bg-teal-100 text-teal-800 dark:text-teal-200" : "bg-zinc-200 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}`}>
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "inbox" ? "bg-teal-200 text-teal-950" : "bg-zinc-300 text-zinc-950"}`}>
               {inbox.length}
             </span>
           ) : null}
@@ -99,12 +99,12 @@ export function DashboardSurveysSection({
           className={`flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-2.5 text-sm font-semibold transition lg:flex-none lg:px-4 ${
             tab === "completed"
               ? "bg-white dark:bg-zinc-900 text-teal-800 dark:text-teal-200 shadow-sm"
-              : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:text-teal-800 dark:text-teal-200"
+              : "text-zinc-600 dark:text-zinc-300 hover:text-teal-800 dark:text-teal-200"
           } disabled:cursor-not-allowed`}
         >
           {formatHeadingCase("Completed")}
           {completed.length > 0 ? (
-            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "completed" ? "bg-teal-100 text-teal-800 dark:text-teal-200" : "bg-zinc-200 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500"}`}>
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === "completed" ? "bg-teal-200 text-teal-950" : "bg-zinc-300 text-zinc-950"}`}>
               {completed.length}
             </span>
           ) : null}
@@ -114,7 +114,7 @@ export function DashboardSurveysSection({
       {surveys.length > 0 ? (
         <>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
               {surveys.length} {tab === "inbox" ? "survey" : "completed survey"}
               {surveys.length === 1 ? "" : "s"}
             </p>

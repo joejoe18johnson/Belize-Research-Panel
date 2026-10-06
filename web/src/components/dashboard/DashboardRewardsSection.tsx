@@ -49,7 +49,7 @@ export function DashboardRewardsSection({
       {showDevPointsEditor ? <DevPointsEditor rewards={rewards} /> : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0">
+        <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0 dark:border-teal-800 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900">
           <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 dark:border-teal-900/60 bg-teal-700 px-6 py-5 text-white">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -71,11 +71,11 @@ export function DashboardRewardsSection({
           <div className="space-y-5 p-6">
             <div>
               <div className="mb-2 flex items-center justify-between gap-2 text-xs font-medium">
-                <span className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase("Progress to first redemption")}</span>
+                <span className="text-zinc-600 dark:text-zinc-300">{formatHeadingCase("Progress to first redemption")}</span>
                 <span className="text-teal-800 dark:text-teal-200">{progressPercent}%</span>
               </div>
               <div
-                className="h-2.5 overflow-hidden rounded-full bg-zinc-200"
+                className="h-2.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700"
                 role="progressbar"
                 aria-valuenow={progressPercent}
                 aria-valuemin={0}
@@ -87,7 +87,7 @@ export function DashboardRewardsSection({
                   style={{ width: `${Math.max(progressPercent, 4)}%` }}
                 />
               </div>
-              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-300">
                 {pointsToMilestone > 0
                   ? `${pointsToMilestone} more points (${formatBz(pointsToBz(pointsToMilestone, rewardSettings))}) until redemption unlocks.`
                   : formatHeadingCase("Redemption is unlocked — choose an option below and tap Redeem points.")}
@@ -100,7 +100,7 @@ export function DashboardRewardsSection({
                   <span className="font-medium text-zinc-800 dark:text-zinc-200">{formatHeadingCase("Points earned to date")}</span>
                   <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate}</span>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">
                   {formatBz(pointsToBz(rewards.totalPointsToDate))} cumulative
                 </p>
                 <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
@@ -111,7 +111,7 @@ export function DashboardRewardsSection({
               {rewards.fulfilledRedemptionPoints > 0 ? (
                 <li className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-zinc-700 dark:text-zinc-300">
                   <span>{formatHeadingCase("Redeemed (completed payouts)")}</span>
-                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                  <span className="font-semibold text-zinc-600 dark:text-zinc-300">
                     −{rewards.fulfilledRedemptionPoints}
                   </span>
                 </li>
@@ -127,15 +127,15 @@ export function DashboardRewardsSection({
               rewards.reservedPoints === 0 ? (
                 <li className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-zinc-700 dark:text-zinc-300">
                   <span>{formatHeadingCase("Redeemed or reserved")}</span>
-                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">−{rewards.redeemedPoints}</span>
+                  <span className="font-semibold text-zinc-600 dark:text-zinc-300">−{rewards.redeemedPoints}</span>
                 </li>
               ) : null}
-              <li className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3">
+              <li className="rounded-xl border border-teal-700 bg-teal-100 px-4 py-3 dark:bg-teal-950">
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-medium text-teal-900 dark:text-teal-100">{formatHeadingCase("Available balance")}</span>
                   <span className="text-lg font-bold text-teal-900 dark:text-teal-100">{availablePoints}</span>
                 </div>
-                <p className="mt-1 text-xs text-teal-800/80">
+                <p className="mt-1 text-xs text-teal-900 dark:text-teal-100">
                   {formatBz(pointsToBz(availablePoints))} · {rewards.totalPointsToDate} earned
                   {rewards.redeemedPoints > 0
                     ? ` minus ${rewards.redeemedPoints} redeemed or reserved`

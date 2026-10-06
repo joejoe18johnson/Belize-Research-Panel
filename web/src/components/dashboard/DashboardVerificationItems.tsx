@@ -24,12 +24,12 @@ function itemStatusTone(status: VerificationItemStatus): "success" | "warning" |
 function itemStatusClass(status: VerificationItemStatus): string {
   switch (status) {
     case "verified":
-      return "border-emerald-200 bg-emerald-50/80";
+      return "border-emerald-300 bg-emerald-50/80 dark:border-emerald-700 dark:bg-emerald-950!";
     case "under_review":
     case "pending_approval":
-      return "border-amber-200 bg-amber-50/70";
+      return "border-amber-300 bg-amber-50/70 dark:border-amber-700 dark:bg-amber-950!";
     case "missing":
-      return "border-red-200 bg-red-50/80";
+      return "border-red-300 bg-red-50/80 dark:border-red-800 dark:bg-red-950!";
     default:
       return "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900";
   }
@@ -76,7 +76,7 @@ function VerificationItemCard({
 }) {
   const statusBadge =
     item.status === "missing" ? (
-      <span className="inline-flex shrink-0 items-center rounded-full border border-red-300 bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">
+      <span className="inline-flex shrink-0 items-center rounded-full border border-red-800 bg-red-200 px-3 py-1 text-xs font-semibold text-red-950">
         {item.statusLabel}
       </span>
     ) : (
@@ -87,7 +87,7 @@ function VerificationItemCard({
     return (
       <DashboardCard className={`p-4 ${itemStatusClass(item.status)}`}>
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 dark:text-teal-200 shadow-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-900 shadow-sm dark:bg-zinc-800 dark:text-teal-100">
             <VerificationItemIcon id={item.id} />
           </span>
           <div className="min-w-0 flex-1">
@@ -111,7 +111,7 @@ function VerificationItemCard({
     <DashboardCard className={itemStatusClass(item.status)}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-teal-800 dark:text-teal-200 shadow-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-900 shadow-sm dark:bg-zinc-800 dark:text-teal-100">
             <VerificationItemIcon id={item.id} />
           </span>
           <div className="min-w-0 flex-1">
@@ -120,12 +120,12 @@ function VerificationItemCard({
                 {item.label}
               </SectionHeading>
               {item.essential ? (
-                <span className="rounded-full bg-zinc-900/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <span className="rounded-full bg-zinc-900/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
                   {formatHeadingCase("Essential")}
                 </span>
               ) : null}
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{item.description}</p>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{item.description}</p>
             <p className="mt-3 text-sm">
               <span className="font-medium text-zinc-800 dark:text-zinc-200">
                 {item.valueLabel ?? formatHeadingCase("On file")}:{" "}
@@ -133,14 +133,14 @@ function VerificationItemCard({
               <span className="text-zinc-700 dark:text-zinc-300">{item.valueOnFile}</span>
             </p>
             {item.status === "pending_approval" ? (
-              <p className="mt-2 text-sm text-amber-900">
+              <p className="mt-2 text-sm text-amber-950 dark:text-amber-100">
                 {formatHeadingCase(
                   "A phone number change is waiting for administrator approval before it can be verified."
                 )}
               </p>
             ) : null}
             {item.status === "missing" ? (
-              <p className="mt-2 text-sm text-red-800">
+              <p className="mt-2 text-sm text-red-900 dark:text-red-100">
                 {formatHeadingCase(
                   "This item is missing or incomplete. Update your profile or contact the panel team if you need help."
                 )}
