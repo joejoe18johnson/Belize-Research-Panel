@@ -1148,7 +1148,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
           <FormSection step={6} title={copy.sections.residence} id="residence-section">
             {mustLiveAbroad(form.citizenshipStatus) ? (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="text-sm text-zinc-600 dark:text-zinc-300">
                 {copy.abroadIntro}
               </p>
             ) : null}
@@ -1530,7 +1530,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
             <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 lg:hidden">
               {reviewRows.map(([label, value]) => (
                 <div key={label} className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-0">
-                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{label}</p>
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-300">{label}</p>
                   <p className="mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-words">{String(value || copy.notProvided)}</p>
                 </div>
               ))}
@@ -1546,7 +1546,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                 <tbody className="divide-y divide-zinc-100 bg-white dark:bg-zinc-900">
                   {reviewRows.map(([label, value]) => (
                     <tr key={label}>
-                      <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{label}</td>
+                      <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-300">{label}</td>
                       <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{String(value || copy.notProvided)}</td>
                     </tr>
                   ))}

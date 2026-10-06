@@ -85,7 +85,7 @@ export function SurveyBrandingHeader({
           ) : null}
           {description ? (
             <p
-              className={`leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 ${
+              className={`leading-relaxed text-zinc-600 dark:text-zinc-300 ${
                 compact ? "mt-1 line-clamp-2 text-[11px]" : "mt-2 text-sm"
               }`}
             >

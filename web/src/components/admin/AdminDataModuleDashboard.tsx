@@ -48,13 +48,13 @@ function SortableTable({
     <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
       <div className="border-b border-zinc-100 dark:border-zinc-800 px-5 py-4">
         <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{sorted.length} rows · click headers to sort</p>
-        {note ? <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{note}</p> : null}
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">{sorted.length} rows · click headers to sort</p>
+        {note ? <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-300">{note}</p> : null}
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
               {columns.map((column) => (
                 <th key={column.key} className={`px-4 py-3 ${column.align === "right" ? "text-right" : ""}`}>
                   <button type="button" onClick={() => toggle(column.key)} className="font-semibold hover:text-teal-800 dark:text-teal-200">
@@ -68,7 +68,7 @@ function SortableTable({
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                   No data available.
                 </td>
               </tr>

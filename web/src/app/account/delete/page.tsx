@@ -26,13 +26,13 @@ export default async function DeleteAccountPage() {
       <main className={`mx-auto w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 ${AUTH_CONTENT_MAX}`}>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{formatHeadingCase("Delete account and opt out")}</h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
             {formatHeadingCase("Signed in as")}{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">{account.email}</span>
           </p>
         </div>
         <DeleteAccountPanel compact />
-        <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-300">
           {formatHeadingCase("Changed your mind?")}{" "}
           <Link
             href={account.panelistRegistered ? "/dashboard/profile" : "/register"}

@@ -104,9 +104,9 @@ function PayoutProcessDialog({
           <div>
             <p className="text-xs font-semibold text-teal-700">Payout request</p>
             <h3 className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-100">{row.shortId}</h3>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Submitted {row.formattedDate}</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">Submitted {row.formattedDate}</p>
             {readOnly && row.formattedUpdatedDate ? (
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-300">
                 Processed {row.formattedUpdatedDate}
                 {row.processedBy ? ` by ${row.processedBy}` : ""}
               </p>
@@ -115,7 +115,7 @@ function PayoutProcessDialog({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-sm font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800"
+            className="rounded-lg px-2 py-1 text-sm font-semibold text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:bg-zinc-800"
           >
             Close
           </button>
@@ -125,11 +125,11 @@ function PayoutProcessDialog({
           <div className="flex flex-wrap items-center gap-2">
             <AdminStatusPill label={payoutStatusLabel(row.status)} tone={payoutStatusTone(row.status)} />
             <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{row.optionLabel}</span>
-            <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatBz(row.amountBz)} · {row.points.toLocaleString()} pts</span>
+            <span className="text-sm text-zinc-600 dark:text-zinc-300">{formatBz(row.amountBz)} · {row.points.toLocaleString()} pts</span>
           </div>
 
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-3">
-            <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Payment details</p>
+            <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Payment details</p>
             <p className="mt-1 font-medium text-zinc-900 dark:text-zinc-100">{row.paymentTitle}</p>
             <dl className="mt-2 space-y-1.5">
               {(row.paymentFields.length > 0 ? row.paymentFields : row.paymentLines.map((line) => {
@@ -138,7 +138,7 @@ function PayoutProcessDialog({
                 return { label: line.slice(0, split), value: line.slice(split + 2) };
               })).map((field) => (
                 <div key={`${row.id}-${field.label}`}>
-                  <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{field.label}</dt>
+                  <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-300">{field.label}</dt>
                   <dd className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all">{field.value}</dd>
                 </div>
               ))}
@@ -183,14 +183,14 @@ function PayoutProcessDialog({
             </button>
           ) : null}
           {readOnly ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">This request is closed. No further action is required.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-300">This request is closed. No further action is required.</p>
           ) : null}
           <div className="mt-2">
             <BrandedPdfActions viewHref={payoutStatementHref(row.id)} compact viewLabel="View statement" />
           </div>
         </div>
 
-        <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-300">
           When you update this request, the panelist is notified in their dashboard and by email or WhatsApp when contact details are on file.
         </p>
       </div>
@@ -320,7 +320,7 @@ export function AdminPayoutQueueSection({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(title)}</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{description}</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">{description}</p>
         </div>
         <input
           type="search"

@@ -55,7 +55,7 @@ function PayoutRequestCard({ request, layout }: { request: RedemptionRequest; la
 
   if (layout === "cards") {
     return (
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 p-4">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">{formatHeadingCase(request.optionLabel)}</p>

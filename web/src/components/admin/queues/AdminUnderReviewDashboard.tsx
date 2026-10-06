@@ -148,7 +148,7 @@ export function AdminUnderReviewDashboard({
       ) : null}
 
       {requirementFilter === "phone" ? (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
           Pending phone number <em>changes</em> awaiting approval are in{" "}
           <Link href="/admin/notifications?type=phone" className="font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100">
             Notifications → Phone changes
@@ -226,7 +226,7 @@ export function AdminUnderReviewDashboard({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Review queue")}</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{filtered.length} records</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">{filtered.length} records</p>
           </div>
           <input
             type="search"

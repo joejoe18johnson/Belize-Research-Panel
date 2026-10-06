@@ -112,7 +112,7 @@ function SurveyAction({
   if (completed) {
     return (
       <p
-        className={`rounded-lg border border-emerald-200 bg-emerald-50 text-center font-medium text-emerald-800 ${
+        className={`rounded-lg border border-emerald-200 bg-emerald-50 text-center font-medium text-emerald-900 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-50 ${
           compact ? "px-2.5 py-1.5 text-[11px]" : "px-3 py-2 text-xs"
         }`}
       >

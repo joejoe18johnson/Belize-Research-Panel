@@ -60,10 +60,10 @@ export function AdminAlertGuide({
                 )}
               </div>
               <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">{guide.description}</p>
-              <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-500">
+              <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-300">
                 <span className="font-semibold text-zinc-700 dark:text-zinc-300">Sidebar:</span> {guide.navLabel}
               </p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">
                 <span className="font-semibold text-zinc-700 dark:text-zinc-300">Marked read:</span>{" "}
                 {guide.markedReadWhen}
               </p>

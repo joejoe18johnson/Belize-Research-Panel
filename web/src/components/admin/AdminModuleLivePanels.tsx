@@ -27,7 +27,7 @@ export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) 
   };
 
   return (
-    <section className="space-y-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-5 sm:p-6">
+    <section className="space-y-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-5 dark:border-teal-800 dark:bg-teal-950 sm:p-6">
       <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">
         {formatHeadingCase("Live duplicate detection")}
       </h2>
@@ -38,7 +38,7 @@ export function FraudPreventionLive({ stats }: { stats: FraudPreventionStats }) 
           ["Same name + DOB", stats.duplicateNameDob],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 px-4 py-3">
-            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{label}</p>
+            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{label}</p>
             <p className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100">{value}</p>
           </div>
         ))}

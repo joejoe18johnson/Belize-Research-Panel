@@ -13,7 +13,7 @@ import type { CampaignSummary } from "@/lib/campaign-targeting";
 import { formatAdminLabel, formatHeadingCase } from "@/lib/sentence-case";
 
 function statusBadgeClass(status: CampaignSummary["status"]): string {
-  if (status === "active") return "bg-teal-100 text-teal-900 dark:text-teal-100";
+  if (status === "active") return "bg-teal-100 dark:bg-teal-800 text-teal-900 dark:text-teal-100";
   if (status === "closed") return "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300";
   return "bg-amber-100 text-amber-900";
 }
@@ -132,7 +132,7 @@ export function AdminCampaignsDashboard({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Campaign register")}</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{filtered.length} campaigns</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">{filtered.length} campaigns</p>
           </div>
           <input
             type="search"
@@ -157,7 +157,7 @@ export function AdminCampaignsDashboard({
           <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   <th className="px-4 py-3">Campaign</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Assigned</th>
@@ -193,7 +193,7 @@ export function AdminCampaignsDashboard({
                             {row.title}
                             {isNew ? <AdminNewBadge label="Completed" /> : null}
                           </p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-300">
                             {formatAdminLabel(row.category)}
                             {row.surveyBy ? ` · Survey by ${row.surveyBy}` : ""}
                           </p>
@@ -211,7 +211,7 @@ export function AdminCampaignsDashboard({
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.completed}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.overdue}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{row.responseRate}%</td>
-                    <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.targetingLabel}</td>
+                    <td className="max-w-[12rem] px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-300">{row.targetingLabel}</td>
                     <td className="px-4 py-2.5">
                       <Link
                         href={`/admin/campaigns/${encodeURIComponent(row.id)}/results`}

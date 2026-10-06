@@ -93,7 +93,7 @@ export function SurveyQuestionField({
             </button>
           ))}
         </div>
-        <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+        <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-300">
           <span>{question.scaleMinLabel}</span>
           <span>{question.scaleMaxLabel}</span>
         </div>
@@ -193,8 +193,8 @@ export function SurveyQuestionPreviewLabel({
         {index + 1}. {question.title || "Untitled question"}
         {question.required ? <span className="text-red-600"> *</span> : null}
       </p>
-      {question.description ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{question.description}</p> : null}
-      <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+      {question.description ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">{question.description}</p> : null}
+      <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-400 dark:text-zinc-300">
         {formatHeadingCase(SURVEY_QUESTION_TYPE_LABELS[question.type])}
       </p>
     </div>

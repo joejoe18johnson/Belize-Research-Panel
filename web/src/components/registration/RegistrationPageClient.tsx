@@ -49,7 +49,7 @@ function RegistrationVerifiedShell({
               >
                 {display(copy.deleteAccount, formatHeadingCase)}
               </Link>
-              <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-500 lg:inline">{account.email}</span>
+              <span className="hidden max-w-[12rem] truncate text-zinc-600 dark:text-zinc-300 lg:inline">{account.email}</span>
               <ThemeIconButton />
               <LogoutButton
                 compact
@@ -71,7 +71,7 @@ function RegistrationVerifiedShell({
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             {display(copy.pageTitle, formatHeadingCase)}
           </h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-500">{copy.pageSubtitle}</p>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">{copy.pageSubtitle}</p>
         </div>
         <RegistrationForm account={account} />
       </main>

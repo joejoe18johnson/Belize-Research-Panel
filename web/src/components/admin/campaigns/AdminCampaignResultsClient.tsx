@@ -36,7 +36,7 @@ function formatSubmittedAt(iso: string | null): string {
 }
 
 function statusBadgeClass(status: CampaignResultsSnapshot["campaign"]["status"]): string {
-  if (status === "active") return "bg-teal-100 text-teal-900 dark:text-teal-100";
+  if (status === "active") return "bg-teal-100 dark:bg-teal-800 text-teal-900 dark:text-teal-100";
   if (status === "closed") return "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300";
   return "bg-amber-100 text-amber-900";
 }
@@ -128,16 +128,16 @@ export function AdminCampaignResultsClient({
         <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
           {formatAdminLabel(campaign.category)}
         </span>
-        <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
+        <span className="rounded-full bg-teal-50 dark:bg-teal-950 px-3 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
           {snapshot.isInternal ? "On-site survey" : "External link"}
         </span>
         {snapshot.surveyTitle ? (
-          <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <span className="text-sm text-zinc-600 dark:text-zinc-300">
             Instrument: <strong>{snapshot.surveyTitle}</strong>
           </span>
         ) : null}
         {clientName ? (
-          <span className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <span className="text-sm text-zinc-600 dark:text-zinc-300">
             Client: <strong>{clientName}</strong>
           </span>
         ) : null}
@@ -169,7 +169,7 @@ export function AdminCampaignResultsClient({
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "border border-b-0 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
-                : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 hover:text-teal-800 dark:text-teal-200"
+                : "text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-950 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -214,7 +214,7 @@ export function AdminCampaignResultsClient({
 
       {tab === "sample" ? (
         <div className="space-y-4">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-sm text-zinc-600 dark:text-zinc-300">
             Compare the assigned sample with completed respondents to assess coverage bias across geography and
             demographics.
           </p>
@@ -255,16 +255,16 @@ export function AdminCampaignResultsClient({
                   <div>
                     <p className="text-xs font-semibold text-teal-700">Q{index + 1}</p>
                     <h3 className="mt-1 text-base font-semibold text-teal-950 dark:text-teal-100">{question.title}</h3>
-                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
                       {SURVEY_QUESTION_TYPE_LABELS[question.type]}
                       {question.required ? " · Required" : " · Optional"}
                     </p>
                   </div>
-                  <div className="text-right text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                  <div className="text-right text-sm text-zinc-600 dark:text-zinc-300">
                     <p>
                       <strong>{question.nAnswered}</strong> / {question.nSubmitted} answered
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Item non-response: {question.itemNonresponseRate}%</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-300">Item non-response: {question.itemNonresponseRate}%</p>
                   </div>
                 </div>
 
@@ -286,9 +286,9 @@ export function AdminCampaignResultsClient({
 
                 {question.type === "short_text" || question.type === "long_text" ? (
                   <div className="mt-5">
-                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Verbatim responses</p>
+                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Verbatim responses</p>
                     {question.textSamples.length === 0 ? (
-                      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">No text responses yet.</p>
+                      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-300">No text responses yet.</p>
                     ) : (
                       <ul className="mt-3 space-y-2">
                         {question.textSamples.map((sample, sampleIndex) => (
@@ -327,7 +327,7 @@ export function AdminCampaignResultsClient({
           <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">
             {formatHeadingCase("Individual responses")}
           </h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
             {isClient
               ? "Submitted questionnaire answers for each respondent. Panelist identifiers are withheld in the client portal."
               : "Every submitted response with the full answer given to each survey question."}
@@ -424,11 +424,11 @@ export function AdminCampaignResultsClient({
       {tab === "roster" ? (
         <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Panelist roster")}</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Individual assignment status and completion progress.</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">Individual assignment status and completion progress.</p>
           <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   <th className="px-4 py-3">Panelist</th>
                   <th className="px-4 py-3">District</th>
                   <th className="px-4 py-3">Constituency</th>
@@ -440,7 +440,7 @@ export function AdminCampaignResultsClient({
               <tbody>
                 {snapshot.assignments.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                       No assignments found for this campaign.
                     </td>
                   </tr>
@@ -449,7 +449,7 @@ export function AdminCampaignResultsClient({
                     <tr key={row.panelistEmail} className="border-b border-zinc-50 hover:bg-teal-50/20 dark:border-zinc-800/80 dark:hover:bg-teal-950/30">
                       <td className="px-4 py-2.5">
                         <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.panelistName}</p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{row.panelistEmail}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-300">{row.panelistEmail}</p>
                       </td>
                       <td className="px-4 py-2.5">{row.district || "—"}</td>
                       <td className="px-4 py-2.5">{row.constituency || "—"}</td>
@@ -461,7 +461,7 @@ export function AdminCampaignResultsClient({
                               : row.status === "completed"
                                 ? "bg-teal-700 text-white"
                                 : row.status === "in_progress"
-                                  ? "bg-teal-100 text-teal-900 dark:text-teal-100"
+                                  ? "bg-teal-100 dark:bg-teal-800 text-teal-900 dark:text-teal-100"
                                   : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                           }`}
                         >
@@ -471,7 +471,7 @@ export function AdminCampaignResultsClient({
                         </span>
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">{row.progressPercent}%</td>
-                      <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.completeByDate}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-300">{row.completeByDate}</td>
                     </tr>
                   ))
                 )}

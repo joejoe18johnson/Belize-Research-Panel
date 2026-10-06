@@ -60,7 +60,7 @@ export function SurveyBrandingFields({
   return (
     <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
       <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Company branding</h2>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
         Add a company introduction and optional cover image. Put any sponsor logo directly on the cover image. If no
         cover is uploaded, the default category banner is used.
       </p>
@@ -68,7 +68,7 @@ export function SurveyBrandingFields({
       <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Company intro</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Company intro</label>
             <textarea
               rows={3}
               value={companyIntro}
@@ -79,7 +79,7 @@ export function SurveyBrandingFields({
           </div>
 
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Cover image (optional)</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Cover image (optional)</label>
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
@@ -90,9 +90,9 @@ export function SurveyBrandingFields({
                 if (file) setRemoveCover(false);
                 publishBrandingState({ coverFile: file, removeCover: nextRemoveCover });
               }}
-              className="mt-1.5 block w-full text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-teal-800 dark:text-teal-200"
+              className="mt-1.5 block w-full text-sm text-zinc-600 dark:text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-teal-800 dark:text-teal-200"
             />
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Wide image recommended · max 5 MB</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">Wide image recommended · max 5 MB</p>
             {hasSavedCover || coverFile ? (
               <button
                 type="button"
@@ -110,7 +110,7 @@ export function SurveyBrandingFields({
         </div>
 
         <div className="lg:sticky lg:top-4">
-          <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Preview</p>
+          <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Preview</p>
           <div className="mt-2 max-w-[220px]">
             <SurveyBrandingHeader
               variant="compact"

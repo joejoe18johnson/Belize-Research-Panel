@@ -125,7 +125,7 @@ export function LoginForm({
           {submitting ? copy.loggingIn : copy.loginSubmit}
         </button>
 
-        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="text-center text-sm text-zinc-600 dark:text-zinc-300">
           {copy.noAccount}{" "}
           <Link
             href={`/signup?next=${encodeURIComponent(nextPath)}`}

@@ -41,7 +41,7 @@ export default async function RegisterPage() {
           <div className="pt-2">
             <LogoutButton className="text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-100" />
           </div>
-          <p className="pt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="pt-2 text-xs text-zinc-500 dark:text-zinc-300">
             {formatHeadingCase("Want to leave?")}{" "}
             <Link href="/account/delete" className="font-medium text-teal-700 hover:underline">
               {formatHeadingCase("Delete account and opt out")}

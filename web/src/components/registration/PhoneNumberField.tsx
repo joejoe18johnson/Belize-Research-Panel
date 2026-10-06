@@ -42,7 +42,7 @@ export function PhoneNumberField({
     <div className="space-y-1.5">
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start">
         <div className="sm:w-52 sm:shrink-0">
-          <label htmlFor="phoneCountryCode" className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
+          <label htmlFor="phoneCountryCode" className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-50 sm:sr-only">
             {copy.phoneCountryCode}
           </label>
           <SelectInput
@@ -60,7 +60,7 @@ export function PhoneNumberField({
           </SelectInput>
         </div>
         <div className="min-w-0 flex-1">
-          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-200 sm:sr-only">
+          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-50 sm:sr-only">
             {copy.phoneNumber}
           </label>
           <TextInput
@@ -78,7 +78,7 @@ export function PhoneNumberField({
         </div>
       </div>
       {!error ? (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-zinc-600 dark:text-zinc-300">
           {localizeValidationMessage(rule.hint, locale)}
         </p>
       ) : null}

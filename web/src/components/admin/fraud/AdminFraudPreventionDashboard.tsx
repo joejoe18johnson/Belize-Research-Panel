@@ -50,7 +50,7 @@ function DuplicateTable({
     <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
             {headers.map(([key, label]) => (
               <th key={key} className="px-3 py-3">
                 <button type="button" onClick={() => onSort(key)} className="font-semibold hover:text-teal-800 dark:text-teal-200">
@@ -65,7 +65,7 @@ function DuplicateTable({
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                 No duplicate records for this category.
               </td>
             </tr>
@@ -79,7 +79,7 @@ function DuplicateTable({
                 <td className="px-3 py-2.5 text-zinc-700 dark:text-zinc-300">{row.phone || "—"}</td>
                 <td className="px-3 py-2.5">{row.verificationStatus}</td>
                 <td className="px-3 py-2.5">{row.district || "—"}</td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.dob || "—"}</td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-300">{row.dob || "—"}</td>
               </tr>
             ))
           )}
@@ -118,7 +118,7 @@ function SuspiciousEmailTable({
     <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
       <table className="min-w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
             <th className="px-3 py-3">Risk</th>
             <th className="px-3 py-3">Name</th>
             <th className="px-3 py-3">Email</th>
@@ -131,7 +131,7 @@ function SuspiciousEmailTable({
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                 No suspicious-looking emails matched the current filters.
               </td>
             </tr>
@@ -142,14 +142,14 @@ function SuspiciousEmailTable({
                 <tr key={row.email} className="border-b border-zinc-50 align-top hover:bg-amber-50/30">
                   <td className="px-3 py-3">
                     <RiskBadge level={row.riskLevel} />
-                    <p className="mt-1 text-xs tabular-nums text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Score {row.riskScore}</p>
+                    <p className="mt-1 text-xs tabular-nums text-zinc-500 dark:text-zinc-300">Score {row.riskScore}</p>
                   </td>
                   <td className="px-3 py-3 font-medium text-zinc-800 dark:text-zinc-200">
                     {row.firstName} {row.lastName}
                   </td>
                   <td className="px-3 py-3 text-zinc-700 dark:text-zinc-300">{row.email}</td>
-                  <td className="px-3 py-3 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.domain}</td>
-                  <td className="max-w-xs px-3 py-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                  <td className="px-3 py-3 text-zinc-600 dark:text-zinc-300">{row.domain}</td>
+                  <td className="max-w-xs px-3 py-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
                     <ul className="space-y-1">
                       {row.signals.map((signal) => (
                         <li key={signal.id}>
@@ -393,7 +393,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
-                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -408,7 +408,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div>
             <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Suspicious emails")}</h2>
-            <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
               Flags disposable providers, bot-like local parts, random aliases, and addresses that do not match the
               panelist name. New signups with high-risk patterns are blocked automatically. Review, flag, or delete as
               needed.
@@ -416,7 +416,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
           </div>
           <div className="grid gap-4 lg:grid-cols-[1fr_280px_220px]">
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Search</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Search</label>
               <input
                 type="search"
                 value={search}
@@ -438,7 +438,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
               onChange={(values) => setRiskLevels(values as Array<"medium" | "high">)}
             />
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-300">
             Showing <strong>{filteredSuspicious.length}</strong> suspicious email
             {filteredSuspicious.length === 1 ? "" : "s"}
           </p>
@@ -462,7 +462,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
         <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Search</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Search</label>
               <input
                 type="search"
                 value={search}
@@ -478,7 +478,7 @@ export function AdminFraudPreventionDashboard({ detail }: { detail: FraudPrevent
               onChange={setVerificationStatuses}
             />
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-300">
             Showing <strong>{activeRows.length}</strong> rows
           </p>
           <DuplicateTable

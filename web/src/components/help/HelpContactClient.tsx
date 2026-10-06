@@ -20,7 +20,7 @@ function FaqList({ items }: { items: SupportFaqItem[] }) {
           <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-zinc-900 marker:content-none dark:text-zinc-100 [&::-webkit-details-marker]:hidden">
             <span className="flex items-start justify-between gap-3">
               <span>{formatHeadingCase(item.question)}</span>
-              <span className="text-zinc-400 transition group-open:rotate-45 dark:text-zinc-500">+</span>
+              <span className="text-zinc-400 transition group-open:rotate-45 dark:text-zinc-300">+</span>
             </span>
           </summary>
           <div className="border-t border-zinc-200 px-4 py-3 text-sm leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">

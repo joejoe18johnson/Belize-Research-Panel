@@ -33,7 +33,7 @@ function SurveyPreviewRow({ survey, isNew = false }: { survey: PanelistSurvey; i
       href={href}
       target={survey.surveyUrl ? "_blank" : undefined}
       rel={survey.surveyUrl ? "noopener noreferrer" : undefined}
-      className="group flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
+      className="group flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-teal-700 dark:hover:bg-teal-950"
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">

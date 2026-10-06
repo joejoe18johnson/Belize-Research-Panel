@@ -37,9 +37,9 @@ export function SurveyTemplatePicker({
 
       <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
         <div className="flex flex-col lg:flex-row">
-          <aside className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
+          <aside className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
             <div className="border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 lg:hidden">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Topic</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Topic</label>
               <SiteSelect
                 value={activeTopicId}
                 onChange={(value) => setActiveTopicId(value as SurveyTemplateTopicId)}
@@ -61,7 +61,7 @@ export function SurveyTemplatePicker({
                     className={`mb-0.5 w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${
                       active
                         ? "bg-white dark:bg-zinc-900 font-semibold text-teal-900 dark:text-teal-100 shadow-sm ring-1 ring-zinc-200"
-                        : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-white/70 hover:text-zinc-900 dark:text-zinc-100"
+                        : "text-zinc-600 dark:text-zinc-300 hover:bg-white/70 hover:text-zinc-900 dark:text-zinc-100"
                     }`}
                   >
                     {topic.label}
@@ -133,7 +133,7 @@ export function SurveyTemplatePicker({
             </div>
 
             {templates.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-300">
                 No templates in this topic yet.
               </p>
             ) : (
@@ -143,13 +143,13 @@ export function SurveyTemplatePicker({
                     key={template.id}
                     type="button"
                     onClick={() => onSelectTemplate(template)}
-                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 p-4 text-left transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/40 hover:shadow-sm"
+                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950 p-4 text-left transition hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/40 hover:shadow-sm"
                   >
                     <p className="text-sm font-semibold text-teal-800 dark:text-teal-200 group-hover:text-teal-900 dark:text-teal-100">{template.title}</p>
-                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-300">
                       {template.questions.length} {template.questions.length === 1 ? "question" : "questions"}
                     </p>
-                    <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{template.description}</p>
+                    <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{template.description}</p>
                     <p className="mt-3 text-xs font-semibold text-teal-700 opacity-0 transition group-hover:opacity-100">
                       Use template →
                     </p>
@@ -161,7 +161,7 @@ export function SurveyTemplatePicker({
         </div>
       </div>
 
-      <p className="text-center text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+      <p className="text-center text-xs text-zinc-500 dark:text-zinc-300">
         Templates are starting points only — you can rename, reorder, add, or remove questions in the builder.
       </p>
     </div>
@@ -176,7 +176,7 @@ export function SurveyTemplateBanner({
   onChangeTemplate: () => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 dark:border-teal-800 dark:bg-teal-950">
       <p className="text-sm text-teal-950 dark:text-teal-100">
         Started from template: <span className="font-semibold">{formatHeadingCase(templateTitle)}</span>
       </p>

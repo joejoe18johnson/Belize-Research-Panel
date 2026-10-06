@@ -142,14 +142,14 @@ export function AdminExternalDataImportDashboard({
       <AdminDataModuleDashboard snapshot={snapshot} />
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
         <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">Import & match external CSV</h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
           Upload a voter roll, census extract, or client list. Rows are matched against the live panel by email, phone, or name + DOB.
         </p>
         <input
           type="file"
           accept=".csv,text/csv"
           onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-          className="mt-4 block w-full text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800"
+          className="mt-4 block w-full text-sm text-zinc-600 dark:text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800"
         />
         {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
         {summary ? (
@@ -162,7 +162,7 @@ export function AdminExternalDataImportDashboard({
           <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   <th className="px-3 py-3">Row</th>
                   <th className="px-3 py-3">Name</th>
                   <th className="px-3 py-3">Email</th>

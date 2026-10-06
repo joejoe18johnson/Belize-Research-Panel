@@ -138,13 +138,13 @@ function RequirementOnFileDetail({
   onFile: boolean;
 }) {
   if (!onFile) {
-    return <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Not on file — add details before verifying.</p>;
+    return <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-300">Not on file — add details before verifying.</p>;
   }
 
   if (itemKey === "email") {
     return (
       <div className="mt-2 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-2">
-        <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">On file</p>
+        <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">On file</p>
         <p className="mt-0.5 break-all text-sm font-medium text-zinc-800 dark:text-zinc-200">{detail.email}</p>
         <Link
           href={`mailto:${detail.email}`}
@@ -159,7 +159,7 @@ function RequirementOnFileDetail({
   if (itemKey === "phone") {
     return (
       <div className="mt-2 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-2">
-        <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">On file</p>
+        <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">On file</p>
         <p className="mt-0.5 text-sm font-medium tabular-nums text-zinc-800 dark:text-zinc-200">{detail.phone}</p>
         <a
           href={`tel:${detail.phone.replace(/\D/g, "")}`}
@@ -177,7 +177,7 @@ function RequirementOnFileDetail({
     <div className="mt-2 space-y-2">
       {detail.photoIdType ? (
         <div className="rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-2">
-          <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">ID type</p>
+          <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">ID type</p>
           <p className="mt-0.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">{detail.photoIdType}</p>
         </div>
       ) : null}

@@ -121,7 +121,7 @@ function TemplateList({
                       </span>
                     </span>
                     <span
-                      className="mt-0.5 shrink-0 text-zinc-400 lg:hidden dark:text-zinc-500"
+                      className="mt-0.5 shrink-0 text-zinc-400 lg:hidden dark:text-zinc-300"
                       aria-hidden="true"
                     >
                       →

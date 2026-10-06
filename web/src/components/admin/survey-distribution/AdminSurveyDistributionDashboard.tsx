@@ -159,7 +159,7 @@ export function AdminSurveyDistributionDashboard({
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
-                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -178,7 +178,7 @@ export function AdminSurveyDistributionDashboard({
         <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Search</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Search</label>
               <input
                 type="search"
                 value={search}
@@ -208,13 +208,13 @@ export function AdminSurveyDistributionDashboard({
             />
             <FilterMultiSelect label="District" options={filterOptions.districts} selected={districts} onChange={setDistricts} />
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-300">
             Showing <strong>{filteredRows.length}</strong> of <strong>{allRows.length}</strong> assignments
           </p>
           <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   {(
                     [
                       ["title", "Survey"],
@@ -238,7 +238,7 @@ export function AdminSurveyDistributionDashboard({
               <tbody>
                 {filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                       No assignments match the current filters.
                     </td>
                   </tr>
@@ -249,11 +249,11 @@ export function AdminSurveyDistributionDashboard({
                         <p className="truncate font-medium text-zinc-800 dark:text-zinc-200" title={row.title}>
                           {row.title}
                         </p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(row.category)}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-300">{formatAdminLabel(row.category)}</p>
                       </td>
                       <td className="px-3 py-2.5">
                         <p className="font-medium text-zinc-800 dark:text-zinc-200">{row.panelistName}</p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{row.panelistEmail}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-300">{row.panelistEmail}</p>
                       </td>
                       <td className="px-3 py-2.5">
                         <span
@@ -262,15 +262,15 @@ export function AdminSurveyDistributionDashboard({
                               ? "bg-red-100 text-red-800"
                               : row.status === "completed"
                                 ? "bg-emerald-100 text-emerald-800"
-                                : "bg-teal-100 text-teal-800 dark:text-teal-200"
+                                : "bg-teal-100 dark:bg-teal-800 text-teal-800 dark:text-teal-200"
                           }`}
                         >
                           {formatAdminLabel(row.overdue ? "overdue" : row.status.replace(/_/g, " "))}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 tabular-nums">{row.points}</td>
-                      <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.assignedDate}</td>
-                      <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.completeByDate}</td>
+                      <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-300">{row.assignedDate}</td>
+                      <td className="px-3 py-2.5 tabular-nums text-zinc-600 dark:text-zinc-300">{row.completeByDate}</td>
                       <td className="px-3 py-2.5 tabular-nums">{row.progressPercent}%</td>
                     </tr>
                   ))
@@ -293,14 +293,14 @@ export function AdminSurveyDistributionDashboard({
         <section className="space-y-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <div>
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("New distribution preview")}</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
               Configure a distribution plan. Automated sending is not wired yet — this preview shows eligible
               panelists and MVP-aligned settings.
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey title</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Survey title</label>
               <input
                 type="text"
                 value={plannerTitle}
@@ -310,7 +310,7 @@ export function AdminSurveyDistributionDashboard({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Delivery method</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Delivery method</label>
               <SiteSelect
                 value={deliveryMethod}
                 onChange={setDeliveryMethod}
@@ -319,7 +319,7 @@ export function AdminSurveyDistributionDashboard({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Target group</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Target group</label>
               <SiteSelect
                 value={targetGroup}
                 onChange={(value) => setTargetGroup(value as TargetGroup)}
@@ -332,7 +332,7 @@ export function AdminSurveyDistributionDashboard({
             </div>
             {targetGroup === "specific_constituency" ? (
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Constituency</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Constituency</label>
                 <SiteSelect
                   value={constituency}
                   onChange={setConstituency}
@@ -346,7 +346,7 @@ export function AdminSurveyDistributionDashboard({
               </div>
             ) : null}
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Reward</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Reward</label>
               <SiteSelect
                 value={reward}
                 onChange={setReward}
@@ -355,7 +355,7 @@ export function AdminSurveyDistributionDashboard({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Reminder (days before due)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Reminder (days before due)</label>
               <input
                 type="number"
                 min={0}
@@ -366,14 +366,14 @@ export function AdminSurveyDistributionDashboard({
               />
             </div>
           </div>
-          <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/50 p-4">
+          <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-950">
             <p className="text-sm font-semibold text-teal-950 dark:text-teal-100">Eligible panelists: {eligibleCount}</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
               {plannerTitle.trim()
                 ? `"${plannerTitle.trim()}" would reach ${eligibleCount} verified active panelists via ${deliveryMethod.toLowerCase()}.`
                 : "Enter a survey title to preview the distribution summary."}
             </p>
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-300">
               Reward: {reward} · Reminder: {reminderDays} day(s) before due date
             </p>
           </div>

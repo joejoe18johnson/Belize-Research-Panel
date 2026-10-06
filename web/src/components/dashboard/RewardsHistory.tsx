@@ -52,7 +52,7 @@ function HistoryIcon({ kind }: { kind: RewardsHistoryEntry["kind"] }) {
 function HistoryEntryCard({ entry, layout }: { entry: RewardsHistoryEntry; layout: ViewLayout }) {
   if (layout === "cards") {
     return (
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 p-4">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950 p-4">
         <div className="flex items-start gap-3">
           <HistoryIcon kind={entry.kind} />
           <div className="min-w-0 flex-1">

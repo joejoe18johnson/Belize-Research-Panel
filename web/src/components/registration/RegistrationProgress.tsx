@@ -34,7 +34,7 @@ export function RegistrationProgress({
             {copy.stepOf(progress.currentIndex + 1, progress.totalPhases)}
           </p>
           <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{currentPhase.label}</p>
-          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-300">
             {currentPhase.description}
           </p>
         </div>
@@ -83,7 +83,7 @@ export function RegistrationProgress({
                       ? "border-teal-700 bg-teal-50 text-teal-900 ring-2 ring-teal-300/60 dark:border-teal-300 dark:bg-teal-50 dark:text-teal-950 dark:ring-teal-400/50"
                       : reachable
                         ? "cursor-pointer border-teal-600 bg-white text-teal-800 hover:bg-teal-50 dark:border-teal-500 dark:bg-zinc-900 dark:text-teal-200 dark:hover:bg-teal-950"
-                        : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-500"
+                        : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
                 }`}
               >
                 {phase.status === "complete" ? (

@@ -14,7 +14,7 @@ import {
 import { formatAdminLabel, formatHeadingCase, formatHeadingChildren } from "@/lib/sentence-case";
 
 /** Form and filter labels in the admin console (title case, not all caps). */
-export const adminFieldLabelClass = "text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500";
+export const adminFieldLabelClass = "text-xs font-semibold text-zinc-600 dark:text-zinc-300";
 
 export function AdminFieldLabel({ children }: { children: ReactNode }) {
   return <span className={adminFieldLabelClass}>{formatHeadingChildren(children)}</span>;
@@ -38,7 +38,7 @@ export function FilterMultiSelect({
       <p className={adminFieldLabelClass}>{formatAdminLabel(label)}</p>
       <div className="mt-1.5 max-h-36 space-y-0.5 overflow-y-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2">
         {options.length === 0 ? (
-          <p className="px-2 py-1 text-xs text-zinc-400 dark:text-zinc-500">None</p>
+          <p className="px-2 py-1 text-xs text-zinc-400 dark:text-zinc-300">None</p>
         ) : (
           options.map((option) => {
             const checked = selected.includes(option);
@@ -57,7 +57,7 @@ export function FilterMultiSelect({
                 />
                 <span className="min-w-0 flex-1 truncate">{formatAdminLabel(option)}</span>
                 {counts && counts[option] !== undefined ? (
-                  <span className="shrink-0 tabular-nums text-xs font-medium text-zinc-400 dark:text-zinc-500">({counts[option]})</span>
+                  <span className="shrink-0 tabular-nums text-xs font-medium text-zinc-400 dark:text-zinc-300">({counts[option]})</span>
                 ) : null}
               </label>
             );
@@ -151,9 +151,9 @@ export function IconMetricCard({
         {icon}
       </span>
       <span className="min-w-0">
-        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(label)}</p>
+        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">{formatAdminLabel(label)}</p>
         <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{value}</p>
-        {hint ? <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{hint}</p> : null}
+        {hint ? <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-300">{hint}</p> : null}
       </span>
     </>
   );
@@ -322,7 +322,7 @@ export function AdminTableTd({
 export function AdminTableHead({ children }: { children: ReactNode }) {
   return (
     <thead>
-      <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+      <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
         {children}
       </tr>
     </thead>
@@ -372,13 +372,13 @@ export function AdminDownloadButton({
 
 export function ReviewReasonList({ reasons }: { reasons: string[] }) {
   if (reasons.length === 0) {
-    return <span className="text-zinc-400 dark:text-zinc-500">—</span>;
+    return <span className="text-zinc-400 dark:text-zinc-300">—</span>;
   }
 
   return (
     <ul className="min-w-[11rem] space-y-1.5">
       {reasons.map((reason) => (
-        <li key={reason} className="flex items-start gap-2 text-xs leading-snug text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <li key={reason} className="flex items-start gap-2 text-xs leading-snug text-zinc-600 dark:text-zinc-300">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-300" aria-hidden="true" />
           <span>{reason}</span>
         </li>
@@ -403,7 +403,7 @@ export function PageIntro({
       <div>
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">{formatHeadingCase(eyebrow)}</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase(title)}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{formatHeadingCase(description)}</p>
       </div>
       {action ? (
         <div className="w-full shrink-0 sm:w-auto [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_button]:w-full sm:[&_a]:inline-flex sm:[&_a]:w-auto sm:[&_button]:w-auto">

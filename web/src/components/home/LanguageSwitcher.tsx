@@ -145,7 +145,7 @@ export function LanguageSwitcher({
                 aria-selected={selected}
                 onClick={() => selectLocale(option.id)}
                 className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-teal-50 dark:hover:bg-teal-900/40 ${
-                  selected ? "bg-teal-50/80 font-semibold text-teal-900 dark:text-teal-100" : "text-zinc-700 dark:text-zinc-300"
+                  selected ? "bg-teal-50/80 dark:bg-teal-950 font-semibold text-teal-900 dark:text-teal-100" : "text-zinc-700 dark:text-zinc-300"
                 }`}
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200">

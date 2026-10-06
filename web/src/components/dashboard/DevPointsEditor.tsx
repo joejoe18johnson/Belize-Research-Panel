@@ -92,10 +92,10 @@ export function DevPointsEditor({ rewards }: { rewards: DashboardRewardSummary }
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">{rewards.totalPointsToDate} pts</p>
           <p className="text-xs text-zinc-500 dark:text-zinc-300">{formatBz(pointsToBz(rewards.totalPointsToDate))}</p>
         </div>
-        <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm">
-          <p className="text-teal-700">{formatHeadingCase("Displayed balance")}</p>
-          <p className="mt-1 text-lg font-bold text-teal-900 dark:text-teal-100">{rewards.availablePoints} pts</p>
-          <p className="text-xs text-teal-700">{formatBz(pointsToBz(rewards.availablePoints))}</p>
+        <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm dark:border-teal-700 dark:bg-teal-950">
+          <p className="text-teal-800 dark:text-teal-100">{formatHeadingCase("Displayed balance")}</p>
+          <p className="mt-1 text-lg font-bold text-teal-950 dark:text-teal-50">{rewards.availablePoints} pts</p>
+          <p className="text-xs text-teal-800 dark:text-teal-100">{formatBz(pointsToBz(rewards.availablePoints))}</p>
         </div>
       </div>
 

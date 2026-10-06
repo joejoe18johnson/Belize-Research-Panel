@@ -274,7 +274,7 @@ export function AdminRolePermissionsEditor({
                 ))}
               </div>
 
-              <p className="mt-3 text-xs leading-relaxed text-zinc-500 dark:text-zinc-500">{moduleSummary}</p>
+              <p className="mt-3 text-xs leading-relaxed text-zinc-500 dark:text-zinc-300">{moduleSummary}</p>
             </div>
           );
         })}

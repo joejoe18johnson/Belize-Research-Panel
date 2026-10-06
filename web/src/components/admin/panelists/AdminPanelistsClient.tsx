@@ -567,7 +567,7 @@ export function AdminPanelistsClient({
       <div className="border-l-4 border-teal-600 pl-4">
         <p className="text-xs font-semibold tracking-[0.14em] text-teal-700">Panel register</p>
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">{formatHeadingCase("Panelists")}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
           Browse, filter, and open panelist records. Click a row or View record to open someone. Flag and delete stay in the actions column.
         </p>
       </div>
@@ -634,7 +634,7 @@ export function AdminPanelistsClient({
             counts={voterCounts}
           />
         </div>
-        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
           <strong>{filteredRows.length}</strong> panelists match filters · <strong>{rows.length}</strong> total in register
         </p>
       </section>
@@ -648,7 +648,7 @@ export function AdminPanelistsClient({
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
-                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label} ({item.count})
@@ -661,7 +661,7 @@ export function AdminPanelistsClient({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Duplicate Review")}</h2>
-              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
                 Records that share the same name and exact date of birth are grouped here for comparison. Flag a record
                 to set its verification status to Possible Duplicate.
               </p>
@@ -732,7 +732,7 @@ export function AdminPanelistsClient({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Flagged panelists")}</h2>
-              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
                 Panelists with verification status Possible Duplicate. Their accounts are placed on hold until an
                 administrator clears the review.
               </p>
@@ -783,7 +783,7 @@ export function AdminPanelistsClient({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("All panelists")}</h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
                 Click a row to open it. View record stays on screen while the other columns scroll.
               </p>
             </div>
@@ -971,9 +971,9 @@ function PanelistEditModal({
       }
     >
       <div className="space-y-6">
-        <div className="rounded-xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/40 p-4">
-          <p className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Required checks")}</p>
-          <p className="mt-1 text-xs text-teal-900/80">
+        <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 dark:border-teal-700 dark:bg-teal-950">
+          <p className="text-sm font-semibold text-teal-950 dark:text-teal-50">{formatHeadingCase("Required checks")}</p>
+          <p className="mt-1 text-xs text-teal-900 dark:text-teal-100">
             Email is verified automatically when the panelist confirms it from their inbox. Verify or deny phone
             and photo ID below — each choice saves immediately and notifies the panelist. When all three are
             verified, the panelist becomes fully verified.

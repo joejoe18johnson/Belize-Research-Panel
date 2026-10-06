@@ -165,9 +165,9 @@ function RedemptionOptionCard({
     <div
       className={`rounded-xl border p-4 transition ${
         canRedeemNow
-          ? "border-emerald-200 bg-emerald-50/40"
+          ? "border-emerald-200 bg-emerald-50/40 dark:border-emerald-800 dark:bg-emerald-950"
           : eligible
-            ? "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50"
+            ? "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950"
             : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
       }`}
     >
@@ -206,13 +206,13 @@ export function RedemptionOptionsCatalog({
         </div>
         <div className="flex flex-col gap-3 sm:items-end">
           <ViewLayoutToggle value={layout} onChange={setLayout} />
-          <div className="w-full rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 sm:w-auto sm:shrink-0 sm:px-3 sm:py-2 sm:text-right">
+          <div className="w-full rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 dark:border-teal-700 dark:bg-teal-950 sm:w-auto sm:shrink-0 sm:px-3 sm:py-2 sm:text-right">
           <div className="flex items-center justify-between gap-4 sm:block">
             <div>
-              <p className="text-xs font-medium text-teal-700">{formatHeadingCase("Available to redeem")}</p>
+              <p className="text-xs font-medium text-teal-800 dark:text-teal-100">{formatHeadingCase("Available to redeem")}</p>
               <p className="text-lg font-bold text-teal-900 dark:text-teal-100">{availablePoints} pts</p>
             </div>
-            <p className="text-sm font-semibold text-teal-700 sm:mt-0 sm:text-xs sm:font-normal">
+            <p className="text-sm font-semibold text-teal-800 dark:text-teal-100 sm:mt-0 sm:text-xs sm:font-normal">
               {formatBz(pointsToBz(availablePoints, rewardSettings))}
             </p>
           </div>

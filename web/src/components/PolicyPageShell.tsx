@@ -40,7 +40,7 @@ export function PolicyPageShell({
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             {formatHeadingCase(title)}
           </h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatHeadingCase(description)}</p>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{formatHeadingCase(description)}</p>
           <div className={plainContent ? "mt-8" : "policy-prose mt-8 space-y-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"}>
             {children}
           </div>

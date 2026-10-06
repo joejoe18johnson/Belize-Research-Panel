@@ -128,9 +128,9 @@ export function ProfileContactChangePanel({
       ) : null}
 
       <div className="mt-5 space-y-6">
-        <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
-          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current email</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{account.email}</p>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-100 p-4 dark:border-zinc-600 dark:bg-zinc-950">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Current email</p>
+          <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-100">{account.email}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field label="New email address" error={errors.newEmail ?? errors.emailChange} id="newEmail">
@@ -147,7 +147,7 @@ export function ProfileContactChangePanel({
                 type="button"
                 onClick={requestEmailChange}
                 disabled={emailSubmitting || !newEmail.trim()}
-                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-white disabled:hover:bg-zinc-600 sm:w-auto"
               >
                 {emailSubmitting ? "Submitting…" : "Request email change (admin approval)"}
               </button>
@@ -156,9 +156,9 @@ export function ProfileContactChangePanel({
           ) : null}
         </div>
 
-        <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 p-4">
-          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Current phone / WhatsApp</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{contact.phone || "Not provided"}</p>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-100 p-4 dark:border-zinc-600 dark:bg-zinc-950">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Current phone / WhatsApp</p>
+          <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-100">{contact.phone || "Not provided"}</p>
           {!onHold ? (
             <div className="mt-4 space-y-3">
               <Field
@@ -179,7 +179,7 @@ export function ProfileContactChangePanel({
                 type="button"
                 onClick={requestPhoneChange}
                 disabled={phoneSubmitting || !phoneLocalNumber.trim()}
-                className="flex min-h-12 w-full items-center justify-center rounded-xl border border-teal-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-50 dark:hover:bg-teal-900/40 disabled:opacity-60 sm:w-auto"
+                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-white disabled:hover:bg-zinc-600 sm:w-auto"
               >
                 {phoneSubmitting ? "Submitting…" : "Request phone change (admin approval)"}
               </button>

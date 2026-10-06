@@ -288,12 +288,12 @@ export function AdminAuthorisedRegistrarsClient({
                     <tr
                       key={row.id}
                       className={`border-t border-zinc-100 dark:border-zinc-800 ${
-                        used ? "bg-zinc-50 text-zinc-400 dark:bg-zinc-950/60 dark:text-zinc-500" : ""
+                        used ? "bg-zinc-50 text-zinc-400 dark:bg-zinc-950/60 dark:text-zinc-300" : ""
                       }`}
                     >
                       <td
                         className={`px-5 py-3 font-medium ${
-                          used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100"
+                          used ? "text-zinc-400 dark:text-zinc-300" : "text-zinc-900 dark:text-zinc-100"
                         }`}
                       >
                         {row.name}
@@ -304,7 +304,7 @@ export function AdminAuthorisedRegistrarsClient({
                           onClick={() => void copyCode(row.code, row.id)}
                           className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 font-mono tracking-widest ${
                             used
-                              ? "text-zinc-400 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
+                              ? "text-zinc-400 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
                               : "text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
                           }`}
                           title={copied ? "Copied" : used ? "Used code" : "Copy code"}
@@ -329,10 +329,10 @@ export function AdminAuthorisedRegistrarsClient({
                           ) : null}
                         </div>
                       </td>
-                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-600 dark:text-zinc-400"}`}>
+                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-300" : "text-zinc-600 dark:text-zinc-400"}`}>
                         {row.notes || "—"}
                       </td>
-                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-600 dark:text-zinc-400"}`}>
+                      <td className={`px-5 py-3 ${used ? "text-zinc-400 dark:text-zinc-300" : "text-zinc-600 dark:text-zinc-400"}`}>
                         {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "—"}
                         {row.createdBy ? ` · ${row.createdBy}` : ""}
                       </td>

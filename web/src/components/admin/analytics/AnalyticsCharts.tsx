@@ -25,7 +25,7 @@ export function HorizontalBarChart({
     return (
       <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
         <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{emptyMessage}</p>
+        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-300">{emptyMessage}</p>
       </div>
     );
   }
@@ -42,8 +42,8 @@ export function HorizontalBarChart({
                 <span className="min-w-0 truncate font-medium text-zinc-800 dark:text-zinc-200" title={row.label}>
                   {formatAdminLabel(row.label)}
                 </span>
-                <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
-                  {row.count} <span className="text-zinc-400 dark:text-zinc-500">({row.percent}%)</span>
+                <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-300">
+                  {row.count} <span className="text-zinc-400 dark:text-zinc-300">({row.percent}%)</span>
                 </span>
               </div>
               <div className={`h-2.5 overflow-hidden rounded-full ${progressTrackClass}`}>
@@ -75,7 +75,7 @@ export function DonutBreakdown({
     return (
       <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
         <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">No data for current filters.</p>
+        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-300">No data for current filters.</p>
       </div>
     );
   }
@@ -109,7 +109,7 @@ export function DonutBreakdown({
                 />
                 <span className="truncate">{formatAdminLabel(row.label)}</span>
               </span>
-              <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.percent}%</span>
+              <span className="shrink-0 tabular-nums text-zinc-600 dark:text-zinc-300">{row.percent}%</span>
             </li>
           ))}
         </ul>
@@ -170,12 +170,12 @@ export function SortableAnalyticsTable({
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
       <div className="border-b border-zinc-100 dark:border-zinc-800 px-5 py-4">
         <h3 className="text-sm font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase(title)}</h3>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{sorted.length} rows · click headers to sort</p>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">{sorted.length} rows · click headers to sort</p>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+            <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
               <th className="px-4 py-3">
                 <button type="button" onClick={() => toggleSort("label")} className="font-semibold hover:text-teal-800 dark:text-teal-200">
                   {formatAdminLabel(labelHeader)}
@@ -199,7 +199,7 @@ export function SortableAnalyticsTable({
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                <td colSpan={3} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                   No data for current filters.
                 </td>
               </tr>
@@ -210,7 +210,7 @@ export function SortableAnalyticsTable({
                     {formatAdminLabel(row.label)}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{row.count}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.percent}%</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-300">{row.percent}%</td>
                 </tr>
               ))
             )}

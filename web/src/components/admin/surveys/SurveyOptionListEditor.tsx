@@ -38,10 +38,10 @@ export function SurveyOptionListEditor({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+          <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
             {formatHeadingCase("Answer choices")}
           </label>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
             {multipleAnswers
               ? "Respondents can check more than one option."
               : "Add each choice on its own line — drag-free editing, one field per option."}
@@ -50,7 +50,7 @@ export function SurveyOptionListEditor({
         <button
           type="button"
           onClick={addOption}
-          className="inline-flex min-h-9 items-center rounded-lg border border-teal-200 bg-teal-50 px-3 text-xs font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-100"
+          className="inline-flex min-h-9 items-center rounded-lg border border-teal-200 bg-teal-50 dark:bg-teal-950 px-3 text-xs font-semibold text-teal-800 dark:text-teal-200 hover:bg-teal-100"
         >
           + Add option
         </button>
@@ -59,7 +59,7 @@ export function SurveyOptionListEditor({
       <ul className="mt-3 space-y-2">
         {options.map((option, index) => (
           <li key={`option-${index}`} className="flex items-center gap-2">
-            <span className="flex h-9 w-8 shrink-0 items-center justify-center text-xs font-semibold text-zinc-400 dark:text-zinc-500">
+            <span className="flex h-9 w-8 shrink-0 items-center justify-center text-xs font-semibold text-zinc-400 dark:text-zinc-300">
               {index + 1}.
             </span>
             <input
@@ -73,7 +73,7 @@ export function SurveyOptionListEditor({
                 type="button"
                 onClick={() => moveOption(index, -1)}
                 disabled={index === 0}
-                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-800 dark:text-teal-200 disabled:opacity-30"
+                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-800 dark:text-teal-200 disabled:opacity-30"
                 aria-label={`Move option ${index + 1} up`}
               >
                 ↑
@@ -82,7 +82,7 @@ export function SurveyOptionListEditor({
                 type="button"
                 onClick={() => moveOption(index, 1)}
                 disabled={index === options.length - 1}
-                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-800 dark:text-teal-200 disabled:opacity-30"
+                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-800 dark:text-teal-200 disabled:opacity-30"
                 aria-label={`Move option ${index + 1} down`}
               >
                 ↓

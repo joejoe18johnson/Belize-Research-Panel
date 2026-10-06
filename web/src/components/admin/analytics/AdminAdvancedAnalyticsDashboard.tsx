@@ -23,9 +23,9 @@ type AnalyticsTab = "overview" | "geography" | "demographics" | "interests";
 function MetricCard({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
     <div className="rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-white dark:bg-zinc-900 p-4 shadow-sm">
-      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{formatAdminLabel(label)}</p>
+      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{formatAdminLabel(label)}</p>
       <p className="mt-2 text-3xl font-bold tabular-nums text-teal-950 dark:text-teal-100">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-300">{hint}</p> : null}
     </div>
   );
 }
@@ -65,7 +65,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
         <h1 className="mt-1 text-2xl font-bold text-teal-950 dark:text-teal-100 sm:text-3xl">
           {formatHeadingCase("Advanced analytics")}
         </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
           Live breakdowns from the panel register — filter, sort, and chart coverage across geography,
           demographics, and research interests. Aligned with the Streamlit MVP Advanced Analytics module.
         </p>
@@ -75,7 +75,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Filters")}</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
               Showing <strong>{filtered.length}</strong> of <strong>{slices.length}</strong> panelists
               {activeFilterCount > 0 ? ` · ${activeFilterCount} filter(s) active` : ""}
             </p>
@@ -155,7 +155,7 @@ export function AdminAdvancedAnalyticsDashboard({ slices }: { slices: AnalyticsP
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "bg-teal-700 text-white"
-                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-900 dark:text-teal-100"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-teal-900 dark:text-teal-100"
             }`}
           >
             {formatHeadingCase(item.label)}

@@ -238,7 +238,7 @@ export function AdminCreateCampaignClient({
           <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Campaign details")}</h2>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Campaign title</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Campaign title</label>
               <input
                 type="text"
                 required
@@ -249,7 +249,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                 Survey by
               </label>
               <input
@@ -265,7 +265,7 @@ export function AdminCreateCampaignClient({
               </p>
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Description (optional)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Description (optional)</label>
               <textarea
                 rows={2}
                 value={description}
@@ -275,7 +275,7 @@ export function AdminCreateCampaignClient({
             </div>
             <CampaignCoverField category={category} onCoverChange={setCoverFile} />
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                 Client account (optional)
               </label>
               <SiteSelect
@@ -312,7 +312,7 @@ export function AdminCreateCampaignClient({
               </p>
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Category</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Category</label>
               <SiteSelect
                 value={category}
                 onChange={(value) => setCategory(value as SurveyCategory)}
@@ -324,7 +324,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Reward points</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Reward points</label>
               <input
                 type="number"
                 min={0}
@@ -335,7 +335,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey delivery</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Survey delivery</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -363,7 +363,7 @@ export function AdminCreateCampaignClient({
             </div>
             {deliveryType === "internal" ? (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Published survey</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Published survey</label>
                 <SiteSelect
                   value={surveyDefinitionId}
                   onChange={setSurveyDefinitionId}
@@ -389,7 +389,7 @@ export function AdminCreateCampaignClient({
               </div>
             ) : (
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Survey URL</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Survey URL</label>
                 <input
                   type="url"
                   required
@@ -401,7 +401,7 @@ export function AdminCreateCampaignClient({
               </div>
             )}
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Assigned date</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Assigned date</label>
               <input
                 type="date"
                 required
@@ -411,7 +411,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Complete by date</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Complete by date</label>
               <input
                 type="date"
                 required
@@ -421,7 +421,7 @@ export function AdminCreateCampaignClient({
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Delivery method</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Delivery method</label>
               <SiteSelect
                 value={deliveryMethod}
                 onChange={setDeliveryMethod}
@@ -435,7 +435,7 @@ export function AdminCreateCampaignClient({
         <section className="space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-6">
           <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Target audience")}</h2>
           <div>
-            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Target group</label>
+            <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Target group</label>
             <SiteSelect
               value={targetMode}
               onChange={(value) => setTargetMode(value as CampaignTargetMode)}
@@ -449,7 +449,7 @@ export function AdminCreateCampaignClient({
 
           {targetMode === "specific_constituency" ? (
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Constituency</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Constituency</label>
               <SiteSelect
                 value={constituency}
                 onChange={setConstituency}
@@ -478,7 +478,7 @@ export function AdminCreateCampaignClient({
 
           {targetMode === "specific_emails" ? (
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Panelist emails</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Panelist emails</label>
               <textarea
                 rows={4}
                 value={emails}
@@ -492,7 +492,7 @@ export function AdminCreateCampaignClient({
           {targetMode === "panelist_group" ? (
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   Saved panelist group
                 </label>
                 <SiteSelect

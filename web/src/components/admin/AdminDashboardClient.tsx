@@ -325,7 +325,7 @@ export function AdminDashboardClient({
                       {row.phoneApproved ? (
                         <span className="font-medium text-emerald-600">Yes</span>
                       ) : (
-                        <span className="text-zinc-400 dark:text-zinc-500">—</span>
+                        <span className="text-zinc-400 dark:text-zinc-300">—</span>
                       )}
                     </AdminTableTd>
                     <AdminTableTd label="Docs">
@@ -342,7 +342,7 @@ export function AdminDashboardClient({
                             label="Addr"
                           />
                         ) : null}
-                        {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400 dark:text-zinc-500">—</span> : null}
+                        {!row.hasIdDoc && !row.hasAddressDoc ? <span className="text-zinc-400 dark:text-zinc-300">—</span> : null}
                       </div>
                     </AdminTableTd>
                   </AdminTableRow>

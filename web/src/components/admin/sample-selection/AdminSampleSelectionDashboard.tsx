@@ -147,7 +147,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === item.id
                 ? "border border-b-0 border-teal-200 bg-white dark:bg-zinc-900 text-teal-900 dark:text-teal-100"
-                : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-500 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-teal-50/50 hover:text-teal-800 dark:text-teal-200"
             }`}
           >
             {item.label}
@@ -173,7 +173,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             </div>
             <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age min</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Age min</label>
                 <input
                   type="number"
                   min={18}
@@ -184,7 +184,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Age max</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Age max</label>
                 <input
                   type="number"
                   min={filters.ageMin}
@@ -210,7 +210,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
             <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Draw sample")}</h2>
             <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sampling method</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Sampling method</label>
                 <SiteSelect
                   value={samplingMethod}
                   onChange={(value) => setSamplingMethod(value as SamplingMethod)}
@@ -224,7 +224,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                 ) : null}
               </div>
               <div>
-                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Sample size</label>
+                <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Sample size</label>
                 <input
                   type="number"
                   min={1}
@@ -260,12 +260,12 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
       {tab === "calculator" ? (
         <section className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
           <h2 className="text-base font-semibold text-teal-950 dark:text-teal-100">{formatHeadingCase("Sample size calculator")}</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-300">
             Uses the same finite population correction as the Streamlit MVP (Cochran formula with p = 0.5).
           </p>
           <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Population size (N)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Population size (N)</label>
               <input
                 type="number"
                 min={1}
@@ -275,7 +275,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Margin of error (%)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Margin of error (%)</label>
               <input
                 type="number"
                 min={1}
@@ -287,7 +287,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Confidence level</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Confidence level</label>
               <SiteSelect
                 value={confidenceLevel}
                 onChange={(value) => setConfidenceLevel(value as "90%" | "95%" | "99%")}
@@ -300,7 +300,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">Expected response rate (%)</label>
+              <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Expected response rate (%)</label>
               <input
                 type="number"
                 min={1}
@@ -321,7 +321,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               setSampleSize(Math.min(requiredSample, filteredPool.length || requiredSample));
               setTab("filters");
             }}
-            className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-teal-50 px-4 text-sm font-semibold text-teal-900 dark:text-teal-100 hover:bg-teal-100"
+            className="inline-flex min-h-10 items-center rounded-xl border border-teal-200 bg-teal-50 dark:bg-teal-950 px-4 text-sm font-semibold text-teal-900 dark:text-teal-100 hover:bg-teal-100"
           >
             Apply {requiredSample} to sample size and return to filters
           </button>
@@ -337,7 +337,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                   ? formatHeadingCase("Generated sample")
                   : formatHeadingCase("Filtered pool preview")}
               </h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
                 {tab === "sample" && generatedSample.length === 0
                   ? "Generate a random sample from the Filter pool tab."
                   : `${displayRows.length} rows · click headers to sort`}
@@ -355,7 +355,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
           <div className="overflow-x-auto rounded-xl border border-zinc-100 dark:border-zinc-800">
             <table className="min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 text-xs font-semibold text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+                <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   {(
                     [
                       ["lastName", "Name"],
@@ -380,7 +380,7 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
               <tbody>
                 {displayRows.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-300">
                       No panelists match the current filters.
                     </td>
                   </tr>
@@ -395,8 +395,8 @@ export function AdminSampleSelectionDashboard({ panelists }: { panelists: Paneli
                       <td className="px-3 py-2.5">{row.sex}</td>
                       <td className="px-3 py-2.5 tabular-nums">{row.age ?? "—"}</td>
                       <td className="px-3 py-2.5">{row.verificationStatus}</td>
-                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.email}</td>
-                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">{row.phone || "—"}</td>
+                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300">{row.email}</td>
+                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300">{row.phone || "—"}</td>
                     </tr>
                   ))
                 )}

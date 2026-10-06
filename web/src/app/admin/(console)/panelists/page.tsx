@@ -48,7 +48,7 @@ export default async function AdminPanelistsPage({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-600 dark:text-zinc-300">
         No panelists registered yet.
       </div>
     );

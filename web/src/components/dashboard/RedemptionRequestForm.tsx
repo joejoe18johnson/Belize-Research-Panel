@@ -242,7 +242,7 @@ export function RedemptionRequestForm({
 
   if (!unlocked) {
     return (
-      <DashboardCard className="border-dashed border-zinc-300 bg-zinc-50/80">
+      <DashboardCard className="border-dashed border-zinc-300 bg-zinc-50/80 dark:bg-zinc-950">
         {!standalone ? <SectionHeading as="h3">Redeem points</SectionHeading> : null}
         <p className={`text-sm leading-relaxed text-zinc-600 dark:text-zinc-300 ${standalone ? "" : "mt-2"}`}>
           Redemption unlocks at <strong>{rewardSettings.redemptionMinimumPoints} points ({formatBz(redemptionMinimumBz(rewardSettings))})</strong>. You currently

@@ -295,7 +295,7 @@ export function AdminUserRolesClient({
         <AdminTableScroll>
         <table className={`${adminResponsiveTableClass} w-full text-left text-sm lg:min-w-[900px]`}>
           <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
+            <tr className="border-b border-zinc-100 bg-zinc-50 text-[11px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Role</th>
