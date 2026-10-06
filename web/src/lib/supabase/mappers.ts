@@ -20,6 +20,28 @@ function boolToString(value: boolean): string {
   return value ? "true" : "false";
 }
 
+/**
+ * Phone and photo ID are booleans in the database: true means verified, false is the default
+ * for a check nobody has reviewed yet. An explicit denial is stored in metadata so it is not
+ * confused with that default.
+ */
+function requirementDecisionFromStored(verified: unknown, metadataDecision: string): string {
+  const explicit = cleanText(metadataDecision).toLowerCase();
+  if (explicit === "true" || explicit === "false") return explicit;
+  if (verified === true || cleanText(String(verified ?? "")).toLowerCase() === "true") return "true";
+  return "";
+}
+
+function requirementVerifiedFlag(decision: string | undefined): boolean {
+  return cleanText(decision).toLowerCase() === "true";
+}
+
+function requirementDecisionForMetadata(decision: string | undefined): string {
+  const value = cleanText(decision).toLowerCase();
+  if (value === "true" || value === "false") return value;
+  return "";
+}
+
 function stringToBool(value: string | boolean | null | undefined): boolean {
   if (typeof value === "boolean") return value;
   const v = cleanText(String(value ?? "")).toLowerCase();
@@ -177,9 +199,9 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     password_salt: cleanText(String(row.password_salt)),
     password_hash: cleanText(String(row.password_hash)),
     verification_status: cleanText(String(row.verification_status)),
-    admin_email_approved: boolToString(Boolean(row.email_verified)),
-    admin_phone_approved: boolToString(Boolean(row.phone_verified)),
-    admin_photo_id_approved: boolToString(Boolean(row.id_verified)),
+    admin_email_approved: requirementDecisionFromStored(row.email_verified, metadataString(meta, "admin_email_approved")),
+    admin_phone_approved: requirementDecisionFromStored(row.phone_verified, metadataString(meta, "admin_phone_approved")),
+    admin_photo_id_approved: requirementDecisionFromStored(row.id_verified, metadataString(meta, "admin_photo_id_approved")),
     consent_research: metadataString(meta, "consent_research") || "True",
     consent_contact: metadataString(meta, "consent_contact") || "True",
     consent_privacy: metadataString(meta, "consent_privacy") || "True",
@@ -265,6 +287,9 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     org_contact_means: row.org_contact_means ?? "",
     notes: row.notes ?? "",
     market_interests: row.market_interests ?? "",
+    admin_email_approved: requirementDecisionForMetadata(row.admin_email_approved),
+    admin_phone_approved: requirementDecisionForMetadata(row.admin_phone_approved),
+    admin_photo_id_approved: requirementDecisionForMetadata(row.admin_photo_id_approved),
   };
 
   return {
@@ -289,9 +314,9 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
       .filter(Boolean),
     verification_status: row.verification_status || "Pending",
     status: row.status || "Active",
-    email_verified: stringToBool(row.admin_email_approved),
-    phone_verified: stringToBool(row.admin_phone_approved),
-    id_verified: stringToBool(row.admin_photo_id_approved),
+    email_verified: requirementVerifiedFlag(row.admin_email_approved),
+    phone_verified: requirementVerifiedFlag(row.admin_phone_approved),
+    id_verified: requirementVerifiedFlag(row.admin_photo_id_approved),
     password_salt: row.password_salt ?? "",
     password_hash: row.password_hash ?? "",
     registration_date: parseFlexibleDateOnly(row.registration_date as string),
