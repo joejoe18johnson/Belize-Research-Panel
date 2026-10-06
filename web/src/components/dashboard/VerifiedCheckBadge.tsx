@@ -87,7 +87,7 @@ export function VerifiedStatusPill({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border border-emerald-300/40 bg-emerald-500/15 py-0.5 pl-0.5 pr-2.5 text-xs font-semibold text-emerald-50 backdrop-blur-sm ${className}`.trim()}
+      className={`inline-flex items-center gap-1 rounded-full border border-emerald-300/40 bg-emerald-800/80 py-0.5 pl-0.5 pr-2.5 text-xs font-semibold text-emerald-50 ${className}`.trim()}
     >
       <VerifiedCheckBadge size="sm" title={formatHeadingCase(label)} />
       <span>{formatHeadingCase(label)}</span>

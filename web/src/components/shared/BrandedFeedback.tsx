@@ -75,7 +75,7 @@ export function BrandedAlert({
         <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
           {title ? <p className="font-semibold leading-snug">{formatHeadingCase(title)}</p> : null}
           <div
-            className={`${title ? "mt-1 space-y-2 leading-relaxed opacity-90" : "leading-relaxed"} [&_a]:inline-flex [&_p]:break-words`}
+            className={`${title ? "mt-1 space-y-2 leading-relaxed" : "leading-relaxed"} [&_a]:inline-flex [&_p]:break-words`}
           >
             {formatBody ? formatSiteText(children) : children}
           </div>

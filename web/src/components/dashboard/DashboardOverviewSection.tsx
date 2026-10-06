@@ -109,9 +109,8 @@ export function DashboardOverviewSection({
       ) : null}
 
       <DashboardCard className={`${dashboardHeroCardClass} p-0`}>
-        <div className="relative overflow-hidden rounded-t-2xl p-5 sm:p-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
-          <div className="relative flex flex-col gap-4">
+        <div className="rounded-t-2xl p-5 sm:p-8">
+          <div className="flex flex-col gap-4">
             <div className="flex items-start gap-4 sm:gap-5">
               <div className="relative shrink-0">
                 <UserAvatar firstName={profile.firstName} email={profile.email} size="lg" />
@@ -135,11 +134,11 @@ export function DashboardOverviewSection({
                   {approved ? (
                     <VerifiedStatusPill />
                   ) : (
-                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+                    <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold">
                       {profile.verificationStatus}
                     </span>
                   )}
-                  <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+                  <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold">
                     {profile.panelistStatus}
                   </span>
                 </div>

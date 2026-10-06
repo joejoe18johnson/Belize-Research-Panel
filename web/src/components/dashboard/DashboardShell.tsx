@@ -40,8 +40,8 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   return (
-    <div className={`${dashboardShellClass} w-full max-w-full overflow-x-clip`}>
-      <header className={`${dashboardHeaderClass} w-full max-w-full overflow-x-clip`}>
+    <div className={`${dashboardShellClass} w-full max-w-full`}>
+      <header className={`${dashboardHeaderClass} w-full max-w-full`}>
         <div className={`${CONTENT_CLASS} py-2.5 sm:py-3`}>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5">
             <BrpLogoLink
@@ -55,15 +55,17 @@ export function DashboardShell({
               showIcon
               className={`${dashboardSecondaryButtonClass} order-2 min-h-10 shrink-0 gap-1.5 px-3 text-sm lg:order-3 lg:min-h-11 lg:px-4`}
             />
-            <div className="order-3 flex w-full items-center gap-3 lg:order-2 lg:ml-auto lg:w-auto">
+            <div className="order-3 flex w-full items-center lg:order-2 lg:ml-auto lg:w-auto lg:gap-3">
               <PointsBalanceLink availablePoints={badges.availablePoints} />
-              <NotificationBellLink unreadCount={badges.unreadNotifications} />
-              <DashboardAccountMenu
-                email={email}
-                firstName={firstName}
-                lastName={lastName}
-                badges={badges}
-              />
+              <div className="ml-auto flex items-center gap-0.5 sm:gap-1 lg:ml-0">
+                <NotificationBellLink unreadCount={badges.unreadNotifications} />
+                <DashboardAccountMenu
+                  email={email}
+                  firstName={firstName}
+                  lastName={lastName}
+                  badges={badges}
+                />
+              </div>
             </div>
           </div>
         </div>

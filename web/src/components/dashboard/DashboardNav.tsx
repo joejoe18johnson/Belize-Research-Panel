@@ -23,7 +23,7 @@ export function DashboardNav({ badges }: { badges: DashboardNavBadges }) {
 
   return (
     <nav
-      className="max-w-full overflow-x-hidden border-t border-teal-50 bg-gradient-to-b from-white to-teal-50/30 dark:border-teal-900/40 dark:from-zinc-900 dark:to-zinc-900/80"
+      className="max-w-full border-t border-teal-50 bg-white dark:border-teal-900/40 dark:bg-zinc-900"
       aria-label="Dashboard sections"
     >
       <div className={`nav-scroll overflow-x-auto overscroll-x-contain ${appContentFrameClass}`}>

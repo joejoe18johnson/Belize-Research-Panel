@@ -263,7 +263,7 @@ export function PublicMobileBottomNav({
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <div className="pointer-events-auto mx-auto flex max-w-sm items-stretch overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-white/95 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-950/95 dark:shadow-black/40">
+      <div className="pointer-events-auto mx-auto flex max-w-sm items-stretch overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] dark:border-zinc-700/80 dark:bg-zinc-950 dark:shadow-black/40">
         {showPanelistNav ? (
           <>
             <NavItem

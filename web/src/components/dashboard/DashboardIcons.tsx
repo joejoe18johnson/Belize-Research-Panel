@@ -72,6 +72,26 @@ export function GiftIcon({ className }: { className?: string }) {
   );
 }
 
+/** Wallet mark for the header points balance. */
+export function WalletIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className}>
+      <path
+        d="M5.2 7.2V6.4A2.4 2.4 0 0 1 7.6 4h10.1"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <rect x="3.4" y="7.2" width="17.2" height="12.2" rx="2.2" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M15.1 12.2h5.5v3.1a1.15 1.15 0 0 1-1.15 1.15h-3.2a1.55 1.55 0 0 1 0-3.1h-.15"
+        fill="currentColor"
+      />
+      <circle cx="16.35" cy="13.75" r="0.7" className="fill-amber-50 dark:fill-amber-950" />
+    </svg>
+  );
+}
+
 /** Professional gold coin stacks used for reward points. */
 export function PointsCoinsIcon({
   className = "h-5 w-5",
