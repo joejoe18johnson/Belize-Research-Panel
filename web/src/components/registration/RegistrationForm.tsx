@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Alert,
   CheckboxField,
@@ -169,7 +168,6 @@ function withAccountCitizenshipLock(
 }
 
 export function RegistrationForm({ account }: { account: RegistrationAccountContext }) {
-  const router = useRouter();
   const citizenshipLocked = Boolean(cleanText(account.citizenshipStatus));
   const [form, setForm] = useState<RegistrationFormData>(() => {
     const base = buildInitialForm(account);
@@ -679,7 +677,24 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }
 
     setSubmitting(true);
-    try {
+    const finishSuccess = () => {
+      clearRegistrationDraft(account.email);
+      window.location.assign("/dashboard?welcome=1");
+    };
+
+    const confirmRegistered = async (): Promise<boolean> => {
+      try {
+        const statusRes = await fetch("/api/auth/me", { cache: "no-store", credentials: "include" });
+        const status = (await statusRes.json().catch(() => null)) as {
+          account?: { panelistRegistered?: boolean } | null;
+        } | null;
+        return Boolean(status?.account?.panelistRegistered);
+      } catch {
+        return false;
+      }
+    };
+
+    const buildBody = () => {
       const body = new FormData();
       Object.entries(form).forEach(([key, value]) => {
         if (value instanceof File) {
@@ -692,27 +707,78 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           body.append(key, String(value));
         }
       });
+      return body;
+    };
 
-      const res = await fetch("/api/register", { method: "POST", body });
-      const data = (await res.json()) as { ok?: boolean; verificationStatus?: string; errors?: FieldErrors; message?: string };
+    const postRegistration = async () => {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: buildBody(),
+        credentials: "include",
+      });
+      const data = (await res.json().catch(() => null)) as
+        | { ok?: boolean; alreadyRegistered?: boolean; errors?: FieldErrors; message?: string }
+        | null;
+      return { res, data };
+    };
 
-      if (!res.ok) {
-        if (data.errors) {
-          setErrors(data.errors);
-          setPhaseAttempted(true);
-          revealFirstError(data.errors);
-        } else {
-          setErrors({ submit: data.message ?? "Registration failed. Please try again." });
-          scrollToTopAfterPhaseChange.current = true;
-          setActivePhaseIndex(REGISTRATION_PHASES.length - 1);
+    const applyFailure = (data: { errors?: FieldErrors; message?: string } | null) => {
+      if (data?.errors) {
+        setErrors(data.errors);
+        setPhaseAttempted(true);
+        revealFirstError(data.errors);
+        return;
+      }
+      setErrors({
+        submit: data?.message ?? "Registration could not be completed. Please try again or contact support if the problem continues.",
+      });
+      scrollToTopAfterPhaseChange.current = true;
+      setActivePhaseIndex(REGISTRATION_PHASES.length - 1);
+    };
+
+    try {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const { res, data } = await postRegistration();
+
+          if (data?.ok || data?.alreadyRegistered) {
+            finishSuccess();
+            return;
+          }
+
+          if (res.ok) {
+            // Empty or non-JSON success body still means the request completed.
+            finishSuccess();
+            return;
+          }
+
+          if (data?.errors || data?.message) {
+            // Validation / known server message — do not retry.
+            applyFailure(data);
+            return;
+          }
+
+          if (await confirmRegistered()) {
+            finishSuccess();
+            return;
+          }
+        } catch {
+          if (await confirmRegistered()) {
+            finishSuccess();
+            return;
+          }
         }
+      }
+
+      if (await confirmRegistered()) {
+        finishSuccess();
         return;
       }
 
-      router.push("/dashboard?welcome=1");
-      clearRegistrationDraft(account.email);
-    } catch {
-      setErrors({ submit: "Network error. Please check your connection and try again." });
+      applyFailure({
+        message:
+          "Registration could not be completed. Please try again or contact support if the problem continues.",
+      });
     } finally {
       setSubmitting(false);
     }

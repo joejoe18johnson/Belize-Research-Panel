@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Verify your email before completing registration." }, { status: 403 });
     }
     if (session.panelistRegistered) {
-      return NextResponse.json({ message: "You have already completed panelist registration." }, { status: 409 });
+      // Treat a repeat submit as success so a slow first response cannot leave the user stuck.
+      return NextResponse.json({ ok: true, alreadyRegistered: true });
     }
 
     const accountRecord = await findAccountById(session.id);
@@ -106,7 +107,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Account not found." }, { status: 401 });
     }
 
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (error) {
+      logServerError("Registration form parse failed", error);
+      return NextResponse.json(
+        {
+          message:
+            "We could not read your registration form. Try smaller JPG or PDF files for your documents, then submit again.",
+        },
+        { status: 413 }
+      );
+    }
     const data = parseRegistrationForm(formData);
     const rows = await loadPanelists();
     const { loadPlatformTestingSettings } = await import("@/lib/platform-testing-settings-store");
