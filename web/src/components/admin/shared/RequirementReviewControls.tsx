@@ -35,7 +35,7 @@ function statusFromDecision(
 }
 
 const WHATSAPP_VERIFICATION_MESSAGE =
-  "This is a quick identity verification for our survey panel. Please confirm the initials of the name you used to register. Thank you.";
+  "This is a quick identity verification for our survey panel. Please reply with the initials of the name you used when registering.\n\nFor example, if you registered as John Brown, simply reply JB.\n\nThank you!";
 
 function whatsAppVerificationHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
