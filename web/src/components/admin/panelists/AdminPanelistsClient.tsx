@@ -38,8 +38,6 @@ function requirementToastTitle(key: "email" | "phone" | "photoId", decision: "tr
 import { DuplicateReviewClusters } from "./DuplicateReviewClusters";
 import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
 import { PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
-
-const ADMIN_REQUIREMENT_TOAST_KEY = "brp-admin-requirement-toast";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import {
   ADMIN_REQUIREMENT_FIELDS,
@@ -52,6 +50,8 @@ import {
   panelistHasResidenceDocument,
   type UsernameCollection,
 } from "@/lib/panelist-document-view";
+
+const ADMIN_REQUIREMENT_TOAST_KEY = "brp-admin-requirement-toast";
 
 const TABLE_COLUMNS = [
   "account_opened_at",

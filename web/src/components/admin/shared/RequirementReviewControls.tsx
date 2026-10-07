@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
-import { PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
+import { PHOTO_ID_DELETED_RECORD_MESSAGE, PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
 import { RequirementStatusBadge } from "./RequirementStatusBadges";
 
 type ReviewKey = "email" | "phone" | "photoId";
@@ -85,8 +85,16 @@ function ViewDocumentLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function PhotoIdPreview({ url }: { url: string }) {
-  const [status, setStatus] = useState<"loading" | "ready" | "missing">("loading");
+function PhotoIdPreview({
+  url,
+  verified,
+  onRemoved,
+}: {
+  url: string;
+  verified: boolean;
+  onRemoved?: () => void;
+}) {
+  const [status, setStatus] = useState<"loading" | "ready" | "missing" | "deleted">("loading");
   const [preview, setPreview] = useState<{ objectUrl: string; type: string } | null>(null);
 
   useEffect(() => {
@@ -98,6 +106,10 @@ function PhotoIdPreview({ url }: { url: string }) {
     const controller = new AbortController();
     fetch(url, { credentials: "same-origin", signal: controller.signal })
       .then(async (response) => {
+        if (response.status === 404) {
+          if (!cancelled) setStatus(verified ? "deleted" : "missing");
+          return;
+        }
         if (!response.ok) throw new Error("missing");
         const type = (response.headers.get("content-type") || "").toLowerCase();
         const blob = await response.blob();
@@ -115,10 +127,18 @@ function PhotoIdPreview({ url }: { url: string }) {
       controller.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [url]);
+  }, [url, verified]);
+
+  useEffect(() => {
+    if (status === "deleted") onRemoved?.();
+  }, [status, onRemoved]);
 
   if (status === "loading") {
     return <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Loading uploaded ID…</p>;
+  }
+
+  if (status === "deleted" || (verified && (status === "missing" || !preview))) {
+    return <p className="text-[11px] leading-snug text-zinc-800 dark:text-zinc-100">{PHOTO_ID_DELETED_RECORD_MESSAGE}</p>;
   }
 
   if (status === "missing" || !preview) {
@@ -158,10 +178,14 @@ function RequirementOnFileDetail({
   itemKey,
   detail,
   onFile,
+  verified = false,
+  onDocumentRemoved,
 }: {
   itemKey: ReviewKey;
   detail: RequirementReviewDetail;
   onFile: boolean;
+  verified?: boolean;
+  onDocumentRemoved?: () => void;
 }) {
   if (!onFile) {
     return <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-300">Not on file — add details before verifying.</p>;
@@ -212,9 +236,9 @@ function RequirementOnFileDetail({
       {detail.photoPreviewSuppressed ? (
         <p className="text-[11px] leading-snug text-zinc-700 dark:text-zinc-200">Saving this verification…</p>
       ) : detail.photoIdDeleted ? (
-        <p className="text-[11px] leading-snug text-zinc-800 dark:text-zinc-100">{PHOTO_ID_DENY_AFTER_PURGE_MESSAGE}</p>
+        <p className="text-[11px] leading-snug text-zinc-800 dark:text-zinc-100">{PHOTO_ID_DELETED_RECORD_MESSAGE}</p>
       ) : photoUrl ? (
-        <PhotoIdPreview url={photoUrl} />
+        <PhotoIdPreview url={photoUrl} verified={verified} onRemoved={onDocumentRemoved} />
       ) : (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-400">No panelist email on this record, so the ID file cannot be loaded.</p>
       )}
@@ -242,6 +266,8 @@ export function RequirementReviewControls({
 }) {
   const [photoDenialOpen, setPhotoDenialOpen] = useState(false);
   const [photoDenialReason, setPhotoDenialReason] = useState(detail.photoIdDenialReason ?? "");
+  const [photoFileRemoved, setPhotoFileRemoved] = useState(false);
+  const markPhotoRemoved = useCallback(() => setPhotoFileRemoved(true), []);
   return (
     <div className="grid gap-3 lg:grid-cols-3">
       {REVIEW_ITEMS.map((item) => {
@@ -251,12 +277,18 @@ export function RequirementReviewControls({
         const denied = decision === "false";
         const note = itemNotes?.[item.key];
         const emailLocked = item.key === "email" && verified && Boolean(note);
-        const photoLocked = item.key === "photoId" && Boolean(detail.photoIdDeleted);
+        const photoLocked = item.key === "photoId" && (Boolean(detail.photoIdDeleted) || photoFileRemoved);
 
         return (
           <div key={item.key} className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-sm">
             <RequirementStatusBadge label={item.label} status={status} />
-            <RequirementOnFileDetail itemKey={item.key} detail={detail} onFile={onFile[item.key]} />
+            <RequirementOnFileDetail
+              itemKey={item.key}
+              detail={detail}
+              onFile={onFile[item.key]}
+              verified={item.key === "photoId" && verified}
+              onDocumentRemoved={item.key === "photoId" ? markPhotoRemoved : undefined}
+            />
             {note ? <p className="mt-2 text-[11px] leading-snug text-emerald-800 dark:text-emerald-300">{note}</p> : null}
             {item.key === "photoId" && denied && !photoDenialOpen ? (
               <div className="mt-2">
