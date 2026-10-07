@@ -4,21 +4,43 @@ import type { VerificationCenterSummary, VerificationItemStatus } from "@/lib/pa
 import type { ViewLayout } from "@/lib/view-layout";
 import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
 import { ViewLayoutToggle, useViewLayout } from "@/components/shared/ViewLayoutToggle";
-import { DashboardCard, SectionHeading, StatusBadge } from "./DashboardShell";
+import { DashboardCard, SectionHeading } from "./DashboardShell";
+import { VerificationStatusMark, type VerificationMarkStatus } from "@/components/shared/VerificationStatusMark";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { PhotoIdResubmitForm } from "./PhotoIdResubmitForm";
 
-function itemStatusTone(status: VerificationItemStatus): "success" | "warning" | "default" {
-  switch (status) {
-    case "verified":
-      return "success";
-    case "under_review":
-    case "pending_approval":
-      return "warning";
-    case "missing":
-      return "default";
-    default:
-      return "default";
+function PhotoIdDenialDetails({ item }: { item: VerificationCenterSummary["items"][number] }) {
+  if (item.id !== "photo_id" || item.status !== "denied") return null;
+  return (
+    <div className="mt-3">
+      <p className="text-sm text-red-900 dark:text-red-100">
+        {item.denialReason
+          ? item.denialReason
+          : "This document was not approved. Submit another photo ID below."}
+      </p>
+      <PhotoIdResubmitForm />
+    </div>
+  );
+}
+
+function markStatus(status: VerificationItemStatus): VerificationMarkStatus {
+  if (status === "verified") return "approved";
+  if (status === "denied") return "denied";
+  if (status === "missing") return "missing";
+  return "under_review";
+}
+
+function statusChipClass(status: VerificationItemStatus): string {
+  if (status === "verified") {
+    return "border-emerald-300 bg-emerald-50 text-emerald-950 dark:border-emerald-600 dark:bg-emerald-950 dark:text-emerald-50";
   }
+  if (status === "denied") {
+    return "border-red-300 bg-red-50 text-red-950 dark:border-red-600 dark:bg-red-950 dark:text-red-50";
+  }
+  if (status === "missing") {
+    return "border-zinc-300 bg-zinc-100 text-zinc-800 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100";
+  }
+  return "border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-50";
 }
 
 function itemStatusClass(status: VerificationItemStatus): string {
@@ -75,14 +97,12 @@ function VerificationItemCard({
   item: VerificationCenterSummary["items"][number];
   layout: ViewLayout;
 }) {
-  const statusBadge =
-    item.status === "missing" || item.status === "denied" ? (
-      <span className="inline-flex shrink-0 items-center rounded-full border border-red-800 bg-red-200 px-3 py-1 text-xs font-semibold text-red-950">
-        {item.statusLabel}
-      </span>
-    ) : (
-      <StatusBadge label={item.statusLabel} tone={itemStatusTone(item.status)} />
-    );
+  const statusBadge = (
+    <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${statusChipClass(item.status)}`}>
+      <VerificationStatusMark status={markStatus(item.status)} size="sm" />
+      {item.statusLabel}
+    </span>
+  );
 
   if (layout === "list") {
     return (
@@ -102,6 +122,7 @@ function VerificationItemCard({
               <span className="font-medium">{item.valueLabel ?? formatHeadingCase("On file")}: </span>
               {item.valueOnFile}
             </p>
+            <PhotoIdDenialDetails item={item} />
           </div>
         </div>
       </DashboardCard>
@@ -140,11 +161,12 @@ function VerificationItemCard({
                 )}
               </p>
             ) : null}
-            {item.status === "denied" ? (
+            {item.status === "denied" && item.id !== "photo_id" ? (
               <p className="mt-2 text-sm text-red-900 dark:text-red-100">
                 {formatHeadingCase("This check was not approved. Contact the panel team if you need to submit it again.")}
               </p>
             ) : null}
+            <PhotoIdDenialDetails item={item} />
             {item.status === "missing" ? (
               <p className="mt-2 text-sm text-red-900 dark:text-red-100">
                 {formatHeadingCase(

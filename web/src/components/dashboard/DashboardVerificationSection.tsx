@@ -19,7 +19,7 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
     photo?.status === "verified"
       ? "Your photo identification is verified."
       : photo?.status === "denied"
-        ? "Your photo identification was not approved."
+        ? "Your photo identification was not approved. Submit another document below."
         : "Your photo identification is still under review.";
   return `Your email is already verified. ${phoneCopy} ${photoCopy} Commonwealth citizens in Belize may also need proof of residence.`;
 }
@@ -65,7 +65,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
           <SectionHeading as="h3">{formatHeadingCase("Need to update something?")}</SectionHeading>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
             {formatHeadingCase(
-              "Contact details such as phone number can be updated from your profile. Photo ID changes require support from the panel team."
+              "Contact details such as phone number can be updated from your profile. If photo identification is not approved, submit another document on this page."
             )}
           </p>
           <div className="mt-4 flex flex-col gap-3 lg:flex-row">

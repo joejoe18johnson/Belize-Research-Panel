@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "crypto";
 import { normalizeDobForComparison } from "./dob";
 import { promises as fs } from "fs";
 import path from "path";
-import { PANELIST_COLUMNS, isCommonwealthCitizenInBelize, ownsBusinessOrNgo, storedVotingStatus } from "./constants";
+import { PANELIST_COLUMNS, PHOTO_ID_TYPES, isCommonwealthCitizenInBelize, ownsBusinessOrNgo, storedVotingStatus } from "./constants";
 import { flattenFirstOrganisation } from "./organisations";
 import {
   calculateAge,
@@ -172,6 +172,7 @@ export async function updatePanelistAdminFields(
     admin_email_approved?: string;
     admin_phone_approved?: string;
     admin_photo_id_approved?: string;
+    photo_id_denial_reason?: string;
   }
 ): Promise<boolean> {
   const normalized = cleanText(accountEmail).toLowerCase();
@@ -191,6 +192,87 @@ export async function updatePanelistAdminFields(
   };
   await savePanelists(rows);
   return true;
+}
+
+const PHOTO_ID_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".pdf"]);
+const PHOTO_ID_MAX_BYTES = 8 * 1024 * 1024;
+
+async function removeLocalPhotoIdFiles(username: string): Promise<void> {
+  const safeUsername = cleanText(username);
+  if (!safeUsername) return;
+  let files: string[] = [];
+  try {
+    files = await fs.readdir(UPLOADS_DIR);
+  } catch {
+    return;
+  }
+  await Promise.all(
+    files
+      .filter((file) => file.startsWith(`photo-id-${safeUsername}`))
+      .map((file) => fs.unlink(path.join(UPLOADS_DIR, file)).catch(() => undefined))
+  );
+}
+
+export async function replaceDeniedPhotoId(
+  accountEmail: string,
+  input: { photoIdType: string; file: File }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const normalized = cleanText(accountEmail).toLowerCase();
+  const photoIdType = cleanText(input.photoIdType);
+  if (!normalized) return { ok: false, message: "Panelist profile not found." };
+  if (!PHOTO_ID_TYPES.includes(photoIdType)) {
+    return { ok: false, message: "Choose a photo ID type." };
+  }
+  const file = input.file;
+  const ext = path.extname(file?.name || "").toLowerCase();
+  if (!file || file.size <= 0 || !PHOTO_ID_EXTENSIONS.has(ext)) {
+    return { ok: false, message: "Upload a PNG, JPG, or PDF." };
+  }
+  if (file.size > PHOTO_ID_MAX_BYTES) {
+    return { ok: false, message: "That file is too large. Use a PNG, JPG, or PDF under 8 MB." };
+  }
+
+  const rows = await loadPanelists();
+  const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === normalized);
+  if (index < 0) return { ok: false, message: "Panelist profile not found." };
+
+  const current = rows[index];
+  if (!cleanText(current.username)) {
+    return { ok: false, message: "This profile is missing a username, so a new document cannot be saved." };
+  }
+  if (cleanText(current.admin_photo_id_approved).toLowerCase() !== "false") {
+    return {
+      ok: false,
+      message: "You can submit another document after photo identification is not approved.",
+    };
+  }
+
+  const { useSupabase } = await import("./supabase/data-source");
+  let photoIdPath = "";
+  if (useSupabase()) {
+    const { supabaseDeletePhotoIdDocument, supabaseUploadPanelistFile } = await import("./supabase/repos");
+    await supabaseDeletePhotoIdDocument(current).catch(() => undefined);
+    const folderId = cleanText(current.account_id) || cleanText(current.username) || normalized;
+    photoIdPath = await supabaseUploadPanelistFile(folderId, "photo_id", file);
+  }
+
+  await removeLocalPhotoIdFiles(current.username);
+  if (!useSupabase()) {
+    await saveUploadedFile(file, `photo-id-${cleanText(current.username)}`);
+  }
+
+  const next: PanelistRow = {
+    ...current,
+    photo_id_type: photoIdType,
+    photo_id_path: photoIdPath,
+    admin_photo_id_approved: "",
+    photo_id_denial_reason: "",
+  };
+  const { verificationStatusFromRequirementApprovals } = await import("./panelist-requirements");
+  next.verification_status = verificationStatusFromRequirementApprovals(next, { hasPhotoUpload: true });
+  rows[index] = next;
+  await savePanelists(rows);
+  return { ok: true };
 }
 
 export async function clearPanelistPhotoIdPath(accountEmail: string): Promise<void> {

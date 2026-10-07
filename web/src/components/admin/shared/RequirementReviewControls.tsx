@@ -11,6 +11,7 @@ export interface RequirementReviewDetail {
   email: string;
   phone: string;
   photoIdType: string;
+  photoIdDenialReason?: string;
   photoIdDocumentUrl?: string;
   residenceDocumentUrl?: string;
 }
@@ -36,6 +37,18 @@ const WHATSAPP_VERIFICATION_MESSAGE =
 function whatsAppVerificationHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   return `https://wa.me/${digits}?text=${encodeURIComponent(WHATSAPP_VERIFICATION_MESSAGE)}`;
+}
+
+function DecisionGlyph({ kind }: { kind: "check" | "x" }) {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden="true">
+      {kind === "check" ? (
+        <path d="M3.5 8.2 6.4 11 12.5 4.8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      ) : (
+        <path d="M4.2 4.2 11.8 11.8M11.8 4.2 4.2 11.8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      )}
+    </svg>
+  );
 }
 
 function photoIdDocumentHref(detail: RequirementReviewDetail): string {
@@ -214,10 +227,12 @@ export function RequirementReviewControls({
   decisions: Record<ReviewKey, AdminRequirementDecision>;
   onFile: Record<ReviewKey, boolean>;
   detail: RequirementReviewDetail;
-  onDecision: (key: ReviewKey, decision: "true" | "false") => void;
+  onDecision: (key: ReviewKey, decision: "true" | "false", reason?: string) => void;
   disabled?: boolean;
   itemNotes?: Partial<Record<ReviewKey, string>>;
 }) {
+  const [photoDenialOpen, setPhotoDenialOpen] = useState(false);
+  const [photoDenialReason, setPhotoDenialReason] = useState(detail.photoIdDenialReason ?? "");
   return (
     <div className="grid gap-3 lg:grid-cols-3">
       {REVIEW_ITEMS.map((item) => {
@@ -233,24 +248,107 @@ export function RequirementReviewControls({
             <RequirementStatusBadge label={item.label} status={status} />
             <RequirementOnFileDetail itemKey={item.key} detail={detail} onFile={onFile[item.key]} />
             {note ? <p className="mt-2 text-[11px] leading-snug text-emerald-800 dark:text-emerald-300">{note}</p> : null}
+            {item.key === "photoId" && denied && !photoDenialOpen ? (
+              <div className="mt-2">
+                <p className="text-[11px] leading-snug text-red-900 dark:text-red-100">
+                  {detail.photoIdDenialReason
+                    ? `Reason sent to the panelist: ${detail.photoIdDenialReason}`
+                    : "Add the reason the panelist will see."}
+                </p>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    setPhotoDenialReason(detail.photoIdDenialReason ?? "");
+                    setPhotoDenialOpen(true);
+                  }}
+                  className="mt-1 text-[11px] font-semibold text-red-800 underline underline-offset-2 dark:text-red-200"
+                >
+                  Change reason
+                </button>
+              </div>
+            ) : null}
+            {item.key === "photoId" && photoDenialOpen ? (
+              <div className="mt-3 space-y-2">
+                <label htmlFor="photo-id-denial-reason" className="block text-[11px] font-semibold text-zinc-800 dark:text-zinc-100">
+                  Why was this document not approved?
+                </label>
+                <textarea
+                  id="photo-id-denial-reason"
+                  rows={3}
+                  maxLength={400}
+                  value={photoDenialReason}
+                  onChange={(event) => setPhotoDenialReason(event.target.value)}
+                  placeholder="For example: the name was covered, or the photo was too blurry to read."
+                  className="w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2 text-xs text-zinc-900 placeholder:text-zinc-500 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50 dark:placeholder:text-zinc-400"
+                />
+                <p className="text-[11px] leading-snug text-zinc-600 dark:text-zinc-300">
+                  The panelist sees this reason and can submit another document.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={disabled || !photoDenialReason.trim()}
+                    onClick={() => {
+                      onDecision(item.key, "false", photoDenialReason.trim());
+                      setPhotoDenialOpen(false);
+                    }}
+                    className="inline-flex min-h-9 flex-1 items-center justify-center rounded-lg bg-red-700 px-3 text-xs font-semibold text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-white"
+                  >
+                    {denied ? "Save reason" : "Confirm denial"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => {
+                      setPhotoDenialReason(detail.photoIdDenialReason ?? "");
+                      setPhotoDenialOpen(false);
+                    }}
+                    className="inline-flex min-h-9 items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            {item.key === "photoId" && photoDenialOpen ? null : (
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={disabled || !onFile[item.key] || verified}
                 onClick={() => onDecision(item.key, "true")}
-                className="inline-flex min-h-9 flex-1 items-center justify-center rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className={`inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold disabled:cursor-not-allowed ${
+                  verified
+                    ? "bg-emerald-600 text-white"
+                    : "border border-emerald-700 bg-white text-emerald-900 hover:bg-emerald-50 disabled:border-zinc-400 disabled:bg-zinc-200 disabled:text-zinc-700 dark:border-emerald-400 dark:bg-zinc-950 dark:text-emerald-50 dark:hover:bg-emerald-950 dark:disabled:border-zinc-600 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-200"
+                }`}
               >
-                Verify
+                {verified ? <DecisionGlyph kind="check" /> : null}
+                {verified ? "Verified" : "Verify"}
               </button>
               <button
                 type="button"
                 disabled={disabled || !onFile[item.key] || denied || emailLocked}
-                onClick={() => onDecision(item.key, "false")}
-                className="inline-flex min-h-9 flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={denied ? "Denied" : "Deny"}
+                onClick={() => {
+                  if (item.key === "photoId") {
+                    setPhotoDenialReason(detail.photoIdDenialReason ?? "");
+                    setPhotoDenialOpen(true);
+                    return;
+                  }
+                  onDecision(item.key, "false");
+                }}
+                className={`inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold disabled:cursor-not-allowed ${
+                  denied
+                    ? "bg-red-600 text-white"
+                    : "border border-red-700 bg-white text-red-900 hover:bg-red-50 disabled:border-zinc-400 disabled:bg-zinc-200 disabled:text-zinc-700 dark:border-red-400 dark:bg-zinc-950 dark:text-red-50 dark:hover:bg-red-950 dark:disabled:border-zinc-600 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-200"
+                }`}
               >
-                Deny
+                {denied ? <DecisionGlyph kind="x" /> : null}
+                {denied ? "Denied" : "Deny"}
               </button>
             </div>
+            )}
           </div>
         );
       })}

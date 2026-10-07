@@ -151,7 +151,11 @@ export function panelistRowToDashboardProfile(row: PanelistRow): PanelistDashboa
     politicalInterests: splitInterests(row.political_interests ?? ""),
     marketInterests: splitInterests(row.market_interests ?? ""),
     civicInterests: splitInterests(row.civic_interests ?? ""),
-    verificationStatus: formatSentenceCaseLabel(displayValue(row.verification_status, "Pending")),
+    verificationStatus: formatSentenceCaseLabel(
+      displayValue(row.verification_status, "Pending").toLowerCase() === "pending"
+        ? "Under review"
+        : displayValue(row.verification_status, "Pending")
+    ),
     panelistStatus: formatSentenceCaseLabel(displayValue(row.status, "Active")),
     registrationDate: displayValue(row.registration_date, "Recently submitted"),
   };
@@ -277,6 +281,7 @@ export interface VerificationRequirementNotices {
   photoId: RequirementApprovalStatus;
   phoneDetail: string;
   photoDetail: string;
+  photoDenialReason?: string;
 }
 
 export function buildDashboardNotifications(
@@ -376,7 +381,9 @@ export function buildDashboardNotifications(
     notifications.push({
       id: "verification-photo-id-denied",
       title: "Photo identification not approved",
-      body: `Your photo identification (${requirements.photoDetail}) was not approved. Contact the panel team if you need to submit it again.`,
+      body: requirements.photoDenialReason
+        ? `Your photo identification (${requirements.photoDetail}) was not approved: ${requirements.photoDenialReason} Submit another document from your verification page.`
+        : `Your photo identification (${requirements.photoDetail}) was not approved. Submit another document from your verification page.`,
       dateLabel: "Just now",
       sortAt: new Date().toISOString(),
       priority: "high",

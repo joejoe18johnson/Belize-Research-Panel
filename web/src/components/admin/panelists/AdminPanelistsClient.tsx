@@ -342,7 +342,11 @@ export function AdminPanelistsClient({
     };
   }, [editingRow, photoUploadUsernames, residenceUploadUsernames, emailVerifiedByAccount]);
 
-  const applyRequirementDecision = async (key: "email" | "phone" | "photoId", decision: "true" | "false") => {
+  const applyRequirementDecision = async (
+    key: "email" | "phone" | "photoId",
+    decision: "true" | "false",
+    reason?: string
+  ) => {
     if (!editState || !editingRow || !editingEmail || saving) return;
 
     const field =
@@ -364,6 +368,7 @@ export function AdminPanelistsClient({
       [ADMIN_REQUIREMENT_FIELDS.email]: next.admin_email_approved,
       [ADMIN_REQUIREMENT_FIELDS.phone]: next.admin_phone_approved,
       [ADMIN_REQUIREMENT_FIELDS.photoId]: next.admin_photo_id_approved,
+      ...(key === "photoId" ? { photo_id_denial_reason: decision === "false" ? reason ?? "" : "" } : {}),
     };
 
     next.verification_status = verificationStatusFromRequirementApprovals(
@@ -380,7 +385,12 @@ export function AdminPanelistsClient({
       const res = await fetch(`/api/admin/panelists/${encodeURIComponent(editingEmail)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(next),
+        body: JSON.stringify({
+          ...next,
+          ...(key === "photoId"
+            ? { photo_id_denial_reason: decision === "false" ? reason ?? "" : "" }
+            : {}),
+        }),
       });
       const data = (await res.json()) as { ok?: boolean; message?: string };
       if (!res.ok) {
@@ -834,6 +844,7 @@ export function AdminPanelistsClient({
           error={error}
           message={message}
           photoIdType={cleanText(editingRow.photo_id_type)}
+          photoIdDenialReason={cleanText(editingRow.photo_id_denial_reason)}
           authorisedCode={parseAuthorisedRegistration(editingRow).code}
           authorisedBy={parseAuthorisedRegistration(editingRow).registrarName}
           panelistEmail={editingRow.email}
@@ -872,6 +883,7 @@ function PanelistEditModal({
   error,
   message,
   photoIdType,
+  photoIdDenialReason,
   authorisedCode,
   authorisedBy,
   panelistEmail,
@@ -890,11 +902,12 @@ function PanelistEditModal({
   error: string;
   message: string;
   photoIdType: string;
+  photoIdDenialReason: string;
   authorisedCode: string;
   authorisedBy: string;
   panelistEmail: string;
   requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean; emailVerified?: boolean };
-  onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false") => void;
+  onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false", reason?: string) => void;
   onChange: (state: EditState) => void;
   onClose: () => void;
   onSave: () => void;
@@ -930,6 +943,7 @@ function PanelistEditModal({
     email: editState.email || panelistEmail,
     phone: editState.phone_whatsapp,
     photoIdType,
+    photoIdDenialReason,
     photoIdDocumentUrl: `${documentBase}?kind=photo-id`,
     residenceDocumentUrl: requirementContext.hasResidenceUpload
       ? `${documentBase}?kind=residence-proof`
@@ -975,8 +989,9 @@ function PanelistEditModal({
           <p className="text-sm font-semibold text-teal-950 dark:text-teal-50">{formatHeadingCase("Required checks")}</p>
           <p className="mt-1 text-xs text-teal-900 dark:text-teal-100">
             Email is verified automatically when the panelist confirms it from their inbox. Verify or deny phone
-            and photo ID below — each choice saves immediately and notifies the panelist. When all three are
-            verified, the panelist becomes fully verified.
+            and photo ID below — each choice saves immediately and notifies the panelist. If a document is not
+            approved, say why. The panelist can then submit another document. When all three are verified, the
+            panelist becomes fully verified.
           </p>
           <div className="mt-3">
             <RequirementReviewControls

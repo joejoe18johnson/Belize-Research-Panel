@@ -239,6 +239,7 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     country_if_abroad_other: metadataString(meta, "country_if_abroad_other"),
     status: cleanText(String(row.status)),
     notes: metadataString(meta, "notes"),
+    photo_id_denial_reason: metadataString(meta, "photo_id_denial_reason"),
   };
 }
 
@@ -286,6 +287,7 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     org_year_started: row.org_year_started ?? "",
     org_contact_means: row.org_contact_means ?? "",
     notes: row.notes ?? "",
+    photo_id_denial_reason: row.photo_id_denial_reason ?? "",
     market_interests: row.market_interests ?? "",
     admin_email_approved: requirementDecisionForMetadata(row.admin_email_approved),
     admin_phone_approved: requirementDecisionForMetadata(row.admin_phone_approved),

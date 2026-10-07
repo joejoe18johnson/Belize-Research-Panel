@@ -23,6 +23,7 @@ import {
 } from "@/lib/panelist-requirements";
 import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
 import { findPanelistByEmail, updatePanelistAdminFields } from "@/lib/panelists";
+import { setNotificationRead } from "@/lib/notification-state";
 import { purgePhotoIdAfterVerification } from "@/lib/purge-verified-photo-id";
 import { cleanText, validEmail } from "@/lib/validation";
 
@@ -48,6 +49,7 @@ export async function PATCH(
     admin_email_approved?: string;
     admin_phone_approved?: string;
     admin_photo_id_approved?: string;
+    photo_id_denial_reason?: string;
   };
 
   const errors: string[] = [];
@@ -111,6 +113,21 @@ export async function PATCH(
     }
   }
 
+  const photoDecision = cleanText(body.admin_photo_id_approved).toLowerCase();
+  const previousPhotoDecision = readAdminRequirementDecision(panelist, "photoId");
+  let photoDenialReason: string | undefined;
+  if (photoDecision === "false" && (previousPhotoDecision !== "false" || body.photo_id_denial_reason !== undefined)) {
+    photoDenialReason = cleanText(body.photo_id_denial_reason).replace(/\s+/g, " ").slice(0, 400);
+    if (!photoDenialReason) {
+      return NextResponse.json(
+        { ok: false, message: "Tell the panelist why the document was not approved." },
+        { status: 400 }
+      );
+    }
+  } else if (photoDecision === "true" && previousPhotoDecision !== "true") {
+    photoDenialReason = "";
+  }
+
   const updated = await updatePanelistAdminFields(accountEmail, {
     verification_status: verificationStatus,
     status: body.status,
@@ -123,6 +140,7 @@ export async function PATCH(
     admin_email_approved: merged[ADMIN_REQUIREMENT_FIELDS.email] || body.admin_email_approved,
     admin_phone_approved: body.admin_phone_approved,
     admin_photo_id_approved: body.admin_photo_id_approved,
+    photo_id_denial_reason: photoDenialReason,
   });
 
   if (!updated) {
@@ -171,12 +189,21 @@ export async function PATCH(
 
   const denialNotes: Array<[keyof typeof ADMIN_REQUIREMENT_FIELDS, string]> = [
     ["phone", "Phone number was not approved. The panelist will see this in their alerts."],
-    ["photoId", "Photo identification was not approved. The panelist will see this in their alerts."],
+    ["photoId", "Photo identification was not approved. The panelist will see your reason in their alerts and can submit another document."],
   ];
   for (const [key, note] of denialNotes) {
     const beforeDecision = readAdminRequirementDecision(panelist, key);
     const afterDecision = readAdminRequirementDecision(merged, key);
     if (beforeDecision !== "false" && afterDecision === "false") noticeNotes.push(note);
+  }
+
+  if (photoDenialReason) {
+    await setNotificationRead(notifyEmail, "verification-photo-id-denied", false);
+    if (previousPhotoDecision === "false") {
+      noticeNotes.push(
+        "The document reason was updated. The panelist will see it in their alerts and can submit another document."
+      );
+    }
   }
 
   if (idDocumentDeleted) {

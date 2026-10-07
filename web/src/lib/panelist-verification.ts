@@ -20,6 +20,7 @@ export interface VerificationItem {
   status: VerificationItemStatus;
   statusLabel: string;
   essential: boolean;
+  denialReason?: string;
 }
 
 export interface VerificationCenterSummary {
@@ -37,7 +38,7 @@ function statusLabel(status: VerificationItemStatus): string {
     case "under_review":
       return formatHeadingCase("Under review");
     case "pending_approval":
-      return formatHeadingCase("Pending approval");
+      return formatHeadingCase("Under review");
     case "missing":
       return formatHeadingCase("Action required");
     case "denied":
@@ -73,7 +74,8 @@ export async function buildVerificationCenterSummary(
   panelist: PanelistRow,
   account: SessionAccount
 ): Promise<VerificationCenterSummary> {
-  const overallStatus = formatHeadingCase(cleanText(panelist.verification_status) || "Pending");
+  const storedStatus = cleanText(panelist.verification_status) || "Pending";
+  const overallStatus = formatHeadingCase(storedStatus.toLowerCase() === "pending" ? "Under review" : storedStatus);
   const isVerified = overallStatus.toLowerCase() === "verified";
   const username = cleanText(panelist.username);
   const phone = cleanText(panelist.phone_whatsapp);
@@ -154,6 +156,8 @@ export async function buildVerificationCenterSummary(
         : itemStatusWhenAccountPending(photoOnFile),
       statusLabel: "",
       essential: true,
+      denialReason:
+        photoRequirement?.status === "denied" ? cleanText(panelist.photo_id_denial_reason) : "",
     },
   ];
 

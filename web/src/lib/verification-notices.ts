@@ -61,6 +61,7 @@ export function requirementNoticesForPanelist(
     photoId: photo?.status ?? "under_review",
     phoneDetail: phone?.detail ?? "",
     photoDetail: photo?.detail ?? "",
+    photoDenialReason: cleanText(panelist.photo_id_denial_reason),
   };
 }
 
