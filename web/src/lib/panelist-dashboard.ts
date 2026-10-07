@@ -246,6 +246,7 @@ const VERIFICATION_ACTION_TOAST_IDS = new Set([
   "verification-phone-denied",
   "verification-photo-id",
   "verification-photo-id-denied",
+  "id-document-deleted",
 ]);
 
 export function verificationActionToasts(notifications: DashboardNotification[]): Array<{
@@ -286,6 +287,7 @@ export function buildDashboardNotifications(
     redemptionRequests?: RedemptionRequest[];
     inboxSurveys?: PanelistSurvey[];
     requirements?: VerificationRequirementNotices;
+    photoIdDocumentDeleted?: boolean;
   } = {}
 ): DashboardNotification[] {
   const notifications: DashboardNotification[] = [];
@@ -345,6 +347,18 @@ export function buildDashboardNotifications(
       sortAt: new Date().toISOString(),
       priority: "high",
       unread: isUnread("verification-phone-denied", true),
+    });
+  }
+
+  if (options.photoIdDocumentDeleted) {
+    notifications.push({
+      id: "id-document-deleted",
+      title: "ID document deleted",
+      body: "Your account is verified, and the photo ID document you submitted has been deleted and wiped from our database.",
+      dateLabel: "Just now",
+      sortAt: new Date().toISOString(),
+      priority: "high",
+      unread: isUnread("id-document-deleted", true),
     });
   }
 

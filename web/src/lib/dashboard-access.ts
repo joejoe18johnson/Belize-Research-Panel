@@ -19,6 +19,7 @@ import { loadNotificationReadState } from "./notification-state";
 import { loadRedemptionRequests } from "./redemption-requests";
 import { resolveRewardSummary } from "./panelist-points";
 import { isPanelistVerified } from "./verification-status";
+import { PHOTO_ID_PURGED_MARKER, purgePhotoIdAfterVerification } from "./purge-verified-photo-id";
 import { countUnreadSurveyInvitations } from "./survey-notifications";
 import {
   emailApprovedRequirementsIfUnsent,
@@ -80,6 +81,9 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
     redirect("/register");
   }
 
+  if (isPanelistVerified(panelist.verification_status)) {
+    await purgePhotoIdAfterVerification(panelist);
+  }
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(account.email, profile);
   const readState = await loadNotificationReadState(account.email);
@@ -96,6 +100,7 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
     redemptionRequests,
     inboxSurveys: inbox,
     requirements: requirementNoticesForPanelist(panelist, requirementContext),
+    photoIdDocumentDeleted: Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read),
   });
 
   return { account, profile, rewards, notifications };
@@ -107,6 +112,9 @@ export async function getDashboardNavBadges(email: string, accountId?: string): 
     return { unreadNotifications: 0, inboxSurveys: 0, newSurveys: 0, verificationAttention: 0, availablePoints: 0 };
   }
 
+  if (isPanelistVerified(panelist.verification_status)) {
+    await purgePhotoIdAfterVerification(panelist);
+  }
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(email, profile);
   const readState = await loadNotificationReadState(email);
@@ -130,6 +138,7 @@ export async function getDashboardNavBadges(email: string, accountId?: string): 
     redemptionRequests,
     inboxSurveys: inbox,
     requirements: requirementNoticesForPanelist(panelist, requirementContext),
+    photoIdDocumentDeleted: Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read),
   });
   const newSurveys = countUnreadSurveyInvitations(notifications);
 

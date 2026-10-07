@@ -16,6 +16,8 @@ import {
 } from "@/lib/notification-state";
 import { cleanText } from "@/lib/validation";
 import { requirementNoticesForPanelist } from "@/lib/verification-notices";
+import { PHOTO_ID_PURGED_MARKER, purgePhotoIdAfterVerification } from "@/lib/purge-verified-photo-id";
+import { isPanelistVerified } from "@/lib/verification-status";
 import type { SessionAccount } from "@/lib/auth-types";
 import type { PanelistRow } from "@/lib/panelists";
 
@@ -42,20 +44,28 @@ function requirementNotices(session: SessionAccount, panelist: PanelistRow) {
   });
 }
 
+async function notificationBundle(session: SessionAccount, panelist: PanelistRow) {
+  if (isPanelistVerified(panelist.verification_status)) {
+    await purgePhotoIdAfterVerification(panelist);
+  }
+  const profile = panelistRowToDashboardProfile(panelist);
+  const readState = await loadNotificationReadState(session.email);
+  const redemptionRequests = await loadRedemptionRequests(session.email);
+  const { inbox } = await getPanelistSurveys(session.email);
+  return buildDashboardNotifications(profile, {
+    readState,
+    redemptionRequests,
+    inboxSurveys: inbox,
+    requirements: requirementNotices(session, panelist),
+    photoIdDocumentDeleted: Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read),
+  });
+}
+
 export async function GET() {
   const result = await requireRegisteredPanelist();
   if ("error" in result) return result.error;
 
-  const profile = panelistRowToDashboardProfile(result.panelist);
-  const readState = await loadNotificationReadState(result.session.email);
-  const redemptionRequests = await loadRedemptionRequests(result.session.email);
-  const { inbox } = await getPanelistSurveys(result.session.email);
-  const notifications = buildDashboardNotifications(profile, {
-    readState,
-    redemptionRequests,
-    inboxSurveys: inbox,
-    requirements: requirementNotices(result.session, result.panelist),
-  });
+  const notifications = await notificationBundle(result.session, result.panelist);
 
   return NextResponse.json({ toasts: verificationActionToasts(notifications) });
 }
@@ -80,6 +90,7 @@ export async function PATCH(request: NextRequest) {
       redemptionRequests,
       inboxSurveys: inbox,
       requirements: requirementNotices(result.session, result.panelist),
+      photoIdDocumentDeleted: Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read),
     });
 
     if (body.markAllRead) {
@@ -107,6 +118,7 @@ export async function PATCH(request: NextRequest) {
       redemptionRequests,
       inboxSurveys: inbox,
       requirements: requirementNotices(result.session, result.panelist),
+      photoIdDocumentDeleted: Boolean(updatedReadState[PHOTO_ID_PURGED_MARKER]?.read),
     });
 
     return NextResponse.json({ ok: true, notifications: updatedNotifications });

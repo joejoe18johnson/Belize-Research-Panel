@@ -4,6 +4,7 @@ import { ShieldCheckIcon } from "./DashboardIcons";
 import { DashboardVerificationItems } from "./DashboardVerificationItems";
 import { DashboardCard, SectionHeading } from "./DashboardShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
+import { ID_DOCUMENT_DELETED_NOTICE } from "@/lib/purge-verified-photo-id";
 
 function verificationProgressCopy(summary: VerificationCenterSummary): string {
   const phone = summary.items.find((item) => item.id === "phone");
@@ -34,7 +35,9 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
               <p className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{summary.overallStatus}</p>
               <p className="mt-2 text-sm text-teal-100/90">
                 {summary.isVerified
-                  ? formatHeadingCase("Your essential verification items have been approved.")
+                  ? summary.idDocumentDeleted
+                    ? `Your essential verification items have been approved. ${ID_DOCUMENT_DELETED_NOTICE}`
+                    : formatHeadingCase("Your essential verification items have been approved.")
                   : formatHeadingCase(
                       "Our team is reviewing the items below from your registration. You will be notified when verification is complete."
                     )}

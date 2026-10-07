@@ -486,10 +486,16 @@ function renderRegistrationSubmitted(data: Record<string, string>): RenderedEmai
 function renderPanelistVerified(data: Record<string, string>): RenderedEmail {
   const firstName = pick(data, "firstName", "there");
   const dashboardUrl = pick(data, "dashboardUrl", "#");
+  const idDocumentDeleted = pick(data, "idDocumentDeleted", "") === "true";
   const bodyHtml = [
     paragraph(`Hi ${firstName},`),
     paragraph("Great news — your Belize Research Panel account is fully verified."),
     paragraph("You can now participate in surveys and redeem your reward points."),
+    idDocumentDeleted
+      ? paragraph(
+          "Your photo ID document has been deleted and wiped from our database. We do not keep identification images on file after your account is verified."
+        )
+      : "",
   ].join("");
   return finish("You are verified", bodyHtml, { label: "Go to dashboard", href: dashboardUrl });
 }

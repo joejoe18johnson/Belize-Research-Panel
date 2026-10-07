@@ -193,6 +193,24 @@ export async function updatePanelistAdminFields(
   return true;
 }
 
+export async function clearPanelistPhotoIdPath(accountEmail: string): Promise<void> {
+  const normalized = cleanText(accountEmail).toLowerCase();
+  if (!normalized) return;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseClearPanelistPhotoIdPath } = await import("./supabase/repos");
+    await supabaseClearPanelistPhotoIdPath(normalized);
+    return;
+  }
+
+  const rows = await loadPanelists();
+  const index = rows.findIndex((row) => cleanText(row.email).toLowerCase() === normalized);
+  if (index < 0) return;
+  rows[index] = { ...rows[index], photo_id_path: "" };
+  await savePanelists(rows);
+}
+
 export async function savePanelists(rows: PanelistRow[]): Promise<void> {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {

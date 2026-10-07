@@ -136,6 +136,7 @@ export async function sendPanelistVerifiedEmail(input: {
   to: string;
   firstName: string;
   origin: string;
+  idDocumentDeleted?: boolean;
 }): Promise<void> {
   await sendTemplateEmail({
     templateId: "panelist-verified",
@@ -143,6 +144,7 @@ export async function sendPanelistVerifiedEmail(input: {
     data: {
       firstName: panelistFirstName(input.firstName),
       dashboardUrl: originDashboard(input.origin),
+      idDocumentDeleted: input.idDocumentDeleted ? "true" : "",
     },
   });
 }

@@ -510,6 +510,32 @@ export async function supabaseBackfillPanelistDocumentPath(
   if (error && isMissingColumnError(error, column)) return;
 }
 
+export async function supabaseClearPanelistPhotoIdPath(email: string): Promise<void> {
+  const normalized = normalizePanelistEmail(email);
+  if (!normalized) return;
+  const { error } = await db().from("panelists").update({ photo_id_path: null }).eq("email", normalized);
+  if (error && isMissingColumnError(error, "photo_id_path")) return;
+  throwIfError(error);
+}
+
+export async function supabaseDeletePhotoIdDocument(panelist: PanelistRow): Promise<void> {
+  const paths = new Set<string>();
+  const stored = cleanText(panelist.photo_id_path);
+  if (stored) paths.add(stored);
+  const discovered = await supabaseFindPanelistDocumentPath(panelist, "photo_id", { ignoreStored: true });
+  if (discovered) paths.add(discovered);
+  if (paths.size) {
+    const { error } = await db().storage.from("panelist-documents").remove([...paths]);
+    if (error) throwIfError(error);
+  }
+
+  const panelistId = cleanText(panelist.id);
+  if (!panelistId) return;
+  ignoreMissingTable(
+    (await db().from("panelist_uploads").delete().eq("panelist_id", panelistId).eq("kind", "photo_id")).error
+  );
+}
+
 export async function supabaseDownloadPanelistDocument(
   storagePath: string
 ): Promise<{ buffer: Buffer; filename: string; contentType: string } | null> {

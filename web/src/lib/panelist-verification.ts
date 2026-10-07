@@ -6,6 +6,8 @@ import { parseAuthorisedRegistration } from "./authorised-registrars";
 import { isCommonwealthCitizenInBelize } from "./constants";
 import { assessPanelistRequirements, type RequirementApprovalStatus } from "./panelist-requirements";
 import { cleanText } from "./validation";
+import { loadNotificationReadState } from "./notification-state";
+import { ID_DOCUMENT_DELETED_NOTICE, PHOTO_ID_PURGED_MARKER } from "./purge-verified-photo-id";
 
 export type VerificationItemStatus = "verified" | "under_review" | "pending_approval" | "missing" | "denied";
 
@@ -23,6 +25,7 @@ export interface VerificationItem {
 export interface VerificationCenterSummary {
   overallStatus: string;
   isVerified: boolean;
+  idDocumentDeleted: boolean;
   items: VerificationItem[];
   registrationDate: string;
 }
@@ -97,6 +100,8 @@ export async function buildVerificationCenterSummary(
   const emailRequirement = requirements.items.find((item) => item.key === "email");
 
   const email = cleanText(account.email);
+  const readState = email ? await loadNotificationReadState(email) : {};
+  const idDocumentDeleted = Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read);
   const items: VerificationItem[] = [
     {
       id: "email",
@@ -131,17 +136,19 @@ export async function buildVerificationCenterSummary(
         "We use government-issued photo ID submitted during registration solely to confirm your identity and eligibility. We do not keep or store ID documents in our files."
       ),
       valueLabel: formatHeadingCase("Submitted"),
-      valueOnFile: photoOnFile
-        ? authorisedRegistration.isAuthorised
-          ? formatHeadingCase(
-              authorisedRegistration.registrarName
-                ? `Authorised registration — ID checked in person by ${authorisedRegistration.registrarName} (code ${authorisedRegistration.code}). No ID file on record.`
-                : `Authorised registration — ID checked in person (code ${authorisedRegistration.code || "on file"}). No ID file on record.`
-            )
-          : hasPhotoUpload
-            ? `${photoIdType} — ${formatHeadingCase("used for verification only; not stored in our files")}`
-            : `${photoIdType} — ${formatHeadingCase("type declared; document not stored in our files")}`
-        : formatHeadingCase("Not provided"),
+      valueOnFile: idDocumentDeleted
+        ? ID_DOCUMENT_DELETED_NOTICE
+        : photoOnFile
+          ? authorisedRegistration.isAuthorised
+            ? formatHeadingCase(
+                authorisedRegistration.registrarName
+                  ? `Authorised registration — ID checked in person by ${authorisedRegistration.registrarName} (code ${authorisedRegistration.code}). No ID file on record.`
+                  : `Authorised registration — ID checked in person (code ${authorisedRegistration.code || "on file"}). No ID file on record.`
+              )
+            : hasPhotoUpload
+              ? `${photoIdType} — ${formatHeadingCase("used for verification only; not stored in our files")}`
+              : `${photoIdType} — ${formatHeadingCase("type declared; document not stored in our files")}`
+          : formatHeadingCase("Not provided"),
       status: photoRequirement
         ? requirementItemStatus(photoRequirement.status)
         : itemStatusWhenAccountPending(photoOnFile),
@@ -169,6 +176,7 @@ export async function buildVerificationCenterSummary(
   return {
     overallStatus,
     isVerified,
+    idDocumentDeleted,
     items: items.map((item) => ({ ...item, statusLabel: statusLabel(item.status) })),
     registrationDate: cleanText(panelist.registration_date) || formatHeadingCase("Recently submitted"),
   };

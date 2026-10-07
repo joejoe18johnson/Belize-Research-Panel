@@ -23,6 +23,7 @@ import {
 } from "@/lib/panelist-requirements";
 import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
 import { findPanelistByEmail, updatePanelistAdminFields } from "@/lib/panelists";
+import { purgePhotoIdAfterVerification } from "@/lib/purge-verified-photo-id";
 import { cleanText, validEmail } from "@/lib/validation";
 
 export async function PATCH(
@@ -143,12 +144,16 @@ export async function PATCH(
   const notifyEmail = lookupEmail || accountEmail;
   const origin = resolveRequestOrigin(request);
   const noticeNotes: string[] = [];
+  const idDocumentDeleted = fullyVerified
+    ? await purgePhotoIdAfterVerification({ ...panelist, verification_status: verificationStatus })
+    : false;
 
   if (fullyVerified && !wasVerified) {
     void sendPanelistVerifiedEmail({
       to: notifyEmail,
       firstName: panelist.first_name,
       origin,
+      idDocumentDeleted,
     });
     await markRequirementVerifiedEmailsSent(notifyEmail);
   } else {
@@ -172,6 +177,12 @@ export async function PATCH(
     const beforeDecision = readAdminRequirementDecision(panelist, key);
     const afterDecision = readAdminRequirementDecision(merged, key);
     if (beforeDecision !== "false" && afterDecision === "false") noticeNotes.push(note);
+  }
+
+  if (idDocumentDeleted) {
+    noticeNotes.push(
+      "The photo ID document was deleted and wiped from the database. The panelist will see this in their alerts."
+    );
   }
 
   revalidatePath("/admin", "layout");

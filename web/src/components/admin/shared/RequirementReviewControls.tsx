@@ -30,6 +30,14 @@ function statusFromDecision(
   return onFile ? "under_review" : "missing";
 }
 
+const WHATSAPP_VERIFICATION_MESSAGE =
+  "This is a quick identity verification for our survey panel. Please confirm the initials of the name you used to register. Thank you.";
+
+function whatsAppVerificationHref(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(WHATSAPP_VERIFICATION_MESSAGE)}`;
+}
+
 function photoIdDocumentHref(detail: RequirementReviewDetail): string {
   if (detail.photoIdDocumentUrl) return detail.photoIdDocumentUrl;
   const email = detail.email.trim();
@@ -162,10 +170,12 @@ function RequirementOnFileDetail({
         <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">On file</p>
         <p className="mt-0.5 text-sm font-medium tabular-nums text-zinc-800 dark:text-zinc-200">{detail.phone}</p>
         <a
-          href={`tel:${detail.phone.replace(/\D/g, "")}`}
+          href={whatsAppVerificationHref(detail.phone)}
+          target="_blank"
+          rel="noopener noreferrer"
           className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
         >
-          Call / open dialer
+          Message on WhatsApp
         </a>
       </div>
     );

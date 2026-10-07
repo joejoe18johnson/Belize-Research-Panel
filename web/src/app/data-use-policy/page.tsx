@@ -89,7 +89,7 @@ export default function DataUsePolicyPage() {
       <PolicySection title="Retention">
         <p>
           {formatHeadingCase(
-            "We keep personal data only as long as necessary for the purposes above, including active panel membership, legal compliance, dispute resolution, and audit requirements. Verification documents and contact history may be retained for a defined period after account closure unless deletion is requested and no overriding legal basis applies."
+            "We keep personal data only as long as necessary for the purposes above, including active panel membership, legal compliance, dispute resolution, and audit requirements. Photo identification images are deleted and wiped from our database once an account is verified. Contact history may be retained for a defined period after account closure unless deletion is requested and no overriding legal basis applies."
           )}
         </p>
       </PolicySection>
