@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -53,19 +54,32 @@ function NotificationCard({
   updatingId: string | null;
   onToggle: (notification: DashboardNotification) => void;
 }) {
+  const resolveAction =
+    notification.actionHref && notification.actionLabel ? (
+      <Link
+        href={notification.actionHref}
+        className="inline-flex min-h-11 items-center rounded-lg bg-teal-700 px-3 text-xs font-semibold text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
+      >
+        {formatHeadingCase(notification.actionLabel)}
+      </Link>
+    ) : null;
+
   const action = (
-    <button
-      type="button"
-      onClick={() => onToggle(notification)}
-      disabled={updatingId === notification.id}
-      className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100 disabled:opacity-60"
-    >
-      {updatingId === notification.id
-        ? formatHeadingCase("Saving…")
-        : notification.unread
-          ? formatHeadingCase("Mark as read")
-          : formatHeadingCase("Mark as unread")}
-    </button>
+    <div className="flex flex-wrap items-center gap-2">
+      {resolveAction}
+      <button
+        type="button"
+        onClick={() => onToggle(notification)}
+        disabled={updatingId === notification.id}
+        className="inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-900/40 hover:text-teal-900 dark:text-teal-100 disabled:opacity-60"
+      >
+        {updatingId === notification.id
+          ? formatHeadingCase("Saving…")
+          : notification.unread
+            ? formatHeadingCase("Mark as read")
+            : formatHeadingCase("Mark as unread")}
+      </button>
+    </div>
   );
 
   if (layout === "list") {

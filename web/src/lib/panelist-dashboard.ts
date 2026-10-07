@@ -56,6 +56,9 @@ export interface DashboardNotification {
   sortAt: string;
   priority: "normal" | "high";
   unread: boolean;
+  /** Optional resolve link shown on the alert toast and notifications list. */
+  actionHref?: string;
+  actionLabel?: string;
 }
 
 function parseNotificationSortAt(value: string, fallback = "1970-01-01T00:00:00.000Z"): string {
@@ -259,6 +262,7 @@ export function verificationActionToasts(notifications: DashboardNotification[])
   body: string;
   tone: "success" | "warning" | "info";
   href: string;
+  hrefLabel: string;
 }> {
   return notifications
     .filter(
@@ -272,7 +276,8 @@ export function verificationActionToasts(notifications: DashboardNotification[])
       title: notification.title,
       body: notification.body,
       tone: notification.id.endsWith("-denied") ? "warning" : "success",
-      href: "/dashboard/notifications",
+      href: notification.actionHref ?? "/dashboard/notifications",
+      hrefLabel: notification.actionLabel ?? "View alerts",
     }));
 }
 
@@ -382,12 +387,14 @@ export function buildDashboardNotifications(
       id: "verification-photo-id-denied",
       title: "Photo identification not approved",
       body: requirements.photoDenialReason
-        ? `Your photo identification (${requirements.photoDetail}) was not approved: ${requirements.photoDenialReason} Submit another document from your verification page.`
-        : `Your photo identification (${requirements.photoDetail}) was not approved. Submit another document from your verification page.`,
+        ? `Your photo identification (${requirements.photoDetail}) was not approved: ${requirements.photoDenialReason} Submit another document to continue verification.`
+        : `Your photo identification (${requirements.photoDetail}) was not approved. Submit another document to continue verification.`,
       dateLabel: "Just now",
       sortAt: new Date().toISOString(),
       priority: "high",
       unread: isUnread("verification-photo-id-denied", true),
+      actionHref: "/dashboard/verification#photo-id",
+      actionLabel: "Submit another ID",
     });
   }
 

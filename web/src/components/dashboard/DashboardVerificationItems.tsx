@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { VerificationCenterSummary, VerificationItemStatus } from "@/lib/panelist-verification";
 import type { ViewLayout } from "@/lib/view-layout";
 import { viewLayoutContainerClass, viewLayoutItemClass } from "@/lib/view-layout";
@@ -104,9 +105,11 @@ function VerificationItemCard({
     </span>
   );
 
+  const sectionId = item.id === "photo_id" ? "photo-id" : undefined;
+
   if (layout === "list") {
     return (
-      <DashboardCard className={`p-4 ${itemStatusClass(item.status)}`}>
+      <DashboardCard id={sectionId} className={`p-4 ${itemStatusClass(item.status)}`}>
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-900 shadow-sm dark:bg-zinc-800 dark:text-teal-100">
             <VerificationItemIcon id={item.id} />
@@ -130,7 +133,7 @@ function VerificationItemCard({
   }
 
   return (
-    <DashboardCard className={itemStatusClass(item.status)}>
+    <DashboardCard id={sectionId} className={itemStatusClass(item.status)}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 flex-1 items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-900 shadow-sm dark:bg-zinc-800 dark:text-teal-100">
@@ -184,6 +187,15 @@ function VerificationItemCard({
 
 export function DashboardVerificationItems({ items }: { items: VerificationCenterSummary["items"] }) {
   const [layout, setLayout] = useViewLayout("dashboard-verification");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#/, "");
+    if (hash !== "photo-id") return;
+    const target = document.getElementById("photo-id");
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [items]);
 
   return (
     <div className="space-y-3">

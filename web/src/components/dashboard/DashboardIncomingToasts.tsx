@@ -9,6 +9,7 @@ interface IncomingToast {
   body: string;
   tone: "success" | "warning" | "info";
   href: string;
+  hrefLabel?: string;
 }
 
 const SEEN_KEY = "brp-verification-toasts";
@@ -55,7 +56,7 @@ export function DashboardIncomingToasts() {
             body: toast.body,
             tone: toast.tone,
             href: toast.href,
-            hrefLabel: "View alerts",
+            hrefLabel: toast.hrefLabel ?? "View alerts",
           });
         }
 

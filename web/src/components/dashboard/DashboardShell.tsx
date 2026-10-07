@@ -133,8 +133,20 @@ export function DashboardPageHeader({
   );
 }
 
-export function DashboardCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`${dashboardCardClass} ${className}`.trim()}>{children}</div>;
+export function DashboardCard({
+  children,
+  className = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <div id={id} className={`${dashboardCardClass} ${className}`.trim()}>
+      {children}
+    </div>
+  );
 }
 
 /** Clips top-of-card media (images, gradients) to the card corner radius. */
