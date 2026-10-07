@@ -5,6 +5,7 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { RegisterAuthGate } from "@/components/auth/RegisterAuthGate";
 import { RegistrationPageClient } from "@/components/registration/RegistrationPageClient";
 import { getSessionAccount } from "@/lib/auth";
+import { findPanelistByEmail } from "@/lib/panelists";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -53,7 +54,8 @@ export default async function RegisterPage() {
   }
 
   if (account.panelistRegistered) {
-    redirect("/dashboard");
+    const panelist = await findPanelistByEmail(account.email, account.id);
+    redirect(panelist ? "/dashboard" : "/account/closed");
   }
 
   return (

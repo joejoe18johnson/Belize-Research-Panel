@@ -1,5 +1,6 @@
 import { LoginPageClient } from "@/components/auth/LoginPageClient";
 import { getSessionAccount } from "@/lib/auth";
+import { findPanelistByEmail } from "@/lib/panelists";
 import { safeAppNextPath } from "@/lib/login-redirect";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { redirect } from "next/navigation";
@@ -21,6 +22,10 @@ export default async function LoginPage({
   const destination = safeAppNextPath(nextPath, "/dashboard");
 
   if (account?.panelistRegistered && account.emailVerified) {
+    const panelist = await findPanelistByEmail(account.email, account.id);
+    if (!panelist) {
+      redirect("/account/closed");
+    }
     if (account.accountStatus === "on_hold") {
       redirect("/dashboard/account-on-hold");
     }

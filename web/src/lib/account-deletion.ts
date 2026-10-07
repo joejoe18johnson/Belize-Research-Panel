@@ -150,19 +150,34 @@ export async function deleteAccountAndOptOut(
 
   await unsubscribeClosedAccount(account.email);
 
-  if (panelist) {
-    await deletePanelistUploads(username);
-    await withdrawPanelistRecord(account.email);
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseCloseAccount } = await import("./supabase/repos");
+    await supabaseCloseAccount({
+      accountId: account.id,
+      email: account.email,
+      storageFolders: [account.id, cleanText(panelist?.account_id), cleanText(panelist?.id), username],
+    });
+    return { ok: true };
   }
 
-  await Promise.all([
-    removeJsonStoreKey(NOTIFICATION_STATE_FILE, account.email),
-    removeJsonStoreKey(POINTS_OVERRIDE_FILE, account.email),
-    removeJsonStoreKey(REDEMPTION_REQUESTS_FILE, account.email),
-    removePanelistSurveyAssignments(account.email),
-  ]);
-
   await removeAccountRecord(accountId);
+
+  try {
+    if (panelist) {
+      await deletePanelistUploads(username);
+      await withdrawPanelistRecord(account.email);
+    }
+
+    await Promise.all([
+      removeJsonStoreKey(NOTIFICATION_STATE_FILE, account.email),
+      removeJsonStoreKey(POINTS_OVERRIDE_FILE, account.email),
+      removeJsonStoreKey(REDEMPTION_REQUESTS_FILE, account.email),
+      removePanelistSurveyAssignments(account.email),
+    ]);
+  } catch (error) {
+    console.error("[account-delete] login was removed; leftover records could not be cleared", error);
+  }
 
   return { ok: true };
 }

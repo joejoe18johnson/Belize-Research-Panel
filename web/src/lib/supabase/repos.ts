@@ -339,6 +339,30 @@ export async function supabaseDeletePanelistByEmail(email: string): Promise<bool
   return (data?.length ?? 0) > 0;
 }
 
+/** Removes the login first, then the panelist row. Related survey and reward rows cascade. */
+export async function supabaseCloseAccount(input: {
+  accountId: string;
+  email: string;
+  storageFolders?: string[];
+}): Promise<void> {
+  await supabaseDeleteAccountById(input.accountId);
+
+  const folders = [...new Set((input.storageFolders ?? []).map((folder) => cleanText(folder)).filter(Boolean))];
+  for (const folder of folders) {
+    try {
+      await supabaseDeletePanelistStorage(folder);
+    } catch (error) {
+      console.error("[account-delete] could not remove stored documents", error);
+    }
+  }
+
+  try {
+    await supabaseDeletePanelistByEmail(input.email);
+  } catch (error) {
+    console.error("[account-delete] could not remove the panelist row", error);
+  }
+}
+
 export async function supabaseDeletePanelistStorage(accountId: string): Promise<void> {
   const folder = cleanText(accountId);
   if (!folder) return;

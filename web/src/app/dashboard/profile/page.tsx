@@ -20,7 +20,7 @@ export default async function DashboardProfilePage({
   const account = await requireRegisteredPanelistSession();
   const panelist = await findPanelistByEmail(account.email);
   if (!panelist) {
-    redirect("/register");
+    redirect("/account/closed");
   }
 
   const { emailUpdated } = await searchParams;

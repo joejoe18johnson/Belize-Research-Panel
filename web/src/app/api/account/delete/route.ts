@@ -32,16 +32,26 @@ export async function POST(request: Request) {
   const deleteEmail = session.email;
   const deleteFirstName = session.firstName;
 
-  const result = await deleteAccountAndOptOut(session.id, password);
-  if (!result.ok) {
-    return NextResponse.json({ ok: false, message: result.error }, { status: 400 });
+  try {
+    const result = await deleteAccountAndOptOut(session.id, password);
+    if (!result.ok) {
+      return NextResponse.json({ ok: false, message: result.error }, { status: 400 });
+    }
+  } catch (error) {
+    console.error("[account-delete] failed", error);
+    return NextResponse.json(
+      { ok: false, message: "Could not delete your account. Please try again." },
+      { status: 500 }
+    );
   }
 
+  await clearSessionCookie();
   void sendAccountDeletedEmail({
     to: deleteEmail,
     firstName: deleteFirstName,
+  }).catch((error) => {
+    console.error("[account-delete] confirmation email failed", error);
   });
 
-  await clearSessionCookie();
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, redirect: "/" });
 }

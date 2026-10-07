@@ -23,17 +23,17 @@ export function DeleteAccountPanel({ compact = false }: { compact?: boolean }) {
         credentials: "include",
         body: JSON.stringify({ password, confirmOptOut }),
       });
-      const data = (await res.json()) as { ok?: boolean; message?: string };
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
 
-      if (!res.ok || !data.ok) {
-        setError(data.message ?? "Could not delete your account. Please try again.");
+      if (!res.ok || !data?.ok) {
+        setError(data?.message ?? "Could not delete your account. Please try again.");
+        setSubmitting(false);
         return;
       }
 
-      window.location.assign("/?accountDeleted=1");
+      window.location.replace("/");
     } catch {
       setError("Network error. Please try again.");
-    } finally {
       setSubmitting(false);
     }
   };

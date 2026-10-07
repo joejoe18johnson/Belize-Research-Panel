@@ -87,7 +87,7 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   const account = await requireDashboardAccount();
   const panelist = await findPanelistByEmail(account.email, account.id);
   if (!panelist) {
-    redirect("/register");
+    redirect("/account/closed");
   }
 
   if (isPanelistVerified(panelist.verification_status)) {

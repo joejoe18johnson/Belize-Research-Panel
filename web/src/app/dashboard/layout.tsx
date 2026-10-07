@@ -3,6 +3,7 @@ import { getDashboardNavBadges, requireRegisteredPanelistSession } from "@/lib/d
 import { panelistRowToDashboardProfile } from "@/lib/panelist-dashboard";
 import { findPanelistByEmail } from "@/lib/panelists";
 import { privateAreaMetadata } from "@/lib/seo/metadata";
+import { redirect } from "next/navigation";
 
 export const metadata = privateAreaMetadata("Dashboard");
 
@@ -14,11 +15,13 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const account = await requireRegisteredPanelistSession();
+  const panelist = await findPanelistByEmail(account.email, account.id);
+  if (!panelist) {
+    redirect("/account/closed");
+  }
+
   const badges = await getDashboardNavBadges(account.email, account.id);
-  const panelist = await findPanelistByEmail(account.email);
-  const verificationStatus = panelist
-    ? panelistRowToDashboardProfile(panelist).verificationStatus
-    : "Pending";
+  const verificationStatus = panelistRowToDashboardProfile(panelist).verificationStatus;
 
   return (
     <DashboardShell
