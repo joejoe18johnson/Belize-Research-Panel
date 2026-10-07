@@ -49,9 +49,28 @@ export async function POST(request: Request) {
   void sendAccountDeletedEmail({
     to: deleteEmail,
     firstName: deleteFirstName,
-  }).catch((error) => {
-    console.error("[account-delete] confirmation email failed", error);
-  });
+  })
+    .catch((error) => {
+      console.error("[account-delete] confirmation email failed", error);
+    })
+    .finally(async () => {
+      // Confirmation mail may write a log row; wipe that personal record too.
+      try {
+        const { removeOutboundMessagesForEmail } = await import("@/lib/admin-panelist-delete");
+        await removeOutboundMessagesForEmail(deleteEmail);
+      } catch (error) {
+        console.error("[account-delete] could not clear outbound message log", error);
+      }
+      try {
+        const { useSupabase } = await import("@/lib/supabase/data-source");
+        if (useSupabase()) {
+          const { supabaseWipeOutboundMessagesForEmail } = await import("@/lib/supabase/repos");
+          await supabaseWipeOutboundMessagesForEmail(deleteEmail);
+        }
+      } catch (error) {
+        console.error("[account-delete] could not clear outbound message rows", error);
+      }
+    });
 
   return NextResponse.json({ ok: true, redirect: "/" });
 }

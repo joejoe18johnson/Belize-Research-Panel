@@ -127,16 +127,20 @@ export async function sendTransactionalEmail(input: {
     }
   }
 
-  const logged = await logOutboundMessage({
-    email,
-    phone: "",
-    channel: "email",
-    subject,
-    body: text || html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 2000),
-    context,
-    resendId,
-    deliveryStatus,
-  });
+  // Do not keep a personal message log after a user deletes their account.
+  const shouldLog = context !== "account-deleted";
+  const logged = shouldLog
+    ? await logOutboundMessage({
+        email,
+        phone: "",
+        channel: "email",
+        subject,
+        body: text || html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 2000),
+        context,
+        resendId,
+        deliveryStatus,
+      })
+    : false;
 
   return {
     sent: deliveryStatus === "sent",

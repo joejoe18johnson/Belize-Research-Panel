@@ -82,34 +82,48 @@ export async function deletePanelistByEmail(email: string): Promise<boolean> {
   const { useSupabase } = await import("./supabase/data-source");
   if (useSupabase()) {
     const {
+      supabaseCloseAccount,
       supabaseDeleteAccountByEmail,
       supabaseDeletePanelistByEmail,
       supabaseDeletePanelistStorage,
+      supabaseWipeOutboundMessagesForEmail,
     } = await import("./supabase/repos");
 
+    const username = cleanText(panelist?.username ?? "");
     if (account?.id) {
-      try {
-        await supabaseDeletePanelistStorage(account.id);
-      } catch (error) {
-        logServerError("Panelist storage delete failed", error);
+      await supabaseCloseAccount({
+        accountId: account.id,
+        email: normalized,
+        panelistId: cleanText(panelist?.id),
+        storageFolders: [account.id, cleanText(panelist?.account_id), cleanText(panelist?.id), username],
+      });
+    } else {
+      if (panelist) {
+        try {
+          await supabaseDeletePanelistStorage(cleanText(panelist.id) || username);
+        } catch (error) {
+          logServerError("Panelist storage delete failed", error);
+        }
+        await supabaseDeletePanelistByEmail(normalized);
       }
+      await supabaseDeleteAccountByEmail(normalized).catch(() => undefined);
+      await supabaseWipeOutboundMessagesForEmail(normalized);
     }
 
-    if (panelist) {
-      await supabaseDeletePanelistByEmail(normalized);
-    }
-    if (account) {
-      await supabaseDeleteAccountByEmail(normalized);
-    }
-
-    await deletePanelistRelatedData(normalized, cleanText(panelist?.username ?? ""));
+    await deletePanelistRelatedData(normalized, username, {
+      accountId: account?.id,
+      removeAccount: false,
+    });
     return true;
   }
 
-  await deletePanelistRelatedData(normalized, cleanText(panelist?.username ?? ""));
   if (panelist) {
     const rows = await loadPanelists();
     await savePanelists(rows.filter((row) => cleanText(row.email).toLowerCase() !== normalized));
   }
+  await deletePanelistRelatedData(normalized, cleanText(panelist?.username ?? ""), {
+    accountId: account?.id,
+    removeAccount: "by-email",
+  });
   return true;
 }

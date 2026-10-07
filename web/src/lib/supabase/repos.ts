@@ -339,13 +339,90 @@ export async function supabaseDeletePanelistByEmail(email: string): Promise<bool
   return (data?.length ?? 0) > 0;
 }
 
-/** Removes the login first, then the panelist row. Related survey and reward rows cascade. */
+async function supabaseWipeSupportMessagesForIdentity(input: {
+  email: string;
+  accountId?: string;
+  panelistId?: string;
+}): Promise<void> {
+  const email = normalizePanelistEmail(input.email);
+  if (email) {
+    ignoreMissingTable((await db().from("support_messages").delete().eq("email", email)).error);
+    ignoreMissingTable((await db().from("support_messages").delete().eq("panelist_email", email)).error);
+  }
+  if (cleanText(input.accountId)) {
+    ignoreMissingTable((await db().from("support_messages").delete().eq("account_id", input.accountId)).error);
+  }
+  if (cleanText(input.panelistId)) {
+    ignoreMissingTable((await db().from("support_messages").delete().eq("panelist_id", input.panelistId)).error);
+  }
+}
+
+export async function supabaseWipeOutboundMessagesForEmail(email: string): Promise<void> {
+  const normalized = normalizePanelistEmail(email);
+  if (!normalized) return;
+  ignoreMissingTable((await db().from("outbound_messages").delete().eq("email", normalized)).error);
+}
+
+async function supabaseScrubEmailFromCampaignTargets(email: string): Promise<void> {
+  const normalized = normalizePanelistEmail(email);
+  if (!normalized) return;
+  const { data, error } = await db().from("campaigns").select("id, target_emails");
+  ignoreMissingTable(error);
+  for (const row of data ?? []) {
+    const emails = Array.isArray(row.target_emails) ? row.target_emails.map((entry) => normalizePanelistEmail(String(entry))) : [];
+    if (!emails.includes(normalized)) continue;
+    const next = emails.filter((entry) => entry !== normalized);
+    ignoreMissingTable(
+      (await db().from("campaigns").update({ target_emails: next }).eq("id", row.id)).error
+    );
+  }
+}
+
+async function supabaseScrubEmailFromPanelistGroups(email: string): Promise<void> {
+  const normalized = normalizePanelistEmail(email);
+  if (!normalized) return;
+  const { data, error } = await db().from("panelist_groups").select("id, member_emails");
+  ignoreMissingTable(error);
+  for (const row of data ?? []) {
+    const emails = Array.isArray(row.member_emails)
+      ? row.member_emails.map((entry) => normalizePanelistEmail(String(entry)))
+      : [];
+    if (!emails.includes(normalized)) continue;
+    const next = emails.filter((entry) => entry !== normalized);
+    ignoreMissingTable(
+      (await db().from("panelist_groups").update({ member_emails: next }).eq("id", row.id)).error
+    );
+  }
+}
+
+async function supabaseScrubRegistrarUsedByEmail(email: string): Promise<void> {
+  const normalized = normalizePanelistEmail(email);
+  if (!normalized) return;
+  ignoreMissingTable(
+    (await db().from("authorised_registrars").update({ used_by_email: null }).eq("used_by_email", normalized)).error
+  );
+}
+
+/**
+ * Removes the login, panelist row, storage, and every related personal record.
+ * Survey, reward, upload, and notification rows cascade from the panelist delete.
+ * Support and outbound message tables are wiped explicitly because they only set null on delete.
+ */
 export async function supabaseCloseAccount(input: {
   accountId: string;
   email: string;
+  panelistId?: string;
   storageFolders?: string[];
 }): Promise<void> {
-  await supabaseDeleteAccountById(input.accountId);
+  const email = normalizePanelistEmail(input.email);
+  const panelistId = cleanText(input.panelistId);
+
+  await supabaseWipeSupportMessagesForIdentity({
+    email,
+    accountId: input.accountId,
+    panelistId,
+  });
+  await supabaseWipeOutboundMessagesForEmail(email);
 
   const folders = [...new Set((input.storageFolders ?? []).map((folder) => cleanText(folder)).filter(Boolean))];
   for (const folder of folders) {
@@ -356,10 +433,29 @@ export async function supabaseCloseAccount(input: {
     }
   }
 
+  // Kill the login first so a leftover session cannot reopen the dashboard.
+  await supabaseDeleteAccountById(input.accountId);
+
+  if (panelistId) {
+    try {
+      throwIfError((await db().from("panelists").delete().eq("id", panelistId)).error);
+    } catch (error) {
+      console.error("[account-delete] could not remove the panelist row by id", error);
+    }
+  }
+
   try {
-    await supabaseDeletePanelistByEmail(input.email);
+    await supabaseDeletePanelistByEmail(email);
   } catch (error) {
-    console.error("[account-delete] could not remove the panelist row", error);
+    console.error("[account-delete] could not remove the panelist row by email", error);
+  }
+
+  try {
+    await supabaseScrubEmailFromCampaignTargets(email);
+    await supabaseScrubEmailFromPanelistGroups(email);
+    await supabaseScrubRegistrarUsedByEmail(email);
+  } catch (error) {
+    console.error("[account-delete] could not scrub leftover email references", error);
   }
 }
 
