@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { ThemeMenuToggle } from "@/components/theme/ThemeToggle";
 import { dashboardPrimaryButtonClass } from "@/lib/brand";
 import type { DashboardNavBadges } from "@/lib/dashboard-access";
 import { formatHeadingCase } from "@/lib/sentence-case";
@@ -16,7 +15,7 @@ import {
 import { DASHBOARD_NAV_SECTIONS } from "./dashboard-sections";
 import { UserAvatar } from "./UserAvatar";
 
-function MenuIcon({ className = "h-3 w-3" }: { className?: string }) {
+function MenuIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2.4">
       <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
@@ -92,22 +91,15 @@ export function DashboardAccountMenu({
       <button
         ref={triggerRef}
         type="button"
-        className="relative flex h-10 shrink-0 items-center justify-center rounded-xl p-1 transition hover:bg-teal-50 dark:hover:bg-teal-900/40 sm:h-11 lg:w-auto lg:min-w-0 lg:justify-start lg:gap-2.5 lg:px-1.5"
+        className="relative flex h-10 shrink-0 items-center justify-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-2 text-teal-900 transition hover:border-teal-300 hover:bg-teal-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-teal-600 dark:hover:bg-teal-950 sm:h-11 lg:px-2.5"
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="dialog"
         aria-label={open ? "Close account menu" : "Open account menu"}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="relative">
-          <UserAvatar
-            firstName={firstName}
-            email={email}
-            className={open ? "ring-teal-600 dark:ring-teal-400" : undefined}
-          />
-          <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-teal-800 text-white ring-2 ring-white dark:bg-teal-500 dark:ring-zinc-900 lg:hidden">
-            <MenuIcon />
-          </span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-800 text-white dark:bg-teal-600">
+          {open ? <CloseIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
         </span>
         <div className="hidden min-w-0 max-w-[16rem] text-left lg:block">
           <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{displayName}</p>
@@ -217,9 +209,6 @@ export function DashboardAccountMenu({
                   </ul>
                 </nav>
 
-                <div className="shrink-0 border-t border-teal-50 px-4 py-4 dark:border-teal-900/40">
-                  <ThemeMenuToggle variant="light" />
-                </div>
               </aside>
             </div>,
             document.body

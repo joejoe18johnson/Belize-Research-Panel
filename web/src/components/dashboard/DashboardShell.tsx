@@ -54,7 +54,6 @@ export function DashboardShell({
               logoClassName="text-sm sm:text-base"
             />
             <div className="order-2 flex shrink-0 items-center gap-1.5 lg:order-3">
-              <ThemeIconButton className="lg:hidden" />
               <LogoutButton
                 showIcon
                 className={`${dashboardSecondaryButtonClass} min-h-10 shrink-0 gap-1.5 px-3 text-sm lg:min-h-11 lg:px-4`}
@@ -63,6 +62,7 @@ export function DashboardShell({
             <div className="order-3 flex w-full items-center lg:order-2 lg:ml-auto lg:w-auto lg:gap-3">
               <PointsBalanceLink availablePoints={badges.availablePoints} />
               <div className="ml-auto flex items-center gap-0.5 sm:gap-1 lg:ml-0">
+                <ThemeIconButton />
                 <NotificationBellLink unreadCount={badges.unreadNotifications} />
                 <DashboardAccountMenu
                   email={email}
