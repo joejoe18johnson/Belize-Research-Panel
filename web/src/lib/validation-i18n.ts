@@ -184,9 +184,7 @@ const VALIDATION_ES_EXACT: Record<string, string> = {
     "Demasiado débil. Use mayúsculas, minúsculas, números y símbolos.",
   "Registration failed. Please try again.": "El registro falló. Inténtelo de nuevo.",
   "Network error. Please check your connection and try again.":
-    "El registro no se pudo completar. Inténtelo de nuevo o contacte a soporte si el problema continúa.",
-  "Registration could not be completed. Please try again or contact support if the problem continues.":
-    "El registro no se pudo completar. Inténtelo de nuevo o contacte a soporte si el problema continúa.",
+    "No se pudo completar el registro. Inténtelo de nuevo o contacte a soporte si el problema continúa.",
   "Please fix the highlighted fields before continuing.":
     "Corrija los campos resaltados antes de continuar.",
   "Argentina mobile (e.g. 911-234-5678).": "Argentina móvil (p. ej. 911-234-5678).",
