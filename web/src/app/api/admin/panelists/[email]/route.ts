@@ -24,7 +24,8 @@ import {
 import { loadPanelistPhotoUploadUsernames, requirementContextForPanelist } from "@/lib/panelist-requirement-context";
 import { findPanelistByEmail, updatePanelistAdminFields } from "@/lib/panelists";
 import { setNotificationRead } from "@/lib/notification-state";
-import { purgePhotoIdAfterVerification } from "@/lib/purge-verified-photo-id";
+import { PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
+import { isPhotoIdDocumentPurged, purgePhotoIdAfterVerification } from "@/lib/purge-verified-photo-id";
 import { cleanText, validEmail } from "@/lib/validation";
 
 export async function PATCH(
@@ -115,6 +116,13 @@ export async function PATCH(
 
   const photoDecision = cleanText(body.admin_photo_id_approved).toLowerCase();
   const previousPhotoDecision = readAdminRequirementDecision(panelist, "photoId");
+  if (
+    photoDecision === "false" &&
+    previousPhotoDecision !== "false" &&
+    (await isPhotoIdDocumentPurged(panelist.email))
+  ) {
+    return NextResponse.json({ ok: false, message: PHOTO_ID_DENY_AFTER_PURGE_MESSAGE }, { status: 400 });
+  }
   let photoDenialReason: string | undefined;
   if (photoDecision === "false" && (previousPhotoDecision !== "false" || body.photo_id_denial_reason !== undefined)) {
     photoDenialReason = cleanText(body.photo_id_denial_reason).replace(/\s+/g, " ").slice(0, 400);
@@ -162,29 +170,34 @@ export async function PATCH(
   const notifyEmail = lookupEmail || accountEmail;
   const origin = resolveRequestOrigin(request);
   const noticeNotes: string[] = [];
-  const idDocumentDeleted = fullyVerified
-    ? await purgePhotoIdAfterVerification({ ...panelist, verification_status: verificationStatus })
-    : false;
+  let idDocumentDeleted = false;
+  try {
+    idDocumentDeleted = fullyVerified
+      ? await purgePhotoIdAfterVerification({ ...panelist, verification_status: verificationStatus })
+      : false;
 
-  if (fullyVerified && !wasVerified) {
-    void sendPanelistVerifiedEmail({
-      to: notifyEmail,
-      firstName: panelist.first_name,
-      origin,
-      idDocumentDeleted,
-    });
-    await markRequirementVerifiedEmailsSent(notifyEmail);
-  } else {
-    noticeNotes.push(
-      ...(await emailNewlyVerifiedRequirements({
+    if (fullyVerified && !wasVerified) {
+      void sendPanelistVerifiedEmail({
         to: notifyEmail,
         firstName: panelist.first_name,
         origin,
-        before: panelist,
-        after: { ...merged, verification_status: verificationStatus },
-        context: requirementContext,
-      }))
-    );
+        idDocumentDeleted,
+      });
+      await markRequirementVerifiedEmailsSent(notifyEmail);
+    } else {
+      noticeNotes.push(
+        ...(await emailNewlyVerifiedRequirements({
+          to: notifyEmail,
+          firstName: panelist.first_name,
+          origin,
+          before: panelist,
+          after: { ...merged, verification_status: verificationStatus },
+          context: requirementContext,
+        }))
+      );
+    }
+  } catch (error) {
+    console.error("Panelist verification follow-up failed after the check was saved.", error);
   }
 
   const denialNotes: Array<[keyof typeof ADMIN_REQUIREMENT_FIELDS, string]> = [
@@ -222,6 +235,7 @@ export async function PATCH(
 
   return NextResponse.json({
     ok: true,
+    idDocumentDeleted,
     message: noticeNotes[0]
       ? noticeNotes.join(" ")
       : fullyVerified

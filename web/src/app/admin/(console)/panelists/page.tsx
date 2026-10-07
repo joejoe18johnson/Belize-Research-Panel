@@ -11,6 +11,8 @@ import {
 import { assessPanelistRequirements } from "@/lib/panelist-requirements";
 import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import { useSupabase } from "@/lib/supabase/data-source";
+import { listEmailsWithReadNotification } from "@/lib/notification-state";
+import { PHOTO_ID_PURGED_MARKER } from "@/lib/purge-verified-photo-id";
 import { cleanText } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -39,11 +41,12 @@ export default async function AdminPanelistsPage({
     params.from === "under-review"
       ? adminUnderReviewPath({ queue: params.queue, requirement: params.requirement })
       : undefined;
-  const [rows, accounts, photoUploadUsernames, residenceUploadUsernames] = await Promise.all([
+  const [rows, accounts, photoUploadUsernames, residenceUploadUsernames, purgedPhotoIdEmails] = await Promise.all([
     loadPanelists(),
     listAccounts(),
     loadPanelistPhotoUploadUsernames(),
     loadPanelistResidenceUploadUsernames(),
+    listEmailsWithReadNotification(PHOTO_ID_PURGED_MARKER),
   ]);
 
   if (rows.length === 0) {
@@ -98,6 +101,7 @@ export default async function AdminPanelistsPage({
       returnTo={returnTo}
       photoUploadUsernames={[...photoUploadUsernames]}
       residenceUploadUsernames={[...residenceUploadUsernames]}
+      purgedPhotoIdEmails={purgedPhotoIdEmails}
       liveDatabase={useSupabase()}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),

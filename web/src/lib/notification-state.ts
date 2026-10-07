@@ -70,6 +70,22 @@ export async function setNotificationRead(
   return current;
 }
 
+export async function listEmailsWithReadNotification(notificationId: string): Promise<string[]> {
+  const id = cleanText(notificationId);
+  if (!id) return [];
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseListEmailsWithReadNotification } = await import("./supabase/repos");
+    return supabaseListEmailsWithReadNotification(id);
+  }
+
+  const store = await loadStore();
+  return Object.entries(store)
+    .filter(([, state]) => state[id]?.read)
+    .map(([email]) => email);
+}
+
 export async function markNotificationUnread(email: string, notificationId: string): Promise<NotificationReadState> {
   return setNotificationRead(email, notificationId, false);
 }

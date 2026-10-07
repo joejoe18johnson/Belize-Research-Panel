@@ -14,6 +14,13 @@ export const PHOTO_ID_PURGED_MARKER = "__purged:photo-id";
 export const ID_DOCUMENT_DELETED_NOTICE =
   "Your photo ID document has been deleted and wiped from our database. We do not keep identification images on file after your account is verified.";
 
+export async function isPhotoIdDocumentPurged(email: string): Promise<boolean> {
+  const key = cleanText(email).toLowerCase();
+  if (!key) return false;
+  const readState = await loadNotificationReadState(key);
+  return Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read);
+}
+
 async function deleteLocalPhotoIdFiles(username: string): Promise<boolean> {
   const safeUsername = cleanText(username);
   if (!safeUsername) return false;

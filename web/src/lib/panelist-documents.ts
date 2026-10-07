@@ -58,9 +58,13 @@ export async function loadPanelistVerificationDocument(
   const upload = await findPanelistUpload(cleanText(panelist.username), kind);
   if (!upload) return null;
   const ext = path.extname(upload.filename).toLowerCase();
-  return {
-    buffer: await readFile(upload.absolutePath),
-    filename: upload.filename,
-    contentType: CONTENT_TYPES[ext] ?? "application/octet-stream",
-  };
+  try {
+    return {
+      buffer: await readFile(upload.absolutePath),
+      filename: upload.filename,
+      contentType: CONTENT_TYPES[ext] ?? "application/octet-stream",
+    };
+  } catch {
+    return null;
+  }
 }

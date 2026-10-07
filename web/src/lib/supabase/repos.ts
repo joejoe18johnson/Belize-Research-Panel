@@ -1179,6 +1179,18 @@ export async function supabaseLoadRewardBalanceSeed(email: string): Promise<numb
   return data?.total_points ?? null;
 }
 
+export async function supabaseListEmailsWithReadNotification(notificationId: string): Promise<string[]> {
+  const { data, error } = await db()
+    .from("panelist_notification_reads")
+    .select("panelist_email")
+    .eq("notification_id", notificationId)
+    .eq("read", true);
+  throwIfError(error);
+  return (data ?? [])
+    .map((row) => normalizePanelistEmail(String((row as { panelist_email?: string }).panelist_email ?? "")))
+    .filter(Boolean);
+}
+
 export async function supabaseLoadNotificationReadState(email: string): Promise<NotificationReadState> {
   const { data, error } = await db()
     .from("panelist_notification_reads")

@@ -56,10 +56,9 @@ export function RequirementStatusBadge({
       title={`${label}: ${displayLabel}`}
     >
       <VerificationStatusMark status={toMarkStatus(status)} />
-      <span className="text-sm leading-tight">
-        <span className="font-semibold">{label}</span>
-        <span className="mx-1.5 font-normal opacity-60">·</span>
-        <span className="font-semibold">{displayLabel}</span>
+      <span className="flex min-w-0 flex-col leading-tight">
+        <span className="text-sm font-semibold">{label}</span>
+        <span className="text-xs font-semibold">{displayLabel}</span>
       </span>
     </span>
   );

@@ -37,6 +37,9 @@ function requirementToastTitle(key: "email" | "phone" | "photoId", decision: "tr
 }
 import { DuplicateReviewClusters } from "./DuplicateReviewClusters";
 import { RequirementReviewControls } from "@/components/admin/shared/RequirementReviewControls";
+import { PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
+
+const ADMIN_REQUIREMENT_TOAST_KEY = "brp-admin-requirement-toast";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import {
   ADMIN_REQUIREMENT_FIELDS,
@@ -110,6 +113,7 @@ export function AdminPanelistsClient({
   initialTab,
   photoUploadUsernames,
   residenceUploadUsernames,
+  purgedPhotoIdEmails = [],
   liveDatabase = false,
   returnTo,
 }: {
@@ -130,11 +134,16 @@ export function AdminPanelistsClient({
   initialTab?: "all" | "duplicates" | "flagged";
   photoUploadUsernames: UsernameCollection;
   residenceUploadUsernames: UsernameCollection;
+  purgedPhotoIdEmails?: string[];
   liveDatabase?: boolean;
   returnTo?: string;
 }) {
   const router = useRouter();
   const { showToast } = useToast();
+  const purgedPhotoIdEmailSet = useMemo(
+    () => new Set(purgedPhotoIdEmails.map((email) => cleanText(email).toLowerCase()).filter(Boolean)),
+    [purgedPhotoIdEmails]
+  );
   const [tab, setTab] = useState<"all" | "duplicates" | "flagged">(initialTab ?? "all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState("account_opened_at");
@@ -146,6 +155,7 @@ export function AdminPanelistsClient({
   const [editingRow, setEditingRow] = useState<PanelistRow | null>(null);
   const [editState, setEditState] = useState<EditState | null>(null);
   const [saving, setSaving] = useState(false);
+  const [photoPreviewHeld, setPhotoPreviewHeld] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [markingDuplicates, setMarkingDuplicates] = useState(false);
@@ -306,6 +316,18 @@ export function AdminPanelistsClient({
   };
 
   useEffect(() => {
+    const raw = sessionStorage.getItem(ADMIN_REQUIREMENT_TOAST_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(ADMIN_REQUIREMENT_TOAST_KEY);
+    try {
+      const toast = JSON.parse(raw) as { title?: string; body?: string; tone?: "success" | "warning" | "error" | "info" };
+      if (toast.title) showToast({ title: toast.title, body: toast.body, tone: toast.tone });
+    } catch {
+      sessionStorage.removeItem(ADMIN_REQUIREMENT_TOAST_KEY);
+    }
+  }, [showToast]);
+
+  useEffect(() => {
     if (initialTab) setTab(initialTab);
   }, [initialTab]);
 
@@ -348,6 +370,11 @@ export function AdminPanelistsClient({
     reason?: string
   ) => {
     if (!editState || !editingRow || !editingEmail || saving) return;
+    if (key === "photoId" && decision === "false" && purgedPhotoIdEmailSet.has(editingEmail.toLowerCase())) {
+      setError(PHOTO_ID_DENY_AFTER_PURGE_MESSAGE);
+      showToast({ tone: "error", title: "Check not saved", body: PHOTO_ID_DENY_AFTER_PURGE_MESSAGE });
+      return;
+    }
 
     const field =
       key === "email"
@@ -381,6 +408,9 @@ export function AdminPanelistsClient({
     setSaving(true);
     setMessage("");
     setError("");
+    const verifyingPhoto = key === "photoId" && decision === "true";
+    if (verifyingPhoto) setPhotoPreviewHeld(true);
+    let saved = false;
     try {
       const res = await fetch(`/api/admin/panelists/${encodeURIComponent(editingEmail)}`, {
         method: "PATCH",
@@ -392,31 +422,43 @@ export function AdminPanelistsClient({
             : {}),
         }),
       });
-      const data = (await res.json()) as { ok?: boolean; message?: string };
-      if (!res.ok) {
-        const failure = data.message ?? "Could not save this check.";
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+      if (!res.ok || !data) {
+        const failure = data?.message ?? "Could not save this check.";
         setEditState(editState);
+        setPhotoPreviewHeld(false);
         setError(failure);
         showToast({ tone: "error", title: "Check not saved", body: failure });
         return;
       }
+      saved = true;
       const success = data.message ?? "Record updated successfully.";
       const tellsThePanelist = /panelist/i.test(success);
       const fullyVerified = /fully verified/i.test(success);
-      setEditingRow(mergedRow);
-      setMessage(success);
-      showToast({
-        tone: decision === "true" ? "success" : "warning",
+      const toast = {
+        tone: decision === "true" ? ("success" as const) : ("warning" as const),
         title: fullyVerified ? "Account verified" : requirementToastTitle(key, decision),
         body: tellsThePanelist ? success : "Saved. The panelist will see this in their alerts.",
-      });
+      };
+      if (verifyingPhoto) {
+        sessionStorage.setItem(ADMIN_REQUIREMENT_TOAST_KEY, JSON.stringify(toast));
+        const url = new URL(window.location.href);
+        url.searchParams.set("email", editingEmail);
+        window.location.assign(url.toString());
+        return;
+      }
+      setEditingRow(mergedRow);
+      setMessage(success);
+      showToast(toast);
       router.refresh();
     } catch {
+      if (saved) return;
       setEditState(editState);
+      setPhotoPreviewHeld(false);
       setError("Network error. Please try again.");
       showToast({ tone: "error", title: "Check not saved", body: "Network error. Please try again." });
     } finally {
-      setSaving(false);
+      if (!saved || !verifyingPhoto) setSaving(false);
     }
   };
 
@@ -848,6 +890,8 @@ export function AdminPanelistsClient({
           authorisedCode={parseAuthorisedRegistration(editingRow).code}
           authorisedBy={parseAuthorisedRegistration(editingRow).registrarName}
           panelistEmail={editingRow.email}
+          photoIdDeleted={purgedPhotoIdEmailSet.has(cleanText(editingRow.email).toLowerCase())}
+          photoPreviewSuppressed={photoPreviewHeld}
           requirementContext={requirementReviewContext}
           onRequirementDecision={applyRequirementDecision}
           onChange={setEditState}
@@ -887,6 +931,8 @@ function PanelistEditModal({
   authorisedCode,
   authorisedBy,
   panelistEmail,
+  photoIdDeleted = false,
+  photoPreviewSuppressed = false,
   requirementContext,
   onRequirementDecision,
   onChange,
@@ -906,6 +952,8 @@ function PanelistEditModal({
   authorisedCode: string;
   authorisedBy: string;
   panelistEmail: string;
+  photoIdDeleted?: boolean;
+  photoPreviewSuppressed?: boolean;
   requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean; emailVerified?: boolean };
   onRequirementDecision: (key: "email" | "phone" | "photoId", decision: "true" | "false", reason?: string) => void;
   onChange: (state: EditState) => void;
@@ -944,7 +992,9 @@ function PanelistEditModal({
     phone: editState.phone_whatsapp,
     photoIdType,
     photoIdDenialReason,
-    photoIdDocumentUrl: `${documentBase}?kind=photo-id`,
+    photoIdDeleted,
+    photoPreviewSuppressed,
+    photoIdDocumentUrl: photoIdDeleted || photoPreviewSuppressed ? undefined : `${documentBase}?kind=photo-id`,
     residenceDocumentUrl: requirementContext.hasResidenceUpload
       ? `${documentBase}?kind=residence-proof`
       : undefined,

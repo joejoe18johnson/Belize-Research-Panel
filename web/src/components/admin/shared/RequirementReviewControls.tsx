@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { AdminRequirementDecision, RequirementApprovalStatus } from "@/lib/panelist-requirements";
+import { PHOTO_ID_DENY_AFTER_PURGE_MESSAGE } from "@/lib/photo-id-purge-copy";
 import { RequirementStatusBadge } from "./RequirementStatusBadges";
 
 type ReviewKey = "email" | "phone" | "photoId";
@@ -12,6 +13,8 @@ export interface RequirementReviewDetail {
   phone: string;
   photoIdType: string;
   photoIdDenialReason?: string;
+  photoIdDeleted?: boolean;
+  photoPreviewSuppressed?: boolean;
   photoIdDocumentUrl?: string;
   residenceDocumentUrl?: string;
 }
@@ -92,7 +95,8 @@ function PhotoIdPreview({ url }: { url: string }) {
     setStatus("loading");
     setPreview(null);
 
-    fetch(url, { credentials: "same-origin" })
+    const controller = new AbortController();
+    fetch(url, { credentials: "same-origin", signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("missing");
         const type = (response.headers.get("content-type") || "").toLowerCase();
@@ -108,6 +112,7 @@ function PhotoIdPreview({ url }: { url: string }) {
 
     return () => {
       cancelled = true;
+      controller.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [url]);
@@ -204,7 +209,11 @@ function RequirementOnFileDetail({
           <p className="mt-0.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">{detail.photoIdType}</p>
         </div>
       ) : null}
-      {photoUrl ? (
+      {detail.photoPreviewSuppressed ? (
+        <p className="text-[11px] leading-snug text-zinc-700 dark:text-zinc-200">Saving this verification…</p>
+      ) : detail.photoIdDeleted ? (
+        <p className="text-[11px] leading-snug text-zinc-800 dark:text-zinc-100">{PHOTO_ID_DENY_AFTER_PURGE_MESSAGE}</p>
+      ) : photoUrl ? (
         <PhotoIdPreview url={photoUrl} />
       ) : (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-400">No panelist email on this record, so the ID file cannot be loaded.</p>
@@ -242,6 +251,7 @@ export function RequirementReviewControls({
         const denied = decision === "false";
         const note = itemNotes?.[item.key];
         const emailLocked = item.key === "email" && verified && Boolean(note);
+        const photoLocked = item.key === "photoId" && Boolean(detail.photoIdDeleted);
 
         return (
           <div key={item.key} className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-sm">
@@ -328,8 +338,8 @@ export function RequirementReviewControls({
               </button>
               <button
                 type="button"
-                disabled={disabled || !onFile[item.key] || denied || emailLocked}
-                aria-label={denied ? "Denied" : "Deny"}
+                disabled={disabled || !onFile[item.key] || denied || emailLocked || photoLocked}
+                aria-label={photoLocked ? PHOTO_ID_DENY_AFTER_PURGE_MESSAGE : denied ? "Denied" : "Deny"}
                 onClick={() => {
                   if (item.key === "photoId") {
                     setPhotoDenialReason(detail.photoIdDenialReason ?? "");
