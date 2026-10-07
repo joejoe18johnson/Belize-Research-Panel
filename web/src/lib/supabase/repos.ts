@@ -44,6 +44,14 @@ function db() {
   return getSupabaseAdmin();
 }
 
+function isStorageObjectMissing(error: { message?: string; statusCode?: string | number; status?: number } | null): boolean {
+  if (!error) return false;
+  const status = String(error.statusCode ?? error.status ?? "");
+  if (status === "404") return true;
+  const message = (error.message ?? "").toLowerCase();
+  return message.includes("not found") || message.includes("does not exist");
+}
+
 function throwIfError(error: { message: string; code?: string } | null): void {
   if (!error) return;
   if (error.code === "23505") {
@@ -106,7 +114,15 @@ function isNotNullViolation(error: { message?: string; code?: string } | null, c
 export async function supabaseListAccounts(): Promise<AccountRecord[]> {
   const { data, error } = await db().from("accounts").select("*");
   throwIfError(error);
-  return (data ?? []).map((row) => accountRowToRecord(row as Record<string, unknown>));
+  const accounts: AccountRecord[] = [];
+  for (const row of data ?? []) {
+    try {
+      accounts.push(accountRowToRecord(row as Record<string, unknown>));
+    } catch (mapError) {
+      console.error("[accounts] skipped a record that could not be read", mapError);
+    }
+  }
+  return accounts;
 }
 
 export async function supabaseFindAccountsByEmail(email: string): Promise<AccountRecord[]> {
@@ -292,7 +308,15 @@ export async function supabaseRetargetPanelistEmail(oldEmail: string, newEmail: 
 export async function supabaseListPanelists(): Promise<PanelistRow[]> {
   const { data, error } = await db().from("panelists").select("*");
   throwIfError(error);
-  return (data ?? []).map((row) => panelistRowToRecord(row as Record<string, unknown>));
+  const rows: PanelistRow[] = [];
+  for (const row of data ?? []) {
+    try {
+      rows.push(panelistRowToRecord(row as Record<string, unknown>));
+    } catch (mapError) {
+      console.error("[panelists] skipped a record that could not be read", mapError);
+    }
+  }
+  return rows;
 }
 
 export async function supabaseDeleteAccountById(id: string): Promise<void> {
@@ -526,7 +550,7 @@ export async function supabaseDeletePhotoIdDocument(panelist: PanelistRow): Prom
   if (discovered) paths.add(discovered);
   if (paths.size) {
     const { error } = await db().storage.from("panelist-documents").remove([...paths]);
-    if (error) throwIfError(error);
+    if (error && !isStorageObjectMissing(error)) throwIfError(error);
   }
 
   const panelistId = cleanText(panelist.id);

@@ -1,3 +1,3 @@
-export function isPanelistVerified(verificationStatus: string): boolean {
-  return verificationStatus.toLowerCase() === "verified";
+export function isPanelistVerified(verificationStatus: unknown): boolean {
+  return String(verificationStatus ?? "").trim().toLowerCase() === "verified";
 }

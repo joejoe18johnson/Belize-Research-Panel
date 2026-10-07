@@ -27,6 +27,15 @@ import {
 } from "./verification-notices";
 import { cleanText } from "./validation";
 
+/** Follow-up work must not turn a saved login into the dashboard error page. */
+async function runDashboardFollowUp(label: string, task: () => Promise<unknown>): Promise<void> {
+  try {
+    await task();
+  } catch (error) {
+    console.error(`[dashboard] ${label} failed`, error);
+  }
+}
+
 export interface DashboardNavBadges {
   unreadNotifications: number;
   inboxSurveys: number;
@@ -82,7 +91,7 @@ export async function requireDashboardContext(options: { welcome?: boolean } = {
   }
 
   if (isPanelistVerified(panelist.verification_status)) {
-    await purgePhotoIdAfterVerification(panelist);
+    await runDashboardFollowUp("delete verified photo ID", () => purgePhotoIdAfterVerification(panelist));
   }
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(account.email, profile);
@@ -113,7 +122,7 @@ export async function getDashboardNavBadges(email: string, accountId?: string): 
   }
 
   if (isPanelistVerified(panelist.verification_status)) {
-    await purgePhotoIdAfterVerification(panelist);
+    await runDashboardFollowUp("delete verified photo ID", () => purgePhotoIdAfterVerification(panelist));
   }
   const profile = panelistRowToDashboardProfile(panelist);
   const rewards = await resolveRewardSummary(email, profile);
@@ -126,12 +135,14 @@ export async function getDashboardNavBadges(email: string, accountId?: string): 
     hasPhotoUpload: Boolean(cleanText(panelist.photo_id_path) || cleanText(panelist.photo_id_type)),
   };
   if (!isPanelistVerified(panelist.verification_status)) {
-    await emailApprovedRequirementsIfUnsent({
-      to: email,
-      firstName: panelist.first_name,
-      panelist,
-      context: requirementContext,
-    });
+    await runDashboardFollowUp("send requirement emails", () =>
+      emailApprovedRequirementsIfUnsent({
+        to: email,
+        firstName: panelist.first_name,
+        panelist,
+        context: requirementContext,
+      })
+    );
   }
   const notifications = buildDashboardNotifications(profile, {
     readState,

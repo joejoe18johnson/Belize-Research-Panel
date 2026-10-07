@@ -53,9 +53,13 @@ function isoOrEmpty(value: string | null | undefined): string {
   return value;
 }
 
-function dateOnlyOrEmpty(value: string | null | undefined): string {
-  if (!value) return "";
-  return value.slice(0, 10);
+function dateOnlyOrEmpty(value: unknown): string {
+  if (value == null || value === "") return "";
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? "" : value.toISOString().slice(0, 10);
+  }
+  const text = cleanText(value);
+  return text ? text.slice(0, 10) : "";
 }
 
 function parseFlexibleDateOnly(value: string | null | undefined): string | null {

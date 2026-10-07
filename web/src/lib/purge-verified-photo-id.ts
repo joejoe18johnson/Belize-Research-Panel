@@ -58,9 +58,9 @@ async function photoIdDocumentExists(panelist: PanelistRow): Promise<boolean> {
  * Removes the stored photo ID file once the account is verified.
  * Returns true only the first time a document is actually deleted.
  */
-export async function purgePhotoIdAfterVerification(panelist: PanelistRow): Promise<boolean> {
+async function purgePhotoIdAfterVerificationNow(panelist: PanelistRow): Promise<boolean> {
   const email = cleanText(panelist.email).toLowerCase();
-  if (!email || !isPanelistVerified(cleanText(panelist.verification_status))) return false;
+  if (!email || !isPanelistVerified(panelist.verification_status)) return false;
 
   const readState = await loadNotificationReadState(email);
   if (readState[PHOTO_ID_PURGED_MARKER]?.read) return false;
@@ -76,4 +76,18 @@ export async function purgePhotoIdAfterVerification(panelist: PanelistRow): Prom
   await clearPanelistPhotoIdPath(email);
   await setNotificationRead(email, PHOTO_ID_PURGED_MARKER, true);
   return true;
+}
+
+/**
+ * Removes the stored photo ID file once the account is verified.
+ * Returns true only the first time a document is actually deleted.
+ * Failures are logged and swallowed so opening the dashboard cannot 500.
+ */
+export async function purgePhotoIdAfterVerification(panelist: PanelistRow): Promise<boolean> {
+  try {
+    return await purgePhotoIdAfterVerificationNow(panelist);
+  } catch (error) {
+    console.error("[photo-id] verified ID could not be deleted; dashboard will still load", error);
+    return false;
+  }
 }
