@@ -167,13 +167,42 @@ function withAccountCitizenshipLock(
   };
 }
 
+/** Instagram and TikTok live under Other contact now; fold older drafts into that field. */
+function foldDedicatedSocialsIntoOther(form: RegistrationFormData): RegistrationFormData {
+  const instagram = cleanText(form.instagram);
+  const tiktok = cleanText(form.tiktok);
+  if (!instagram && !tiktok) {
+    return { ...form, instagram: "", tiktok: "" };
+  }
+
+  let next = { ...form, instagram: "", tiktok: "" };
+  if (!cleanText(next.otherContact)) {
+    if (instagram) {
+      next = {
+        ...next,
+        otherContactPlatform: "Instagram",
+        otherContactPlatformCustom: "",
+        otherContact: instagram,
+      };
+    } else if (tiktok) {
+      next = {
+        ...next,
+        otherContactPlatform: "TikTok",
+        otherContactPlatformCustom: "",
+        otherContact: tiktok,
+      };
+    }
+  }
+  return next;
+}
+
 export function RegistrationForm({ account }: { account: RegistrationAccountContext }) {
   const citizenshipLocked = Boolean(cleanText(account.citizenshipStatus));
   const [form, setForm] = useState<RegistrationFormData>(() => {
     const base = buildInitialForm(account);
     const draft = loadRegistrationDraft(account.email);
     const merged = draft ? mergeDraftIntoForm(base, draft) : base;
-    return withAccountCitizenshipLock(merged, account);
+    return foldDedicatedSocialsIntoOther(withAccountCitizenshipLock(merged, account));
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -529,8 +558,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       [rl.accountEmail, asked(account.email)],
       [rl.phone, asked(getFullPhoneNumber(form))],
       [rl.facebook, asked(form.facebook)],
-      [rl.instagram, asked(form.instagram)],
-      [rl.tiktok, asked(form.tiktok)],
       [rl.otherPlatform, asked(otherPlatform)],
       [rl.otherContact, asked(form.otherContact)],
       [rl.streetAddress, addressAsked ? asked([form.addressHouseNumber, form.streetAddress].filter(Boolean).join(" ")) : na],
@@ -696,7 +723,12 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
     const buildBody = () => {
       const body = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
+      const payload = foldDedicatedSocialsIntoOther(form);
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "instagram" || key === "tiktok") {
+          body.append(key, "");
+          return;
+        }
         if (value instanceof File) {
           if (value) body.append(key, value);
         } else if (Array.isArray(value)) {
@@ -1418,22 +1450,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                   error={fieldError("phoneLocalNumber")}
                 />
               </Field>
-              <SocialContactField
-                platform="instagram"
-                label={copy.instagram}
-                id="instagram"
-                value={form.instagram}
-                onChange={(value) => update("instagram", value)}
-                placeholder={copy.instagramPlaceholder}
-              />
-              <SocialContactField
-                platform="tiktok"
-                label={copy.tiktok}
-                id="tiktok"
-                value={form.tiktok}
-                onChange={(value) => update("tiktok", value)}
-                placeholder={copy.tiktokPlaceholder}
-              />
               <div className="space-y-4">
                 <Field label={copy.otherPlatform} hint={copy.optional} id="otherContactPlatform">
                   <SelectInput id="otherContactPlatform" value={form.otherContactPlatform} onChange={(e) => update("otherContactPlatform", e.target.value)} error={fieldError("otherContactPlatform")}>
@@ -1446,9 +1462,27 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
                     <TextInput id="otherContactPlatformCustom" value={form.otherContactPlatformCustom} onChange={(e) => update("otherContactPlatformCustom", e.target.value)} placeholder={copy.otherPlatformPlaceholder} />
                   </Field>
                 ) : null}
-                <Field label={otherPlatform === "Second email address" ? copy.secondEmail : copy.otherContact} hint={copy.optional} error={fieldError("otherContact")} id="otherContact">
-                  <TextInput id="otherContact" value={form.otherContact} onChange={(e) => update("otherContact", e.target.value)} onBlur={() => touchAndValidate("otherContact")} placeholder={otherPlatform === "Second email address" ? copy.secondEmailPlaceholder : copy.otherContactPlaceholder} error={fieldError("otherContact")} />
-                </Field>
+                {form.otherContactPlatform ? (
+                  <Field
+                    label={otherPlatform === "Second email address" ? copy.secondEmail : copy.otherContact}
+                    hint={copy.optional}
+                    error={fieldError("otherContact")}
+                    id="otherContact"
+                  >
+                    <TextInput
+                      id="otherContact"
+                      value={form.otherContact}
+                      onChange={(e) => update("otherContact", e.target.value)}
+                      onBlur={() => touchAndValidate("otherContact")}
+                      placeholder={
+                        otherPlatform === "Second email address"
+                          ? copy.secondEmailPlaceholder
+                          : copy.otherContactPlaceholder
+                      }
+                      error={fieldError("otherContact")}
+                    />
+                  </Field>
+                ) : null}
               </div>
             </FieldGroup>
             {errors.contact ? (
@@ -1535,16 +1569,6 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
               {cleanText(form.facebook) ? (
                 <p>
                   <strong>{copy.reviewLabels.facebook}:</strong> {form.facebook}
-                </p>
-              ) : null}
-              {cleanText(form.instagram) ? (
-                <p>
-                  <strong>{copy.reviewLabels.instagram}:</strong> {form.instagram}
-                </p>
-              ) : null}
-              {cleanText(form.tiktok) ? (
-                <p>
-                  <strong>{copy.reviewLabels.tiktok}:</strong> {form.tiktok}
                 </p>
               ) : null}
               {otherContactDisplay ? (

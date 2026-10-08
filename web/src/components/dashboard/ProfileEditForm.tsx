@@ -545,20 +545,6 @@ export function ProfileEditForm({
             value={form.facebook}
             onChange={(value) => update("facebook", value)}
           />
-          <SocialContactField
-            platform="instagram"
-            label="Instagram"
-            id="instagram"
-            value={form.instagram}
-            onChange={(value) => update("instagram", value)}
-          />
-          <SocialContactField
-            platform="tiktok"
-            label="TikTok"
-            id="tiktok"
-            value={form.tiktok}
-            onChange={(value) => update("tiktok", value)}
-          />
 
           <Field label="Other contact platform" id="otherContactPlatform">
             <SelectInput
@@ -585,14 +571,28 @@ export function ProfileEditForm({
             </Field>
           ) : null}
 
-          <Field label="Other contact handle / number" id="otherContact">
-            <TextInput
+          {form.otherContactPlatform ? (
+            <Field
+              label={
+                form.otherContactPlatform === "Second email address"
+                  ? "Second email address"
+                  : "Profile link or username"
+              }
               id="otherContact"
-              value={form.otherContact}
-              onChange={(e) => update("otherContact", e.target.value)}
-              error={errors.otherContact}
-            />
-          </Field>
+            >
+              <TextInput
+                id="otherContact"
+                value={form.otherContact}
+                onChange={(e) => update("otherContact", e.target.value)}
+                placeholder={
+                  form.otherContactPlatform === "Second email address"
+                    ? "name@example.com"
+                    : "@username or profile link"
+                }
+                error={errors.otherContact}
+              />
+            </Field>
+          ) : null}
 
           {streetAddressRequired ? (
             <StreetAddressFields

@@ -392,6 +392,8 @@ export function normalizeContactPlatform(value: string): string {
     linkedin: "LinkedIn",
     wechat: "WeChat",
     snapchat: "Snapchat",
+    instagram: "Instagram",
+    tiktok: "TikTok",
     x: "X",
     twitter: "X / Twitter",
     "twitter/x": "X / Twitter",

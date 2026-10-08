@@ -41,7 +41,31 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
   }
 
   const otherPlatform = cleanText(row.other_contact_platform);
-  const isKnownPlatform = OTHER_CONTACT_PLATFORM_OPTIONS.includes(otherPlatform);
+  const otherContact = cleanText(row.other_contact);
+  const legacyInstagram = cleanText(row.instagram);
+  const legacyTiktok = cleanText(row.tiktok);
+  let otherContactPlatform = OTHER_CONTACT_PLATFORM_OPTIONS.includes(otherPlatform)
+    ? otherPlatform
+    : otherPlatform
+      ? "Other"
+      : "";
+  let otherContactPlatformCustom = OTHER_CONTACT_PLATFORM_OPTIONS.includes(otherPlatform)
+    ? ""
+    : otherPlatform;
+  let otherContactValue = otherContact;
+
+  // Older profiles stored Instagram/TikTok as dedicated fields; fold them into Other contact.
+  if (!otherContactValue) {
+    if (legacyInstagram) {
+      otherContactPlatform = "Instagram";
+      otherContactPlatformCustom = "";
+      otherContactValue = legacyInstagram;
+    } else if (legacyTiktok) {
+      otherContactPlatform = "TikTok";
+      otherContactPlatformCustom = "";
+      otherContactValue = legacyTiktok;
+    }
+  }
 
   return {
     education: row.education ?? "",
@@ -52,11 +76,11 @@ export function profileUpdateFormFromRow(row: PanelistRow): ProfileUpdateFormDat
     registeredCtvArea,
     registeredCtvAreaOther,
     facebook: row.facebook ?? "",
-    instagram: row.instagram ?? "",
-    tiktok: row.tiktok ?? "",
-    otherContactPlatform: isKnownPlatform ? otherPlatform : otherPlatform ? "Other" : "",
-    otherContactPlatformCustom: isKnownPlatform ? "" : otherPlatform,
-    otherContact: row.other_contact ?? "",
+    instagram: "",
+    tiktok: "",
+    otherContactPlatform,
+    otherContactPlatformCustom,
+    otherContact: otherContactValue,
     ...parseStreetAddress(row.street_address ?? ""),
     placeOfResidence,
     cityTownVillage,

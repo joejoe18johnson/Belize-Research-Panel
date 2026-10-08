@@ -186,13 +186,15 @@ export function DashboardProfileView({
             <ProfileField label="Email address" value={profile.email} />
             <ProfileField label="Phone / WhatsApp" value={profile.phone} />
             <ProfileField label="Facebook" value={profile.facebook} />
-            <ProfileField label="Instagram" value={profile.instagram} />
-            <ProfileField label="TikTok" value={profile.tiktok} />
             {profile.otherContact ? (
               <ProfileField
                 label={profile.otherContactPlatform || "Other contact"}
                 value={profile.otherContact}
               />
+            ) : profile.instagram ? (
+              <ProfileField label="Instagram" value={profile.instagram} />
+            ) : profile.tiktok ? (
+              <ProfileField label="TikTok" value={profile.tiktok} />
             ) : null}
           </dl>
         </DashboardCard>
