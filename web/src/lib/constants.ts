@@ -267,6 +267,18 @@ export function isCommonwealthCitizenInBelize(citizenshipStatus: string): boolea
   );
 }
 
+/**
+ * Commonwealth citizens living in Belize need residence proof only when they are
+ * not registered to vote. Registered voters are exempt.
+ */
+export function requiresCommonwealthResidenceProof(
+  citizenshipStatus: string,
+  votingStatus: string
+): boolean {
+  if (!isCommonwealthCitizenInBelize(citizenshipStatus)) return false;
+  return votingStatus.trim() === "No";
+}
+
 export function isBelizeanCitizenship(citizenshipStatus: string): boolean {
   return (
     citizenshipStatus === CITIZENSHIP_BELIZEAN_IN_BELIZE ||

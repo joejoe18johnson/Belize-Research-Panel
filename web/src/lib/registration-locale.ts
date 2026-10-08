@@ -361,7 +361,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "Confirmed when you created your account. It cannot be changed here.",
     voterQuestion: "Are you registered to vote in Belize?",
     proofAlert:
-      "Commonwealth citizens must provide proof that they are currently resident in Belize. This protects the integrity of the panel.",
+      "If you are a Commonwealth citizen living in Belize and are not registered to vote, provide proof of current residence. Registered voters do not need to upload residence proof.",
     proofType: "Proof of residence in Belize",
     proofUpload: "Upload proof of Belize residence",
     nameAlert:
@@ -607,7 +607,7 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
       "Confirmado al crear su cuenta. No se puede cambiar aquí.",
     voterQuestion: "¿Está registrado para votar en Belice?",
     proofAlert:
-      "Los ciudadanos de la Commonwealth deben presentar comprobante de que actualmente residen en Belice. Esto protege la integridad del panel.",
+      "Si es ciudadano de la Commonwealth que vive en Belice y no está registrado para votar, presente comprobante de residencia actual. Los votantes registrados no necesitan subir comprobante de residencia.",
     proofType: "Comprobante de residencia en Belice",
     proofUpload: "Subir comprobante de residencia en Belice",
     nameAlert:

@@ -21,7 +21,13 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
       : photo?.status === "denied"
         ? "Your photo identification was not approved. Submit another document below."
         : "Your photo identification is still under review.";
-  return `Your email is already verified. ${phoneCopy} ${photoCopy} Commonwealth citizens in Belize may also need proof of residence.`;
+  const residence = summary.items.find((item) => item.id === "proof_of_residence");
+  const residenceCopy = residence
+    ? residence.status === "verified"
+      ? "Your proof of Belize residence is verified."
+      : "Proof of Belize residence is still needed."
+    : "";
+  return `Your email is already verified. ${phoneCopy} ${photoCopy}${residenceCopy ? ` ${residenceCopy}` : ""}`;
 }
 
 export function DashboardVerificationSection({ summary }: { summary: VerificationCenterSummary }) {

@@ -1,7 +1,7 @@
 import type { RegistrationFormData } from "./registration-types";
 import {
   hasRegisteredCtvQuestion,
-  isCommonwealthCitizenInBelize,
+  requiresCommonwealthResidenceProof,
   isHeadOfHousehold,
   isUnitedStatesCountry,
 } from "./constants";
@@ -194,7 +194,10 @@ function collectPhaseErrors(
   if (phaseIndex === ELIGIBILITY_PHASE && !isEligibleCitizenship(form.citizenshipStatus)) {
     delete allErrors.votingStatus;
   }
-  if (phaseIndex === ELIGIBILITY_PHASE && !isCommonwealthCitizenInBelize(form.citizenshipStatus)) {
+  if (
+    phaseIndex === ELIGIBILITY_PHASE &&
+    !requiresCommonwealthResidenceProof(form.citizenshipStatus, form.votingStatus)
+  ) {
     delete allErrors.proofOfBelizeResidenceType;
     delete allErrors.proofOfBelizeResidenceFile;
   }

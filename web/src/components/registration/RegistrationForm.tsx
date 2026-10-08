@@ -46,6 +46,7 @@ import {
   getResidenceOptions,
   hasRegisteredCtvQuestion,
   isCommonwealthCitizenInBelize,
+  requiresCommonwealthResidenceProof,
   isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveAbroad,
@@ -387,6 +388,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         next.constituency = "";
         next.registeredCtvArea = "";
         next.registeredCtvAreaOther = "";
+        if (String(value) === "Yes") {
+          next.proofOfBelizeResidenceType = "";
+          next.proofOfBelizeResidenceFile = null;
+        }
       }
       if (key === "constituency") {
         next.registeredCtvArea = "";
@@ -454,7 +459,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
   const eligibleCitizenship = isEligibleCitizenship(form.citizenshipStatus);
   const citizenshipIneligible =
     activePhaseIndex === 1 && Boolean(form.citizenshipStatus) && !eligibleCitizenship;
-  const needsCommonwealthCountry = isCommonwealthCitizenInBelize(form.citizenshipStatus);
+  const needsResidenceProof = requiresCommonwealthResidenceProof(
+    form.citizenshipStatus,
+    form.votingStatus
+  );
   const needsVoterQuestion = needsVoterRegistrationQuestion(form.citizenshipStatus);
   const registeredVoter = isRegisteredVoter(form.citizenshipStatus, form.votingStatus);
   const progressInput = { form, registeredVoter };
@@ -507,7 +515,10 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     const ctvAsked = registeredVoter && hasRegisteredCtvQuestion(form.constituency);
     const interestsAsked = !skipsInterestsPhase(form.placeOfResidence);
     const usRegionAsked = livingAbroad && isUnitedStatesCountry(form.countryIfAbroad);
-    const proofAsked = isCommonwealthCitizenInBelize(form.citizenshipStatus);
+    const proofAsked = requiresCommonwealthResidenceProof(
+      form.citizenshipStatus,
+      form.votingStatus
+    );
     const addressAsked = streetAddressRequired || physicalAddressComplete;
     const rl = copy.reviewLabels;
 
@@ -1043,7 +1054,7 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
         </div>
       ) : null}
 
-      {needsCommonwealthCountry && !citizenshipIneligible ? (
+      {needsResidenceProof && !citizenshipIneligible ? (
         <FormSection step={4} title={copy.sections.proofResidence}>
           <Alert variant="warning">{copy.proofAlert}</Alert>
           <Field label={copy.proofType} required error={fieldError("proofOfBelizeResidenceType")} id="proofOfBelizeResidenceType">

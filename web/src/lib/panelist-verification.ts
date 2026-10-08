@@ -3,7 +3,7 @@ import type { PanelistRow } from "./panelists";
 import { panelistHasUpload } from "./panelists";
 import { formatHeadingCase } from "./sentence-case";
 import { parseAuthorisedRegistration } from "./authorised-registrars";
-import { isCommonwealthCitizenInBelize } from "./constants";
+import { requiresCommonwealthResidenceProof } from "./constants";
 import { assessPanelistRequirements, type RequirementApprovalStatus } from "./panelist-requirements";
 import { cleanText } from "./validation";
 import { loadNotificationReadState } from "./notification-state";
@@ -80,7 +80,10 @@ export async function buildVerificationCenterSummary(
   const username = cleanText(panelist.username);
   const phone = cleanText(panelist.phone_whatsapp);
   const photoIdType = cleanText(panelist.photo_id_type);
-  const isCommonwealthInBelize = isCommonwealthCitizenInBelize(cleanText(panelist.citizenship_status));
+  const needsResidenceProof = requiresCommonwealthResidenceProof(
+    cleanText(panelist.citizenship_status),
+    cleanText(panelist.voting_status)
+  );
   const authorisedRegistration = parseAuthorisedRegistration(panelist);
 
   const [hasPhotoUpload, hasResidenceUpload] = await Promise.all([
@@ -161,12 +164,12 @@ export async function buildVerificationCenterSummary(
     },
   ];
 
-  if (isCommonwealthInBelize) {
+  if (needsResidenceProof) {
     items.push({
       id: "proof_of_residence",
       label: formatHeadingCase("Proof of Belize residence"),
       description: formatHeadingCase(
-        "Required for Commonwealth citizens living in Belize to confirm current residency."
+        "Required for Commonwealth citizens living in Belize who are not registered to vote, to confirm current residency."
       ),
       valueOnFile: residenceOnFile
         ? formatHeadingCase("Document submitted with registration")

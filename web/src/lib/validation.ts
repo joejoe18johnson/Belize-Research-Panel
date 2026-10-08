@@ -14,12 +14,12 @@ import {
   MAX_MARKET_INTERESTS,
   OTHER_RESIDENCE_COUNTRIES,
   hasRegisteredCtvQuestion,
-  isCommonwealthCitizenInBelize,
   isHeadOfHousehold,
   isUnitedStatesCountry,
   mustLiveAbroad,
   mustLiveInBelize,
   needsVoterRegistrationQuestion,
+  requiresCommonwealthResidenceProof,
   US_DIASPORA_REGIONS,
 } from "./constants";
 import { isValidDobString, parseBirthDate } from "./dob";
@@ -449,7 +449,7 @@ export function validateRegistrationForm(
     }
   }
 
-  if (isCommonwealthCitizenInBelize(data.citizenshipStatus)) {
+  if (requiresCommonwealthResidenceProof(data.citizenshipStatus, data.votingStatus)) {
     if (!cleanText(data.proofOfBelizeResidenceType)) {
       errors.proofOfBelizeResidenceType = "Please provide proof of residence in Belize for Commonwealth citizens.";
     }
