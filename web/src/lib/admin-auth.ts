@@ -24,8 +24,12 @@ function staffDisplayName(user: StaffUserRecord): string {
 
 export async function setAdminSessionCookie(session: Omit<AdminSession, "exp">): Promise<void> {
   const cookieStore = await cookies();
+  // Keep the cookie small — allowedModules are reloaded in getAdminSession().
   const token = await encodeAdminSessionToken({
-    ...session,
+    role: session.role,
+    email: session.email,
+    staffId: session.staffId,
+    displayName: session.displayName,
     exp: createAdminSessionExpiry(),
   });
   cookieStore.set(ADMIN_SESSION_COOKIE, token, {

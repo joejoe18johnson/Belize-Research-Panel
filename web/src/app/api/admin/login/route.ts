@@ -27,11 +27,16 @@ export async function POST(request: Request) {
     console.error("[admin/login]", message);
     const missingEnv = /missing NEXT_PUBLIC_SUPABASE|SUPABASE_SERVICE_ROLE/i.test(message);
     const websocket = /websocket/i.test(message);
+    const detail = message
+      .replace(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/g, "[redacted]")
+      .replace(/sb_secret_[A-Za-z0-9_]+/g, "[redacted]")
+      .slice(0, 240);
     return NextResponse.json(
       {
         ok: false,
         message: "Unable to sign in right now. Please try again.",
         reason: missingEnv ? "supabase_env" : websocket ? "websocket" : "server_error",
+        detail,
       },
       { status: 500 }
     );
