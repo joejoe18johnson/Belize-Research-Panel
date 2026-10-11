@@ -44,11 +44,10 @@ export function getSupabaseAdmin(): SupabaseClient {
   return adminClient;
 }
 
-/** True when Supabase env vars are configured (does not verify connectivity). */
+/** True when server can use Supabase as the data store (does not verify connectivity). */
 export function isSupabaseConfigured(): boolean {
+  // Admin/data access uses the service role. Anon key is only required for browser Auth (e.g. Facebook).
   return Boolean(
-    cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-      cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY) &&
-      cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL) && cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY)
   );
 }

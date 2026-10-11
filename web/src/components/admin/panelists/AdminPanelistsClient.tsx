@@ -631,8 +631,9 @@ export function AdminPanelistsClient({
       ) : (
         <BrandedAlert tone="warning" showIcon>
           This admin list is using local files, not the live Supabase database. Deletes you make in Supabase will not
-          show here, and this list can still block registration. Add the Supabase keys to web/.env.local and restart
-          the app so admin and the live site stay in sync.
+          show here, and this list can still block registration. On Netlify, set NEXT_PUBLIC_SUPABASE_URL,
+          SUPABASE_SERVICE_ROLE_KEY, and NEXT_PUBLIC_SUPABASE_ANON_KEY (and USE_SUPABASE=true). Locally, add them to
+          web/.env.local and restart the app.
         </BrandedAlert>
       )}
 
