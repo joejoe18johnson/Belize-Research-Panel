@@ -15,6 +15,9 @@
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
   NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS = "false"
   ENABLE_DEMO_ACCOUNTS = "false"
+  # Public contact / from-address values are not credentials; omit so Netlify
+  # secrets scan does not fail when the same strings appear in app defaults.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPPORT_EMAIL,RESEND_FROM_EMAIL,SUPPORT_INBOX_EMAIL,PRIVACY_CONTACT_EMAIL,SIGNUP_NOTIFY_EMAIL"
 
 [context.production.environment]
   NEXT_PUBLIC_USE_TEXT_LOGO = "true"
