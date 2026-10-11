@@ -8,7 +8,8 @@ export const SESSION_COOKIE = "brp_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
 function sessionSecret(): string {
-  return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
+  const configured = process.env.AUTH_SESSION_SECRET?.trim();
+  return configured || "belize-research-panel-dev-secret";
 }
 
 function signSessionPayload(payload: string): string {

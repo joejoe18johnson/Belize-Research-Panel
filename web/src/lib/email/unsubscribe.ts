@@ -39,7 +39,8 @@ function normalizeEmail(email: string): string {
 }
 
 function tokenSecret(): string {
-  return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
+  const configured = process.env.AUTH_SESSION_SECRET?.trim();
+  return configured || "belize-research-panel-dev-secret";
 }
 
 export function createUnsubscribeToken(email: string): string {

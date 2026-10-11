@@ -15,7 +15,10 @@ export interface AdminSession {
 }
 
 function sessionSecret(): string {
-  return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
+  // Netlify may define AUTH_SESSION_SECRET as "" when marked secret but unset;
+  // empty string must not reach crypto.subtle.importKey.
+  const configured = process.env.AUTH_SESSION_SECRET?.trim();
+  return configured || "belize-research-panel-dev-secret";
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {

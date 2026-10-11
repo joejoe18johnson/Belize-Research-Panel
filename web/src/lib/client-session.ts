@@ -10,7 +10,8 @@ export interface ClientSession {
 }
 
 function sessionSecret(): string {
-  return process.env.AUTH_SESSION_SECRET ?? "belize-research-panel-dev-secret";
+  const configured = process.env.AUTH_SESSION_SECRET?.trim();
+  return configured || "belize-research-panel-dev-secret";
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
