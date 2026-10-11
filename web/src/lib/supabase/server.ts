@@ -1,10 +1,18 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 
 let adminClient: SupabaseClient | null = null;
 
 function cleanEnv(value: string | undefined): string {
   return (value ?? "").trim().replace(/^['"]|['"]$/g, "");
+}
+
+/** Node 20 (and some serverless runtimes) lack global WebSocket; supabase-js requires one at init. */
+function ensureServerWebSocket(): void {
+  if (typeof globalThis.WebSocket !== "undefined") return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const wsModule = require("ws") as { WebSocket?: typeof WebSocket } & typeof WebSocket;
+  const WS = (wsModule.WebSocket ?? wsModule) as typeof WebSocket;
+  globalThis.WebSocket = WS;
 }
 
 /** Server-only Supabase client using the service role (bypasses RLS). Never import in client components. */
@@ -20,14 +28,12 @@ export function getSupabaseAdmin(): SupabaseClient {
     );
   }
 
-  // Netlify/Node 20 has no native WebSocket; supabase-js requires an explicit transport.
+  ensureServerWebSocket();
+
   adminClient = createClient(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
-    },
-    realtime: {
-      transport: ws as unknown as typeof WebSocket,
     },
     global: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) =>

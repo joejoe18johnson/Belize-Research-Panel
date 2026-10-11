@@ -26,15 +26,24 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, next: nextPath }),
       });
-      let data: { ok?: boolean; message?: string; redirectTo?: string } = {};
+      let data: { ok?: boolean; message?: string; redirectTo?: string; reason?: string } = {};
       try {
-        data = (await res.json()) as { ok?: boolean; message?: string; redirectTo?: string };
+        data = (await res.json()) as {
+          ok?: boolean;
+          message?: string;
+          redirectTo?: string;
+          reason?: string;
+        };
       } catch {
         setError(res.ok ? "Unexpected login response." : "Unable to sign in right now. Please try again.");
         return;
       }
       if (!res.ok) {
-        setError(data.message ?? "Invalid email or password.");
+        if (data.reason === "supabase_env") {
+          setError("Server is missing Supabase configuration. Check Netlify environment variables.");
+        } else {
+          setError(data.message ?? "Invalid email or password.");
+        }
         return;
       }
       router.push(data.redirectTo ?? "/admin/home");
