@@ -26,7 +26,13 @@ export function AdminLoginForm({ nextPath = "" }: { nextPath?: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, next: nextPath }),
       });
-      const data = (await res.json()) as { ok?: boolean; message?: string; redirectTo?: string };
+      let data: { ok?: boolean; message?: string; redirectTo?: string } = {};
+      try {
+        data = (await res.json()) as { ok?: boolean; message?: string; redirectTo?: string };
+      } catch {
+        setError(res.ok ? "Unexpected login response." : "Unable to sign in right now. Please try again.");
+        return;
+      }
       if (!res.ok) {
         setError(data.message ?? "Invalid email or password.");
         return;

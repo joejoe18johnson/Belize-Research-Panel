@@ -1,13 +1,18 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import ws from "ws";
 
 let adminClient: SupabaseClient | null = null;
+
+function cleanEnv(value: string | undefined): string {
+  return (value ?? "").trim().replace(/^['"]|['"]$/g, "");
+}
 
 /** Server-only Supabase client using the service role (bypasses RLS). Never import in client components. */
 export function getSupabaseAdmin(): SupabaseClient {
   if (adminClient) return adminClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const serviceRoleKey = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   if (!url || !serviceRoleKey) {
     throw new Error(
@@ -15,10 +20,14 @@ export function getSupabaseAdmin(): SupabaseClient {
     );
   }
 
+  // Netlify/Node 20 has no native WebSocket; supabase-js requires an explicit transport.
   adminClient = createClient(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+    },
+    realtime: {
+      transport: ws as unknown as typeof WebSocket,
     },
     global: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) =>
@@ -32,8 +41,8 @@ export function getSupabaseAdmin(): SupabaseClient {
 /** True when Supabase env vars are configured (does not verify connectivity). */
 export function isSupabaseConfigured(): boolean {
   return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+      cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY) &&
+      cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   );
 }

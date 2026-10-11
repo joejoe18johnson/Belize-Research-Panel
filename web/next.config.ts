@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   productionBrowserSourceMaps: false,
+  // supabase-js on Node 20 needs the `ws` package; keep it external for Netlify/server runtimes
+  serverExternalPackages: ["ws"],
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 7,
