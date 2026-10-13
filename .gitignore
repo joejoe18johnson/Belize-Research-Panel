@@ -11,3 +11,6 @@ appfiles/
 
 # Accidental nested clone — use repo root instead
 web/Belize-Research-Panel/
+
+# Local Netlify folder
+.netlify
