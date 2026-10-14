@@ -172,6 +172,7 @@ export async function updatePanelistAdminFields(
     admin_email_approved?: string;
     admin_phone_approved?: string;
     admin_photo_id_approved?: string;
+    phone_verified_via?: string;
     photo_id_denial_reason?: string;
   }
 ): Promise<boolean> {

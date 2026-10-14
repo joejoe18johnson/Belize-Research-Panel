@@ -87,9 +87,13 @@ function hasPendingPhoneChange(record: AccountRecord): boolean {
   return Boolean(cleanText(record.pending_phone_whatsapp));
 }
 
+function phoneChangeNeedsAdminHold(record: AccountRecord): boolean {
+  return hasPendingPhoneChange(record) && cleanText(record.phone_change_via_otp) !== "true";
+}
+
 function computeContactHoldReason(record: AccountRecord): AccountHoldReason {
   const emailPending = hasPendingEmailChange(record);
-  const phonePending = hasPendingPhoneChange(record);
+  const phonePending = phoneChangeNeedsAdminHold(record);
   if (emailPending && phonePending) return "email_and_phone";
   if (emailPending) return "email_change";
   if (phonePending) return "phone_change";
@@ -135,6 +139,7 @@ function applyHoldSync(record: AccountRecord): AccountRecord {
     email_change_requested_at: "",
     pending_phone_whatsapp: "",
     phone_change_requested_at: "",
+    phone_change_via_otp: "",
   };
 }
 
@@ -550,6 +555,46 @@ export async function requestAccountPhoneChange(
     ...current,
     pending_phone_whatsapp: composed,
     phone_change_requested_at: new Date().toISOString(),
+    phone_change_via_otp: "",
+  };
+  updated = applyHoldSync(updated);
+  accounts[index] = updated;
+  await saveAccountsRaw(accounts);
+  return updated;
+}
+
+/** Store a pending phone for Twilio OTP without putting the account on admin hold. */
+export async function requestAccountPhoneChangeViaOtp(
+  accountId: string,
+  phoneCountryCode: string,
+  phoneLocalNumber: string
+): Promise<AccountRecord> {
+  const phoneError = validatePhoneFields({ phoneCountryCode, phoneLocalNumber });
+  if (phoneError) throw new Error("invalid_phone");
+
+  const composed = cleanText(composePhoneNumber(phoneCountryCode, phoneLocalNumber));
+  if (!composed) throw new Error("invalid_phone");
+
+  const accounts = await loadAccountsRaw();
+  const index = accounts.findIndex((row) => row.id === accountId);
+  if (index < 0) throw new Error("not_found");
+
+  const current = accounts[index];
+  const panelistRows = await loadPanelists();
+  const { loadPlatformTestingSettings } = await import("./platform-testing-settings-store");
+  const testing = await loadPlatformTestingSettings();
+  if (
+    !testing.allowDuplicatePhones &&
+    isPhoneDuplicateAmongPanelists(composed, panelistRows, current.email)
+  ) {
+    throw new Error("phone_exists");
+  }
+
+  let updated: AccountRecord = {
+    ...current,
+    pending_phone_whatsapp: composed,
+    phone_change_requested_at: new Date().toISOString(),
+    phone_change_via_otp: "true",
   };
   updated = applyHoldSync(updated);
   accounts[index] = updated;
@@ -569,6 +614,7 @@ export async function approveAccountPhoneChange(accountEmail: string): Promise<A
     ...accounts[index],
     pending_phone_whatsapp: "",
     phone_change_requested_at: "",
+    phone_change_via_otp: "",
   };
   updated = applyHoldSync(updated);
   accounts[index] = updated;
@@ -598,6 +644,7 @@ export async function denyAccountPhoneChange(accountEmail: string): Promise<{
     ...accounts[index],
     pending_phone_whatsapp: "",
     phone_change_requested_at: "",
+    phone_change_via_otp: "",
   };
   updated = applyHoldSync(updated);
   accounts[index] = updated;
@@ -705,6 +752,9 @@ export function toSessionAccount(account: AccountRecord): SessionAccount {
     holdReason: hold.holdReason,
     pendingEmail: hold.pendingEmail,
     pendingPhone: hold.pendingPhone,
+    phoneChangeViaOtp:
+      Boolean(cleanText(account.pending_phone_whatsapp)) &&
+      cleanText(account.phone_change_via_otp) === "true",
   };
 }
 
@@ -860,6 +910,167 @@ export async function createOrLinkFacebookAccount(
     hold_reason: "",
     auth_provider: "facebook",
     facebook_user_id: facebookUserId,
+  };
+
+  const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseInsertAccount } = await import("./supabase/repos");
+    try {
+      await supabaseInsertAccount(account);
+    } catch (error) {
+      if (error instanceof Error && error.message === "duplicate_key") {
+        throw new Error("email_exists");
+      }
+      throw error;
+    }
+    return { account, created: true };
+  }
+
+  assertCanPersistData();
+  const accounts = await loadAccountsRaw();
+  accounts.push(account);
+  await saveAccountsRaw(accounts);
+  return { account, created: true };
+}
+
+export interface GoogleIdentityInput {
+  googleUserId: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+}
+
+export interface GoogleEligibilityInput {
+  citizenshipStatus?: string;
+  commonwealthCountry?: string;
+  dob?: string;
+}
+
+function splitGoogleName(identity: GoogleIdentityInput): { firstName: string; lastName: string } {
+  const first = cleanText(identity.firstName);
+  const last = cleanText(identity.lastName);
+  if (first || last) {
+    return { firstName: first || "Google", lastName: last || "User" };
+  }
+  const full = cleanText(identity.fullName);
+  if (!full) return { firstName: "Google", lastName: "User" };
+  const parts = full.split(/\s+/);
+  return {
+    firstName: parts[0] || "Google",
+    lastName: parts.slice(1).join(" ") || "User",
+  };
+}
+
+export async function findAccountByGoogleUserId(googleUserId: string): Promise<AccountRecord | null> {
+  const id = cleanText(googleUserId);
+  if (!id) return null;
+
+  const { useSupabase } = await import("./supabase/data-source");
+  if (useSupabase()) {
+    const { supabaseFindAccountByGoogleUserId } = await import("./supabase/repos");
+    return supabaseFindAccountByGoogleUserId(id);
+  }
+
+  const accounts = await loadAccountsRaw();
+  return accounts.find((account) => cleanText(account.google_user_id) === id) ?? null;
+}
+
+/**
+ * Create or link a panel account from a verified Google identity (via Supabase Auth).
+ * Real Google emails are treated as verified. If Google shares no email, a placeholder
+ * is used so the person can continue with WhatsApp / social contact during registration.
+ */
+export async function createOrLinkGoogleAccount(
+  identity: GoogleIdentityInput,
+  eligibility: GoogleEligibilityInput = {}
+): Promise<{ account: AccountRecord; created: boolean }> {
+  const { googlePlaceholderEmail, isGooglePlaceholderEmail } = await import("./google-auth");
+  const googleUserId = cleanText(identity.googleUserId);
+  if (!googleUserId) throw new Error("missing_google_id");
+
+  const existingByGoogle = await findAccountByGoogleUserId(googleUserId);
+  if (existingByGoogle) {
+    const { firstName, lastName } = splitGoogleName(identity);
+    const updated: AccountRecord = {
+      ...existingByGoogle,
+      auth_provider: "google",
+      google_user_id: googleUserId,
+      first_name: existingByGoogle.first_name || titleCaseName(firstName),
+      last_name: existingByGoogle.last_name || titleCaseName(lastName),
+      email_verified: "true",
+    };
+
+    if (!cleanText(updated.citizenship_status) && cleanText(eligibility.citizenshipStatus)) {
+      updated.citizenship_status = cleanText(eligibility.citizenshipStatus);
+      updated.commonwealth_country = isCommonwealthCitizenInBelize(updated.citizenship_status)
+        ? cleanText(eligibility.commonwealthCountry)
+        : "";
+    }
+    if (!cleanText(updated.dob) && cleanText(eligibility.dob)) {
+      updated.dob = cleanText(eligibility.dob);
+    }
+
+    await persistAccount(updated);
+    return { account: updated, created: false };
+  }
+
+  const googleEmail = cleanText(identity.email).toLowerCase();
+  const hasRealEmail = Boolean(
+    googleEmail && validEmail(googleEmail) && !isGooglePlaceholderEmail(googleEmail)
+  );
+  const email = hasRealEmail ? googleEmail : googlePlaceholderEmail(googleUserId);
+
+  if (hasRealEmail) {
+    const byEmail = await findAccountByEmail(email);
+    if (byEmail) {
+      const linked: AccountRecord = {
+        ...byEmail,
+        auth_provider: byEmail.auth_provider === "facebook" ? "facebook" : "google",
+        google_user_id: googleUserId,
+        email_verified: "true",
+        verification_token: "",
+      };
+      if (!cleanText(linked.citizenship_status) && cleanText(eligibility.citizenshipStatus)) {
+        linked.citizenship_status = cleanText(eligibility.citizenshipStatus);
+        linked.commonwealth_country = isCommonwealthCitizenInBelize(linked.citizenship_status)
+          ? cleanText(eligibility.commonwealthCountry)
+          : "";
+      }
+      if (!cleanText(linked.dob) && cleanText(eligibility.dob)) {
+        linked.dob = cleanText(eligibility.dob);
+      }
+      await persistAccount(linked);
+      return { account: linked, created: false };
+    }
+  }
+
+  const { firstName, lastName } = splitGoogleName(identity);
+  const { salt, hash } = hashPassword(randomBytes(32).toString("hex"));
+  const now = new Date().toISOString();
+  const citizenshipStatus = cleanText(eligibility.citizenshipStatus);
+
+  const account: AccountRecord = {
+    id: randomUUID(),
+    first_name: titleCaseName(firstName),
+    last_name: titleCaseName(lastName),
+    email,
+    password_salt: salt,
+    password_hash: hash,
+    email_verified: "true",
+    verification_token: "",
+    verification_sent_at: now,
+    created_at: now,
+    panelist_registered: "false",
+    citizenship_status: citizenshipStatus,
+    commonwealth_country: isCommonwealthCitizenInBelize(citizenshipStatus)
+      ? cleanText(eligibility.commonwealthCountry)
+      : "",
+    dob: cleanText(eligibility.dob),
+    account_status: "active",
+    hold_reason: "",
+    auth_provider: "google",
+    google_user_id: googleUserId,
   };
 
   const { useSupabase, assertCanPersistData } = await import("./supabase/data-source");

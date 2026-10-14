@@ -22,8 +22,8 @@ export type SignupCopy = {
   eligibilityConfirmedTitle: string;
   eligibilityConfirmedBody: string;
   changeEligibility: string;
-  facebookSignup: string;
-  facebookConnecting: string;
+  googleSignup: string;
+  googleConnecting: string;
   orCreateWithEmail: string;
   firstName: string;
   lastName: string;
@@ -121,8 +121,8 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     eligibilityConfirmedBody:
       "Proof of citizenship or residency will be required when you complete panelist registration. If you do not use email, sign up with Facebook and add WhatsApp or another social contact on the next registration step.",
     changeEligibility: "Change eligibility answers",
-    facebookSignup: "Sign up with Facebook",
-    facebookConnecting: "Connecting Facebook…",
+    googleSignup: "Sign up with Google",
+    googleConnecting: "Connecting Google…",
     orCreateWithEmail: "or create with email",
     firstName: "First name",
     lastName: "Last name(s)",
@@ -174,8 +174,8 @@ export const SIGNUP_COPY: Record<HomeLocale, SignupCopy> = {
     eligibilityConfirmedBody:
       "Se requerirá comprobante de ciudadanía o residencia cuando complete el registro como panelista. Si no usa correo, regístrese con Facebook y agregue WhatsApp u otro contacto social en el siguiente paso.",
     changeEligibility: "Cambiar respuestas de elegibilidad",
-    facebookSignup: "Registrarse con Facebook",
-    facebookConnecting: "Conectando Facebook…",
+    googleSignup: "Registrarse con Google",
+    googleConnecting: "Conectando Google…",
     orCreateWithEmail: "o crear con correo electrónico",
     firstName: "Nombre",
     lastName: "Apellido(s)",

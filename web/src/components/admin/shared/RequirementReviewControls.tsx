@@ -11,6 +11,8 @@ type ReviewKey = "email" | "phone" | "photoId";
 export interface RequirementReviewDetail {
   email: string;
   phone: string;
+  /** How phone ownership was confirmed: twilio_whatsapp | twilio_sms | admin */
+  phoneVerifiedVia?: string;
   photoIdType: string;
   photoIdDenialReason?: string;
   photoIdDeleted?: boolean;
@@ -207,18 +209,41 @@ function RequirementOnFileDetail({
   }
 
   if (itemKey === "phone") {
+    const via = (detail.phoneVerifiedVia || "").toLowerCase();
+    const twilioVerified = via === "twilio_whatsapp" || via === "twilio_sms";
+    const viaLabel =
+      via === "twilio_whatsapp"
+        ? "Twilio Verify (WhatsApp)"
+        : via === "twilio_sms"
+          ? "Twilio Verify (SMS)"
+          : via === "admin"
+            ? "Manual admin verification"
+            : "";
     return (
       <div className="mt-2 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-2">
         <p className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">On file</p>
         <p className="mt-0.5 text-sm font-medium tabular-nums text-zinc-800 dark:text-zinc-200">{detail.phone}</p>
-        <a
-          href={whatsAppVerificationHref(detail.phone)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
-        >
-          Message on WhatsApp
-        </a>
+        {twilioVerified ? (
+          <p className="mt-1 text-xs font-semibold text-emerald-800 dark:text-emerald-200">
+            Auto-verified via {viaLabel}
+          </p>
+        ) : verified && viaLabel ? (
+          <p className="mt-1 text-xs font-semibold text-zinc-700 dark:text-zinc-200">{viaLabel}</p>
+        ) : (
+          <>
+            <p className="mt-1 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300">
+              Prefer panelist self-verify with WhatsApp / SMS codes. Manual WhatsApp initials are a fallback only.
+            </p>
+            <a
+              href={whatsAppVerificationHref(detail.phone)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
+            >
+              Fallback: message on WhatsApp
+            </a>
+          </>
+        )}
       </div>
     );
   }

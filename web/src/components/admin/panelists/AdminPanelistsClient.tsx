@@ -891,6 +891,7 @@ export function AdminPanelistsClient({
           authorisedCode={parseAuthorisedRegistration(editingRow).code}
           authorisedBy={parseAuthorisedRegistration(editingRow).registrarName}
           panelistEmail={editingRow.email}
+          phoneVerifiedVia={cleanText(editingRow.phone_verified_via)}
           photoIdDeleted={purgedPhotoIdEmailSet.has(cleanText(editingRow.email).toLowerCase())}
           photoPreviewSuppressed={photoPreviewHeld}
           requirementContext={requirementReviewContext}
@@ -932,6 +933,7 @@ function PanelistEditModal({
   authorisedCode,
   authorisedBy,
   panelistEmail,
+  phoneVerifiedVia = "",
   photoIdDeleted = false,
   photoPreviewSuppressed = false,
   requirementContext,
@@ -953,6 +955,7 @@ function PanelistEditModal({
   authorisedCode: string;
   authorisedBy: string;
   panelistEmail: string;
+  phoneVerifiedVia?: string;
   photoIdDeleted?: boolean;
   photoPreviewSuppressed?: boolean;
   requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean; emailVerified?: boolean };
@@ -991,6 +994,7 @@ function PanelistEditModal({
   const reviewDetail = {
     email: editState.email || panelistEmail,
     phone: editState.phone_whatsapp,
+    phoneVerifiedVia,
     photoIdType,
     photoIdDenialReason,
     photoIdDeleted,
@@ -1059,6 +1063,13 @@ function PanelistEditModal({
                 email: requirementContext.emailVerified
                   ? "Confirmed by the panelist from their inbox. No administrator check is required."
                   : undefined,
+                phone:
+                  editState.admin_phone_approved === "true" &&
+                  (phoneVerifiedVia === "twilio_whatsapp" || phoneVerifiedVia === "twilio_sms")
+                    ? "Confirmed automatically by Twilio Verify. No administrator check is required."
+                    : editState.admin_phone_approved === "true"
+                      ? "Phone ownership was marked verified. Prefer Twilio self-verify for new panelists."
+                      : "Panelists confirm ownership with a WhatsApp or SMS code. Use Verify only as a fallback.",
               }}
             />
           </div>

@@ -1,6 +1,6 @@
 export type AccountStatus = "active" | "on_hold";
 export type AccountHoldReason = "" | "email_change" | "phone_change" | "email_and_phone" | "fraud_review";
-export type AccountAuthProvider = "password" | "facebook";
+export type AccountAuthProvider = "password" | "facebook" | "google";
 
 export interface AccountRecord {
   id: string;
@@ -25,12 +25,16 @@ export interface AccountRecord {
   email_change_requested_at?: string;
   pending_phone_whatsapp?: string;
   phone_change_requested_at?: string;
+  /** When "true", pending phone is awaiting Twilio OTP (no admin hold). */
+  phone_change_via_otp?: string;
   password_reset_token?: string;
   password_reset_sent_at?: string;
   /** How the account was created / primarily authenticates. */
   auth_provider?: AccountAuthProvider;
-  /** Facebook user id when signed in with Facebook. */
+  /** Facebook user id when signed in with Facebook (legacy). */
   facebook_user_id?: string;
+  /** Google user id when signed in with Google. */
+  google_user_id?: string;
 }
 
 export interface SessionAccount {
@@ -47,6 +51,8 @@ export interface SessionAccount {
   holdReason: AccountHoldReason;
   pendingEmail: string;
   pendingPhone: string;
+  /** Pending phone is waiting on Twilio OTP (not admin hold). */
+  phoneChangeViaOtp?: boolean;
 }
 
 export interface SignupFormData {

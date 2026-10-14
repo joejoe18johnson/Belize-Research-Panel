@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { PhoneNumberField } from "@/components/registration/PhoneNumberField";
@@ -11,6 +11,8 @@ import type { SessionAccount } from "@/lib/auth-types";
 import type { ProfileContactDisplay } from "@/lib/profile-update-types";
 import type { FieldErrors } from "@/lib/validation";
 
+type TwilioChannel = "whatsapp" | "sms";
+
 export function ProfileContactChangePanel({
   contact,
   account,
@@ -18,7 +20,7 @@ export function ProfileContactChangePanel({
   contact: ProfileContactDisplay;
   account: Pick<
     SessionAccount,
-    "accountStatus" | "holdReason" | "pendingEmail" | "pendingPhone" | "email"
+    "accountStatus" | "holdReason" | "pendingEmail" | "pendingPhone" | "email" | "phoneChangeViaOtp"
   >;
 }) {
   const router = useRouter();
@@ -30,8 +32,28 @@ export function ProfileContactChangePanel({
   const [phoneSubmitting, setPhoneSubmitting] = useState(false);
   const [emailMessage, setEmailMessage] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
+  const [twilioEnabled, setTwilioEnabled] = useState(false);
+  const [otpChannel, setOtpChannel] = useState<TwilioChannel | null>(null);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpPendingPhone, setOtpPendingPhone] = useState(account.pendingPhone || "");
+  const [otpChecking, setOtpChecking] = useState(false);
 
   const onHold = account.accountStatus === "on_hold";
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/profile/phone/status", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data: { twilioEnabled?: boolean }) => {
+        if (!cancelled) setTwilioEnabled(Boolean(data.twilioEnabled));
+      })
+      .catch(() => {
+        if (!cancelled) setTwilioEnabled(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const requestEmailChange = async () => {
     setEmailSubmitting(true);
@@ -69,8 +91,35 @@ export function ProfileContactChangePanel({
     setPhoneSubmitting(true);
     setErrors({});
     setPhoneMessage("");
+    setOtpChannel(null);
+    setOtpCode("");
 
     try {
+      if (twilioEnabled) {
+        const res = await fetch("/api/profile/phone-change/send-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ phoneCountryCode, phoneLocalNumber, preferChannel: "whatsapp" }),
+        });
+        const data = (await res.json()) as {
+          ok?: boolean;
+          message?: string;
+          errors?: FieldErrors;
+          channel?: TwilioChannel;
+          pendingPhone?: string;
+        };
+        if (!res.ok || !data.ok) {
+          if (data.errors) setErrors(data.errors);
+          else setErrors({ phoneChange: data.message ?? "Could not start phone change." });
+          return;
+        }
+        setOtpChannel(data.channel ?? "whatsapp");
+        setOtpPendingPhone(data.pendingPhone ?? "");
+        setPhoneMessage(data.message ?? "Enter the code sent to your new number.");
+        return;
+      }
+
       const res = await fetch("/api/profile/request-phone-change", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,14 +146,44 @@ export function ProfileContactChangePanel({
     }
   };
 
+  const confirmPhoneOtp = async () => {
+    setOtpChecking(true);
+    setErrors({});
+    setPhoneMessage("");
+    try {
+      const res = await fetch("/api/profile/phone-change/check-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code: otpCode, channel: otpChannel ?? "whatsapp" }),
+      });
+      const data = (await res.json()) as { ok?: boolean; message?: string };
+      if (!res.ok || !data.ok) {
+        setErrors({ phoneChange: data.message ?? "Could not verify that code." });
+        return;
+      }
+      setPhoneMessage(data.message ?? "Phone updated and verified.");
+      setOtpCode("");
+      setOtpChannel(null);
+      setPhoneLocalNumber("");
+      router.refresh();
+      router.push("/dashboard/verification");
+    } catch {
+      setErrors({ phoneChange: "Network error. Please try again." });
+    } finally {
+      setOtpChecking(false);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm sm:p-6">
       <h3 className="border-b border-zinc-100 dark:border-zinc-800 pb-3 text-base font-semibold text-zinc-900 dark:text-zinc-100">
         {formatHeadingCase("Email and phone")}
       </h3>
       <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
-        Your email counts as one way to contact you. Changing your email or phone puts your account on hold until an
-        administrator approves or denies the update.
+        {twilioEnabled
+          ? "Changing your email puts your account on hold until an administrator approves it. Phone changes are confirmed with a WhatsApp or SMS code and do not need admin approval."
+          : "Your email counts as one way to contact you. Changing your email or phone puts your account on hold until an administrator approves or denies the update."}
       </p>
 
       {onHold ? (
@@ -159,7 +238,7 @@ export function ProfileContactChangePanel({
         <div className="rounded-xl border border-zinc-200 bg-zinc-100 p-4 dark:border-zinc-600 dark:bg-zinc-950">
           <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Current phone / WhatsApp</p>
           <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-100">{contact.phone || "Not provided"}</p>
-          {!onHold ? (
+          {!onHold || account.phoneChangeViaOtp || otpChannel ? (
             <div className="mt-4 space-y-3">
               <Field
                 label="New phone / WhatsApp"
@@ -181,8 +260,39 @@ export function ProfileContactChangePanel({
                 disabled={phoneSubmitting || !phoneLocalNumber.trim()}
                 className="flex min-h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-white disabled:hover:bg-zinc-600 sm:w-auto"
               >
-                {phoneSubmitting ? "Submitting…" : "Request phone change (admin approval)"}
+                {phoneSubmitting
+                  ? "Sending…"
+                  : twilioEnabled
+                    ? "Send verification code"
+                    : "Request phone change (admin approval)"}
               </button>
+              {otpChannel || (account.phoneChangeViaOtp && otpPendingPhone) ? (
+                <div className="space-y-2 rounded-lg border border-teal-200 bg-white p-3 dark:border-teal-800 dark:bg-zinc-900">
+                  <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                    Code sent to <span className="font-medium">{otpPendingPhone || account.pendingPhone}</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={10}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="min-h-10 w-40 rounded-lg border border-zinc-300 bg-white px-3 text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-950"
+                      placeholder="123456"
+                      aria-label="Phone change verification code"
+                    />
+                    <button
+                      type="button"
+                      disabled={otpChecking || otpCode.length < 4}
+                      onClick={() => void confirmPhoneOtp()}
+                      className="inline-flex min-h-10 items-center justify-center rounded-lg bg-zinc-900 px-3 text-sm font-semibold text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+                    >
+                      {otpChecking ? "Checking…" : "Confirm new number"}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
               {phoneMessage ? <p className="text-sm text-zinc-600 dark:text-zinc-300">{phoneMessage}</p> : null}
             </div>
           ) : null}

@@ -1,0 +1,101 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createOrLinkGoogleAccount } from "@/lib/accounts";
+import { setSessionCookie } from "@/lib/auth";
+import { isGoogleLoginConfigured } from "@/lib/google-auth";
+import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { logServerError } from "@/lib/safe-log";
+import { cleanText } from "@/lib/validation";
+
+export async function POST(request: NextRequest) {
+  if (!isGoogleLoginConfigured()) {
+    return NextResponse.json(
+      { ok: false, message: "Google login is not configured on this site yet." },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const body = (await request.json()) as {
+      accessToken?: string;
+      citizenshipStatus?: string;
+      commonwealthCountry?: string;
+      dob?: string;
+    };
+
+    const accessToken = cleanText(body.accessToken);
+    if (!accessToken) {
+      return NextResponse.json({ ok: false, message: "Missing Google session." }, { status: 400 });
+    }
+
+    const admin = getSupabaseAdmin();
+    const { data, error } = await admin.auth.getUser(accessToken);
+    if (error || !data.user) {
+      return NextResponse.json(
+        { ok: false, message: error?.message || "Could not verify Google sign-in." },
+        { status: 401 }
+      );
+    }
+
+    const user = data.user;
+    const identities = user.identities ?? [];
+    const googleIdentity = identities.find((identity) => identity.provider === "google");
+    const googleUserId =
+      cleanText(googleIdentity?.id) ||
+      cleanText(String(user.user_metadata?.provider_id ?? user.user_metadata?.sub ?? "")) ||
+      cleanText(user.id);
+
+    if (!googleUserId) {
+      return NextResponse.json({ ok: false, message: "Google user id was not returned." }, { status: 400 });
+    }
+
+    const meta = user.user_metadata ?? {};
+    const fullName = cleanText(String(meta.full_name ?? meta.name ?? ""));
+    const firstName = cleanText(String(meta.given_name ?? meta.first_name ?? ""));
+    const lastName = cleanText(String(meta.family_name ?? meta.last_name ?? ""));
+
+    const result = await createOrLinkGoogleAccount(
+      {
+        googleUserId,
+        email: user.email ?? undefined,
+        firstName,
+        lastName,
+        fullName,
+      },
+      {
+        citizenshipStatus: body.citizenshipStatus,
+        commonwealthCountry: body.commonwealthCountry,
+        dob: body.dob,
+      }
+    );
+
+    await setSessionCookie(result.account.id);
+
+    return NextResponse.json({
+      ok: true,
+      created: result.created,
+      account: {
+        emailVerified: result.account.email_verified === "true",
+        panelistRegistered: result.account.panelist_registered === "true",
+        accountStatus: result.account.account_status ?? "active",
+        email: result.account.email,
+        needsContactDetails: result.account.email.endsWith("@google.oauth.local"),
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "storage_not_configured") {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            "Account storage is not configured. Add Supabase environment variables in the hosting dashboard.",
+        },
+        { status: 503 }
+      );
+    }
+    logServerError("Google complete failed", error);
+    return NextResponse.json(
+      { ok: false, message: error instanceof Error ? error.message : "Google sign-in failed." },
+      { status: 500 }
+    );
+  }
+}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { AuthMethodDivider, FacebookAuthButton } from "@/components/auth/FacebookAuthButton";
+import { AuthMethodDivider, GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { useAuthCopy, useLocale } from "@/components/locale/LocaleProvider";
 import { Field, TextInput } from "@/components/registration/form-ui";
@@ -79,7 +79,7 @@ export function LoginForm({
 
   return (
     <div className="space-y-5">
-      <FacebookAuthButton nextPath={nextPath} mode="login" />
+      <GoogleAuthButton nextPath={nextPath} mode="login" />
       <AuthMethodDivider />
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>

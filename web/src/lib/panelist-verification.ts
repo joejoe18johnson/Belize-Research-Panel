@@ -91,13 +91,14 @@ export async function buildVerificationCenterSummary(
     panelistHasUpload(username, "residence-proof"),
   ]);
 
-  const phonePending = Boolean(account.pendingPhone?.trim());
+  const phonePendingAdmin = Boolean(account.pendingPhone?.trim()) && !account.phoneChangeViaOtp;
+  const phonePendingOtp = Boolean(account.pendingPhone?.trim()) && Boolean(account.phoneChangeViaOtp);
   const photoDeclared = Boolean(photoIdType);
   const photoOnFile = photoDeclared || authorisedRegistration.isAuthorised;
   const residenceOnFile = hasResidenceUpload;
   const requirements = assessPanelistRequirements(panelist, {
     emailVerified: account.emailVerified,
-    pendingPhone: phonePending,
+    pendingPhone: phonePendingAdmin,
     hasPhotoUpload,
   });
   const phoneRequirement = requirements.items.find((item) => item.key === "phone");
@@ -107,6 +108,13 @@ export async function buildVerificationCenterSummary(
   const email = cleanText(account.email);
   const readState = email ? await loadNotificationReadState(email) : {};
   const idDocumentDeleted = Boolean(readState[PHOTO_ID_PURGED_MARKER]?.read);
+  const phoneStatus: VerificationItemStatus = phonePendingAdmin
+    ? "pending_approval"
+    : phonePendingOtp
+      ? "under_review"
+      : phoneRequirement
+        ? requirementItemStatus(phoneRequirement.status)
+        : itemStatusWhenAccountPending(Boolean(phone), false);
   const items: VerificationItem[] = [
     {
       id: "email",
@@ -125,12 +133,10 @@ export async function buildVerificationCenterSummary(
       description: formatHeadingCase(
         "Your WhatsApp or mobile number is used to confirm identity and reach you for survey invitations."
       ),
-      valueOnFile: phone || formatHeadingCase("Not provided"),
-      status: phonePending
-        ? "pending_approval"
-        : phoneRequirement
-          ? requirementItemStatus(phoneRequirement.status)
-          : itemStatusWhenAccountPending(Boolean(phone), phonePending),
+      valueOnFile: phonePendingOtp
+        ? `${account.pendingPhone} (confirm with code)`
+        : phone || formatHeadingCase("Not provided"),
+      status: phoneStatus,
       statusLabel: "",
       essential: true,
     },

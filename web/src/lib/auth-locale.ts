@@ -52,18 +52,18 @@ export type AuthCopy = {
   goToVerificationHelp: string;
   logIn: string;
 
-  facebookPageTitle: string;
-  facebookPageSubtitle: string;
-  facebookCouldNotSignIn: string;
-  facebookSetupHelp: string;
-  facebookPleaseWait: string;
-  facebookFinishing: string;
-  facebookSignup: string;
-  facebookContinue: string;
-  facebookConnecting: string;
-  facebookNotEnabled: string;
-  facebookReadyHint: string;
-  facebookCouldNotStart: string;
+  googlePageTitle: string;
+  googlePageSubtitle: string;
+  googleCouldNotSignIn: string;
+  googleSetupHelp: string;
+  googlePleaseWait: string;
+  googleFinishing: string;
+  googleSignup: string;
+  googleContinue: string;
+  googleConnecting: string;
+  googleNotEnabled: string;
+  googleReadyHint: string;
+  googleCouldNotStart: string;
   orContinueWithEmail: string;
 
   loginPageTitle: string;
@@ -149,26 +149,26 @@ export const AUTH_COPY: Record<HomeLocale, AuthCopy> = {
     goToVerificationHelp: "Go to verification help",
     logIn: "Log in",
 
-    facebookPageTitle: "Facebook sign-in",
-    facebookPageSubtitle: "Connecting your Facebook account to the Belize Research Panel.",
-    facebookCouldNotSignIn: "Could not sign in with Facebook",
-    facebookSetupHelp:
-      "If Meta / Facebook Login is still pending verification, finish setup in the Meta Developer Console and enable the Facebook provider in Supabase Auth, then try again.",
-    facebookPleaseWait: "Please wait",
-    facebookFinishing: "Finishing Facebook sign-in…",
-    facebookSignup: "Sign up with Facebook",
-    facebookContinue: "Continue with Facebook",
-    facebookConnecting: "Connecting Facebook…",
-    facebookNotEnabled:
-      "Facebook login will be available after Meta app verification and enabling Facebook in Supabase Auth.",
-    facebookReadyHint:
-      "Facebook sign-in is ready in the app. Enable the Facebook provider in Supabase after your Meta app is verified.",
-    facebookCouldNotStart: "Could not start Facebook sign-in.",
+    googlePageTitle: "Google sign-in",
+    googlePageSubtitle: "Connecting your Google account to the Belize Research Panel.",
+    googleCouldNotSignIn: "Could not sign in with Google",
+    googleSetupHelp:
+      "Enable the Google provider in Supabase Auth (Auth → Providers → Google) and add your Google Cloud OAuth client ID and secret, then try again.",
+    googlePleaseWait: "Please wait",
+    googleFinishing: "Finishing Google sign-in…",
+    googleSignup: "Sign up with Google",
+    googleContinue: "Continue with Google",
+    googleConnecting: "Connecting Google…",
+    googleNotEnabled:
+      "Google login will be available after you enable Google in Supabase Auth and add your Google Cloud OAuth credentials.",
+    googleReadyHint:
+      "Google sign-in is ready in the app. Enable the Google provider in Supabase and add your OAuth client credentials.",
+    googleCouldNotStart: "Could not start Google sign-in.",
     orContinueWithEmail: "or continue with email",
 
     loginPageTitle: "Panelist login",
     loginPageSubtitle:
-      "Sign in with Facebook or with the email and password you used when creating your account.",
+      "Sign in with Google or with the email and password you used when creating your account.",
     loginEmail: "Email address",
     loginPassword: "Password",
     loginSubmit: "Log in",
@@ -249,26 +249,26 @@ export const AUTH_COPY: Record<HomeLocale, AuthCopy> = {
     goToVerificationHelp: "Ir a ayuda de verificación",
     logIn: "Iniciar sesión",
 
-    facebookPageTitle: "Inicio de sesión con Facebook",
-    facebookPageSubtitle: "Conectando su cuenta de Facebook con el Belize Research Panel.",
-    facebookCouldNotSignIn: "No se pudo iniciar sesión con Facebook",
-    facebookSetupHelp:
-      "Si el inicio de sesión de Meta / Facebook aún está pendiente de verificación, termine la configuración en la consola de desarrolladores de Meta, habilite el proveedor de Facebook en Supabase Auth e inténtelo de nuevo.",
-    facebookPleaseWait: "Espere",
-    facebookFinishing: "Finalizando el inicio de sesión con Facebook…",
-    facebookSignup: "Registrarse con Facebook",
-    facebookContinue: "Continuar con Facebook",
-    facebookConnecting: "Conectando Facebook…",
-    facebookNotEnabled:
-      "El inicio de sesión con Facebook estará disponible después de la verificación de la app de Meta y de habilitar Facebook en Supabase Auth.",
-    facebookReadyHint:
-      "El acceso con Facebook está listo en la app. Habilite el proveedor de Facebook en Supabase después de verificar su app de Meta.",
-    facebookCouldNotStart: "No se pudo iniciar el acceso con Facebook.",
+    googlePageTitle: "Inicio de sesión con Google",
+    googlePageSubtitle: "Conectando su cuenta de Google con el Belize Research Panel.",
+    googleCouldNotSignIn: "No se pudo iniciar sesión con Google",
+    googleSetupHelp:
+      "Habilite el proveedor de Google en Supabase Auth (Auth → Providers → Google) y agregue el ID y el secreto de cliente OAuth de Google Cloud, luego inténtelo de nuevo.",
+    googlePleaseWait: "Espere",
+    googleFinishing: "Finalizando el inicio de sesión con Google…",
+    googleSignup: "Registrarse con Google",
+    googleContinue: "Continuar con Google",
+    googleConnecting: "Conectando Google…",
+    googleNotEnabled:
+      "El inicio de sesión con Google estará disponible después de habilitar Google en Supabase Auth y agregar sus credenciales OAuth de Google Cloud.",
+    googleReadyHint:
+      "El acceso con Google está listo en la app. Habilite el proveedor de Google en Supabase y agregue sus credenciales OAuth.",
+    googleCouldNotStart: "No se pudo iniciar el acceso con Google.",
     orContinueWithEmail: "o continuar con correo electrónico",
 
     loginPageTitle: "Inicio de sesión de panelista",
     loginPageSubtitle:
-      "Inicie sesión con Facebook o con el correo y la contraseña que usó al crear su cuenta.",
+      "Inicie sesión con Google o con el correo y la contraseña que usó al crear su cuenta.",
     loginEmail: "Correo electrónico",
     loginPassword: "Contraseña",
     loginSubmit: "Iniciar sesión",

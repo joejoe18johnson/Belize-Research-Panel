@@ -6,7 +6,7 @@ import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { BrandedAlert } from "@/components/shared/BrandedFeedback";
 import { AuthPageSkeleton } from "@/components/shared/PageSkeletons";
 import { AUTH_COPY } from "@/lib/auth-locale";
-import { FACEBOOK_ELIGIBILITY_STORAGE_KEY } from "@/lib/facebook-auth";
+import { GOOGLE_ELIGIBILITY_STORAGE_KEY } from "@/lib/google-auth";
 import {
   readStoredHomeLocale,
   storeHomeLocale,
@@ -62,22 +62,22 @@ function AuthCallbackInner() {
 
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (sessionError || !sessionData.session?.access_token) {
-          setError(sessionError?.message || "Facebook session was not created. Try again.");
+          setError(sessionError?.message || "Google session was not created. Try again.");
           return;
         }
 
         let eligibility: EligibilityPayload = {};
         try {
-          const raw = sessionStorage.getItem(FACEBOOK_ELIGIBILITY_STORAGE_KEY);
+          const raw = sessionStorage.getItem(GOOGLE_ELIGIBILITY_STORAGE_KEY);
           if (raw) {
             eligibility = JSON.parse(raw) as EligibilityPayload;
-            sessionStorage.removeItem(FACEBOOK_ELIGIBILITY_STORAGE_KEY);
+            sessionStorage.removeItem(GOOGLE_ELIGIBILITY_STORAGE_KEY);
           }
         } catch {
           // ignore
         }
 
-        const res = await fetch("/api/auth/facebook/complete", {
+        const res = await fetch("/api/auth/google/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -96,7 +96,7 @@ function AuthCallbackInner() {
         };
 
         if (!res.ok || !data.ok) {
-          setError(data.message ?? "Could not complete Facebook sign-in.");
+          setError(data.message ?? "Could not complete Google sign-in.");
           return;
         }
 
@@ -114,7 +114,7 @@ function AuthCallbackInner() {
 
         window.location.assign("/register");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Facebook sign-in failed.");
+        setError(err instanceof Error ? err.message : "Google sign-in failed.");
       }
     };
 
@@ -136,20 +136,20 @@ function AuthCallbackInner() {
         setLocale(next);
       }}
       formatTitle={false}
-      title={copy.facebookPageTitle}
-      subtitle={copy.facebookPageSubtitle}
+      title={copy.googlePageTitle}
+      subtitle={copy.googlePageSubtitle}
     >
       {error ? (
-        <BrandedAlert tone="error" title={copy.facebookCouldNotSignIn} showIcon formatBody={false}>
+        <BrandedAlert tone="error" title={copy.googleCouldNotSignIn} showIcon formatBody={false}>
           <p>{localizeValidationMessage(error, locale)}</p>
-          <p className="mt-2 text-sm">{copy.facebookSetupHelp}</p>
+          <p className="mt-2 text-sm">{copy.googleSetupHelp}</p>
           <a href="/login" className="mt-3 inline-block font-semibold text-teal-800 underline">
             {copy.backToLogin}
           </a>
         </BrandedAlert>
       ) : (
-        <BrandedAlert tone="info" title={copy.facebookPleaseWait} showIcon formatBody={false}>
-          {copy.facebookFinishing}
+        <BrandedAlert tone="info" title={copy.googlePleaseWait} showIcon formatBody={false}>
+          {copy.googleFinishing}
         </BrandedAlert>
       )}
     </AuthPageShell>

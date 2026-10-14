@@ -15,7 +15,7 @@ import {
 } from "@/components/registration/form-ui";
 import { PasswordStrengthBar } from "@/components/registration/PasswordStrengthBar";
 import { PasswordInput } from "@/components/auth/PasswordInput";
-import { AuthMethodDivider, FacebookAuthButton } from "@/components/auth/FacebookAuthButton";
+import { AuthMethodDivider, GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { PasswordMatchStatus } from "@/components/auth/PasswordMatchStatus";
 import { useLocale, useSignupCopy } from "@/components/locale/LocaleProvider";
 import type { SignupFormData } from "@/lib/auth-types";
@@ -257,11 +257,11 @@ export function SignupForm({ nextPath = "/register" }: { nextPath?: string }) {
         </button>
       </BrandedAlert>
 
-      <FacebookAuthButton
+      <GoogleAuthButton
         nextPath={nextPath}
         mode="signup"
-        label={copy.facebookSignup}
-        connectingLabel={copy.facebookConnecting}
+        label={copy.googleSignup}
+        connectingLabel={copy.googleConnecting}
         eligibility={{
           citizenshipStatus: form.citizenshipStatus,
           commonwealthCountry: "",

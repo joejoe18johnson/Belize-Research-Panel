@@ -112,6 +112,8 @@ export function accountRowToRecord(row: Record<string, unknown>): AccountRecord 
     password_reset_sent_at: metadataString(meta, "password_reset_sent_at"),
     auth_provider: (metadataString(meta, "auth_provider") || "password") as AccountAuthProvider,
     facebook_user_id: metadataString(meta, "facebook_user_id"),
+    google_user_id: metadataString(meta, "google_user_id"),
+    phone_change_via_otp: metadataString(meta, "phone_change_via_otp"),
   };
 }
 
@@ -128,10 +130,12 @@ export function accountRecordToRow(account: AccountRecord): Record<string, unkno
     email_change_requested_at: account.email_change_requested_at ?? "",
     pending_phone_whatsapp: account.pending_phone_whatsapp ?? "",
     phone_change_requested_at: account.phone_change_requested_at ?? "",
+    phone_change_via_otp: account.phone_change_via_otp ?? "",
     password_reset_token: account.password_reset_token ?? "",
     password_reset_sent_at: account.password_reset_sent_at ?? "",
     auth_provider: account.auth_provider ?? "password",
     facebook_user_id: account.facebook_user_id ?? "",
+    google_user_id: account.google_user_id ?? "",
   };
 
   return {
@@ -206,6 +210,7 @@ export function panelistRowToRecord(row: Record<string, unknown>): PanelistRow {
     admin_email_approved: requirementDecisionFromStored(row.email_verified, metadataString(meta, "admin_email_approved")),
     admin_phone_approved: requirementDecisionFromStored(row.phone_verified, metadataString(meta, "admin_phone_approved")),
     admin_photo_id_approved: requirementDecisionFromStored(row.id_verified, metadataString(meta, "admin_photo_id_approved")),
+    phone_verified_via: metadataString(meta, "phone_verified_via"),
     consent_research: metadataString(meta, "consent_research") || "True",
     consent_contact: metadataString(meta, "consent_contact") || "True",
     consent_privacy: metadataString(meta, "consent_privacy") || "True",
@@ -293,6 +298,7 @@ export function panelistRecordToRow(row: PanelistRow, id?: string): Record<strin
     notes: row.notes ?? "",
     photo_id_denial_reason: row.photo_id_denial_reason ?? "",
     market_interests: row.market_interests ?? "",
+    phone_verified_via: row.phone_verified_via ?? "",
     admin_email_approved: requirementDecisionForMetadata(row.admin_email_approved),
     admin_phone_approved: requirementDecisionForMetadata(row.admin_phone_approved),
     admin_photo_id_approved: requirementDecisionForMetadata(row.admin_photo_id_approved),

@@ -136,6 +136,16 @@ export async function PATCH(
     photoDenialReason = "";
   }
 
+  const previousPhoneDecision = readAdminRequirementDecision(panelist, "phone");
+  const nextPhoneDecision = readAdminRequirementDecision(merged, "phone");
+  let phoneVerifiedVia: string | undefined;
+  if (nextPhoneDecision === "true" && previousPhoneDecision !== "true") {
+    const existingVia = cleanText(panelist.phone_verified_via);
+    phoneVerifiedVia = existingVia.startsWith("twilio_") ? existingVia : "admin";
+  } else if (nextPhoneDecision === "false") {
+    phoneVerifiedVia = "";
+  }
+
   const updated = await updatePanelistAdminFields(accountEmail, {
     verification_status: verificationStatus,
     status: body.status,
@@ -148,6 +158,7 @@ export async function PATCH(
     admin_email_approved: merged[ADMIN_REQUIREMENT_FIELDS.email] || body.admin_email_approved,
     admin_phone_approved: body.admin_phone_approved,
     admin_photo_id_approved: body.admin_photo_id_approved,
+    phone_verified_via: phoneVerifiedVia,
     photo_id_denial_reason: photoDenialReason,
   });
 

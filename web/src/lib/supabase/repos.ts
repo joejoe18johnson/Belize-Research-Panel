@@ -152,6 +152,22 @@ export async function supabaseFindAccountByFacebookUserId(
   return row ? accountRowToRecord(row as Record<string, unknown>) : null;
 }
 
+export async function supabaseFindAccountByGoogleUserId(
+  googleUserId: string
+): Promise<AccountRecord | null> {
+  const id = cleanText(googleUserId);
+  if (!id) return null;
+
+  const { data, error } = await db()
+    .from("accounts")
+    .select("*")
+    .filter("metadata->>google_user_id", "eq", id)
+    .limit(1);
+  throwIfError(error);
+  const row = data?.[0];
+  return row ? accountRowToRecord(row as Record<string, unknown>) : null;
+}
+
 export async function supabaseFindAccountByVerificationToken(token: string): Promise<AccountRecord | null> {
   if (!token) return null;
   const { data, error } = await db()

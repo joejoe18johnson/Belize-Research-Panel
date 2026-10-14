@@ -9,6 +9,8 @@ import { DashboardCard, SectionHeading } from "./DashboardShell";
 import { VerificationStatusMark, type VerificationMarkStatus } from "@/components/shared/VerificationStatusMark";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { PhotoIdResubmitForm } from "./PhotoIdResubmitForm";
+import { PhoneVerifyPanel } from "./PhoneVerifyPanel";
+import { PhoneChangeOtpPanel } from "./PhoneChangeOtpPanel";
 
 function PhotoIdDenialDetails({ item }: { item: VerificationCenterSummary["items"][number] }) {
   if (item.id !== "photo_id" || item.status !== "denied") return null;
@@ -125,6 +127,16 @@ function VerificationItemCard({
               <span className="font-medium">{item.valueLabel ?? formatHeadingCase("On file")}: </span>
               {item.valueOnFile}
             </p>
+            {item.id === "phone" && item.status === "under_review" ? (
+              item.valueOnFile.includes("(confirm with code)") ? (
+                <PhoneChangeOtpPanel pendingPhone={item.valueOnFile.replace(/\s*\(confirm with code\)\s*$/, "")} />
+              ) : (
+                <PhoneVerifyPanel phoneOnFile={item.valueOnFile} status={item.status} />
+              )
+            ) : null}
+            {item.id === "phone" && item.status === "denied" ? (
+              <PhoneVerifyPanel phoneOnFile={item.valueOnFile} status={item.status} />
+            ) : null}
             <PhotoIdDenialDetails item={item} />
           </div>
         </div>
@@ -164,7 +176,17 @@ function VerificationItemCard({
                 )}
               </p>
             ) : null}
-            {item.status === "denied" && item.id !== "photo_id" ? (
+            {item.id === "phone" && item.status === "under_review" ? (
+              item.valueOnFile.includes("(confirm with code)") ? (
+                <PhoneChangeOtpPanel pendingPhone={item.valueOnFile.replace(/\s*\(confirm with code\)\s*$/, "")} />
+              ) : (
+                <PhoneVerifyPanel phoneOnFile={item.valueOnFile} status={item.status} />
+              )
+            ) : null}
+            {item.id === "phone" && item.status === "denied" ? (
+              <PhoneVerifyPanel phoneOnFile={item.valueOnFile} status={item.status} />
+            ) : null}
+            {item.status === "denied" && item.id !== "photo_id" && item.id !== "phone" ? (
               <p className="mt-2 text-sm text-red-900 dark:text-red-100">
                 {formatHeadingCase("This check was not approved. Contact the panel team if you need to submit it again.")}
               </p>

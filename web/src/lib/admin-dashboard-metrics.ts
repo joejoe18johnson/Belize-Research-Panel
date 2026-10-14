@@ -148,7 +148,10 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
   ).length;
 
   const pendingEmailChanges = accounts.filter((account) => cleanText(account.pending_email)).length;
-  const pendingPhoneChanges = accounts.filter((account) => cleanText(account.pending_phone_whatsapp)).length;
+  const pendingPhoneChanges = accounts.filter(
+    (account) =>
+      cleanText(account.pending_phone_whatsapp) && cleanText(account.phone_change_via_otp) !== "true"
+  ).length;
   const unverifiedAccounts = accounts.filter((account) => account.email_verified !== "true").length;
 
   const pending = panelists.filter((row) => cleanText(row.verification_status) === "Pending").length;

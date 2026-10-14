@@ -212,6 +212,7 @@ export const PANELIST_COLUMNS = [
   "admin_email_approved",
   "admin_phone_approved",
   "admin_photo_id_approved",
+  "phone_verified_via",
   "photo_id_denial_reason",
   "consent_research",
   "consent_contact",
