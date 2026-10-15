@@ -9,7 +9,9 @@ import {
 } from "./phone-codes";
 import {
   EDUCATION_LEVELS,
+  CITIZENSHIP_BELIZEAN_ABROAD_LEGACY,
   ELIGIBLE_CITIZENSHIP_STATUSES,
+  isBelizeanResidingAbroad,
   HOUSEHOLD_HEAD_OPTIONS,
   MAX_MARKET_INTERESTS,
   OTHER_RESIDENCE_COUNTRIES,
@@ -356,6 +358,7 @@ export function isPasswordStrongEnough(
 }
 
 export function isEligibleCitizenship(citizenshipStatus: string): boolean {
+  if (citizenshipStatus === CITIZENSHIP_BELIZEAN_ABROAD_LEGACY) return true;
   return ELIGIBLE_CITIZENSHIP_STATUSES.includes(
     citizenshipStatus as (typeof ELIGIBLE_CITIZENSHIP_STATUSES)[number]
   );
@@ -372,6 +375,8 @@ export function validateCitizenship(citizenshipStatus: string): string | null {
 }
 
 export function isRegisteredVoter(citizenshipStatus: string, votingStatus: string): boolean {
+  // Citizenship option itself means they are registered to vote in Belize.
+  if (isBelizeanResidingAbroad(citizenshipStatus)) return true;
   return needsVoterRegistrationQuestion(citizenshipStatus) && votingStatus === "Yes";
 }
 

@@ -403,7 +403,8 @@ export function ProfileEditForm({
         <div className="mt-4 space-y-5">
           {mustLiveAbroad(form.citizenshipStatus) ? (
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              You selected Belizean residing abroad. Tell us the country where you currently live.
+              You selected Belizean residing abroad who is registered to vote in Belize. Tell us the
+              country where you currently live.
             </p>
           ) : (
           <Field label="District where you currently live" required error={errors.placeOfResidence} id="placeOfResidence">

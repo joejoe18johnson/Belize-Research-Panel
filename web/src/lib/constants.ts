@@ -4,7 +4,10 @@ import { WORLD_COUNTRIES } from "./world-countries";
 export type RegistrationMode = "Self-registration" | "Registration by authorised person";
 
 export const CITIZENSHIP_BELIZEAN_IN_BELIZE = "Belizean residing in Belize";
-export const CITIZENSHIP_BELIZEAN_ABROAD = "Belizean residing abroad (diaspora)";
+export const CITIZENSHIP_BELIZEAN_ABROAD =
+  "Belizean residing abroad who is registered to vote in Belize";
+/** Previous label kept for existing panelist rows. */
+export const CITIZENSHIP_BELIZEAN_ABROAD_LEGACY = "Belizean residing abroad (diaspora)";
 export const CITIZENSHIP_COMMONWEALTH_IN_BELIZE = "Commonwealth citizen residing in Belize";
 export const CITIZENSHIP_FOREIGNER_IN_BELIZE = "Other foreigner permanently residing in Belize";
 export const CITIZENSHIP_OTHER = "Other";
@@ -24,8 +27,8 @@ export const INELIGIBLE_CITIZENSHIP_STATUSES = [CITIZENSHIP_OTHER] as const;
 
 export const CITIZENSHIP_PANEL_INTRO =
   "Choose the option that best describes your citizenship and where you live. " +
-  "The panel is open to Belizeans in Belize, Belizeans abroad (diaspora), Commonwealth citizens residing in Belize, " +
-  "and other foreigners permanently residing in Belize.";
+  "The panel is open to Belizeans in Belize, Belizeans abroad who are registered to vote in Belize, " +
+  "Commonwealth citizens residing in Belize, and other foreigners permanently residing in Belize.";
 
 export type EligibleCitizenshipStatus = (typeof ELIGIBLE_CITIZENSHIP_STATUSES)[number];
 export const VOTING_STATUS = raw.VOTING_STATUS as string[];
@@ -280,17 +283,25 @@ export function requiresCommonwealthResidenceProof(
   return votingStatus.trim() === "No";
 }
 
+/** Belizean living abroad and registered to vote (current + legacy label). */
+export function isBelizeanResidingAbroad(citizenshipStatus: string): boolean {
+  return (
+    citizenshipStatus === CITIZENSHIP_BELIZEAN_ABROAD ||
+    citizenshipStatus === CITIZENSHIP_BELIZEAN_ABROAD_LEGACY
+  );
+}
+
 export function isBelizeanCitizenship(citizenshipStatus: string): boolean {
   return (
     citizenshipStatus === CITIZENSHIP_BELIZEAN_IN_BELIZE ||
-    citizenshipStatus === CITIZENSHIP_BELIZEAN_ABROAD ||
+    isBelizeanResidingAbroad(citizenshipStatus) ||
     citizenshipStatus === "Citizen of Belize" ||
     citizenshipStatus === "Citizen of Belize living in Belize not registered to vote"
   );
 }
 
 export function mustLiveAbroad(citizenshipStatus: string): boolean {
-  return citizenshipStatus === CITIZENSHIP_BELIZEAN_ABROAD;
+  return isBelizeanResidingAbroad(citizenshipStatus);
 }
 
 export function mustLiveInBelize(citizenshipStatus: string): boolean {
@@ -305,10 +316,13 @@ export function mustLiveInBelize(citizenshipStatus: string): boolean {
 }
 
 export function needsVoterRegistrationQuestion(citizenshipStatus: string): boolean {
+  // Abroad Belizeans are defined as already registered to vote — skip the Yes/No question.
+  if (isBelizeanResidingAbroad(citizenshipStatus)) return false;
   return isBelizeanCitizenship(citizenshipStatus) || isCommonwealthCitizenInBelize(citizenshipStatus);
 }
 
 export function storedVotingStatus(citizenshipStatus: string, votingStatus: string): string {
+  if (isBelizeanResidingAbroad(citizenshipStatus)) return "Yes";
   if (needsVoterRegistrationQuestion(citizenshipStatus)) return votingStatus;
   if (citizenshipStatus === CITIZENSHIP_FOREIGNER_IN_BELIZE || citizenshipStatus === "Other resident of Belize") {
     return "No";
