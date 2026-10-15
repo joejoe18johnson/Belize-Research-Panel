@@ -1,6 +1,7 @@
 import type { HomeLocale } from "./home-locale";
 import {
   CITIZENSHIP_BELIZEAN_ABROAD,
+  CITIZENSHIP_BELIZEAN_ABROAD_LEGACY,
   CITIZENSHIP_BELIZEAN_IN_BELIZE,
   CITIZENSHIP_COMMONWEALTH_IN_BELIZE,
   CITIZENSHIP_FOREIGNER_IN_BELIZE,
@@ -90,6 +91,7 @@ const MONTH_NAMES_ES = [
 const CITIZENSHIP_LABELS_EN: Record<string, string> = {
   [CITIZENSHIP_BELIZEAN_IN_BELIZE]: "Belizean residing in Belize",
   [CITIZENSHIP_BELIZEAN_ABROAD]: "Belizean residing abroad who is registered to vote in Belize",
+  [CITIZENSHIP_BELIZEAN_ABROAD_LEGACY]: "Belizean residing abroad who is registered to vote in Belize",
   [CITIZENSHIP_COMMONWEALTH_IN_BELIZE]: "Commonwealth citizen residing in Belize",
   [CITIZENSHIP_FOREIGNER_IN_BELIZE]: "Other foreigner permanently residing in Belize",
   [CITIZENSHIP_OTHER]: "Other",
@@ -98,6 +100,8 @@ const CITIZENSHIP_LABELS_EN: Record<string, string> = {
 const CITIZENSHIP_LABELS_ES: Record<string, string> = {
   [CITIZENSHIP_BELIZEAN_IN_BELIZE]: "Beliceño residente en Belice",
   [CITIZENSHIP_BELIZEAN_ABROAD]:
+    "Beliceño residente en el extranjero registrado para votar en Belice",
+  [CITIZENSHIP_BELIZEAN_ABROAD_LEGACY]:
     "Beliceño residente en el extranjero registrado para votar en Belice",
   [CITIZENSHIP_COMMONWEALTH_IN_BELIZE]: "Ciudadano de la Commonwealth residente en Belice",
   [CITIZENSHIP_FOREIGNER_IN_BELIZE]: "Otro extranjero residente permanente en Belice",

@@ -132,12 +132,14 @@ export function ProfileEditForm({
     setForm((prev) => {
       const next = { ...prev, [key]: value };
       if (key === "citizenshipStatus") {
+        const abroad = mustLiveAbroad(String(value));
         next.commonwealthCountry = "";
-        next.votingStatus = "";
+        // Abroad option already means registered to vote — no Yes/No question.
+        next.votingStatus = abroad ? "Yes" : "";
         next.constituency = "";
         next.registeredCtvArea = "";
         next.registeredCtvAreaOther = "";
-        next.placeOfResidence = mustLiveAbroad(String(value)) ? "Abroad" : "";
+        next.placeOfResidence = abroad ? "Abroad" : "";
         next.cityTownVillage = "";
         next.cityTownVillageOther = "";
         next.countryIfAbroad = "";

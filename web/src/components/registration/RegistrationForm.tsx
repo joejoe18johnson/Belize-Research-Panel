@@ -434,12 +434,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
 
   const updateCitizenship = (citizenshipStatus: string) => {
     if (citizenshipLocked) return;
+    const abroad = mustLiveAbroad(citizenshipStatus);
     setForm((prev) => ({
       ...prev,
       citizenshipStatus,
       commonwealthCountry: "",
-      votingStatus: "",
-      placeOfResidence: mustLiveAbroad(citizenshipStatus) ? "Abroad" : "",
+      // Abroad option already means registered to vote — no Yes/No question.
+      votingStatus: abroad ? "Yes" : "",
+      placeOfResidence: abroad ? "Abroad" : "",
       cityTownVillage: "",
       cityTownVillageOther: "",
       countryIfAbroad: "",
