@@ -1,17 +1,13 @@
 import "server-only";
 import twilio from "twilio";
 import { splitStoredPhoneNumber, toE164PhoneNumber } from "./phone-codes";
+import { isTwilioVerifyConfigured } from "./twilio-verify-config";
 import { cleanText } from "./validation";
 
 export type TwilioVerifyChannel = "whatsapp" | "sms";
 
 export function isTwilioVerifyEnabled(): boolean {
-  if (process.env.TWILIO_VERIFY_ENABLED === "false") return false;
-  return Boolean(
-    cleanEnv(process.env.TWILIO_ACCOUNT_SID) &&
-      cleanEnv(process.env.TWILIO_AUTH_TOKEN) &&
-      cleanEnv(process.env.TWILIO_VERIFY_SERVICE_SID)
-  );
+  return isTwilioVerifyConfigured();
 }
 
 function cleanEnv(value: string | undefined): string {

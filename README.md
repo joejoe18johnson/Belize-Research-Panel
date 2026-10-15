@@ -38,6 +38,13 @@ Demo accounts: `npm run seed:demo` (also runs automatically on Netlify build).
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Your live URL, e.g. `https://www.yourdomain.com` |
 | `NEXT_PUBLIC_APP_URL` | Optional | Same as site URL; used for verification/reset links |
 | `RESEND_API_KEY` | Optional | Enables real signup/notification emails |
+| `NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN` | Optional | Google OAuth via Supabase Auth (default on when Supabase public keys exist) |
+| `TWILIO_ACCOUNT_SID` | For phone OTP | Twilio account SID |
+| `TWILIO_AUTH_TOKEN` | For phone OTP | Twilio auth token (secret) |
+| `TWILIO_VERIFY_SERVICE_SID` | For phone OTP | Verify service SID (WhatsApp + SMS) |
+| `TWILIO_VERIFY_ENABLED` | Optional | Set `false` to force-disable OTP even when SIDs are set |
+
+**Phone verification:** With the three `TWILIO_*` values set, panelists confirm ownership via WhatsApp (SMS fallback) in Verification Center. That auto-sets `admin_phone_approved` so admins do not need one-by-one WhatsApp initials checks. Without those env vars, the UI shows a waiting state and admins can still verify phones manually.
 
 Without the three Supabase variables, **signup and registration will fail in production** (Netlify’s filesystem cannot store new accounts). Local dev works because `web/.env.local` has Supabase configured.
 

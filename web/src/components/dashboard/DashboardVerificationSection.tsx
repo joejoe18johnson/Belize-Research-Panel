@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { VerificationCenterSummary } from "@/lib/panelist-verification";
 import { ShieldCheckIcon } from "./DashboardIcons";
 import { DashboardVerificationItems } from "./DashboardVerificationItems";
-import { DashboardCard, SectionHeading } from "./DashboardShell";
+import { DashboardAlert, DashboardCard, SectionHeading } from "./DashboardShell";
 import { formatHeadingCase } from "@/lib/sentence-case";
 import { ID_DOCUMENT_DELETED_NOTICE } from "@/lib/purge-verified-photo-id";
 
@@ -14,7 +14,7 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
       ? "Your phone number is verified."
       : phone?.status === "denied"
         ? "Your phone number was not approved."
-        : "Your phone number is still under review.";
+        : "Confirm your phone number with the WhatsApp or SMS code below — no waiting on an administrator.";
   const photoCopy =
     photo?.status === "verified"
       ? "Your photo identification is verified."
@@ -30,9 +30,29 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
   return `Your email is already verified. ${phoneCopy} ${photoCopy}${residenceCopy ? ` ${residenceCopy}` : ""}`;
 }
 
-export function DashboardVerificationSection({ summary }: { summary: VerificationCenterSummary }) {
+export function DashboardVerificationSection({
+  summary,
+  welcome = false,
+}: {
+  summary: VerificationCenterSummary;
+  welcome?: boolean;
+}) {
+  const phoneNeedsConfirm = summary.items.some(
+    (item) => item.id === "phone" && (item.status === "under_review" || item.status === "denied")
+  );
+
   return (
     <div className="space-y-6">
+      {welcome ? (
+        <DashboardAlert title="Registration complete">
+          {formatHeadingCase(
+            phoneNeedsConfirm
+              ? "Next step: confirm your phone number with a WhatsApp or SMS code below. Photo ID is still reviewed by the panel team."
+              : "Your panelist profile has been submitted. Track verification progress below."
+          )}
+        </DashboardAlert>
+      ) : null}
+
       <DashboardCard className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-white to-white p-0 dark:border-teal-800 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900">
         <div className="overflow-hidden rounded-t-2xl border-b border-teal-100 dark:border-teal-900/60 bg-teal-700 px-5 py-5 text-white sm:px-6">
           <div className="flex items-start justify-between gap-4">
@@ -45,7 +65,7 @@ export function DashboardVerificationSection({ summary }: { summary: Verificatio
                     ? `Your essential verification items have been approved. ${ID_DOCUMENT_DELETED_NOTICE}`
                     : formatHeadingCase("Your essential verification items have been approved.")
                   : formatHeadingCase(
-                      "Our team is reviewing the items below from your registration. You will be notified when verification is complete."
+                      "Confirm your phone yourself with a code. Photo ID still needs a team review before your account is fully verified."
                     )}
               </p>
             </div>

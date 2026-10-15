@@ -21,6 +21,7 @@ import {
 } from "./admin-payout-display";
 import { adminNotificationId, adminPanelistVerificationId, PANELIST_VERIFICATION_NOTIFICATION_TYPE } from "./admin-read-ids";
 import { parseAuthorisedRegistration } from "./authorised-registrars";
+import { isTwilioVerifyConfigured } from "./twilio-verify-config";
 import { cleanText } from "./validation";
 
 export interface AdminDashboardMetrics {
@@ -170,6 +171,8 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
     });
   }).length;
 
+  // When Twilio Verify is configured, phone ownership is panelist self-serve — do not queue for admin.
+  const twilioPhoneSelfServe = isTwilioVerifyConfigured();
   let phoneNumbersToReview = pendingPhoneChanges;
   let idDocumentsToReview = 0;
   let addressDocumentsToReview = 0;
@@ -179,7 +182,7 @@ export function buildAdminDashboardMetrics(hub: AdminDataHub): AdminDashboardMet
     const account = hub.accounts.find((item) => cleanText(item.email).toLowerCase() === email);
     const context = requirementContextFromAccount(account);
     const requirements = assessPanelistRequirements(row, context);
-    if (requirements.phone === "under_review") phoneNumbersToReview += 1;
+    if (requirements.phone === "under_review" && !twilioPhoneSelfServe) phoneNumbersToReview += 1;
     if (requirements.photoId === "under_review") idDocumentsToReview += 1;
     if (cleanText(row.place_of_residence) && requirements.photoId !== "approved") {
       addressDocumentsToReview += 1;
@@ -391,7 +394,8 @@ export function buildNotificationQueueRows(hub: AdminDataHub): NotificationQueue
     }
 
     const pendingPhone = cleanText(account.pending_phone_whatsapp);
-    if (pendingPhone) {
+    // OTP phone changes are confirmed by the panelist via Twilio — skip admin queue.
+    if (pendingPhone && cleanText(account.phone_change_via_otp) !== "true") {
       rows.push({
         id: adminNotificationId("Phone change", email),
         email,

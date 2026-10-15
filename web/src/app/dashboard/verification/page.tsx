@@ -10,7 +10,12 @@ export const metadata = {
   title: "Verification Center | Belize Research Panel",
 };
 
-export default async function DashboardVerificationPage() {
+export default async function DashboardVerificationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
+  const { welcome } = await searchParams;
   const { account } = await requireDashboardContext();
   const panelist = await findPanelistByEmail(account.email);
   if (!panelist) {
@@ -26,10 +31,10 @@ export default async function DashboardVerificationPage() {
     <>
       <DashboardPageHeader
         title="Verification Center"
-        description="Track the essential items our team reviews before your account is verified."
+        description="Confirm your phone and track the items needed before your account is verified."
         icon={SectionIcon ? <SectionIcon className="h-5 w-5" /> : undefined}
       />
-      <DashboardVerificationSection summary={summary} />
+      <DashboardVerificationSection summary={summary} welcome={welcome === "1"} />
     </>
   );
 }

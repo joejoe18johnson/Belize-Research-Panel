@@ -13,6 +13,7 @@ import type { RequirementApprovalStatus } from "@/lib/panelist-requirements";
 import { useSupabase } from "@/lib/supabase/data-source";
 import { listEmailsWithReadNotification } from "@/lib/notification-state";
 import { PHOTO_ID_PURGED_MARKER } from "@/lib/purge-verified-photo-id";
+import { isTwilioVerifyConfigured } from "@/lib/twilio-verify-config";
 import { cleanText } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -103,6 +104,7 @@ export default async function AdminPanelistsPage({
       residenceUploadUsernames={[...residenceUploadUsernames]}
       purgedPhotoIdEmails={purgedPhotoIdEmails}
       liveDatabase={useSupabase()}
+      twilioVerifyEnabled={isTwilioVerifyConfigured()}
       filterOptions={{
         verification: getUniqueFilterValues(rows, "verification_status"),
         district: getUniqueFilterValues(rows, "district"),

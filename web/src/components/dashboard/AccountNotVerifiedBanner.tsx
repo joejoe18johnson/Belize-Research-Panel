@@ -13,8 +13,8 @@ export function AccountNotVerifiedBanner({ verificationStatus }: { verificationS
     <div aria-live="polite" className="min-w-0">
       <BrandedAlert tone="warning" title="Account not verified">
         <p>
-          Your panelist account has not been verified yet. Our team is reviewing your registration and will notify you
-          when verification is complete.
+          Your panelist account is not fully verified yet. Confirm your phone with a WhatsApp or SMS code in Verification
+          Center. Photo ID is still reviewed by the panel team.
         </p>
         <p className="font-semibold">
           Current status: {verificationStatus}

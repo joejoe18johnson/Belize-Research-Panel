@@ -181,12 +181,14 @@ function RequirementOnFileDetail({
   detail,
   onFile,
   verified = false,
+  twilioVerifyEnabled = false,
   onDocumentRemoved,
 }: {
   itemKey: ReviewKey;
   detail: RequirementReviewDetail;
   onFile: boolean;
   verified?: boolean;
+  twilioVerifyEnabled?: boolean;
   onDocumentRemoved?: () => void;
 }) {
   if (!onFile) {
@@ -229,10 +231,16 @@ function RequirementOnFileDetail({
           </p>
         ) : verified && viaLabel ? (
           <p className="mt-1 text-xs font-semibold text-zinc-700 dark:text-zinc-200">{viaLabel}</p>
+        ) : twilioVerifyEnabled && !verified ? (
+          <p className="mt-1 text-[11px] leading-snug text-teal-900 dark:text-teal-100">
+            Awaiting panelist WhatsApp / SMS code. No manual phone check needed unless they cannot receive a code.
+          </p>
         ) : (
           <>
             <p className="mt-1 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300">
-              Prefer panelist self-verify with WhatsApp / SMS codes. Manual WhatsApp initials are a fallback only.
+              {twilioVerifyEnabled
+                ? "Manual WhatsApp initials are a fallback only."
+                : "Twilio Verify is not configured yet. Use WhatsApp initials until TWILIO_* env vars are set."}
             </p>
             <a
               href={whatsAppVerificationHref(detail.phone)}
@@ -240,7 +248,7 @@ function RequirementOnFileDetail({
               rel="noopener noreferrer"
               className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:text-teal-900 dark:text-teal-100"
             >
-              Fallback: message on WhatsApp
+              {twilioVerifyEnabled ? "Fallback: message on WhatsApp" : "Message on WhatsApp"}
             </a>
           </>
         )}
@@ -281,6 +289,7 @@ export function RequirementReviewControls({
   onDecision,
   disabled = false,
   itemNotes,
+  twilioVerifyEnabled = false,
 }: {
   decisions: Record<ReviewKey, AdminRequirementDecision>;
   onFile: Record<ReviewKey, boolean>;
@@ -288,6 +297,7 @@ export function RequirementReviewControls({
   onDecision: (key: ReviewKey, decision: "true" | "false", reason?: string) => void;
   disabled?: boolean;
   itemNotes?: Partial<Record<ReviewKey, string>>;
+  twilioVerifyEnabled?: boolean;
 }) {
   const [photoDenialOpen, setPhotoDenialOpen] = useState(false);
   const [photoDenialReason, setPhotoDenialReason] = useState(detail.photoIdDenialReason ?? "");
@@ -311,7 +321,8 @@ export function RequirementReviewControls({
               itemKey={item.key}
               detail={detail}
               onFile={onFile[item.key]}
-              verified={item.key === "photoId" && verified}
+              verified={item.key === "photoId" ? verified : item.key === "phone" ? verified : false}
+              twilioVerifyEnabled={twilioVerifyEnabled}
               onDocumentRemoved={item.key === "photoId" ? markPhotoRemoved : undefined}
             />
             {note ? <p className="mt-2 text-[11px] leading-snug text-emerald-800 dark:text-emerald-300">{note}</p> : null}

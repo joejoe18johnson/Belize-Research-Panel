@@ -115,6 +115,7 @@ export function AdminPanelistsClient({
   residenceUploadUsernames,
   purgedPhotoIdEmails = [],
   liveDatabase = false,
+  twilioVerifyEnabled = false,
   returnTo,
 }: {
   rows: PanelistRow[];
@@ -136,6 +137,7 @@ export function AdminPanelistsClient({
   residenceUploadUsernames: UsernameCollection;
   purgedPhotoIdEmails?: string[];
   liveDatabase?: boolean;
+  twilioVerifyEnabled?: boolean;
   returnTo?: string;
 }) {
   const router = useRouter();
@@ -892,6 +894,7 @@ export function AdminPanelistsClient({
           authorisedBy={parseAuthorisedRegistration(editingRow).registrarName}
           panelistEmail={editingRow.email}
           phoneVerifiedVia={cleanText(editingRow.phone_verified_via)}
+          twilioVerifyEnabled={twilioVerifyEnabled}
           photoIdDeleted={purgedPhotoIdEmailSet.has(cleanText(editingRow.email).toLowerCase())}
           photoPreviewSuppressed={photoPreviewHeld}
           requirementContext={requirementReviewContext}
@@ -934,6 +937,7 @@ function PanelistEditModal({
   authorisedBy,
   panelistEmail,
   phoneVerifiedVia = "",
+  twilioVerifyEnabled = false,
   photoIdDeleted = false,
   photoPreviewSuppressed = false,
   requirementContext,
@@ -956,6 +960,7 @@ function PanelistEditModal({
   authorisedBy: string;
   panelistEmail: string;
   phoneVerifiedVia?: string;
+  twilioVerifyEnabled?: boolean;
   photoIdDeleted?: boolean;
   photoPreviewSuppressed?: boolean;
   requirementContext: { hasPhotoUpload?: boolean; hasResidenceUpload?: boolean; emailVerified?: boolean };
@@ -1059,6 +1064,7 @@ function PanelistEditModal({
               detail={reviewDetail}
               onDecision={onRequirementDecision}
               disabled={saving}
+              twilioVerifyEnabled={twilioVerifyEnabled}
               itemNotes={{
                 email: requirementContext.emailVerified
                   ? "Confirmed by the panelist from their inbox. No administrator check is required."
@@ -1069,7 +1075,9 @@ function PanelistEditModal({
                     ? "Confirmed automatically by Twilio Verify. No administrator check is required."
                     : editState.admin_phone_approved === "true"
                       ? "Phone ownership was marked verified. Prefer Twilio self-verify for new panelists."
-                      : "Panelists confirm ownership with a WhatsApp or SMS code. Use Verify only as a fallback.",
+                      : twilioVerifyEnabled
+                        ? "Twilio Verify is on. Wait for the panelist to enter their WhatsApp/SMS code — do not verify phone manually unless they are stuck."
+                        : "Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_VERIFY_SERVICE_SID on Netlify to turn on automatic phone verification.",
               }}
             />
           </div>

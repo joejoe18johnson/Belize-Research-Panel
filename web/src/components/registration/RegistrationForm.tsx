@@ -719,7 +719,8 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     setSubmitting(true);
     const finishSuccess = () => {
       clearRegistrationDraft(account.email);
-      window.location.assign("/dashboard?welcome=1");
+      // Land on Verification Center so phone can be confirmed by WhatsApp/SMS (Twilio) without admin work.
+      window.location.assign("/dashboard/verification?welcome=1");
     };
 
     const confirmRegistered = async (): Promise<boolean> => {
