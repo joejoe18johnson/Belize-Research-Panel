@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findAccountById, markAccountPanelistRegistered } from "@/lib/accounts";
+import { findAccountById, markAccountPanelistRegistered, updateAccountNames } from "@/lib/accounts";
 import { getSessionAccount, resolveRequestOrigin } from "@/lib/auth";
 import { sendRegistrationSubmittedEmail } from "@/lib/email/process-emails";
 import { duplicateCheck, loadPanelists, registerPanelist } from "@/lib/panelists";
@@ -31,6 +31,7 @@ function parseRegistrationForm(formData: FormData): RegistrationFormData {
     votingStatus: String(formData.get("votingStatus") ?? ""),
     firstName: String(formData.get("firstName") ?? ""),
     lastName: String(formData.get("lastName") ?? ""),
+    nameMatchesOfficialId: parseBoolean(formData.get("nameMatchesOfficialId")),
     sex: String(formData.get("sex") ?? ""),
     education: String(formData.get("education") ?? ""),
     ethnicity: String(formData.get("ethnicity") ?? ""),
@@ -148,11 +149,12 @@ export async function POST(request: NextRequest) {
       accountEmail: session.email,
       accountId: session.id,
     });
+    await updateAccountNames(session.id, data.firstName, data.lastName);
     await markAccountPanelistRegistered(session.id);
 
     void sendRegistrationSubmittedEmail({
       to: session.email,
-      firstName: session.firstName,
+      firstName: data.firstName || session.firstName,
       origin: resolveRequestOrigin(request),
     });
 

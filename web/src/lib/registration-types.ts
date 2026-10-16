@@ -13,6 +13,8 @@ export interface RegistrationFormData {
   votingStatus: string;
   firstName: string;
   lastName: string;
+  /** Panelist confirmed the name matches their official photo ID / voters list. */
+  nameMatchesOfficialId: boolean;
   sex: string;
   education: string;
   ethnicity: string;
@@ -73,6 +75,7 @@ export const initialRegistrationForm: RegistrationFormData = {
   votingStatus: "",
   firstName: "",
   lastName: "",
+  nameMatchesOfficialId: false,
   sex: "",
   education: "",
   ethnicity: "",

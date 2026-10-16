@@ -53,6 +53,7 @@ export interface SessionAccount {
   pendingPhone: string;
   /** Pending phone is waiting on Twilio OTP (not admin hold). */
   phoneChangeViaOtp?: boolean;
+  authProvider?: AccountAuthProvider;
 }
 
 export interface SignupFormData {

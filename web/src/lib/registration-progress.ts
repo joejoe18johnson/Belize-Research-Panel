@@ -67,6 +67,7 @@ const PHASE_ERROR_KEYS: readonly (readonly string[])[] = [
   [
     "firstName",
     "lastName",
+    "nameMatchesOfficialId",
     "sex",
     "education",
     "ethnicity",

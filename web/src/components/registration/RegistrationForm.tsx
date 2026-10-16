@@ -132,6 +132,7 @@ export interface RegistrationAccountContext {
   citizenshipStatus?: string;
   commonwealthCountry?: string;
   dob?: string;
+  authProvider?: "password" | "facebook" | "google";
 }
 
 function buildInitialForm(account: RegistrationAccountContext): RegistrationFormData {
@@ -358,9 +359,14 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
     }, 50);
   }, []);
 
+  const isGoogleAccount = account.authProvider === "google";
+
   const update = useCallback(<K extends keyof RegistrationFormData>(key: K, value: RegistrationFormData[K]) => {
     setForm((prev) => {
       const next = { ...prev, [key]: value };
+      if (key === "firstName" || key === "lastName") {
+        next.nameMatchesOfficialId = false;
+      }
       if (key === "householdHeadRelationship" && !isHeadOfHousehold(String(value))) {
         next.householdSize = "";
         next.householdSizeConfirmed = false;
@@ -1077,17 +1083,37 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
       {activePhaseIndex === 2 ? (
         <>
           <FormSection step={4} title={copy.sections.name}>
-            <Alert variant="info" formatBody={false}>
-              {copy.nameAlert}
+            <Alert variant={isGoogleAccount ? "warning" : "info"} formatBody={false}>
+              {isGoogleAccount ? copy.nameAlertGoogle : copy.nameAlert}
             </Alert>
             <FieldGroup columns={2}>
               <Field label={copy.firstName} required error={fieldError("firstName")} id="firstName">
-                <TextInput id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} onBlur={() => { touch("firstName"); validateField("firstName"); }} error={fieldError("firstName")} />
+                <TextInput id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} onBlur={() => { touch("firstName"); validateField("firstName"); }} error={fieldError("firstName")} autoComplete="given-name" />
               </Field>
               <Field label={copy.lastName} required error={fieldError("lastName")} id="lastName">
-                <TextInput id="lastName" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} onBlur={() => { touch("lastName"); validateField("lastName"); }} error={fieldError("lastName")} />
+                <TextInput id="lastName" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} onBlur={() => { touch("lastName"); validateField("lastName"); }} error={fieldError("lastName")} autoComplete="family-name" />
               </Field>
             </FieldGroup>
+            <div
+              id="nameMatchesOfficialId-field"
+              className={`rounded-lg border px-4 py-3 ${
+                fieldError("nameMatchesOfficialId")
+                  ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
+                  : "border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/60"
+              }`}
+            >
+              <CheckboxField
+                id="nameMatchesOfficialId"
+                label={copy.nameMatchesOfficialId}
+                checked={form.nameMatchesOfficialId}
+                onChange={(checked) => {
+                  update("nameMatchesOfficialId", checked);
+                  touch("nameMatchesOfficialId");
+                  validateField("nameMatchesOfficialId", checked);
+                }}
+                error={fieldError("nameMatchesOfficialId")}
+              />
+            </div>
           </FormSection>
 
           <FormSection step={5} title={copy.sections.demographics}>

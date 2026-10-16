@@ -126,6 +126,8 @@ export type RegistrationCopy = {
   proofType: string;
   proofUpload: string;
   nameAlert: string;
+  nameAlertGoogle: string;
+  nameMatchesOfficialId: string;
   firstName: string;
   lastName: string;
   sex: string;
@@ -366,6 +368,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     proofUpload: "Upload proof of Belize residence",
     nameAlert:
       "Enter your name exactly as it appears on the Belize voters list if you are a registered voter. If you are not a registered voter in Belize, enter your name exactly as it appears on the photo ID attached to this form.",
+    nameAlertGoogle:
+      "Google sometimes fills in a display name that does not match your legal name. Check and correct your first and last name so they match your official photo ID (or the Belize voters list if you are a registered voter) before continuing.",
+    nameMatchesOfficialId:
+      "I have checked my name and confirm it matches my official photo ID (or the Belize voters list if I am a registered voter).",
     firstName: "First name",
     lastName: "Last name(s)",
     sex: "Sex",
@@ -613,6 +619,10 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     proofUpload: "Subir comprobante de residencia en Belice",
     nameAlert:
       "Escriba su nombre exactamente como aparece en la lista de votantes de Belice si está registrado para votar. Si no está registrado para votar en Belice, escriba su nombre exactamente como aparece en la identificación con foto adjunta a este formulario.",
+    nameAlertGoogle:
+      "Google a veces completa un nombre para mostrar que no coincide con su nombre legal. Revise y corrija su nombre y apellido(s) para que coincidan con su identificación oficial con foto (o con la lista de votantes de Belice si está registrado para votar) antes de continuar.",
+    nameMatchesOfficialId:
+      "He revisado mi nombre y confirmo que coincide con mi identificación oficial con foto (o con la lista de votantes de Belice si estoy registrado para votar).",
     firstName: "Nombre",
     lastName: "Apellido(s)",
     sex: "Sexo",

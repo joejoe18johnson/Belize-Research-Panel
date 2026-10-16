@@ -474,6 +474,10 @@ export function validateRegistrationForm(
 
   if (!cleanText(data.firstName)) errors.firstName = "First name is required.";
   if (!cleanText(data.lastName)) errors.lastName = "Last name is required.";
+  if (!data.nameMatchesOfficialId) {
+    errors.nameMatchesOfficialId =
+      "Please confirm that your first and last name match your official photo ID (or the Belize voters list if you are a registered voter).";
+  }
   if (!data.sex) errors.sex = "Sex is required.";
   if (!data.education) errors.education = "Education level is required.";
   if (!data.ethnicity) errors.ethnicity = "Ethnicity is required.";

@@ -67,6 +67,7 @@ export default async function RegisterPage() {
         citizenshipStatus: account.citizenshipStatus,
         commonwealthCountry: account.commonwealthCountry,
         dob: account.dob,
+        authProvider: account.authProvider,
       }}
     />
   );

@@ -707,6 +707,27 @@ export async function markAccountPanelistRegistered(accountId: string): Promise<
   await saveAccountsRaw(accounts);
 }
 
+/** Keep account names in sync when a panelist corrects Google/OAuth display names during registration. */
+export async function updateAccountNames(
+  accountId: string,
+  firstName: string,
+  lastName: string
+): Promise<AccountRecord | null> {
+  const account = await findAccountById(accountId);
+  if (!account) return null;
+  const nextFirst = titleCaseName(firstName);
+  const nextLast = titleCaseName(lastName);
+  if (!nextFirst || !nextLast) return account;
+  if (account.first_name === nextFirst && account.last_name === nextLast) return account;
+  const updated: AccountRecord = {
+    ...account,
+    first_name: nextFirst,
+    last_name: nextLast,
+  };
+  await persistAccount(updated);
+  return updated;
+}
+
 export async function setAccountEmailVerifiedByAdmin(email: string, verified: boolean): Promise<boolean> {
   const normalized = cleanText(email).toLowerCase();
   if (!normalized) return false;
@@ -755,6 +776,7 @@ export function toSessionAccount(account: AccountRecord): SessionAccount {
     phoneChangeViaOtp:
       Boolean(cleanText(account.pending_phone_whatsapp)) &&
       cleanText(account.phone_change_via_otp) === "true",
+    authProvider: account.auth_provider ?? "password",
   };
 }
 
