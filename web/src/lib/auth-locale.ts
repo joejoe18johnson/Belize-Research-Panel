@@ -153,16 +153,16 @@ export const AUTH_COPY: Record<HomeLocale, AuthCopy> = {
     googlePageSubtitle: "Connecting your Google account to the Belize Research Panel.",
     googleCouldNotSignIn: "Could not sign in with Google",
     googleSetupHelp:
-      "Enable the Google provider in Supabase Auth (Auth → Providers → Google) and add your Google Cloud OAuth client ID and secret, then try again.",
+      "Confirm Google is enabled in Supabase Auth, the redirect URI in Google Cloud matches your Supabase callback, and this site was redeployed after setting NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     googlePleaseWait: "Please wait",
     googleFinishing: "Finishing Google sign-in…",
     googleSignup: "Sign up with Google",
     googleContinue: "Continue with Google",
     googleConnecting: "Connecting Google…",
     googleNotEnabled:
-      "Google login will be available after you enable Google in Supabase Auth and add your Google Cloud OAuth credentials.",
+      "Google sign-in is unavailable on this deploy. Confirm NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Netlify, then trigger a new deploy (public env vars are baked in at build time).",
     googleReadyHint:
-      "Google sign-in is ready in the app. Enable the Google provider in Supabase and add your OAuth client credentials.",
+      "Missing public Supabase env on this build. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Netlify and redeploy.",
     googleCouldNotStart: "Could not start Google sign-in.",
     orContinueWithEmail: "or continue with email",
 
@@ -253,16 +253,16 @@ export const AUTH_COPY: Record<HomeLocale, AuthCopy> = {
     googlePageSubtitle: "Conectando su cuenta de Google con el Belize Research Panel.",
     googleCouldNotSignIn: "No se pudo iniciar sesión con Google",
     googleSetupHelp:
-      "Habilite el proveedor de Google en Supabase Auth (Auth → Providers → Google) y agregue el ID y el secreto de cliente OAuth de Google Cloud, luego inténtelo de nuevo.",
+      "Confirme que Google esté habilitado en Supabase Auth, que la URI de redirección en Google Cloud coincida con el callback de Supabase, y que el sitio se haya vuelto a desplegar después de configurar NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     googlePleaseWait: "Espere",
     googleFinishing: "Finalizando el inicio de sesión con Google…",
     googleSignup: "Registrarse con Google",
     googleContinue: "Continuar con Google",
     googleConnecting: "Conectando Google…",
     googleNotEnabled:
-      "El inicio de sesión con Google estará disponible después de habilitar Google en Supabase Auth y agregar sus credenciales OAuth de Google Cloud.",
+      "El inicio de sesión con Google no está disponible en este despliegue. Confirme NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY en Netlify y vuelva a desplegar (esas variables se incluyen en el build).",
     googleReadyHint:
-      "El acceso con Google está listo en la app. Habilite el proveedor de Google en Supabase y agregue sus credenciales OAuth.",
+      "Faltan las variables públicas de Supabase en este build. Agregue NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY en Netlify y vuelva a desplegar.",
     googleCouldNotStart: "No se pudo iniciar el acceso con Google.",
     orContinueWithEmail: "o continuar con correo electrónico",
 
