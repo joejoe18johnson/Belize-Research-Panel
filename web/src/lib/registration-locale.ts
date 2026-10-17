@@ -116,8 +116,19 @@ export type RegistrationCopy = {
   };
   photoIdIntro: string;
   photoIdAlert: string;
+  photoIdClarityNote: string;
   photoIdType: string;
   photoIdUpload: string;
+  photoIdTakePhoto: string;
+  photoIdUploadFile: string;
+  photoIdClear: string;
+  photoIdCaptureTitle: string;
+  photoIdCaptureHint: string;
+  photoIdCaptureButton: string;
+  photoIdUseDeviceCamera: string;
+  photoIdCaptureCancel: string;
+  photoIdAttached: (fileName: string) => string;
+  photoIdCameraUnavailable: string;
   commonwealthCountry: string;
   citizenshipIneligible: string;
   citizenshipLockedNote: string;
@@ -353,9 +364,23 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     },
     photoIdIntro: "",
     photoIdAlert:
-      "Upload a government-issued photo ID. We use it only to verify your identity and eligibility. We do not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.",
+      "Upload or take a photo of a government-issued photo ID. We use it only to verify your identity and eligibility. We do not keep or store ID images in our files. ID numbers may be blurred or covered before upload, as long as your name, photograph, and eligibility details remain visible.",
+    photoIdClarityNote:
+      "The picture must be clear and well lit. All four corners of the ID must be showing in the frame, with no edges cut off.",
     photoIdType: "Photo ID type",
-    photoIdUpload: "Upload photo ID image or PDF",
+    photoIdUpload: "Photo ID image or PDF",
+    photoIdTakePhoto: "Take photo",
+    photoIdUploadFile: "Upload file",
+    photoIdClear: "Remove and try again",
+    photoIdCaptureTitle: "Photograph your ID",
+    photoIdCaptureHint:
+      "Hold your ID flat. Make sure the photo is clear and all four corners are visible before you capture.",
+    photoIdCaptureButton: "Capture photo",
+    photoIdUseDeviceCamera: "Use phone camera app",
+    photoIdCaptureCancel: "Cancel",
+    photoIdAttached: (fileName) => `Attached: ${fileName}`,
+    photoIdCameraUnavailable:
+      "Live camera is not available in this browser. Opening your device camera or file picker instead.",
     commonwealthCountry: "Commonwealth country of citizenship",
     citizenshipIneligible:
       "You are not eligible to register under this citizenship / residency status. Choose a qualifying option or return home.",
@@ -604,9 +629,23 @@ export const REGISTRATION_COPY: Record<HomeLocale, RegistrationCopy> = {
     },
     photoIdIntro: "",
     photoIdAlert:
-      "Suba una identificación con foto emitida por el gobierno. Solo la usamos para verificar su identidad y elegibilidad. No guardamos ni almacenamos imágenes de identificación. Puede ocultar o difuminar números de identificación antes de subirla, siempre que su nombre, fotografía y datos de elegibilidad sigan visibles.",
+      "Suba o tome una foto de una identificación con foto emitida por el gobierno. Solo la usamos para verificar su identidad y elegibilidad. No guardamos ni almacenamos imágenes de identificación. Puede ocultar o difuminar números de identificación antes de subirla, siempre que su nombre, fotografía y datos de elegibilidad sigan visibles.",
+    photoIdClarityNote:
+      "La foto debe ser nítida y con buena iluminación. Las cuatro esquinas de la identificación deben verse en el encuadre, sin cortes en los bordes.",
     photoIdType: "Tipo de identificación con foto",
-    photoIdUpload: "Subir imagen o PDF de identificación",
+    photoIdUpload: "Imagen o PDF de identificación",
+    photoIdTakePhoto: "Tomar foto",
+    photoIdUploadFile: "Subir archivo",
+    photoIdClear: "Quitar e intentar de nuevo",
+    photoIdCaptureTitle: "Fotografíe su identificación",
+    photoIdCaptureHint:
+      "Mantenga la identificación plana. Asegúrese de que la foto sea nítida y que se vean las cuatro esquinas antes de capturar.",
+    photoIdCaptureButton: "Capturar foto",
+    photoIdUseDeviceCamera: "Usar la cámara del teléfono",
+    photoIdCaptureCancel: "Cancelar",
+    photoIdAttached: (fileName) => `Adjunto: ${fileName}`,
+    photoIdCameraUnavailable:
+      "La cámara en vivo no está disponible en este navegador. Se abrirá la cámara del dispositivo o el selector de archivos.",
     commonwealthCountry: "País de ciudadanía de la Commonwealth",
     citizenshipIneligible:
       "No es elegible para registrarse con este estado de ciudadanía / residencia. Elija una opción válida o vuelva al inicio.",

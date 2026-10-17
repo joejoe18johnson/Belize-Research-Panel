@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PHOTO_ID_TYPES } from "@/lib/constants";
 import { useToast } from "@/components/shared/ToastProvider";
+import { PhotoIdCaptureField } from "@/components/registration/PhotoIdCaptureField";
 
 export function PhotoIdResubmitForm() {
   const router = useRouter();
@@ -11,19 +12,23 @@ export function PhotoIdResubmitForm() {
   const [photoIdType, setPhotoIdType] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
+  const [fileError, setFileError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
     if (!photoIdType) {
       setError("Choose a photo ID type.");
+      setFileError("");
       return;
     }
     if (!file) {
-      setError("Upload a PNG, JPG, or PDF.");
+      setError("");
+      setFileError("Take a clear photo or upload a PNG, JPG, or PDF.");
       return;
     }
     setSubmitting(true);
     setError("");
+    setFileError("");
     try {
       const body = new FormData();
       body.set("photoIdType", photoIdType);
@@ -55,6 +60,9 @@ export function PhotoIdResubmitForm() {
   return (
     <div className="mt-4 space-y-3 rounded-xl border border-red-200 bg-white p-3 dark:border-red-800 dark:bg-zinc-950">
       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Submit another document</p>
+      <p className="text-sm text-amber-950 dark:text-amber-100">
+        The picture must be clear and well lit. All four corners of the ID must be showing in the frame.
+      </p>
       <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100" htmlFor="replacement-photo-id-type">
         Photo ID type
       </label>
@@ -71,15 +79,25 @@ export function PhotoIdResubmitForm() {
           </option>
         ))}
       </select>
-      <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100" htmlFor="replacement-photo-id-file">
-        New document
-      </label>
-      <input
+      <p className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">New document</p>
+      <PhotoIdCaptureField
         id="replacement-photo-id-file"
-        type="file"
-        accept=".png,.jpg,.jpeg,.pdf"
-        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-        className="block w-full text-sm text-zinc-800 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-700 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800 dark:text-zinc-100"
+        file={file}
+        onChange={(next) => {
+          setFile(next);
+          setFileError("");
+        }}
+        error={fileError}
+        takePhotoLabel="Take photo"
+        uploadFileLabel="Upload file"
+        clearLabel="Remove and try again"
+        captureTitle="Photograph your ID"
+        captureHint="Hold your ID flat. Make sure the photo is clear and all four corners are visible before you capture."
+        captureButtonLabel="Capture photo"
+        useCameraLabel="Use phone camera app"
+        cancelLabel="Cancel"
+        attachedLabel={(fileName) => `Attached: ${fileName}`}
+        cameraUnavailable="Live camera is not available in this browser. Opening your device camera or file picker instead."
       />
       {error ? <p className="text-sm text-red-800 dark:text-red-200">{error}</p> : null}
       <button

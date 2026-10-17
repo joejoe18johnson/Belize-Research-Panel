@@ -20,6 +20,7 @@ import { RegistrationPhaseNav } from "./RegistrationPhaseNav";
 import { PhoneNumberField } from "./PhoneNumberField";
 import { SocialContactField } from "./SocialContactField";
 import { StreetAddressFields } from "./StreetAddressFields";
+import { PhotoIdCaptureField } from "./PhotoIdCaptureField";
 import { useRegistrationCopy, useLocale } from "@/components/locale/LocaleProvider";
 import { yesNoLabel, marketInterestLabel } from "@/lib/registration-locale";
 import { citizenshipLabelFor } from "@/lib/signup-locale";
@@ -950,37 +951,47 @@ export function RegistrationForm({ account }: { account: RegistrationAccountCont
           <Alert variant="info" formatBody={false}>
             {copy.photoIdAlert}
           </Alert>
-          <FieldGroup columns={2}>
-            <Field label={copy.photoIdType} required error={fieldError("photoIdType")} id="photoIdType">
-              <SelectInput
-                id="photoIdType"
-                value={form.photoIdType}
-                onChange={(e) => update("photoIdType", e.target.value)}
-                onBlur={() => touchAndValidate("photoIdType")}
-                error={fieldError("photoIdType")}
-              >
-                <option value="">{copy.selectPhotoId}</option>
-                {PHOTO_ID_TYPES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-            <Field label={copy.photoIdUpload} required error={fieldError("photoIdFile")}>
-              <FileInput
-                id="photoIdFile"
-                accept=".png,.jpg,.jpeg,.pdf"
-                file={form.photoIdFile}
-                onChange={(file) => {
-                  update("photoIdFile", file);
-                  touch("photoIdFile");
-                  validateField("photoIdFile", file);
-                }}
-                error={fieldError("photoIdFile")}
-              />
-            </Field>
-          </FieldGroup>
+          <Alert variant="warning" formatBody={false}>
+            {copy.photoIdClarityNote}
+          </Alert>
+          <Field label={copy.photoIdType} required error={fieldError("photoIdType")} id="photoIdType">
+            <SelectInput
+              id="photoIdType"
+              value={form.photoIdType}
+              onChange={(e) => update("photoIdType", e.target.value)}
+              onBlur={() => touchAndValidate("photoIdType")}
+              error={fieldError("photoIdType")}
+            >
+              <option value="">{copy.selectPhotoId}</option>
+              {PHOTO_ID_TYPES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+          <Field label={copy.photoIdUpload} required error={fieldError("photoIdFile")} id="photoIdFile">
+            <PhotoIdCaptureField
+              id="photoIdFile"
+              file={form.photoIdFile}
+              onChange={(nextFile) => {
+                update("photoIdFile", nextFile);
+                touch("photoIdFile");
+                validateField("photoIdFile", nextFile);
+              }}
+              error={fieldError("photoIdFile")}
+              takePhotoLabel={copy.photoIdTakePhoto}
+              uploadFileLabel={copy.photoIdUploadFile}
+              clearLabel={copy.photoIdClear}
+              captureTitle={copy.photoIdCaptureTitle}
+              captureHint={copy.photoIdCaptureHint}
+              captureButtonLabel={copy.photoIdCaptureButton}
+              useCameraLabel={copy.photoIdUseDeviceCamera}
+              cancelLabel={copy.photoIdCaptureCancel}
+              attachedLabel={copy.photoIdAttached}
+              cameraUnavailable={copy.photoIdCameraUnavailable}
+            />
+          </Field>
         </FormSection>
       ) : null}
 
