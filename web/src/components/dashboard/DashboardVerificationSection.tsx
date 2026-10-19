@@ -14,7 +14,7 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
       ? "Your phone number is verified."
       : phone?.status === "denied"
         ? "Your phone number was not approved."
-        : "Confirm your phone number with a WhatsApp code below (SMS if WhatsApp cannot deliver) — no waiting on an administrator.";
+        : "Confirm your phone number with a WhatsApp code below — no waiting on an administrator.";
   const photoCopy =
     photo?.status === "verified"
       ? "Your photo identification is verified."
@@ -47,7 +47,7 @@ export function DashboardVerificationSection({
         <DashboardAlert title="Registration complete">
           {formatHeadingCase(
             phoneNeedsConfirm
-              ? "Next step: confirm your phone number with a WhatsApp or SMS code below. Photo ID is still reviewed by the panel team."
+              ? "Next step: confirm your phone number with a WhatsApp code below. Photo ID is still reviewed by the panel team."
               : "Your panelist profile has been submitted. Track verification progress below."
           )}
         </DashboardAlert>

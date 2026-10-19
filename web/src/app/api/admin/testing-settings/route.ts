@@ -28,6 +28,7 @@ export async function PATCH(request: Request) {
     const body = (await request.json()) as Partial<{
       allowDuplicateEmails: boolean;
       allowDuplicatePhones: boolean;
+      smsPhoneOtpEnabled: boolean;
     }>;
     const current = await loadPlatformTestingSettings();
     const settings = await savePlatformTestingSettings(
@@ -41,6 +42,10 @@ export async function PATCH(request: Request) {
           typeof body.allowDuplicatePhones === "boolean"
             ? body.allowDuplicatePhones
             : current.allowDuplicatePhones,
+        smsPhoneOtpEnabled:
+          typeof body.smsPhoneOtpEnabled === "boolean"
+            ? body.smsPhoneOtpEnabled
+            : current.smsPhoneOtpEnabled,
       }),
       session.displayName
     );

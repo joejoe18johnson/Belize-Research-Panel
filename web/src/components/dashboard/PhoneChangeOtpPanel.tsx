@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatHeadingCase } from "@/lib/sentence-case";
 
 type TwilioChannel = "whatsapp" | "sms";
 
 export function PhoneChangeOtpPanel({ pendingPhone }: { pendingPhone: string }) {
   const router = useRouter();
+  const [smsEnabled, setSmsEnabled] = useState(false);
   const [channel, setChannel] = useState<TwilioChannel | null>(null);
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
@@ -15,14 +16,26 @@ export function PhoneChangeOtpPanel({ pendingPhone }: { pendingPhone: string }) 
   const [sending, setSending] = useState(false);
   const [checking, setChecking] = useState(false);
 
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/profile/phone/status", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data: { smsEnabled?: boolean }) => {
+        if (!cancelled) setSmsEnabled(Boolean(data.smsEnabled));
+      })
+      .catch(() => {
+        if (!cancelled) setSmsEnabled(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const resend = async (preferChannel: TwilioChannel) => {
     setSending(true);
     setError("");
     setMessage("");
     try {
-      // Pending phone is already stored; re-send by calling send-code with empty local would fail.
-      // Use check path's sibling: phone-change/send-code needs the number parts.
-      // Parse "+501 612-3456" style for resend via a dedicated resend using status pending.
       const res = await fetch("/api/profile/phone-change/resend-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -90,14 +103,16 @@ export function PhoneChangeOtpPanel({ pendingPhone }: { pendingPhone: string }) 
         >
           {sending ? "Sending…" : "Resend WhatsApp code"}
         </button>
-        <button
-          type="button"
-          disabled={sending}
-          onClick={() => void resend("sms")}
-          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-700 bg-white px-3 text-sm font-semibold text-teal-900 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-400 dark:bg-zinc-950 dark:text-teal-50"
-        >
-          Resend by SMS
-        </button>
+        {smsEnabled ? (
+          <button
+            type="button"
+            disabled={sending}
+            onClick={() => void resend("sms")}
+            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-700 bg-white px-3 text-sm font-semibold text-teal-900 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-400 dark:bg-zinc-950 dark:text-teal-50"
+          >
+            Resend by SMS
+          </button>
+        ) : null}
       </div>
       <div className="flex flex-wrap gap-2">
         <input

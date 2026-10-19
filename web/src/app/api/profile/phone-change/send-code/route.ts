@@ -5,6 +5,7 @@ import {
   assertCanSendPhoneCode,
   recordPhoneCodeSend,
 } from "@/lib/phone-verify-rate-limit";
+import { isSmsPhoneOtpEnabled } from "@/lib/platform-testing-settings-store";
 import {
   isTwilioVerifyEnabled,
   startTwilioVerificationExact,
@@ -90,11 +91,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // WhatsApp primary + SMS fallback. Explicit SMS stays SMS-only.
     const preferSms = body.preferChannel === "sms";
+    const smsEnabled = await isSmsPhoneOtpEnabled();
+    if (preferSms && !smsEnabled) {
+      return NextResponse.json(
+        { ok: false, message: "SMS verification is turned off. Use WhatsApp instead." },
+        { status: 403 }
+      );
+    }
+
     const result = preferSms
       ? await startTwilioVerificationExact({ e164, channel: "sms" })
-      : await startTwilioVerificationWithFallback({ e164, preferChannel: "whatsapp" });
+      : await startTwilioVerificationWithFallback({
+          e164,
+          preferChannel: "whatsapp",
+          allowSmsFallback: smsEnabled,
+        });
     recordPhoneCodeSend(rateKey);
 
     const channel: TwilioVerifyChannel = result.channel;

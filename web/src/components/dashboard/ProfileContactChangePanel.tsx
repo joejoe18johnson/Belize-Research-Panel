@@ -182,7 +182,7 @@ export function ProfileContactChangePanel({
       </h3>
       <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
         {twilioEnabled
-          ? "Changing your email puts your account on hold until an administrator approves it. Phone changes are confirmed with a WhatsApp code first (SMS if WhatsApp cannot deliver) and do not need admin approval."
+          ? "Changing your email puts your account on hold until an administrator approves it. Phone changes are confirmed with a WhatsApp code and do not need admin approval."
           : "Your email counts as one way to contact you. Changing your email or phone puts your account on hold until an administrator approves or denies the update."}
       </p>
 

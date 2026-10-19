@@ -53,7 +53,10 @@ export function AdminTestingSettingsClient({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const saveToggle = async (key: "allowDuplicateEmails" | "allowDuplicatePhones", value: boolean) => {
+  const saveToggle = async (
+    key: "allowDuplicateEmails" | "allowDuplicatePhones" | "smsPhoneOtpEnabled",
+    value: boolean
+  ) => {
     const previous = settings;
     const next = { ...settings, [key]: value };
     setSettings(next);
@@ -73,7 +76,13 @@ export function AdminTestingSettingsClient({
         return;
       }
       setSettings(data.settings);
-      setMessage("Testing option saved. New signups and registrations will use it immediately.");
+      setMessage(
+        key === "smsPhoneOtpEnabled"
+          ? value
+            ? "SMS phone verification is on. Panelists can use SMS and WhatsApp→SMS fallback."
+            : "SMS phone verification is off. Panelists can use WhatsApp only."
+          : "Testing option saved. New signups and registrations will use it immediately."
+      );
       router.refresh();
     } catch {
       setSettings(previous);
@@ -125,8 +134,9 @@ export function AdminTestingSettingsClient({
         </div>
         {twilioVerifyEnabled ? (
           <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Panelists confirm phone ownership with a WhatsApp or SMS code. Phone approval is set automatically
-            when the code succeeds.
+            Panelists confirm phone ownership with a WhatsApp code
+            {settings.smsPhoneOtpEnabled ? " (SMS available when enabled below)" : " only right now"}. Phone
+            approval is set automatically when the code succeeds.
           </p>
         ) : (
           <div className="space-y-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -137,12 +147,20 @@ export function AdminTestingSettingsClient({
               <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_VERIFY_SERVICE_SID</code>.
               Leave{" "}
               <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_VERIFY_ENABLED</code>{" "}
-              unset (do not set it to false).
+              unset (do not set it to false). Use the full Primary Auth Token from Twilio (usually 32
+              characters).
             </p>
           </div>
         )}
+        <TestingToggle
+          label="Allow SMS phone verification"
+          description="Off = WhatsApp only. On = panelists see Send SMS instead, and WhatsApp failures can fall back to SMS."
+          checked={settings.smsPhoneOtpEnabled}
+          disabled={Boolean(savingKey) || !twilioVerifyEnabled}
+          onChange={(value) => void saveToggle("smsPhoneOtpEnabled", value)}
+        />
         <div className="space-y-2 border-t border-zinc-100 pt-3 text-sm leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-          <p className="font-semibold text-zinc-800 dark:text-zinc-200">WhatsApp first, SMS fallback</p>
+          <p className="font-semibold text-zinc-800 dark:text-zinc-200">WhatsApp setup</p>
           <ol className="list-decimal space-y-1 pl-5">
             <li>
               Confirm your WhatsApp sender is Online and on Messaging Service{" "}
@@ -157,10 +175,7 @@ export function AdminTestingSettingsClient({
             <li>
               On a trial account, verify the recipient phone under Phone Numbers → Verified Caller IDs.
             </li>
-            <li>
-              After Netlify env + redeploy: Verification Center → Send WhatsApp code. If WhatsApp fails, the
-              site falls back to SMS automatically and tells the panelist.
-            </li>
+            <li>After Netlify env + redeploy: Verification Center → Send WhatsApp code.</li>
           </ol>
         </div>
       </section>

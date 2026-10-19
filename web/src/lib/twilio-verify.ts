@@ -90,6 +90,12 @@ function friendlyTwilioError(error: unknown, channel: TwilioVerifyChannel): Erro
   const code =
     error && typeof error === "object" && "code" in error ? Number((error as { code: unknown }).code) : NaN;
 
+  if (/auth token is not valid|authenticate|20003/i.test(raw) || code === 20003) {
+    return new Error(
+      "Twilio rejected the account credentials. In Netlify, replace TWILIO_AUTH_TOKEN with the full Primary Auth Token from Twilio Console (usually 32 characters), then redeploy."
+    );
+  }
+
   if (channel === "whatsapp") {
     if (code === 63008 || /messaging service|whatsapp sender|63008/i.test(raw)) {
       return new Error(
@@ -123,20 +129,25 @@ export async function startTwilioVerificationExact(input: {
   }
 }
 
-/** Prefer WhatsApp; if start fails, try SMS. */
+/** Prefer WhatsApp; if start fails and SMS is allowed, try SMS. */
 export async function startTwilioVerificationWithFallback(input: {
   e164: string;
   preferChannel?: TwilioVerifyChannel;
+  /** When false, WhatsApp failures are not retried as SMS. Default true for backward compatibility. */
+  allowSmsFallback?: boolean;
 }): Promise<{ sid: string; channel: TwilioVerifyChannel; status: string; fellBack: boolean }> {
   const preferred = input.preferChannel ?? "whatsapp";
-  const fallback: TwilioVerifyChannel = preferred === "whatsapp" ? "sms" : "whatsapp";
+  const allowSmsFallback = input.allowSmsFallback !== false;
 
   try {
     const result = await startTwilioVerification({ e164: input.e164, channel: preferred });
     return { ...result, fellBack: false };
   } catch (preferredError) {
+    if (!allowSmsFallback || preferred !== "whatsapp") {
+      throw friendlyTwilioError(preferredError, preferred);
+    }
     try {
-      const result = await startTwilioVerification({ e164: input.e164, channel: fallback });
+      const result = await startTwilioVerification({ e164: input.e164, channel: "sms" });
       return { ...result, fellBack: true };
     } catch {
       throw friendlyTwilioError(preferredError, preferred);

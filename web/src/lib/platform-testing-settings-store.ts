@@ -22,6 +22,12 @@ export async function loadPlatformTestingSettings(): Promise<PlatformTestingSett
   }
 }
 
+/** Admin toggle: SMS button + WhatsApp→SMS fallback. Default off (WhatsApp only). */
+export async function isSmsPhoneOtpEnabled(): Promise<boolean> {
+  const settings = await loadPlatformTestingSettings();
+  return settings.smsPhoneOtpEnabled;
+}
+
 export async function savePlatformTestingSettings(
   settings: PlatformTestingSettings,
   updatedBy: string

@@ -107,7 +107,7 @@ function VerificationItemCard({
     </span>
   );
 
-  const sectionId = item.id === "photo_id" ? "photo-id" : undefined;
+  const sectionId = item.id === "photo_id" ? "photo-id" : item.id === "phone" ? "phone" : undefined;
 
   if (layout === "list") {
     return (

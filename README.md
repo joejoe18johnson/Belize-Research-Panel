@@ -44,9 +44,11 @@ Demo accounts: `npm run seed:demo` (also runs automatically on Netlify build).
 | `TWILIO_VERIFY_SERVICE_SID` | For phone OTP | Verify service SID (WhatsApp + SMS) |
 | `TWILIO_VERIFY_ENABLED` | Optional | Set `false` to force-disable OTP even when SIDs are set |
 
-**Phone verification:** With the three `TWILIO_*` values set, panelists confirm ownership in Verification Center. **WhatsApp is primary; SMS is the automatic fallback** if WhatsApp cannot deliver. That auto-sets `admin_phone_approved` so admins do not need one-by-one WhatsApp initials checks. Without those env vars, the UI shows a waiting state and admins can still verify phones manually.
+**Phone verification:** With the three `TWILIO_*` values set, panelists confirm ownership in Verification Center via **WhatsApp**. That auto-sets `admin_phone_approved` so admins do not need one-by-one WhatsApp initials checks. Without those env vars, the UI shows a waiting state and admins can still verify phones manually.
 
-**WhatsApp OTP:** Link your WhatsApp Sender’s Messaging Service (`MG…`) on the Verify service’s **WhatsApp** tab. Until that is linked, Send WhatsApp code will fall back to SMS.
+**SMS:** Off by default. Turn on **Allow SMS phone verification** under Admin → Testing to show the SMS button and enable WhatsApp→SMS fallback.
+
+**WhatsApp OTP:** Link your WhatsApp Sender’s Messaging Service (`MG…`) on the Verify service’s **WhatsApp** tab. Use the full Primary Auth Token (usually 32 characters) for `TWILIO_AUTH_TOKEN`.
 
 Without the three Supabase variables, **signup and registration will fail in production** (Netlify’s filesystem cannot store new accounts). Local dev works because `web/.env.local` has Supabase configured.
 

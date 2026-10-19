@@ -17,7 +17,7 @@ export default async function DashboardVerificationPage({
 }) {
   const { welcome } = await searchParams;
   const { account } = await requireDashboardContext();
-  const panelist = await findPanelistByEmail(account.email);
+  const panelist = await findPanelistByEmail(account.email, account.id);
   if (!panelist) {
     redirect("/account/closed");
   }

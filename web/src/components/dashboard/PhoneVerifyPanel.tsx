@@ -15,6 +15,7 @@ export function PhoneVerifyPanel({
 }) {
   const router = useRouter();
   const [twilioEnabled, setTwilioEnabled] = useState<boolean | null>(null);
+  const [smsEnabled, setSmsEnabled] = useState(false);
   const [channel, setChannel] = useState<TwilioChannel | null>(null);
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
@@ -26,11 +27,17 @@ export function PhoneVerifyPanel({
     let cancelled = false;
     void fetch("/api/profile/phone/status", { credentials: "include" })
       .then((res) => res.json())
-      .then((data: { twilioEnabled?: boolean }) => {
-        if (!cancelled) setTwilioEnabled(Boolean(data.twilioEnabled));
+      .then((data: { twilioEnabled?: boolean; smsEnabled?: boolean }) => {
+        if (!cancelled) {
+          setTwilioEnabled(Boolean(data.twilioEnabled));
+          setSmsEnabled(Boolean(data.smsEnabled));
+        }
       })
       .catch(() => {
-        if (!cancelled) setTwilioEnabled(false);
+        if (!cancelled) {
+          setTwilioEnabled(false);
+          setSmsEnabled(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -53,7 +60,7 @@ export function PhoneVerifyPanel({
     return (
       <p className="mt-3 text-sm text-amber-950 dark:text-amber-100">
         {formatHeadingCase(
-          "Phone ownership will be confirmed automatically once WhatsApp / SMS verification is enabled. Until then, an administrator may still review your number."
+          "Phone ownership will be confirmed automatically once WhatsApp verification is enabled. Until then, an administrator may still review your number."
         )}
       </p>
     );
@@ -119,8 +126,17 @@ export function PhoneVerifyPanel({
         {formatHeadingCase("Confirm this number belongs to you")}
       </p>
       <p className="text-sm text-teal-900 dark:text-teal-100">
-        We send a one-time code to <span className="font-medium">{phoneOnFile}</span> on WhatsApp
-        first. If WhatsApp cannot deliver, we automatically fall back to SMS.
+        {smsEnabled ? (
+          <>
+            We send a one-time code to <span className="font-medium">{phoneOnFile}</span> on WhatsApp
+            first. If WhatsApp cannot deliver, we automatically fall back to SMS.
+          </>
+        ) : (
+          <>
+            We will send a one-time code to <span className="font-medium">{phoneOnFile}</span> on
+            WhatsApp.
+          </>
+        )}
       </p>
       <div className="flex flex-wrap gap-2">
         <button
@@ -131,14 +147,16 @@ export function PhoneVerifyPanel({
         >
           {sending && channel !== "sms" ? "Sending…" : "Send WhatsApp code"}
         </button>
-        <button
-          type="button"
-          disabled={sending}
-          onClick={() => void sendCode("sms")}
-          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-700 bg-white px-3 text-sm font-semibold text-teal-900 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-400 dark:bg-zinc-950 dark:text-teal-50"
-        >
-          {sending && channel === "sms" ? "Sending…" : "Send SMS instead"}
-        </button>
+        {smsEnabled ? (
+          <button
+            type="button"
+            disabled={sending}
+            onClick={() => void sendCode("sms")}
+            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-700 bg-white px-3 text-sm font-semibold text-teal-900 hover:bg-teal-50 disabled:opacity-60 dark:border-teal-400 dark:bg-zinc-950 dark:text-teal-50"
+          >
+            {sending && channel === "sms" ? "Sending…" : "Send SMS instead"}
+          </button>
+        ) : null}
       </div>
       {channel ? (
         <div className="space-y-2">

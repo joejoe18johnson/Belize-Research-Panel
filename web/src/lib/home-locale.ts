@@ -194,11 +194,12 @@ export const REGISTER_GATE_COPY = {
     },
     title: "Panelist registration",
     subtitle:
-      "Create an account and verify your email before completing the registration form. Eligibility is checked when you sign up.",
+      "Create an account, verify your email and WhatsApp number, then complete the registration form. Eligibility is checked when you sign up.",
     steps: [
       "Confirm your citizenship and age eligibility.",
       "Create an account with your name, email, and password.",
       "Verify your email address.",
+      "Verify your WhatsApp number.",
       "Complete the panelist registration form.",
     ],
     createAccount: "Create account",
@@ -213,11 +214,12 @@ export const REGISTER_GATE_COPY = {
     },
     title: "Registro de panelista",
     subtitle:
-      "Cree una cuenta y verifique su correo electrónico antes de completar el formulario de registro. La elegibilidad se verifica al registrarse.",
+      "Cree una cuenta, verifique su correo y su número de WhatsApp, luego complete el formulario de registro. La elegibilidad se verifica al registrarse.",
     steps: [
       "Confirme su ciudadanía y elegibilidad por edad.",
       "Cree una cuenta con su nombre, correo electrónico y contraseña.",
       "Verifique su dirección de correo electrónico.",
+      "Verifique su número de WhatsApp.",
       "Complete el formulario de registro del panelista.",
     ],
     createAccount: "Crear cuenta",
