@@ -80,7 +80,7 @@ export async function checkTwilioVerification(input: {
   };
 }
 
-function friendlyTwilioError(error: unknown, channel: TwilioVerifyChannel): Error {
+function twilioErrorParts(error: unknown): { raw: string; code: number } {
   const raw =
     error && typeof error === "object" && "message" in error && typeof (error as { message: unknown }).message === "string"
       ? (error as { message: string }).message
@@ -89,28 +89,48 @@ function friendlyTwilioError(error: unknown, channel: TwilioVerifyChannel): Erro
         : "Could not send a verification code.";
   const code =
     error && typeof error === "object" && "code" in error ? Number((error as { code: unknown }).code) : NaN;
+  return { raw, code };
+}
 
-  if (/auth token is not valid|authenticate|20003/i.test(raw) || code === 20003) {
+function friendlyTwilioError(error: unknown, channel: TwilioVerifyChannel): Error {
+  const { raw, code } = twilioErrorParts(error);
+  const withCode = Number.isFinite(code) ? ` (Twilio ${code})` : "";
+
+  if (code === 20003 || /auth token is not valid|authenticate/i.test(raw)) {
     return new Error(
-      "Twilio rejected the account credentials. In Netlify, replace TWILIO_AUTH_TOKEN with the full Primary Auth Token from Twilio Console (usually 32 characters), then redeploy."
+      "Twilio rejected the account credentials. In Netlify, replace TWILIO_AUTH_TOKEN with the full Primary Auth Token from Twilio Console, then redeploy."
+    );
+  }
+
+  if (
+    code === 21608 ||
+    /Primary Compliance Profile|verified caller ids|unverified numbers/i.test(raw)
+  ) {
+    return new Error(
+      `Twilio will not message this number until compliance is approved${withCode}. Either add +501… under Phone Numbers → Verified Caller IDs (quick test), or complete Trust Hub → Primary Customer Profile / Primary Compliance Profile for production sends to any Belize number.`
     );
   }
 
   if (channel === "whatsapp") {
-    if (code === 63008 || /messaging service|whatsapp sender|63008/i.test(raw)) {
+    if (code === 68008 || code === 63008 || /whatsapp channel not configured|messaging service|whatsapp sender/i.test(raw)) {
       return new Error(
-        "WhatsApp OTP is not fully set up yet. In Twilio Console, link a WhatsApp Sender (Messaging Service MG…) to your Verify service’s WhatsApp tab, then try again."
+        `WhatsApp is not linked to your Verify service yet${withCode}. In Twilio Console: Verify → your Service → WhatsApp tab → select Messaging Service “Dashboard Research Verification System” (sender +1 711 344 5053) → Save.`
       );
     }
-    if (code === 60200 || /trial|unverified|not a valid/i.test(raw)) {
+    if (code === 60242 || /whatsapp template/i.test(raw)) {
       return new Error(
-        "Twilio could not send WhatsApp to this number. On a trial account, verify the recipient phone in the Twilio Console first."
+        `WhatsApp authentication template is missing or not approved${withCode}. In Twilio, open Content Template Builder and confirm the Verify WhatsApp auth template is approved.`
       );
     }
-    return new Error(raw || "Could not send a WhatsApp verification code.");
+    if (code === 60200) {
+      return new Error(
+        `Twilio rejected the WhatsApp send request${withCode}: ${raw}. Confirm the number is in E.164 format and Verify → WhatsApp tab has your Messaging Service selected.`
+      );
+    }
+    return new Error(raw ? `${raw}${withCode}` : "Could not send a WhatsApp verification code.");
   }
 
-  return new Error(raw || "Could not send a verification code.");
+  return new Error(raw ? `${raw}${withCode}` : "Could not send a verification code.");
 }
 
 /**
