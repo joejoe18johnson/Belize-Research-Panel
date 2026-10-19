@@ -119,8 +119,8 @@ export function PhoneVerifyPanel({
         {formatHeadingCase("Confirm this number belongs to you")}
       </p>
       <p className="text-sm text-teal-900 dark:text-teal-100">
-        We will send a one-time code to <span className="font-medium">{phoneOnFile}</span> on WhatsApp
-        first. If WhatsApp delivery fails, we fall back to SMS.
+        We send a one-time code to <span className="font-medium">{phoneOnFile}</span> on WhatsApp
+        first. If WhatsApp cannot deliver, we automatically fall back to SMS.
       </p>
       <div className="flex flex-wrap gap-2">
         <button

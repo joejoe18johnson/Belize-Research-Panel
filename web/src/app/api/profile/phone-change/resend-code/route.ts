@@ -8,6 +8,7 @@ import {
 import {
   isTwilioVerifyEnabled,
   startTwilioVerificationExact,
+  startTwilioVerificationWithFallback,
   storedPhoneToE164,
   type TwilioVerifyChannel,
 } from "@/lib/twilio-verify";
@@ -54,19 +55,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const channel: TwilioVerifyChannel = body.preferChannel === "sms" ? "sms" : "whatsapp";
-    const result = await startTwilioVerificationExact({ e164, channel });
+    const preferSms = body.preferChannel === "sms";
+    const result = preferSms
+      ? await startTwilioVerificationExact({ e164, channel: "sms" })
+      : await startTwilioVerificationWithFallback({ e164, preferChannel: "whatsapp" });
     recordPhoneCodeSend(rateKey);
+
+    const channel: TwilioVerifyChannel = result.channel;
+    let message =
+      channel === "whatsapp"
+        ? "We sent a new WhatsApp code to your pending number."
+        : "We sent a new SMS code to your pending number.";
+    if (!preferSms && result.fellBack && channel === "sms") {
+      message =
+        "WhatsApp delivery was unavailable, so we sent a new SMS code to your pending number.";
+    }
 
     return NextResponse.json({
       ok: true,
-      channel: result.channel,
-      fellBack: false,
+      channel,
+      fellBack: result.fellBack,
       pendingPhone,
-      message:
-        result.channel === "whatsapp"
-          ? "We sent a new WhatsApp code to your pending number."
-          : "We sent a new SMS code to your pending number.",
+      message,
     });
   } catch (error) {
     logServerError("phone-change resend-code failed", error);

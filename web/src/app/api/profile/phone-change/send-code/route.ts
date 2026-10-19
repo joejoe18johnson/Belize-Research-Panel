@@ -8,6 +8,7 @@ import {
 import {
   isTwilioVerifyEnabled,
   startTwilioVerificationExact,
+  startTwilioVerificationWithFallback,
   storedPhoneToE164,
   type TwilioVerifyChannel,
 } from "@/lib/twilio-verify";
@@ -89,23 +90,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const preferChannel = body.preferChannel === "sms" ? "sms" : "whatsapp";
-    const result = await startTwilioVerificationWithFallback({
-      e164,
-      preferChannel,
-    });
+    // WhatsApp primary + SMS fallback. Explicit SMS stays SMS-only.
+    const preferSms = body.preferChannel === "sms";
+    const result = preferSms
+      ? await startTwilioVerificationExact({ e164, channel: "sms" })
+      : await startTwilioVerificationWithFallback({ e164, preferChannel: "whatsapp" });
     recordPhoneCodeSend(rateKey);
+
+    const channel: TwilioVerifyChannel = result.channel;
+    let message =
+      channel === "whatsapp"
+        ? "We sent a code to WhatsApp on your new number. Enter it to finish the change."
+        : "We sent a code by SMS to your new number. Enter it to finish the change.";
+    if (!preferSms && result.fellBack && channel === "sms") {
+      message =
+        "WhatsApp delivery was unavailable, so we sent the code by SMS to your new number. Enter it to finish the change.";
+    }
 
     return NextResponse.json({
       ok: true,
       needsOtp: true,
-      channel: result.channel,
+      channel,
       fellBack: result.fellBack,
       pendingPhone,
-      message:
-        result.channel === "whatsapp"
-          ? "We sent a code to WhatsApp on your new number. Enter it to finish the change."
-          : "We sent a code by SMS to your new number. Enter it to finish the change.",
+      message,
     });
   } catch (error) {
     logServerError("phone-change send-code failed", error);

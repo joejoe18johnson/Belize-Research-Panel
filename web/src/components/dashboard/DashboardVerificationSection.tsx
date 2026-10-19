@@ -14,7 +14,7 @@ function verificationProgressCopy(summary: VerificationCenterSummary): string {
       ? "Your phone number is verified."
       : phone?.status === "denied"
         ? "Your phone number was not approved."
-        : "Confirm your phone number with the WhatsApp or SMS code below — no waiting on an administrator.";
+        : "Confirm your phone number with a WhatsApp code below (SMS if WhatsApp cannot deliver) — no waiting on an administrator.";
   const photoCopy =
     photo?.status === "verified"
       ? "Your photo identification is verified."

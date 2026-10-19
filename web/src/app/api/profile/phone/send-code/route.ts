@@ -8,6 +8,7 @@ import {
 import {
   isTwilioVerifyEnabled,
   startTwilioVerificationExact,
+  startTwilioVerificationWithFallback,
   storedPhoneToE164,
   type TwilioVerifyChannel,
 } from "@/lib/twilio-verify";
@@ -64,22 +65,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const preferChannel = body.preferChannel === "sms" ? "sms" : "whatsapp";
-    const result = await startTwilioVerificationWithFallback({
-      e164,
-      preferChannel,
-    });
+    // WhatsApp primary + SMS fallback. Explicit SMS stays SMS-only.
+    const preferSms = body.preferChannel === "sms";
+    const result = preferSms
+      ? await startTwilioVerificationExact({ e164, channel: "sms" })
+      : await startTwilioVerificationWithFallback({ e164, preferChannel: "whatsapp" });
     recordPhoneCodeSend(rateKey);
+
+    const channel: TwilioVerifyChannel = result.channel;
+    let message =
+      channel === "whatsapp"
+        ? "We sent a code to WhatsApp. Enter it below."
+        : "We sent a code by SMS. Enter it below.";
+    if (!preferSms && result.fellBack && channel === "sms") {
+      message =
+        "WhatsApp delivery was unavailable, so we sent the code by SMS instead. Enter it below.";
+    }
 
     return NextResponse.json({
       ok: true,
-      channel: result.channel,
+      channel,
       fellBack: result.fellBack,
       maskedPhone: phone,
-      message:
-        result.channel === "whatsapp"
-          ? "We sent a code to WhatsApp. Enter it below."
-          : "We sent a code by SMS. Enter it below.",
+      message,
       origin: resolveRequestOrigin(request),
     });
   } catch (error) {

@@ -142,22 +142,24 @@ export function AdminTestingSettingsClient({
           </div>
         )}
         <div className="space-y-2 border-t border-zinc-100 pt-3 text-sm leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-          <p className="font-semibold text-zinc-800 dark:text-zinc-200">WhatsApp testing</p>
+          <p className="font-semibold text-zinc-800 dark:text-zinc-200">WhatsApp first, SMS fallback</p>
           <ol className="list-decimal space-y-1 pl-5">
             <li>
-              Twilio Console → Messaging → Senders → WhatsApp Senders: create or confirm a WhatsApp Business
-              sender (Meta may need 1–2 weeks for business verification).
+              Confirm your WhatsApp sender is Online and on Messaging Service{" "}
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                Dashboard Research Verification System
+              </span>
+              .
             </li>
-            <li>Add that sender to a Messaging Service (SID starts with MG).</li>
             <li>
               Verify → your Service → WhatsApp tab: select that Messaging Service, then save.
             </li>
             <li>
-              On a trial account, also verify the recipient phone under Phone Numbers → Verified Caller IDs.
+              On a trial account, verify the recipient phone under Phone Numbers → Verified Caller IDs.
             </li>
             <li>
-              After Netlify env + redeploy: as a panelist open Verification Center → Send WhatsApp code → enter
-              the OTP. The app does not silently switch to SMS, so setup errors stay visible.
+              After Netlify env + redeploy: Verification Center → Send WhatsApp code. If WhatsApp fails, the
+              site falls back to SMS automatically and tells the panelist.
             </li>
           </ol>
         </div>
