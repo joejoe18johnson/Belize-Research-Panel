@@ -80,6 +80,49 @@ export async function checkTwilioVerification(input: {
   };
 }
 
+function friendlyTwilioError(error: unknown, channel: TwilioVerifyChannel): Error {
+  const raw =
+    error && typeof error === "object" && "message" in error && typeof (error as { message: unknown }).message === "string"
+      ? (error as { message: string }).message
+      : error instanceof Error
+        ? error.message
+        : "Could not send a verification code.";
+  const code =
+    error && typeof error === "object" && "code" in error ? Number((error as { code: unknown }).code) : NaN;
+
+  if (channel === "whatsapp") {
+    if (code === 63008 || /messaging service|whatsapp sender|63008/i.test(raw)) {
+      return new Error(
+        "WhatsApp OTP is not fully set up yet. In Twilio Console, link a WhatsApp Sender (Messaging Service MG…) to your Verify service’s WhatsApp tab, then try again."
+      );
+    }
+    if (code === 60200 || /trial|unverified|not a valid/i.test(raw)) {
+      return new Error(
+        "Twilio could not send WhatsApp to this number. On a trial account, verify the recipient phone in the Twilio Console first."
+      );
+    }
+    return new Error(raw || "Could not send a WhatsApp verification code.");
+  }
+
+  return new Error(raw || "Could not send a verification code.");
+}
+
+/**
+ * Send on the requested channel only (no silent SMS/WhatsApp swap).
+ * Use this when the panelist explicitly picks WhatsApp or SMS so setup errors stay visible.
+ */
+export async function startTwilioVerificationExact(input: {
+  e164: string;
+  channel: TwilioVerifyChannel;
+}): Promise<{ sid: string; channel: TwilioVerifyChannel; status: string; fellBack: false }> {
+  try {
+    const result = await startTwilioVerification(input);
+    return { ...result, fellBack: false };
+  } catch (error) {
+    throw friendlyTwilioError(error, input.channel);
+  }
+}
+
 /** Prefer WhatsApp; if start fails, try SMS. */
 export async function startTwilioVerificationWithFallback(input: {
   e164: string;
@@ -96,9 +139,7 @@ export async function startTwilioVerificationWithFallback(input: {
       const result = await startTwilioVerification({ e164: input.e164, channel: fallback });
       return { ...result, fellBack: true };
     } catch {
-      throw preferredError instanceof Error
-        ? preferredError
-        : new Error("Could not send a verification code.");
+      throw friendlyTwilioError(preferredError, preferred);
     }
   }
 }

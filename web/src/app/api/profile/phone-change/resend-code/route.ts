@@ -7,7 +7,7 @@ import {
 } from "@/lib/phone-verify-rate-limit";
 import {
   isTwilioVerifyEnabled,
-  startTwilioVerificationWithFallback,
+  startTwilioVerificationExact,
   storedPhoneToE164,
   type TwilioVerifyChannel,
 } from "@/lib/twilio-verify";
@@ -54,17 +54,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const preferChannel = body.preferChannel === "sms" ? "sms" : "whatsapp";
-    const result = await startTwilioVerificationWithFallback({
-      e164,
-      preferChannel,
-    });
+    const channel: TwilioVerifyChannel = body.preferChannel === "sms" ? "sms" : "whatsapp";
+    const result = await startTwilioVerificationExact({ e164, channel });
     recordPhoneCodeSend(rateKey);
 
     return NextResponse.json({
       ok: true,
       channel: result.channel,
-      fellBack: result.fellBack,
+      fellBack: false,
       pendingPhone,
       message:
         result.channel === "whatsapp"

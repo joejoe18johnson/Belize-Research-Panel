@@ -42,8 +42,10 @@ function TestingToggle({
 
 export function AdminTestingSettingsClient({
   initialSettings,
+  twilioVerifyEnabled = false,
 }: {
   initialSettings: PlatformTestingSettings;
+  twilioVerifyEnabled?: boolean;
 }) {
   const router = useRouter();
   const [settings, setSettings] = useState(initialSettings);
@@ -107,6 +109,59 @@ export function AdminTestingSettingsClient({
           {message}
         </BrandedAlert>
       ) : null}
+
+      <section className="space-y-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Twilio phone OTP</h2>
+          <span
+            className={
+              twilioVerifyEnabled
+                ? "rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100"
+                : "rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-950 dark:bg-amber-950 dark:text-amber-100"
+            }
+          >
+            {twilioVerifyEnabled ? "Configured" : "Not configured"}
+          </span>
+        </div>
+        {twilioVerifyEnabled ? (
+          <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            Panelists confirm phone ownership with a WhatsApp or SMS code. Phone approval is set automatically
+            when the code succeeds.
+          </p>
+        ) : (
+          <div className="space-y-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            <p>
+              Add these Netlify env vars, then redeploy:{" "}
+              <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_ACCOUNT_SID</code>,{" "}
+              <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_AUTH_TOKEN</code>,{" "}
+              <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_VERIFY_SERVICE_SID</code>.
+              Leave{" "}
+              <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">TWILIO_VERIFY_ENABLED</code>{" "}
+              unset (do not set it to false).
+            </p>
+          </div>
+        )}
+        <div className="space-y-2 border-t border-zinc-100 pt-3 text-sm leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+          <p className="font-semibold text-zinc-800 dark:text-zinc-200">WhatsApp testing</p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Twilio Console → Messaging → Senders → WhatsApp Senders: create or confirm a WhatsApp Business
+              sender (Meta may need 1–2 weeks for business verification).
+            </li>
+            <li>Add that sender to a Messaging Service (SID starts with MG).</li>
+            <li>
+              Verify → your Service → WhatsApp tab: select that Messaging Service, then save.
+            </li>
+            <li>
+              On a trial account, also verify the recipient phone under Phone Numbers → Verified Caller IDs.
+            </li>
+            <li>
+              After Netlify env + redeploy: as a panelist open Verification Center → Send WhatsApp code → enter
+              the OTP. The app does not silently switch to SMS, so setup errors stay visible.
+            </li>
+          </ol>
+        </div>
+      </section>
 
       <div className="space-y-3">
         <TestingToggle

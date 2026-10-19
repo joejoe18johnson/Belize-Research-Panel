@@ -7,7 +7,7 @@ import {
 } from "@/lib/phone-verify-rate-limit";
 import {
   isTwilioVerifyEnabled,
-  startTwilioVerificationWithFallback,
+  startTwilioVerificationExact,
   storedPhoneToE164,
   type TwilioVerifyChannel,
 } from "@/lib/twilio-verify";
